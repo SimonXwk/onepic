@@ -1,0 +1,23 @@
+{% extends '_layout_error.html' %}
+
+
+{%- block content %}
+<div class="container-fluid">
+	<div class="row uno_main_body">
+
+		<div class="col-sm-12">
+	  		<img src="{{ url_for('static',filename='img/500.png') }}" class="img-fluid uno_hero_img" id="anim" width="500px" alt="500 ERROR">
+		</div>
+
+		<div class="col-sm-12">
+			<h1 class="uno_title">OPPS !!</h1>
+			<p class="uno_title_sec">Something has gone wrong on the web site's server</p>
+			<a href="/">
+				<button type="button" name="button" class="btn btn-light uno_btn">Take me back to Homepage</button>
+			</a>
+		</div>
+
+	</div><!-- row -->
+</div> <!-- container -->	
+
+{% endblock %}

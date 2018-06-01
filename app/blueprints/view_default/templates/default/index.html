@@ -1,0 +1,35 @@
+{% extends '_global_blueprint_layout.html' %}
+
+{% block css_optional %}
+{% endblock %}
+
+{% block js_optional %}
+		{{ import('sketch') }}
+{% endblock %}
+
+{% block css_custom %}
+{% endblock %}
+
+{% block js_custom %}
+{% endblock %}
+
+{% block navbar_global %}`
+{%- endblock %}
+
+{% block content %}
+	{{ bp_content('index.html') }}
+{% endblock %}
+
+
+{% block css_embedded %}
+	{{ bp_include('index_css.html') }}
+{% endblock %}
+
+{% block js_embedded_after %}	
+	{% set user = session['user_name'] %}
+	{% if user %}
+	{{ bp_include('index_js_login.html') }}
+	{% else %}
+	{{ bp_include('index_js_logout.html') }}
+	{% endif %}
+{% endblock %}

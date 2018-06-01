@@ -1,0 +1,41 @@
+{
+  "name": "onepic",
+  "version": "1.0.0",
+  "description": "a management report prototype",
+  "main": "run.py",
+  "scripts": {
+    "start": "python run.py",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SimonXwk/onepic.git"
+  },
+  "keywords": [],
+  "author": "SimonX",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SimonXwk/onepic/issues"
+  },
+  "homepage": "https://github.com/SimonXwk/onepic#readme",
+  "devDependencies": {
+    "browser-sync": "^2.23.6",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^5.0.0",
+    "gulp-clean-css": "^3.9.3",
+    "gulp-html-replace": "^1.6.2",
+    "gulp-plumber": "^1.2.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-sass": "^3.2.1",
+    "gulp-uglify": "^3.0.0"
+  },
+  "dependencies": {
+    "bootstrap": "^4.1.0",
+    "echarts": "^4.0.4",
+    "font-awesome": "^4.7.0",
+    "highcharts": "^6.1.0",
+    "jquery": "^3.3.1",
+    "popper.js": "^1.14.1",
+    "sketch-js": "^1.1.3"
+  }
+}

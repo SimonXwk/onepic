@@ -1,0 +1,35 @@
+{% extends'_global_blueprint_layout.html' %}
+
+{# Addiditonal Libraries #}
+{% block css_optional %}
+{% endblock %}
+
+{% block js_optional %}
+{% endblock %}
+
+
+{# My Own js and css #}
+{% block css_custom %}
+{% endblock %}
+
+{% block js_custom %}
+{% endblock %}
+
+
+{# Actual Content #}
+{% block content %}
+	{{ bp_content('excels.html') }}
+{% endblock %}
+
+
+{# Embedded CSS & Javascript #}
+{% block css_embedded %}
+{% endblock %}
+
+{% block js_embedded_before %}
+	<script>
+	</script>
+{% endblock %}
+
+{% block js_embedded_after %}
+{% endblock %}

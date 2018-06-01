@@ -1,0 +1,21 @@
+{% extends'_layout_view.html' %}
+
+
+{# inheriting from global templates folder #}
+{% block js_optional %}
+{#	{% include '_includes_global/_js_echarts.html' %}#}
+{#	{% include '_includes_global/_js_highcharts.html' %}#}
+{% endblock %}
+
+{# Local Inject : Html content #}
+{% block content %}
+	{{ include_template('_content_rfm_upload.html') }}
+{% endblock %}
+
+{# Local Inject : Html content #}
+{% block css_custom %}
+{% endblock %}
+
+{# Local Inject : Javascript #}
+{% block js_custom %}
+{% endblock %}

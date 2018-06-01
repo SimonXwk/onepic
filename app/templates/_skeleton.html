@@ -1,0 +1,49 @@
+{# Clear out contents in the include html files if they're not applicable in the setup #}
+{# the _skeleton template should remain static #}
+<!doctype html>
+<html lang="en">
+<head>
+	{# Required meta tags #}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	{# Other meta tags #}
+	{% block meta %}{% endblock %}
+  <!-- Page title -->
+  <title>{%- block title -%}{%- endblock -%}</title>
+  <!-- favicon -->
+  <link rel="shortcut icon" href="{{ url_for('static',filename='img/favicon.ico')}}">
+	
+  {# Framework Required CSS Library #}
+  {% block css_framework %}{% include '_includes_global/_css_framework.html' %}{% endblock %}
+	{# Optional CSS Library #}
+  {% block css_optional %}{% endblock %}
+	{# Custom CSS #}
+  {% block css_custom %}{% endblock %}
+	{# Embedded CSS #}
+  {% block css_embedded %}{% endblock %}
+</head>
+<body>
+  {# NavBar primary #}
+  {% block navbar_global %}{% include '_includes_global/_global_nvabar.html' %}{%- endblock %}
+	{# NavBar secondaries #}
+  {% block navbar_local %}{%- endblock %}
+
+	{# Content #}
+  {% block content %}{% endblock %}
+
+	{# Footer #}
+  {% block footer %}{% include '_includes_global/_global_footer.html' %}{% endblock %}
+
+	{# Framework Required JavaScript Library #}
+  {% block js_framework %}{% include '_includes_global/_js_framework.html' %}{% endblock %}
+  {# Optional JavaScript Library #}
+	{% block js_optional %}{% endblock %}
+	{# Embedded JavaScript #}
+  {% block js_embedded_before %}{% endblock %}
+  {# Custom JavaScript #}
+	{% block js_custom %}{% endblock %}
+	{# Embedded JavaScript #}
+  {% block js_embedded_after %}{% endblock %}
+  </body>
+</html>

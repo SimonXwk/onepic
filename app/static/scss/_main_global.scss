@@ -1,0 +1,52 @@
+$body-bg-color: #b8f4d9;
+$bg-color-box: rgba(210, 223, 250, 0.15);
+$border-color-box: rgba(220, 20, 6, .2);
+
+$chart-container-bg-color: #f4d000;
+$chart-container-border-color: #1117f4;
+
+
+body {
+    background: $body-bg-color;
+}
+
+.container-chart {
+  width: 100%;
+  margin-bottom: 1rem;
+  margin-right: auto;
+  margin-left: auto;
+  padding: 0;
+  background: $chart-container-bg-color;
+  border: 0.5px solid $chart-container-border-color;
+  /*flex: 0 0 100%;*/
+  
+}
+
+@media (min-width: 576px) {
+  .container-chart {
+    max-width: 540px;
+  }
+}
+@media (min-width: 768px) {
+  .container-chart {
+    max-width: 720px;
+  }
+}
+@media (min-width: 992px) {
+  .container-chart {
+    max-width: 960px;
+  }
+}
+@media (min-width: 1200px) {
+  .container-chart {
+    max-width: 1140px;
+  }
+}
+
+
+.container-chart .chart {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  position: relative;
+}

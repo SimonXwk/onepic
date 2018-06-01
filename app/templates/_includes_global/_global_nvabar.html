@@ -1,0 +1,44 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light rounded">
+  <div class="container">
+  	<!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar_collapse" aria-controls="navbar_collapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <a class="navbar-brand" href="/"><i class="fa fa-h-square"></i> TLMA </a>
+
+    </div>
+
+
+    <div class="collapse navbar-collapse justify-content-md-center" id="navbar_collapse">
+	
+		<ul class="navbar-nav">
+		  <li class="nav-item">  {# add class active here #}
+				<a class="nav-link" href="{{ url_for('mailbox.index') }}">MAILBOX<span class="sr-only">(current)</span></a>
+		  </li>
+		  <li class="nav-item">
+				<a class="nav-link" href="#">BUDGET</a>
+		  </li>
+		  <li class="nav-item">
+				<a class="nav-link" href="{{ url_for('privenue.index') }}">PRIVENUE</a>
+		  </li>
+		  <li class="nav-item">
+				<a class="nav-link" href="{{ url_for('merchandise.index') }}">MERCH</a>
+		  </li>
+		  <li class="nav-item">
+				<a class="nav-link" href="{{ url_for('dictionary.index') }}">GLOSSARY</a>
+		  </li>
+		  <li class="nav-item">
+				<a class="nav-link" href="{{ url_for('api.index') }}">API</a>
+		  </li>
+
+		</ul>
+
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container -->
+</nav><!-- /.navbar -->
+
+
+

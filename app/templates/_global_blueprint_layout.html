@@ -1,0 +1,70 @@
+{% extends '_skeleton.html' %}
+
+{# Pass a variable 'blueprint_name' when render template #}
+{% set blueprint_name = blueprint_name %}
+
+{# Clear out css except for framework ones #}
+{% block css_optional %}{% endblock %}
+{% block css_custom %}{% endblock %}
+{% block css_embedded %}{% endblock %}
+
+{# Clear out javascript except for framework ones #}
+{% block js_optional %}{% endblock %}
+{% block js_custom %}{% endblock %}
+{% block js_embedded %}{% endblock %}
+
+{# Clear out content #}
+{% block content %}{% endblock %}
+
+
+{# tile comes from render_template 'title' keyword argument #}
+{% block title %}{{ title }}{% endblock %}
+
+{# Blueprint level global navbar #}
+{% block navbar_local %}
+	{{ bp_include('_local_navbar.html') }}
+{% endblock %}
+
+
+{# 
+	Param: 'blueprint_name': a blueprint context_processor variable name
+	refering to the current blueprint's name attribute
+
+	with this name the follwing macros know about which is the current
+	blueprint it's dealing with thus accessing it's standard folder 
+	structure : 
+	blueprint/templates/blueprint_name
+	blueprint/static/css
+	blueprint/static/js
+#}
+
+{# Macros that will be used in each indiviual templates #}
+{% macro bp_include(fname) %}
+	{% include blueprint_name + '/' + 'includes' + '/' + fname %}
+{% endmacro %}
+
+{% macro bp_content(fname) %}
+	{% include blueprint_name + '/' + 'contents' + '/' + fname %}
+{% endmacro %}
+
+{% macro bp_js(fname) %}
+	{# ! [url_prefix] needed for blueprint.static to work #}
+	<script src="{{ url_for(blueprint_name + '.static', filename='js' + '/' + fname + '.js') }}"></script>
+{% endmacro %}
+
+{% macro bp_css(fname) %}
+	{# ! [url_prefix] needed for blueprint.static to work #}
+	<link rel="stylesheet" type="text/css" href="{{ url_for(blueprint_name + '.static', filename='css' + '/' + fname + '.css') }}">
+{% endmacro %}
+
+{# Import global libraries #}
+{% macro import(vendor) %}
+	{% if vendor == 'echart' %}
+		<script src="{{ url_for('vendor', filename='echarts-en.min.js') }}"></script>
+	{% elif vendor == 'highchart' %}
+		<script src="{{ url_for('vendor', filename='highcharts.js') }}"></script>
+	{% elif vendor == 'sketch' %}
+		<script src="{{ url_for('vendor', filename='sketch.min.js') }}"></script>
+	{% else %}
+	{% endif %}
+{% endmacro %}

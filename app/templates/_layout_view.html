@@ -1,0 +1,44 @@
+{% extends '_skeleton.html' %}
+
+{# tile comes from render_template 'title' keyword argument #}
+{% block title %}{{ title }}{% endblock %}
+
+{# Clear out some blocks #}
+{% block css_optional %}{% endblock %}
+{% block css_custom %}{% endblock %}
+{% block js_optional %}{% endblock %}
+{% block js_custom %}{% endblock %}
+{% block content %}{% endblock %}
+
+{# Blueprint level global navbar #}
+{% block navbar_local %}
+	{{ include_template('_local_navbar.html') }}
+{% endblock %}
+
+
+{# Pass a variable 'blueprint_name' when render template #}
+{% set blueprint_name = blueprint_name %}
+{# 
+	Param: 'blueprint_name': a blueprint context_processor variable name
+	refering to the current blueprint's name attribute
+
+	with this name the follwing macros know about which is the current
+	blueprint it's dealing with thus accessing it's standard folder 
+	structure : 
+	blueprint/templates/blueprint_name
+	blueprint/static/css
+	blueprint/static/js
+#}
+
+{# Macros that will be used in each indiviual templates #}
+{% macro include_template(fname) %}
+	{% include blueprint_name + '/' + 'includes' + '/' + fname %}
+{% endmacro %}
+
+{% macro include_js(fname) %}
+	<script src="{{ url_for(blueprint_name + '.static', filename='js' + '/' + fname) }}"></script>
+{% endmacro %}
+
+{% macro include_css(fname) %}
+	<link rel="stylesheet" type="text/css" href="{{ url_for(blueprint_name + '.static', filename='css' + '/' + fname) }}">
+{% endmacro %}

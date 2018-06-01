@@ -1,0 +1,23 @@
+{% extends '_layout_error.html' %}
+
+
+{%- block content %}
+<div class="container-fluid">
+	<div class="row uno_main_body">
+
+		<div class="col-sm-12">
+	  		<img src="{{ url_for('static',filename='img/403.png') }}" class="img-fluid uno_hero_img" id="anim" width="500px" alt="403 ERROR">
+		</div>
+
+		<div class="col-sm-12">
+			<h1 class="uno_title">OPPS !!</h1>
+			<p class="uno_title_sec">Accessing the page or resource you were trying to reach is forbidden for some reason.</p>
+			<a href="/">
+				<button type="button" name="button" class="btn btn-light uno_btn">Take me back to Homepage</button>
+			</a>
+		</div>
+
+	</div><!-- row -->
+</div> <!-- container -->	
+
+{% endblock %}

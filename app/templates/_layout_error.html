@@ -1,0 +1,37 @@
+{% extends '_skeleton.html' %}
+
+{# Pass a variable 'blueprint_name' when render template #}
+{#{% set blueprint_name = blueprint_name %}#}
+
+{% block title %}{{ title }}{% endblock %}
+
+{# Clear out some blocks #}
+{% block css_optional %}{% endblock %}
+{% block js_optional %}{% endblock %}
+{% block js_custom %}{% endblock %}
+{% block content %}{% endblock %}
+{% block navbar_local %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{# Blueprint level global navbar and footer #}
+{% block css_custom %}
+	{{ include_css('style.min.css') }}
+{% endblock %}
+
+
+{# Pass a variable 'blueprint_name' when render template #}
+{% set blueprint_name = blueprint_name %}
+
+{# Macros that will be used in each indiviual templates #}
+{% macro include_template(fname) %}
+	<link href="https://fonts.googleapis.com/css?family=Gloria+Hallelujah|Neucha" rel="stylesheet">
+	{% include blueprint_name + '/' + 'includes' + '/' + fname %}
+{% endmacro %}
+
+{% macro include_js(fname) %}
+	<script src="{{ url_for(blueprint_name + '.static', filename='js' + '/' + fname) }}"></script>
+{% endmacro %}
+
+{% macro include_css(fname) %}
+	<link rel="stylesheet" type="text/css" href="{{ url_for(blueprint_name + '.static', filename='css' + '/' + fname) }}">
+{% endmacro %}

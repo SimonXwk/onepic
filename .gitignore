@@ -1,0 +1,14 @@
+# Byte-compiled / optimized / DLL files
+*.py[cod]
+__pycache__/
+
+
+# Distribution / packaging
+env/
+node_modules/
+
+# Editor / Os
+.idea/
+
+# App
+instance/*.*

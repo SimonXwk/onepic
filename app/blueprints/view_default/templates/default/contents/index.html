@@ -1,0 +1,73 @@
+{% set user = session['user_name'] %}
+{% if user %}
+<canvas id='sketch_login'></canvas>
+{% else %}
+<div id="sketch_logout"></div>
+{% endif %}
+<header class="info">
+	<hgroup class="about">
+			<h1>One Picture &rsaquo;</h1>
+			{% if user %}
+			<h2>welcome back, {{ user|emailName }}</h2>
+			<h3><a href="/logout"> logout</a></h3>
+			{% else %}
+			<h2>please login</h2>
+			<h3>{{ now | dtAU }}</h3>
+			{% endif %}
+
+	</hgroup>
+
+	{% if user %}
+	<nav class="more">
+		<a href="{{ url_for('mailbox.index') }}">&rsaquo; Mailbox</a>
+	</nav>
+	<nav class="more">
+		<a href="{{ url_for('privenue.index') }}">&rsaquo; Private Revenue</a>
+	</nav>
+	<nav class="more">
+		<a href="{{ url_for('merchandise.index') }}">&rsaquo; Merchandise</a>
+	</nav>
+	<nav class="more">
+		<a href="{{ url_for('dictionary.index') }}">&rsaquo; Glossary</a>
+	</nav>
+
+	{% else %}
+	<form action="/login" method="POST" class="form-signin">
+
+		<div class="form-label-group">
+			<input type="email" name="username" id="inputEmail" class="form-control" placeholder="E-mail" required autofocus>
+{#			<label for="inputEmail">Email Address</label>#}
+		</div>
+
+{#		<div class="form-label-group">#}
+{#			<input type="text" name="username" id="inputUsername" class="form-control" placeholder="Username" required autofocus>#}
+{#			<label for="inputEmail">Username</label>#}
+{#		</div>#}
+
+		<div class="form-label-group">
+			<input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required>
+{#			<label for="inputPassword">Password</label>#}
+		</div>
+
+		<div class="checkbox mb-3">
+			<label>
+				<input type="checkbox" value="remember-me"> Remember me
+			</label>
+			{% with messages = get_flashed_messages(with_categories=true) %}
+			{% if messages %}
+				{% for category, message in messages %}
+				{% if category == 'error' %}
+				<span class="badge badge-danger">{{ message }}</span>
+				{% elif category == 'success' %}
+				<span class="badge badge-success">{{ message }}</span>
+				{% endif %}
+				{% endfor %}
+			{% endif %}
+			{% endwith %}
+		</div>
+
+		<button class="btn btn-lg btn-info btn-block" type="submit">Sign in</button>
+	</form>
+
+	{% endif %}
+</header>
