@@ -1,5 +1,5 @@
 from flask import request, session, flash, redirect
-from app.blueprints.helpers import template_applied, login_required
+from app.blueprints.helpers import template_applied
 
 
 @template_applied('index')

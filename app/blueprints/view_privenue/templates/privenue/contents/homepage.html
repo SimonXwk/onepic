@@ -1,0 +1,37 @@
+{#{% set cfy, cfyToal = result.rows[-1].FY, result.rows[-1].TOTAL | float   %}#}
+{##}
+{#<main role="main" class="container">#}
+{##}
+{#	<div class="my-3 p-3 bg-white rounded box-shadow">#}
+{#		<h5 class="border-bottom border-gray pb-2 mb-0">FY{{ cfy }} Total: <mark>{{ cfyToal | currency }}</mark></h5>#}
+{#		<small class="border-bottom border-gray pb-2 mb-0">Data Captured : {{ result.timestamp | dtAU }}</small>#}
+{#		{% for r in result.rows[::-1][1:] %}#}
+{#			{% set thisFY, thisTotal = r.FY, r.TOTAL | float   %}#}
+{#		<div class="media text-muted pt-3">#}
+{#		  <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">#}
+{#		    <strong class="d-block text-gray-dark">FY{{ thisFY }} Total: {{ thisTotal | currency }}</strong>#}
+{#		    Incremental by FY{{ cfy }} :#}
+{#				{% if (cfyToal - thisTotal) > 0 %} <span class="badge badge-success">{{ cfyToal | pct(thisTotal) }}</span>#}
+{#				{% else %} <span class="badge badge-danger">{{ cfyToal | pct(thisTotal,2) }}</span>#}
+{#				{% endif %}#}
+{##}
+{#		  </p>#}
+{#		</div>#}
+{#		{% endfor %}#}
+{##}
+{#		<small class="d-block text-right mt-3">#}
+{#			<a href="#">All updates</a>#}
+{#		</small>#}
+{#	</div>#}
+{#</main>#}
+
+<div class="container-fluid">
+	<div class="row">
+
+		<div class="container-chart">
+			<div class="chart" id="fyTotal"></div>
+		</div>
+
+
+	</div>
+</div>

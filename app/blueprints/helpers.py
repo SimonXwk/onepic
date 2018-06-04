@@ -1,15 +1,6 @@
 from functools import wraps
-from flask import request, render_template, redirect, url_for, g, Blueprint
+from flask import request, render_template, redirect, url_for, g, Blueprint, jsonify
 import pandas
-
-
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if g.user is None:
-            return redirect(url_for('login', next=request.url))
-        return f(*args, **kwargs)
-    return decorated_function
 
 
 def template_applied(template=None, absolute=False, extension='.html'):
@@ -41,6 +32,16 @@ def template_applied(template=None, absolute=False, extension='.html'):
     return decorator
 
 
+def jsonified(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        res = f(*args, **kwargs)
+        if res is None:
+            res = {}
+        return jsonify(res)
+    return decorated_function
+
+
 def create_blueprint(blueprint_name, module_name, prefixed=True):
     mod = Blueprint(blueprint_name, module_name, static_folder='static', template_folder='templates', url_prefix='/' + blueprint_name if prefixed else '')
     """ The variable 'blueprint_name' is required in jinja template(_layout_view.html) to locate resources under the blueprint module
@@ -54,7 +55,7 @@ def create_blueprint(blueprint_name, module_name, prefixed=True):
 
     @mod.context_processor
     def inject_blueprint_name():
-        return dict(blueprint_name=mod.name)
+        return dict(current_blueprint_name=mod.name)
 
     return mod
 
@@ -71,3 +72,12 @@ def to_data_frame(header=None):
             return df
         return decorated_function
     return decorator
+
+
+# def login_required(f):
+#     @wraps(f)
+#     def decorated_function(*args, **kwargs):
+#         if g.user is None:
+#             return redirect(url_for('login', next=request.url))
+#         return f(*args, **kwargs)
+#     return decorated_function

@@ -4,9 +4,7 @@ var browserSync     = require('browser-sync').create();
 var rename          = require('gulp-rename');
 var sass            = require('gulp-sass');
 var autoprefixer    = require('gulp-autoprefixer');
-var uglify          = require('gulp-uglify');
-// const cleanCSS        = require('gulp-clean-css');
-// const htmlreplace     = require('gulp-html-replace');
+
 
 var config = {
     baseDir: '.',
@@ -76,20 +74,6 @@ gulp.task('serve', ['sass'], function() {
     gulp.watch(config.htmlPattern).on('change', browserSync.reload);
 });
 
-
-
-
-
-
-// Replace build blocks in HTML
-// gulp.task('replace_html', function() {
-//   return gulp.src('app/*.html')
-//     .pipe(htmlreplace({
-//         'css': 'styles.min.css',
-//         'js': 'bundle.min.js'
-//     }))
-//     .pipe(gulp.dest('app/dist/'));
-// });
 
 
 gulp.task('default', ['serve']);

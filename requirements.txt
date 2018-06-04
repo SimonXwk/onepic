@@ -8,3 +8,4 @@ SQLAlchemy
 flask_login
 flask_sqlalchemy
 flask_marshmallow
+flask-dance

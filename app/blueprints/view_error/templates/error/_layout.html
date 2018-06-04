@@ -1,0 +1,11 @@
+{% extends '_frameworked.html' %}
+
+
+{% block css_custom %}
+	<link rel="stylesheet" type="text/css" href="{{ url_for(err_blueprint_name + '.static', filename='css' + '/' + 'style.min.css') }}">
+{% endblock %}
+
+{% block css_embedded %}
+{#<style type=text/css>#}
+{#</style>#}
+{% endblock %}

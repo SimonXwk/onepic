@@ -13,9 +13,9 @@
   <title>{%- block title -%}{%- endblock -%}</title>
   <!-- favicon -->
   <link rel="shortcut icon" href="{{ url_for('static',filename='img/favicon.ico')}}">
-	
+
   {# Framework Required CSS Library #}
-  {% block css_framework %}{% include '_includes_global/_css_framework.html' %}{% endblock %}
+  {% block css_framework %}{% endblock %}
 	{# Optional CSS Library #}
   {% block css_optional %}{% endblock %}
 	{# Custom CSS #}
@@ -36,7 +36,7 @@
   {% block footer %}{% include '_includes_global/_global_footer.html' %}{% endblock %}
 
 	{# Framework Required JavaScript Library #}
-  {% block js_framework %}{% include '_includes_global/_js_framework.html' %}{% endblock %}
+  {% block js_framework %}{% endblock %}
   {# Optional JavaScript Library #}
 	{% block js_optional %}{% endblock %}
 	{# Embedded JavaScript #}
