@@ -18,3 +18,12 @@ def fy_total_all():
 	# data = schema.dump(data).data
 	print(data)
 	return data
+
+
+@jsonified
+def fy_total_all_ltd():
+	result = tq.query('FY_TOTAL_LTD', datetime.datetime.today().year+1)
+	rows = result.rows
+	data = dict(fy=[int(row.FY) for row in rows], total=[float(row.TOTAL) for row in rows])
+	print(data)
+	return data

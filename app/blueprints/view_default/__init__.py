@@ -1,16 +1,10 @@
-from flask import Blueprint
+from app.blueprints.helpers import create_blueprint
 from .url_map import map_urls as route
 from .jinja_filters import add_jinja2_filters
 
-mod = Blueprint('default', __name__, static_folder='static', template_folder='templates', url_prefix=None)
+mod = create_blueprint('default', __name__, prefixed=False)
 route(mod)
 add_jinja2_filters(mod)
-
-
-# Blueprint context
-@mod.context_processor
-def inject_blueprint_name():
-	return dict(blueprint_name=mod.name)
 
 
 # App context
