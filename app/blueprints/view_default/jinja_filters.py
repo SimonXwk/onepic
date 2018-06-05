@@ -27,6 +27,11 @@ def add_jinja2_filters(mod):
 	def filter_financial_year(value):
 		return "FY{:d}".format(TLMA.fy(value))
 
+	@mod.app_template_filter('f')
+	def filter_2decimal(value, decimal=2):
+		format = '{:.' + str(decimal) + 'f}'
+		return format.format(value)
+
 	@mod.app_template_filter('dtOffset')
 	def filter_datetime_offset(value, year=0, month=0, day=0):
 		return value.replace(year=value.year + year, month=value.month + month, day=value.day + day)

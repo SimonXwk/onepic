@@ -62,6 +62,11 @@
 		<script src="{{ url_for('vendor', filename='echarts-en.min.js') }}"></script>
 	{% elif vendor == 'highchart' %}
 		<script src="{{ url_for('vendor', filename='highcharts.js') }}"></script>
+	{% elif vendor == 'highchart-sankey' %}
+		<script src="{{ url_for('vendor', filename='sankey.js') }}"></script>
+	{% elif vendor == 'highchart-gague' %}
+		<script src="{{ url_for('vendor', filename='highcharts-more.js') }}"></script>
+		<script src="{{ url_for('vendor', filename='solid-gauge.js') }}"></script>
 	{% elif vendor == 'sketch' %}
 		<script src="{{ url_for('vendor', filename='sketch.min.js') }}"></script>
 	{% else %}

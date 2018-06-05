@@ -30,6 +30,9 @@ gulp.task('vendor', function() {
       'node_modules/popper.js/dist/umd/popper.min.js.map',
       'node_modules/echarts/dist/echarts-en.min.js',
       'node_modules/highcharts/highcharts.js',
+      'node_modules/highcharts/highcharts-more.js',
+      'node_modules/highcharts/modules/sankey.js',
+      'node_modules/highcharts/modules/solid-gauge.js',
       'node_modules/sketch-js/js/sketch.min.js'
     ])
     .pipe(plumber())

@@ -11,6 +11,7 @@ def map_url(mod):
 
 	mod.add_url_rule('/cash/fys', view_func=pv.fy_total_all)
 	mod.add_url_rule('/cash/fysltd', view_func=pv.fy_total_all_ltd)
+	mod.add_url_rule('/cash/cfy/streama', view_func=pv.cfy_platform_type_revenue)
 
 	mod.add_url_rule('/merch/new/fy/<int:fy>', view_func=merch.new_fy)
 	mod.add_url_rule('/merch/new/cfy/<int:month>', view_func=merch.new_cfy_month)

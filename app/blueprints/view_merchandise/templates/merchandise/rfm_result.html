@@ -1,21 +1,38 @@
-{% extends'_blueprint.html' %}
+{% extends '_blueprint.html' %}
 
+{# Addiditonal Libraries #}
+{% block css_optional %}
+{% endblock %}
 
-{# inheriting from global templates folder #}
 {% block js_optional %}
 {% endblock %}
 
-{# Local Inject : Html content #}
-{% block content %}
-	{{ include_template('_content_rfm_result.html') }}
-{% endblock %}
 
-{# Local Inject : Html content #}
+{# My Own js and css #}
 {% block css_custom %}
 {% endblock %}
 
-{# Local Inject : Javascript #}
 {% block js_custom %}
-	<script>var fileName = "{{ filename }}";</script>
-	{{ include_js("result.js") }}
 {% endblock %}
+
+
+{# Actual Content #}
+{% block content %}
+	{{ bp_content('rfm_result.html') }}
+{% endblock %}
+
+
+{# Embedded CSS & Javascript #}
+{% block css_embedded %}
+{% endblock %}
+
+{% block js_embedded_before %}
+	<script>var fileName = "{{ filename }}";</script>
+	{{ bp_js("result") }}
+{% endblock %}
+
+{% block js_embedded_after %}
+{% endblock %}
+
+
+

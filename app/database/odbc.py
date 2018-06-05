@@ -13,7 +13,9 @@ class Result:
 
 
 class ThankQODBC:
-	connection_string = current_app.config.get('TQ_ODBC_CONNECTION_STRING')
+	connection_string_reporter1 = current_app.config.get('TQ_PRT1_CONNECTION_STRING')
+	connection_string_reporter2 = current_app.config.get('TQ_PRT2_CONNECTION_STRING')
+	connection_string = connection_string_reporter1
 	script_folder = os.path.join(current_app.root_path, 'database\scripts')
 
 	@classmethod

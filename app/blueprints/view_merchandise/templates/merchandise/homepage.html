@@ -1,20 +1,37 @@
-{% extends'_blueprint.html' %}
+{% extends '_blueprint.html' %}
 
+{# Addiditonal Libraries #}
+{% block css_optional %}
+{% endblock %}
 
-{# inheriting from global templates folder #}
 {% block js_optional %}
+	{{ import('highchart') }}
+	{{ import('echart') }}
 {% endblock %}
 
 
-{# Local Inject : Javascript #}
-{% block js_custom %}
-{% endblock %}
-
-{# Local Inject : Html content #}
-{% block content %}
-	{{ include_template('_content_homepage.html') }}
-{% endblock %}
-
-{# Local Inject : Html content #}
+{# My Own js and css #}
 {% block css_custom %}
+	{{ bp_css('homepage') }}
+{% endblock %}
+
+{% block js_custom %}
+	{{ bp_js('homepage_chart1') }}
+{% endblock %}
+
+
+{# Actual Content #}
+{% block content %}
+	{{ bp_content('homepage.html') }}
+{% endblock %}
+
+
+{# Embedded CSS & Javascript #}
+{% block css_embedded %}
+{% endblock %}
+
+{% block js_embedded_before %}
+{% endblock %}
+
+{% block js_embedded_after %}
 {% endblock %}
