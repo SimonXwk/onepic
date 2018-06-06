@@ -1,5 +1,9 @@
 {% extends '_frameworked.html' %}
 
+{% block js_framework %}
+{{ super() }}
+<script src="{{ url_for('static',filename= 'js/main.js') }}"></script>
+{% endblock %}
 
 {# Clear out css except for framework ones #}
 {% block css_optional %}{% endblock %}
@@ -12,26 +16,84 @@
 {% block js_embedded_before %}{% endblock %}
 {% block js_embedded_after %}{% endblock %}
 
-{# Clear out content #}
-{% block content %}{% endblock %}
-
 
 {# tile comes from render_template 'title' keyword argument #}
-{% block title %}{{ title }}{% endblock %}
+{% block title %}{% if title %}{{ title }}{% else %}{{ current_blueprint_name }}{% endif %}{% endblock %}
 
-{# Blueprint level global navbar #}
-{% block navbar_local %}
-	{{ bp_include('_local_navbar.html') }}
+{# Nav Bar #}
+{% block navbar_global %}{% include '_includes_global/_global_nvabar.html' %}{% endblock %}
+
+{# Blueprint Overirde Main and redefine content #}
+{% block main %}
+<div class="wrapper">
+	<nav id="sidebar">
+		<!-- Close Sidebar Button -->
+		<div id="dismiss"><i class="glyphicon glyphicon-arrow-left"></i></div>
+		<!-- Sidebar Header -->
+		<div class="sidebar-header"><h3>One Picture</h3></div>
+
+		<!-- Sidebar Links -->
+		<ul class="list-unstyled components">
+			<p>Navigation</p>
+			<li class="active"><a href="/">Home</a></li>
+			<li><a href="{{ url_for('dictionary.index') }}">Dictionary</a></li>
+
+			<li>
+					<a href="#nav-group-mailbox" data-toggle="collapse" aria-expanded="false">Mailbox</a>
+					<ul class="collapse list-unstyled" id="nav-group-mailbox">
+							<li><a href="{{ url_for('mailbox.index') }}">today</a></li>
+							<li><a href="{{ url_for('mailbox.daily') }}">daily</a></li>
+							<li><a href="{{ url_for('mailbox.monthly') }}">Monthly</a></li>
+					</ul>
+			</li>
+
+			<li>
+					<a href="#nav-group-privenue" data-toggle="collapse" aria-expanded="false">Private Revenue</a>
+					<ul class="collapse list-unstyled" id="nav-group-privenue">
+							<li><a href="{{ url_for('privenue.index') }}">Overview</a></li>
+
+					</ul>
+			</li>
+
+			<li>
+					<a href="#nav-group-merchandise" data-toggle="collapse" aria-expanded="false">Merchandise</a>
+					<ul class="collapse list-unstyled" id="nav-group-merchandise">
+							<li><a href="{{ url_for('merchandise.upload') }}">RFM Analysis</a></li>
+
+					</ul>
+			</li>
+
+			<li><a href="{{ url_for('api.index') }}">API</a></li>
+		</ul>
+	</nav>
+
+	<div id="content">
+
+			<button type="button" id="sidebarCollapse" class="btn btn-info navbar-btn">
+					<i class="glyphicon glyphicon-align-left"></i>
+					Toggle Sidebar
+			</button>
+			{# NavBar Secondaries #}
+			{% block navbar_local %}{% endblock %}
+			{# Nav Bar #}
+			{% block content %}{% endblock %}
+			{# Footer #}
+			{% block footer %}{% include '_includes_global/_global_footer.html' %}{% endblock %}
+
+	</div>
+
+        <div class="overlay">asdsa</div>
+</div>
 {% endblock %}
 
 
-{# 
+{#
 	Param: 'current_blueprint_name': a blueprint context_processor variable name
 	refering to the current blueprint's name attribute
 
 	with this name the follwing macros know about which is the current
-	blueprint it's dealing with thus accessing it's standard folder 
-	structure : 
+	blueprint it's dealing with thus accessing it's standard folder
+	structure :
 	blueprint/templates/blueprint
 	blueprint/static/css
 	blueprint/static/js
@@ -42,7 +104,7 @@
 	{% include current_blueprint_name + '/' + 'includes' + '/' + fname %}
 {% endmacro %}
 
-{% macro bp_content(fname) %}
+{% macro bp_content(fname, format='.html') %}
 	{% include current_blueprint_name + '/' + 'contents' + '/' + fname %}
 {% endmacro %}
 
@@ -57,16 +119,19 @@
 {% endmacro %}
 
 {# Import global libraries #}
-{% macro import(vendor) %}
+{% macro import(vendor, vendor_subs=[]) %}
 	{% if vendor == 'echart' %}
 		<script src="{{ url_for('vendor', filename='echarts-en.min.js') }}"></script>
+
 	{% elif vendor == 'highchart' %}
-		<script src="{{ url_for('vendor', filename='highcharts.js') }}"></script>
-	{% elif vendor == 'highchart-sankey' %}
-		<script src="{{ url_for('vendor', filename='sankey.js') }}"></script>
-	{% elif vendor == 'highchart-gague' %}
-		<script src="{{ url_for('vendor', filename='highcharts-more.js') }}"></script>
-		<script src="{{ url_for('vendor', filename='solid-gauge.js') }}"></script>
+		<script src="{{ url_for('hc', filename='highcharts.js') }}"></script>
+		<script src="{{ url_for('hc', filename='exporting.js') }}"></script>
+		{% if vendor_subs %}
+			{% for vsub in vendor_subs %}
+			<script src="{{ url_for('hc', filename=vsub+'.js') }}"></script>
+			{% endfor %}
+		{% endif %}
+
 	{% elif vendor == 'sketch' %}
 		<script src="{{ url_for('vendor', filename='sketch.min.js') }}"></script>
 	{% else %}

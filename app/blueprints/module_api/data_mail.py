@@ -5,10 +5,10 @@ import glob
 import os
 import pandas as pd
 from app.database.excel import read_excel_data
-from app.database.dataframe import to_data_frame
+from app.blueprints.helpers import jsonified
 
 
-def serialize():
+def serialize_mail_data():
 	def decorator(f):
 		@wraps(f)
 		def decorated_function(*args, **kwargs):
@@ -62,8 +62,8 @@ def serialize():
 				r = tuple(row)
 				day_data['date'].append(datetime.datetime.strptime(str(r[0]), '%Y-%m-%d %H:%M:%S'))
 				day_data['opener'].append(r[3])
-				day_data['cash']['value'].append(int(r[16]))
-				day_data['cash']['fullyProcessed'].append(None if int(r[16]) == 0 else False if r[17] else True)
+				day_data['cash']['value'].append(int(r[16]) if r[16] else 0)
+				day_data['cash']['fullyProcessed'].append(int(r[16]) == int(r[17]) if r[16] and r[17] else True if not r[16] else False)
 				day_data['donation']['count']['CashCheque'].append(int(r[4]))
 				day_data['donation']['count']['CreditCard'].append(int(r[5]))
 				day_data['donation']['value']['CashCheque'].append(float(r[10]))
@@ -93,7 +93,7 @@ class MailExcel:
 	summary_sheet = {
 		'name': current_app.config.get('CSD_MAIL_DATA_TAB'),
 		'range': current_app.config.get('CSD_MAIL_DATA_RANGE'),
-		'header': ('Date', 'No', 'Total', 'Recorder', 'NoDCA', 'NoDCC', 'NoMCA', 'NoMCC', 'NoList', 'NoOther', 'ValDCA', 'ValDCC', 'ValMCA', 'ValMCC', 'ValList', 'ValOther', 'ValCash', 'ValCashPending')
+		'header': ('Date', 'No', 'Total', 'Recorder', 'NoDCaCh', 'NoDCC', 'NoMCaCh', 'NoMCC', 'NoList', 'NoOther', 'TotalDCaCh', 'TotalDCC', 'TotalMCaCh', 'TotalMCC', 'TotalList', 'TotalOther', 'Cash', 'CashPending')
 	}
 
 	@classmethod
@@ -109,7 +109,8 @@ class MailExcel:
 		:param months: a list/single value of month number in 2 digits (with leading zeros)
 		:return: a List of file names that matches the years and months given using many - many combination (permutation)
 		"""
-		# if years and months are None
+		# todo: add list support for name searching
+		# if both years and months are None
 		year_pattern = '**'
 		month_pattern = '*.xl*'
 
@@ -132,7 +133,7 @@ class MailExcel:
 
 
 # @to_data_frame(MailExcel.summary_sheet['header'])
-@serialize()
+@serialize_mail_data()
 def read_mail_data(file, sheet_name='Sheet1', range_address='A1:A1'):
 	""" Read a single Excel data range in given sheet by name
 	:param file: a single file name
@@ -148,6 +149,7 @@ def read_mail_data(file, sheet_name='Sheet1', range_address='A1:A1'):
 	return rows
 
 
+@jsonified
 def date(str_date=None):
 	data = {}
 	dt = datetime.date.today()
@@ -167,21 +169,38 @@ def date(str_date=None):
 		else:
 			data = pd.concat([read_mail_data(excel, MailExcel.summary_sheet['name'], MailExcel.summary_sheet['range']) for excel in excels], axis=0, ignore_index=True)
 
-	return jsonify(dict(year=dt.year, month=dt.month, files=excel_display, data=data))
+	return dict(year=dt.year, month=dt.month, files=excel_display, data=data)
 
 
+@jsonified
 def year_month(str_yearmonth=None):
-	print(str_yearmonth)
-
 	excels = MailExcel.locate_excel(int(str_yearmonth[:4]), int(str_yearmonth[4:]))
 	excel = None
 	if excels:
 		excel = excels[0]
-	return jsonify(dict(file=excel))
+	return dict(file=excel)
 
 
+@jsonified
+def today(year_offset=0):
+	td = datetime.date.today()
+	td = td.replace(year=td.year - year_offset, day=td.day if not(td.month == 2 and td.day == 29) else td.day-1)
+	excels = MailExcel.locate_excel(td.year, td.day)
+	data = []
+	if excels:
+		rng = read_excel_data(excels[0], MailExcel.summary_sheet['name'], MailExcel.summary_sheet['range'])
+		if rng:
+			for row in rng:
+				print(row[0].value, row[1].value, row[2].value, row[3].value)
+				if isinstance(row[0].value, datetime.datetime) \
+					and datetime.datetime.strptime(str(row[0].value), '%Y-%m-%d %H:%M:%S').date() == td:
+					data = {MailExcel.summary_sheet['header'][key]: cell.value for key, cell in enumerate(row)}
+	return data
+
+
+@jsonified
 def home():
-	return jsonify(dict(app='onepic', author='Simon Xue'))
+	return dict(app='onepic', author='Simon Xue')
 
 
 

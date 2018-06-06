@@ -5,22 +5,24 @@
 {% endblock %}
 
 {% block js_optional %}
-	{{ import('highchart', ['sankey']) }}
+	{{ import('highchart') }}
+	{{ import('echart') }}
 {% endblock %}
 
 
 {# My Own js and css #}
 {% block css_custom %}
+{#	{{ bp_css('homepage') }}#}
 {% endblock %}
 
 {% block js_custom %}
-	{{ bp_js('homepage_chart1') }}
+	{{ bp_js('daily') }}
 {% endblock %}
 
 
 {# Actual Content #}
 {% block content %}
-	{{ bp_content('homepage.html') }}
+	{{ bp_content('daily.html') }}
 {% endblock %}
 
 

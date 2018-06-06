@@ -1,6 +1,5 @@
 const endpointPrefix = '/api/mailbox/ymd/';
 let endpoint;
-const today = new Date();
 const mth = today.getMonth()+1;
 const mthName = today.toLocaleString('en-au', { month: "long" });
 
@@ -25,7 +24,7 @@ chart =
       }
     },
     credits: {
-      text: 'ⒸThe Leprosy Mission Australia',
+      text: 'ⒸTLMA',
       href: '#',
       enabled: true
     },
@@ -56,7 +55,7 @@ chart =
   });
 
 
-
+// 'monthly_item'
 Highcharts.chart('monthly_item', {
 
     chart: {
@@ -155,9 +154,9 @@ function updateChart(chart, endpointVariable){
   });
 }
 
-updateChart(valueChart, '20180501');
-updateChart(valueChart, '20170501');
-// requestData(chart, '20160601');
+updateChart(valueChart, '20180601');
+updateChart(valueChart, '20170601');
+updateChart(valueChart, '20160601');
 
 
 

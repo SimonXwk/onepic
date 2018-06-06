@@ -1,31 +1,31 @@
 {% extends '_blueprint.html' %}
 
-{% block css_optional %}
-{% endblock %}
 
-{% block js_optional %}
-		{{ import('sketch') }}
-{% endblock %}
+{% block css_framework %}{% endblock %}
+{% block css_optional %}{% endblock %}
+{% block css_custom %}{% endblock %}
 
-{% block css_custom %}
-{% endblock %}
+{% block js_framework %}{% endblock %}
+{% block js_optional %}{% endblock %}
+{% block js_custom %}{% endblock %}
 
-{% block js_custom %}
-{% endblock %}
-
-{% block navbar_global %}`
-{%- endblock %}
-
-{% block content %}
-	{{ bp_content('index.html') }}
-{% endblock %}
-
+{% block title %}{% if title %}{{ title }}{% else %}Home{% endif %}{% endblock %}
 
 {% block css_embedded %}
 	{{ bp_include('index_css.html') }}
 {% endblock %}
 
-{% block js_embedded_after %}	
+{% block main %}
+	{{ bp_content('index.html') }}
+{% endblock %}
+
+
+{% block js_embedded_before %}
+	{{ import('sketch') }}
+{% endblock %}
+
+{% block js_embedded_after %}
+
 	{% set user = session['user_name'] %}
 	{% if user %}
 	{{ bp_include('index_js_login.html') }}

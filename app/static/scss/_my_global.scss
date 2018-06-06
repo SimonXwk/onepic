@@ -1,10 +1,7 @@
 $body-bg-color: #fafafa;
-$bg-color-box: rgba(210, 223, 250, 0.15);
-$border-color-box: rgba(220, 20, 6, .2);
 
-$chart-container-bg-color: #f4d000;
-$chart-container-border-color: #1117f4;
-
+$chart-container-bg-color: #f0f4cf;
+$chart-container-border-color: #8be1f4;
 
 body {
     background: $body-bg-color;
@@ -15,9 +12,9 @@ body {
   margin-bottom: 1rem;
   margin-right: auto;
   margin-left: auto;
-  padding: 0;
+  padding: 1px 1px 1px 1px;
   background: $chart-container-bg-color;
-  border: 0.5px solid $chart-container-border-color;
+  border: 1px solid $chart-container-border-color;
   /*flex: 0 0 100%;*/
   
 }
@@ -42,11 +39,69 @@ body {
     max-width: 1140px;
   }
 }
-
+@media (min-width: 1420px) {
+  .container-chart {
+    max-width: 1360px;
+  }
+}
+@media (min-width: 1600px) {
+  .container-chart {
+    max-width: 1480px;
+  }
+}
 
 .container-chart .chart {
+  position: relative;
   margin: 0;
   padding: 0;
-  border: 0;
-  position: relative;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  border-radius: 0.25rem;
+  word-wrap: break-word;
+  background-clip: border-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: column;
+  flex-direction: column;
+
+}
+
+
+//  ******************************************
+
+.wrapper {
+    display: block;
+}
+
+#sidebar {
+    min-width: 250px;
+    max-width: 250px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    /* top layer */
+    z-index: 9999;
+}
+
+.overlay {
+    /* full screen */
+    width: 100vw;
+    height: 100vh;
+    /* transparent black */
+    background: rgba(0, 0, 0, 0.8);
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: none;
+    /* middle layer, i.e. appears below the sidebar */
+    z-index: 9998;
+}
+
+#dismiss {
+    width: 35px;
+    height: 35px;
+    position: absolute;
+    /* top right corner of the sidebar */
+    top: 10px;
+    right: 10px;
 }

@@ -5,6 +5,11 @@ from . import data_privenue as pv
 
 def map_url(mod):
 	mod.add_url_rule('/', endpoint='index', view_func=mail.home)
+
+	mod.add_url_rule('/mailbox/today', view_func=mail.today)
+	mod.add_url_rule('/mailbox/today/', view_func=mail.today)
+	mod.add_url_rule('/mailbox/today/<int:year_offset>', view_func=mail.today)
+
 	mod.add_url_rule('/mailbox/ymd', view_func=mail.date)
 	mod.add_url_rule('/mailbox/ymd/<string:str_date>', view_func=mail.date)
 	mod.add_url_rule('/mailbox/ym/<string:str_yearmonth>', view_func=mail.year_month)

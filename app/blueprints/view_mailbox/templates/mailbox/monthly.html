@@ -12,17 +12,16 @@
 
 {# My Own js and css #}
 {% block css_custom %}
-	{{ bp_css('homepage') }}
 {% endblock %}
 
 {% block js_custom %}
-	{{ bp_js('homepage_chart1') }}
+	{{ bp_js('monthly') }}
 {% endblock %}
 
 
 {# Actual Content #}
 {% block content %}
-	{{ bp_content('homepage.html') }}
+	{{ bp_content('monthly.html') }}
 {% endblock %}
 
 
@@ -31,9 +30,6 @@
 {% endblock %}
 
 {% block js_embedded_before %}
-	<script>
-		var chart1 = 'mail_overview';
-	</script>
 {% endblock %}
 
 {% block js_embedded_after %}

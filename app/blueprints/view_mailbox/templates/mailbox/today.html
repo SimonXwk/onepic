@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block js_optional %}
-	{{ import('highchart', ['sankey']) }}
+	{{ import('highchart', ['data','drilldown']) }}
 {% endblock %}
 
 
@@ -14,13 +14,13 @@
 {% endblock %}
 
 {% block js_custom %}
-	{{ bp_js('homepage_chart1') }}
+	{{ bp_js('today') }}
 {% endblock %}
 
 
 {# Actual Content #}
 {% block content %}
-	{{ bp_content('homepage.html') }}
+	{{ bp_content('today.html') }}
 {% endblock %}
 
 

@@ -1,6 +1,19 @@
-from flask import Flask, send_from_directory, current_app, session, g
+from flask import Flask, send_from_directory, current_app, url_for
 import os
 from configuration import app_config_dict as cfg
+
+
+# URL Rule: Handle old favicon standard (The old standard is to serve this file, with this name, at the website root.)
+def favicon():
+	return send_from_directory(os.path.join(current_app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
+
+
+def find_vendor_folder(filename=None):
+	return send_from_directory(os.path.join(current_app.root_path, 'static/vendor'), filename)
+
+
+def find_highchart_folder(filename=None):
+	return send_from_directory(os.path.join(current_app.root_path, 'static/vendor/hc'), filename)
 
 
 def create_app(config_name):
@@ -34,20 +47,15 @@ def create_app(config_name):
 		# Init the DataBase
 		from app.database.sqlalchemy_database import db_session
 
+		# Handle old favicon standard (The old standard is to serve this file, with this name, at the website root.)
+		app.add_url_rule('/favicon.ico', endpoint='favicon', view_func=favicon)
+		# Customized endpoint rule
+		app.add_url_rule('/static/vendor/<path:filename>', endpoint='vendor', view_func=find_vendor_folder)
+		app.add_url_rule('/static/vendor/hc/<path:filename>', endpoint='hc', view_func=find_highchart_folder)
+
 	# Close the session after each request or application context shutdown
 	@app.teardown_appcontext
 	def shutdown_session(exception=None):
 		db_session.remove()
-
-	# URL Rule: Handle old favicon standard (The old standard is to serve this file, with this name, at the website root.)
-	def locate_favicon():
-		return send_from_directory(os.path.join(app.root_path, 'static/icons'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
-
-	# @app.route('/static/vendor/<path:filename>', endpoint='vendor', methods=["GET"])
-	def locate_vendor_folder(filename=None):
-		return send_from_directory(os.path.join(current_app.root_path, 'static/vendor'), filename)
-
-	app.add_url_rule('/favicon.ico', endpoint='favicon', view_func=locate_favicon)
-	app.add_url_rule('/static/vendor/<path:filename>', endpoint='vendor', view_func=locate_vendor_folder)
 
 	return app  # Return application object/instance

@@ -4,7 +4,7 @@ from app.blueprints.helpers import template_applied
 
 @template_applied('index')
 def index():
-	return dict(title='Home')
+	return dict(title='OnePic')
 
 
 @template_applied('test')

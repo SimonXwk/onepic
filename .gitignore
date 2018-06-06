@@ -2,13 +2,15 @@
 *.py[cod]
 __pycache__/
 
-
 # Distribution / packaging
 env/
 node_modules/
+dist/
+build/
 
 # Editor / Os
 .idea/
 
 # App
 instance/*.*
+*.egg-info/

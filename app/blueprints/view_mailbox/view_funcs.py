@@ -4,9 +4,10 @@ import os
 from flask import send_from_directory
 
 
-@template_applied('homepage')
-def homepage():
-	return dict(title='Mailbox')
+def excel_download(filename):
+	file = os.path.join(MailExcel.excel_folder, filename)
+	print(file)
+	return send_from_directory(MailExcel.excel_folder, filename=filename)
 
 
 @template_applied('excels')
@@ -17,7 +18,20 @@ def excel_list():
 	return dict(title='Mail Excels', folders=folders)
 
 
-def excel_download(filename):
-	file = os.path.join(MailExcel.excel_folder, filename)
-	print(file)
-	return send_from_directory(MailExcel.excel_folder, filename=filename)
+@template_applied('today')
+def today():
+	return dict(title='Mailbox-Daily')
+
+
+@template_applied('daily')
+def daily():
+	return dict(title='Mailbox-Daily')
+
+
+@template_applied('monthly')
+def monthly():
+	return dict(title='Mailbox-Monthly')
+
+
+
+

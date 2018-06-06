@@ -26,8 +26,7 @@ def list_all_files():
 	sep2 = current_app.config['RFM_SCORE_SEP']
 	# Mask structure: (REX)_(system report start date)_(system report end date)_(NOW)_now date you defined_(R highest score),(F highest score),(M highest score).csv
 	# Date format in file name : '%Y%m%d'
-	filename_pattern = sep1.join(['REX', '[0-9][0-9][0-9][0-9][0-1][0-9][0-3][0-9]', '[0-9][0-9][0-9][0-9][0-1][0-9][0-3][0-9]',
-	                              'NOW', '[0-9][0-9][0-9][0-9][0-1][0-9][0-3][0-9]', '[1-9]' + sep2 + '[1-9]' + sep2 + '[1-9]'])
+	filename_pattern = sep1.join(['REX', '[0-9][0-9][0-9][0-9][0-1][0-9][0-3][0-9]', '[0-9][0-9][0-9][0-9][0-1][0-9][0-3][0-9]', '[1-9]' + sep2 + '[1-9]' + sep2 + '[1-9]'])
 	# String(mask) the describes what the file name looks like
 	mask = os.path.join(get_data_folder(), filename_pattern + '.csv')
 	return glob.glob(mask)
@@ -71,7 +70,7 @@ def rfm_analysis(file_name=None):
 	for f in file_list:
 		# Collect the 'NOW' date for RFM analysis from the file name
 		file_path_exc_extension, file_extension = os.path.splitext(f)
-		folder, filename = file_path_exc_extension.rsplit('\\', 1)
+		folder, filename = file_path_exc_extension.rsplit(os.sep, 1)
 
 		# Interpreting the special file naming structure
 		file_dict = {
@@ -80,10 +79,10 @@ def rfm_analysis(file_name=None):
 			'filename': filename,
 			'start': datetime.datetime.strptime(filename.split(sep1)[1], '%Y%m%d'),
 			'end': datetime.datetime.strptime(filename.split(sep1)[2], '%Y%m%d'),
-			'now': datetime.datetime.strptime(filename.split(sep1)[4], '%Y%m%d'),
-			'r_score_max': int(filename.split(sep1)[5].split(sep2)[0]),
-			'f_score_max': int(filename.split(sep1)[5].split(sep2)[1]),
-			'm_score_max': int(filename.split(sep1)[5].split(sep2)[2]),
+			'now': datetime.datetime.strptime(filename.split(sep1)[2], '%Y%m%d').date() + datetime.timedelta(days=1),
+			'r_score_max': int(filename.split(sep1)[3].split(sep2)[0]),
+			'f_score_max': int(filename.split(sep1)[3].split(sep2)[1]),
+			'm_score_max': int(filename.split(sep1)[3].split(sep2)[2]),
 		}
 
 		# Keep the columns that are essential to RFM analysis

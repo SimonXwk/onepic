@@ -12,7 +12,7 @@
   <!-- Page title -->
   <title>{%- block title -%}{%- endblock -%}</title>
   <!-- favicon -->
-  <link rel="shortcut icon" href="{{ url_for('static',filename='img/favicon.ico')}}">
+  <link rel="shortcut icon" href="{{ url_for('static',filename='favicon.ico')}}">
 
   {# Framework Required CSS Library #}
   {% block css_framework %}{% endblock %}
@@ -24,16 +24,16 @@
   {% block css_embedded %}{% endblock %}
 </head>
 <body>
-  {# NavBar primary #}
-  {% block navbar_global %}{% include '_includes_global/_global_nvabar.html' %}{%- endblock %}
-	{# NavBar secondaries #}
-  {% block navbar_local %}{%- endblock %}
-
-	{# Content #}
-  {% block content %}{% endblock %}
-
-	{# Footer #}
-  {% block footer %}{% include '_includes_global/_global_footer.html' %}{% endblock %}
+	{% block main %}
+		{# NavBar Primary #}
+		{% block navbar_global %}{%- endblock %}
+		{# NavBar Secondaries #}
+		{% block navbar_local %}{%- endblock %}
+		{# Content #}
+		{% block content %}{% endblock %}
+	 	{# Footer #}
+		{% block footer %}{% endblock %}
+	{% endblock %}
 
 	{# Framework Required JavaScript Library #}
   {% block js_framework %}{% endblock %}

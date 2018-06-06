@@ -9,6 +9,7 @@ var autoprefixer    = require('gulp-autoprefixer');
 var config = {
     baseDir: '.',
     vendorDir: 'app/static/vendor',
+    vendorHighChartDir: 'app/static/vendor/hc',
     cssDir: 'app/static/css',
     sassPattern: 'app/**/*.scss',
     htmlPattern: 'app/**/*.html',
@@ -18,8 +19,23 @@ var config = {
 };
 
 
-// Move the Framework libraries(css and javascripts) into app/static/vendor folder : 
-gulp.task('vendor', function() {
+// Move HighChart Libraries into app/static/vendor/hc folder :
+gulp.task('vendor-highchart', function() {
+  return gulp.src([
+      'node_modules/highcharts/highcharts.js',
+      'node_modules/highcharts/highcharts-more.js',
+      'node_modules/highcharts/modules/exporting.js',
+      'node_modules/highcharts/modules/sankey.js',
+      'node_modules/highcharts/modules/data.js',
+      'node_modules/highcharts/modules/drilldown.js',
+      'node_modules/highcharts/modules/solid-gauge.js',
+    ])
+    .pipe(plumber())
+    .pipe(gulp.dest(config.vendorHighChartDir))
+});
+
+// Move the Framework libraries(css and javascripts) into app/static/vendor folder :
+gulp.task('vendor-general', function() {
   return gulp.src([
       'node_modules/bootstrap/dist/css/bootstrap.min.css',
       'node_modules/font-awesome/css/font-awesome.min.css',
@@ -29,15 +45,14 @@ gulp.task('vendor', function() {
       'node_modules/popper.js/dist/umd/popper.min.js',
       'node_modules/popper.js/dist/umd/popper.min.js.map',
       'node_modules/echarts/dist/echarts-en.min.js',
-      'node_modules/highcharts/highcharts.js',
-      'node_modules/highcharts/highcharts-more.js',
-      'node_modules/highcharts/modules/sankey.js',
-      'node_modules/highcharts/modules/solid-gauge.js',
       'node_modules/sketch-js/js/sketch.min.js'
     ])
     .pipe(plumber())
     .pipe(gulp.dest(config.vendorDir))
 });
+
+// Vendor Libraries
+gulp.task('vendor', ['vendor-general', 'vendor-highchart']);
 
 
 // Compile sass into CSS & auto-inject into browsers

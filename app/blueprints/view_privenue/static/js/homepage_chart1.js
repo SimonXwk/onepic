@@ -1,7 +1,6 @@
 const endpoint1 = '/api/cash/fys';
 const endpoint2 = '/api/cash/fysltd';
 const endpoint3 = '/api/cash/cfy/streama';
-const today = new Date();
 const cfy = today.getMonth()+1 < 7 ? today.getFullYear() : today.getFullYear()+1;
 
 let valueChart1 =
@@ -66,7 +65,7 @@ function updateLineChart(chart, endpoint, seriesName){
       });
       chart.update({
         subtitle: {
-            text: 'Data Captured :' + json.timestamp
+            text: 'Data Captured : ' + json.timestamp
         },
 	    xAxis: {
 		        categories: json.fy
