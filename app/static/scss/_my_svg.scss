@@ -1,0 +1,26 @@
+/* ---------------------------------------------------
+    SVG Icons
+----------------------------------------------------- */
+$svg-fill-color: #6683f6;
+$svg-size: 1.5em;
+
+.svg-icon {
+  width: $svg-size;
+  height: $svg-size;
+
+}
+
+.svg-icon path,
+.svg-icon polygon,
+.svg-icon rect {
+  fill: $svg-fill-color;
+  fill-opacity: 0.4;
+}
+
+.svg-icon circle {
+  stroke: $svg-fill-color;
+  stroke-width: 1px;
+  fill-opacity: 0.4;
+}
+
+

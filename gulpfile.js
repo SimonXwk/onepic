@@ -45,6 +45,8 @@ gulp.task('vendor-general', function() {
       'node_modules/popper.js/dist/umd/popper.min.js',
       'node_modules/popper.js/dist/umd/popper.min.js.map',
       'node_modules/echarts/dist/echarts-en.min.js',
+      'node_modules/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js',
+      'node_modules/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css',
       'node_modules/sketch-js/js/sketch.min.js'
     ])
     .pipe(plumber())

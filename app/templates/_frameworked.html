@@ -1,8 +1,10 @@
 {% extends '_skeleton.html' %}
 
 {% block css_framework %}
-<link rel="stylesheet" type="text/css" href="{{ url_for('vendor',filename= 'font-awesome.min.css') }}">
+{#<link rel="stylesheet" type="text/css" href="{{ url_for('vendor',filename= 'jquery.mCustomScrollbar.css') }}">#}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename= 'css/main.min.css') }}">
+
+
 {% endblock %}
 
 
@@ -10,4 +12,5 @@
 <script src="{{ url_for('vendor',filename= 'jquery.min.js') }}"></script>
 <script src="{{ url_for('vendor',filename= 'popper.min.js') }}"></script>
 <script src="{{ url_for('vendor',filename= 'bootstrap.min.js') }}"></script>
+{#<script src="{{ url_for('vendor',filename= 'jquery.mCustomScrollbar.concat.min.js') }}"></script>#}
 {% endblock %}

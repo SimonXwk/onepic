@@ -1,0 +1,63 @@
+/* ---------------------------------------------------
+    Charting Container
+----------------------------------------------------- */
+$chart-container-bg-color: #f0f4cf;
+$chart-container-border-color: #8be1f4;
+
+.container-chart {
+  width: 100%;
+  margin-bottom: 1rem;
+  margin-right: auto;
+  margin-left: auto;
+  padding: 1px 1px 1px 1px;
+  background: $chart-container-bg-color;
+  border: 1px solid $chart-container-border-color;
+  /*flex: 0 0 100%;*/
+
+}
+
+@media (min-width: 576px) {
+  .container-chart {
+    max-width: 540px;
+  }
+}
+@media (min-width: 768px) {
+  .container-chart {
+    max-width: 720px;
+  }
+}
+@media (min-width: 992px) {
+  .container-chart {
+    max-width: 960px;
+  }
+}
+@media (min-width: 1200px) {
+  .container-chart {
+    max-width: 1140px;
+  }
+}
+@media (min-width: 1420px) {
+  .container-chart {
+    max-width: 1360px;
+  }
+}
+@media (min-width: 1600px) {
+  .container-chart {
+    max-width: 1480px;
+  }
+}
+
+.container-chart .chart {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  border-radius: 0.25rem;
+  word-wrap: break-word;
+  background-clip: border-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: column;
+  flex-direction: column;
+
+}

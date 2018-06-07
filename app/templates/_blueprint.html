@@ -25,65 +25,79 @@
 
 {# Blueprint Overirde Main and redefine content #}
 {% block main %}
-<div class="wrapper">
-	<nav id="sidebar">
-		<!-- Close Sidebar Button -->
-		<div id="dismiss"><i class="glyphicon glyphicon-arrow-left"></i></div>
-		<!-- Sidebar Header -->
-		<div class="sidebar-header"><h3>One Picture</h3></div>
+{#<div class="wrapper">#}
+{#	{{ include_global('_global_sidebar') }}#}
+{##}
+{#	<div id="content">#}
+{#			<button type="button" id="sidebarCollapse" class=" ">{{ svg('nav_collapse') }}</button>#}
+{#			 NavBar Secondaries #}
+{#			{% block navbar_local %}{% endblock %}#}
+{#			 Nav Bar #}
+{#			{% block content %}{% endblock %}#}
+{#			 Footer #}
+{#			{% block footer %}{{ include_global('_global_footer') }}{% endblock %}#}
+{##}
+{#	</div>#}
+{##}
+{#	<div class="overlay"></div>#}
+{#</div>#}
 
-		<!-- Sidebar Links -->
-		<ul class="list-unstyled components">
-			<p>Navigation</p>
-			<li class="active"><a href="/">Home</a></li>
-			<li><a href="{{ url_for('dictionary.index') }}">Dictionary</a></li>
+<div id="wrapper">
+		<!-- Sidebar -->
+	<div id="sidebar-wrapper">
+			<ul class="sidebar-nav">
+					<li class="sidebar-brand">
+							<a href="/">One Picture</a>
+					</li>
 
-			<li>
-					<a href="#nav-group-mailbox" data-toggle="collapse" aria-expanded="false">Mailbox</a>
-					<ul class="collapse list-unstyled" id="nav-group-mailbox">
-							<li><a href="{{ url_for('mailbox.index') }}">today</a></li>
-							<li><a href="{{ url_for('mailbox.daily') }}">daily</a></li>
-							<li><a href="{{ url_for('mailbox.monthly') }}">Monthly</a></li>
-					</ul>
-			</li>
+					<li>
+							<a href="{{ url_for('dictionary.index') }}">Dictionary</a>
+					</li>
 
-			<li>
-					<a href="#nav-group-privenue" data-toggle="collapse" aria-expanded="false">Private Revenue</a>
-					<ul class="collapse list-unstyled" id="nav-group-privenue">
-							<li><a href="{{ url_for('privenue.index') }}">Overview</a></li>
+					<li>
+							<a href="#nav-group-mailbox" data-toggle="collapse" aria-expanded="false">Mailbox</a>
+							<ul class="collapse list-unstyled" id="nav-group-mailbox">
+									<li><a href="{{ url_for('mailbox.index') }}">today</a></li>
+									<li><a href="{{ url_for('mailbox.daily') }}">daily</a></li>
+									<li><a href="{{ url_for('mailbox.monthly') }}">Monthly</a></li>
+							</ul>
+					</li>
 
-					</ul>
-			</li>
+				<li>
+						<a href="#nav-group-privenue" data-toggle="collapse" aria-expanded="false">Private Revenue</a>
+						<ul class="collapse list-unstyled" id="nav-group-privenue">
+								<li><a href="{{ url_for('privenue.index') }}">Overview</a></li>
+						</ul>
+				</li>
 
-			<li>
-					<a href="#nav-group-merchandise" data-toggle="collapse" aria-expanded="false">Merchandise</a>
-					<ul class="collapse list-unstyled" id="nav-group-merchandise">
-							<li><a href="{{ url_for('merchandise.upload') }}">RFM Analysis</a></li>
+				<li>
+						<a href="#nav-group-merchandise" data-toggle="collapse" aria-expanded="false">Merchandise</a>
+						<ul class="collapse list-unstyled" id="nav-group-merchandise">
+								<li><a href="{{ url_for('merchandise.upload') }}">RFM Analysis</a></li>
 
-					</ul>
-			</li>
+						</ul>
+				</li>
 
-			<li><a href="{{ url_for('api.index') }}">API</a></li>
-		</ul>
-	</nav>
 
-	<div id="content">
-
-			<button type="button" id="sidebarCollapse" class="btn btn-info navbar-btn">
-					<i class="glyphicon glyphicon-align-left"></i>
-					Toggle Sidebar
-			</button>
-			{# NavBar Secondaries #}
-			{% block navbar_local %}{% endblock %}
-			{# Nav Bar #}
-			{% block content %}{% endblock %}
-			{# Footer #}
-			{% block footer %}{% include '_includes_global/_global_footer.html' %}{% endblock %}
-
+					<li>
+							<a href="{{ url_for('api.index') }}">API</a>
+					</li>
+			</ul>
 	</div>
+	<!-- /#sidebar-wrapper -->
 
-        <div class="overlay">asdsa</div>
+	<!-- Page Content -->
+	<div id="page-content-wrapper">
+		<a href="#menu-toggle" class="btn btn-info" id="menu-toggle">Toggle</a>
+		{% block navbar_local %}{% endblock %}
+		{% block content %}{% endblock %}
+		{% block footer %}{{ include_global('_global_footer') }}{% endblock %}
+	</div>
+	<!-- /#page-content-wrapper -->
+
 </div>
+
+
 {% endblock %}
 
 
@@ -117,6 +131,18 @@
 	{# ! [url_prefix] needed for blueprint.static to work #}
 	<link rel="stylesheet" type="text/css" href="{{ url_for(current_blueprint_name + '.static', filename='css' + '/' + fname + '.css') }}">
 {% endmacro %}
+
+
+{# Import global libraries #}
+{% macro include_global(file, file_type='.html') %}
+	{% include ('_includes_global' + '/' + file + file_type) %}
+{% endmacro %}
+
+{# Import svg #}
+{% macro svg(file, file_type='.html') %}
+	{% include ('_svg' + '/' + file + file_type) %}
+{% endmacro %}
+
 
 {# Import global libraries #}
 {% macro import(vendor, vendor_subs=[]) %}

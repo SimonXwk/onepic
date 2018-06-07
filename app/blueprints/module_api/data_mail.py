@@ -185,13 +185,12 @@ def year_month(str_yearmonth=None):
 def today(year_offset=0):
 	td = datetime.date.today()
 	td = td.replace(year=td.year - year_offset, day=td.day if not(td.month == 2 and td.day == 29) else td.day-1)
-	excels = MailExcel.locate_excel(td.year, td.day)
+	excels = MailExcel.locate_excel(td.year, td.month)
 	data = []
 	if excels:
 		rng = read_excel_data(excels[0], MailExcel.summary_sheet['name'], MailExcel.summary_sheet['range'])
 		if rng:
 			for row in rng:
-				print(row[0].value, row[1].value, row[2].value, row[3].value)
 				if isinstance(row[0].value, datetime.datetime) \
 					and datetime.datetime.strptime(str(row[0].value), '%Y-%m-%d %H:%M:%S').date() == td:
 					data = {MailExcel.summary_sheet['header'][key]: cell.value for key, cell in enumerate(row)}

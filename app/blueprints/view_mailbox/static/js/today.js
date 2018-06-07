@@ -60,7 +60,7 @@ function updateChart(chart, endpoint){
         // console.log(json);
 		chart.update({
 			title: {
-				text: dAU(new Date(json.Date)) + (json.Recorder == null ? ' : No Mail Opened' :' ' +  currency(json.Total) + ' opened by ' + json.Recorder)
+				text:  (json.Recorder == null ? ' : No Mail Opened' : '' +  currency(json.Total) + ' opened by ' + json.Recorder + ' on ' + dAU(new Date(json.Date)))
 			},
 			subtitle: {
 				text: (json.Cash == null ? 'No Cash Record' :'Cash Received: $' + json.Cash)
@@ -73,7 +73,7 @@ function updateChart(chart, endpoint){
 				series: {
 					dataLabels: {
 						enabled: true,
-						format: '{point.name} Total: {point.y:,.2f} ({point.percentage:.1f}%)',
+						format: '{point.name} Total: {point.y:,.2f} ( {point.percentage:.1f}% )',
                         connectorColor: 'silver'
 					}
 				}
