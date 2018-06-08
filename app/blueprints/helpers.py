@@ -3,7 +3,7 @@ from flask import request, render_template, redirect, url_for, g, Blueprint, jso
 import pandas
 
 
-def template_applied(template=None, absolute=False, extension='.html'):
+def templated(template=None, absolute=False, extension='.html'):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):

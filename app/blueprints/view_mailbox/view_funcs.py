@@ -1,4 +1,4 @@
-from app.blueprints.helpers import template_applied
+from app.blueprints.helpers import templated
 from app.blueprints.module_api.data_mail import MailExcel
 import os
 from flask import send_from_directory
@@ -10,7 +10,7 @@ def excel_download(filename):
 	return send_from_directory(MailExcel.excel_folder, filename=filename)
 
 
-@template_applied('excels')
+@templated('excels')
 def excel_list():
 	# excels = MailExcel.locate_excel()
 	# excel_display = [(e.rsplit(os.path.sep, 3)[-2], e.rsplit(os.path.sep, 3)[-1]) for e in excels]
@@ -18,17 +18,17 @@ def excel_list():
 	return dict(title='Mail Excels', folders=folders)
 
 
-@template_applied('today')
+@templated('today')
 def today():
 	return dict(title='Mailbox-Daily')
 
 
-@template_applied('daily')
+@templated('daily')
 def daily():
 	return dict(title='Mailbox-Daily')
 
 
-@template_applied('monthly')
+@templated('monthly')
 def monthly():
 	return dict(title='Mailbox-Monthly')
 

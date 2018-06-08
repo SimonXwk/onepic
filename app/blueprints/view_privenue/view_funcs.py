@@ -1,8 +1,8 @@
-from app.blueprints.helpers import template_applied
+from app.blueprints.helpers import templated
 import datetime
 
 
-@template_applied('homepage')
+@templated('homepage')
 def homepage():
 	today = datetime.date.today()
 	d1 = datetime.date(today.year-1 if today.month < 7 else today.year, 7, 1)

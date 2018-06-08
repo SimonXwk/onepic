@@ -1,13 +1,13 @@
 from flask import request, session, flash, redirect
-from app.blueprints.helpers import template_applied
+from app.blueprints.helpers import templated
 
 
-@template_applied('index')
+@templated('index')
 def index():
 	return dict(title='OnePic')
 
 
-@template_applied('test')
+@templated('test')
 def test():
 	from datetime import datetime
 	from app.database.flasksqlalchemy_model import PledgeInstalmentsActive as Md
