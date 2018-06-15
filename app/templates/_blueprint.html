@@ -25,6 +25,7 @@
 
 {# Blueprint Overirde Main and redefine content #}
 {% block main %}
+	{{ request.endpoint | bpName }}
 {#<div class="wrapper">#}
 {#	{{ include_global('_global_sidebar') }}#}
 {##}
@@ -67,6 +68,7 @@
 						<a href="#nav-group-privenue" data-toggle="collapse" aria-expanded="false">Private Revenue</a>
 						<ul class="collapse list-unstyled" id="nav-group-privenue">
 								<li><a href="{{ url_for('privenue.index') }}">Overview</a></li>
+								<li><a href="{{ url_for('privenue.pending') }}">Pending Batches</a></li>
 						</ul>
 				</li>
 
@@ -114,6 +116,9 @@
 #}
 
 {# Macros that will be used in each indiviual templates #}
+
+{% set current_blueprint_name = request.endpoint | bpName  %}
+
 {% macro bp_include(fname) %}
 	{% include current_blueprint_name + '/' + 'includes' + '/' + fname %}
 {% endmacro %}

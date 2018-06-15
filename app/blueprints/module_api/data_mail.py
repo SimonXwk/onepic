@@ -5,7 +5,7 @@ import glob
 import os
 import pandas as pd
 from app.database.excel import read_excel_data
-from app.blueprints.helpers import jsonified
+from app.helpers import jsonified
 
 
 def serialize_mail_data():

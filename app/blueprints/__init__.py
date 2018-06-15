@@ -1,18 +1,19 @@
-from .view_default import mod as mod_default
-from .module_api import mod as mod_api
-from .view_dictionary import mod as mod_dict
-from .view_error import mod as mod_err
-from .view_mailbox import mod as mod_mail
-from .view_privenue import mod as mod_prv
-from .view_merchandise import mod as mod_merch
+from werkzeug.utils import find_modules, import_string
+from flask.blueprints import Blueprint
+import sys
 
 
-class Blueprints:
-	"""docstring for ClassName"""
-	blueprints_views = {mod_default, mod_mail, mod_prv, mod_merch}
-	blueprints_non_views = {mod_err, mod_dict, mod_api}
-
-	@classmethod
-	def register_blueprints(cls, app):
-		for mod in cls.blueprints_views.union(cls.blueprints_non_views):
-			app.register_blueprint(mod)
+# Circular import in Blueprint is not allowed for this method
+def register_blueprints(app, blueprint_folder='blueprints', blueprint_obj_name='bp', **kwargs):
+	blueprint_package = '.'.join((app.name, blueprint_folder))
+	for dotted_module_name in find_modules(blueprint_package, **kwargs):
+		module = import_string(dotted_module_name, silent=False)
+		print('- Searching for Blueprint object named \'{}\' in {}'.format(blueprint_obj_name, dotted_module_name))
+		if hasattr(module, blueprint_obj_name):
+			blueprint = import_string(':'.join((dotted_module_name, blueprint_obj_name)))
+			if isinstance(blueprint, Blueprint):
+				print('- Found [{}]-({}:{}), registering to [{}]'.format(blueprint, blueprint_obj_name, blueprint.name, app))
+				app.register_blueprint(blueprint)
+				print('> [{}] Registered !'.format(blueprint.name))
+		else:
+			print('> Can not found object named [{}]'.format(blueprint_obj_name))

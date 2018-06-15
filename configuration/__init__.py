@@ -5,16 +5,7 @@ import os
 class BaseConfig(object):
 	""" Builtin Value Configurations
 	"""
-	DEBUG = False
-	TESTING = False
-	SECRET_KEY = 'you-will-never-guess'
-
-	""" General Value Configurations
-	"""
-	# Define the application directory
-	BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-	# Define the database directory
-	DATABASE_URI = 'sqlite://:memory:'
+	SECRET_KEY = 'this-is-an-absolute-secret-or-not'
 
 
 class ExtensionConfig(BaseConfig):
@@ -54,7 +45,6 @@ class DevelopmentConfig(CustomConfig):
 	# Statement for enabling the development environment
 	DEBUG = True
 	TESTING = False
-	ASSETS_DEBUG = False
 
 
 # Production Configuration
@@ -62,7 +52,6 @@ class ProductionConfig(CustomConfig):
 	# Making sure that development/Testing environment are disabled
 	DEBUG = False
 	TESTING = False
-	ASSETS_DEBUG = False
 
 
 # Testing Configuration
@@ -70,10 +59,10 @@ class TestingConfig(CustomConfig):
 	# Statement for enabling the testing environment
 	DEBUG = False
 	TESTING = True
-	ASSETS_DEBUG = False
 
 
 app_config_dict = {
+	'base': CustomConfig,
 	'development': DevelopmentConfig,
 	'production': ProductionConfig,
 	'testing': TestingConfig

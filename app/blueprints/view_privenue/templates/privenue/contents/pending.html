@@ -1,0 +1,39 @@
+
+
+<div class="jumbotron">
+	{% if has_pending %}<h1 class="display-4">Here's the list of pending</h1>
+	{% else %}<h1 class="display-4">No pending batch found, listing Batches approved today</h1>
+	{% endif %}
+  <p class="lead">As at {{ results.timestamp | dtAU }}</p>
+  <hr class="my-4">
+
+	<div class="card-group">
+	{% for row in results.data  %}
+			<div class="card">
+				<div class="card-header">{{ row.CONTACT }} ({{ row.SERIALNUMBER }})
+				</div>
+				<div class="card-body">
+					<h6 class="card-title"><span class="text-muted">Gave a total of  </span>{{ row.TOTAL|currency }}</h6>
+					<p class="card-text">towards
+						{% if row.DESTINATIONCODE|upper != 'GENERAL' and row.DESTINATIONCODE|upper != 'MERCHANDISE' %}
+						<span class="badge badge-success">{{ row.DESTINATIONCODE }}</span>{% else %}{{ row.DESTINATIONCODE }}{% endif %}
+						&
+						{% if row.DESTINATIONCODE2|upper != 'GENERAL' and row.DESTINATIONCODE2|upper != 'MERCHANDISE' %}
+						<span class="badge badge-success">{{ row.DESTINATIONCODE2 }}</span>{% else %}{{ row.DESTINATIONCODE2 }}{% endif %}
+					</p>
+					<p class="card-text">sourcing
+						<span class="badge badge-primary">{{ row.SOURCECODE }}</span> via <span class="badge badge-info">{{ row.SOURCECODE2 }}/{{ row.PAYMENTTYPE }}</span>
+					</p>
+				</div>
+				<div class="card-footer">
+      		<small class="text-muted">By {{ row.CREATEDBY }} @ {{ row.CREATED | dtAU }}</small>
+    		</div>
+			</div>
+
+		{% if (loop.index)%5 ==0 %}</div><div class="card-group">{% endif %}
+	{% endfor %}
+</div>
+
+
+
+

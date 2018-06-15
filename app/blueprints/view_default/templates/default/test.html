@@ -4,8 +4,14 @@
 {% block content %}
 
 <div class="container-fluid">
-
+	<h1>My Testing Page</h1>
+	<hr />
+	{{ request.endpoint }}
+	<hr />
+	{{ 55|currency }}
+	<hr />
 	{{ data }}
+
 
 {#	<ul class="list-group list-group-flush">#}
 {#		{% for d in data %}#}

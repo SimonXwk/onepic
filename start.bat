@@ -11,7 +11,7 @@ if exist "%env_folder%\" (
 )
 
 echo ^>^>^> activate virtual environment ^& collect python dependecies ^& install node packages
-cmd /k "npm install  & env\Scripts\activate & pip install -r requirements.txt -U & gulp vendor & gulp sass & echo Ready :^) & npm start"
+cmd /k "npm install & env\Scripts\activate & pip install -r requirements.txt -U & gulp vendor & gulp sass & echo Ready :^) & npm start"
 
 
 rem npm init -y

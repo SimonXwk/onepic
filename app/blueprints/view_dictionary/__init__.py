@@ -1,5 +1,7 @@
-from app.blueprints.helpers import create_blueprint
-from .url_map import map_urls as route
+from app.helpers import create_blueprint, LazyLoader
 
-mod = create_blueprint('dictionary', __name__)
-route(mod)
+bp = create_blueprint('dictionary', __name__)
+ld = LazyLoader(bp)
+
+# LazyLoading View Functions
+ld.url('view_funcs.homepage', ['/'], endpoint='index')

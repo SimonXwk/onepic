@@ -27,21 +27,6 @@
 
 
 <div class="container-fluid">
-	{% if pending['creators'] %}
-		<div class="alert alert-warning alert-dismissible fade show" role="alert">
-			<strong>Reminder: </strong> Found total ${{ pending['total']|f }} from pending Batches created by {{ pending['creators'] }}
-			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-				<span aria-hidden="true">&times;</span>
-		</button>
-		</div>
-	{% else %}
-		<div class="alert alert-success alert-dismissible fade show" role="alert">
-			<strong></strong> No Pending Batches found, all batches are approved !
-			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-				<span aria-hidden="true">&times;</span>
-		</button>
-		</div>
-	{% endif %}
 
 	<div class="progress">
 		<div class="progress-bar" role="progressbar" aria-valuenow="{{ date_progress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ date_progress }}%">

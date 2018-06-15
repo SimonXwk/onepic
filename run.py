@@ -14,4 +14,4 @@ if __name__ == '__main__':
 		INSTANCE = 'production'
 
 	print("{}".format('-'*60))
-	create_app(INSTANCE).run(host=HOST, port=PORT)
+	create_app().run(host=HOST, port=PORT)

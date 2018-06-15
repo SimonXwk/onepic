@@ -1,7 +1,7 @@
 from app.database.odbc import ThankQODBC as tq
 from marshmallow import Schema, fields
 import datetime
-from app.blueprints.helpers import jsonified
+from app.helpers import jsonified
 
 
 class FyTotalSchema(Schema):
@@ -38,4 +38,16 @@ def cfy_platform_type_revenue():
 def pending_total():
 	result = tq.query('PENDING_TOTAL')
 	data = dict(total=result.rows[0].TOTAL, creators=result.rows[0].CREATEORS)
+	return data
+
+
+def pending_split():
+	result = tq.query('PENDING_SPLIT')
+	data = dict(timestamp=result.timestamp, data=result.rows)
+	return data
+
+
+def approved_split():
+	result = tq.query('APPROVED_SPLIT')
+	data = dict(timestamp=result.timestamp, data=result.rows)
 	return data

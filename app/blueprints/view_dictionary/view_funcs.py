@@ -1,7 +1,7 @@
-from app.blueprints.helpers import templated
+from app.helpers import templatified
 from app.tlma import TLMA
 
 
-@templated('index')
+@templatified('index')
 def homepage():
 	return dict(title='compendium', tlma=TLMA)

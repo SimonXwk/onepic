@@ -1,6 +1,6 @@
 const endpoint1 = '/api/cash/fys';
 const endpoint2 = '/api/cash/fysltd';
-const endpoint3 = '/api/cash/cfy/streama';
+const endpoint3 = '/api/cash/cfy/stream';
 const cfy = today.getMonth()+1 < 7 ? today.getFullYear() : today.getFullYear()+1;
 
 let valueChart1 =
