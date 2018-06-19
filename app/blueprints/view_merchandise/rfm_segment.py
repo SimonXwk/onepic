@@ -51,7 +51,7 @@ class Segment2:
 		:return: Segment Name
 		"""
 		r, f, m = row_raw[0], row_raw[1], row_raw[2]
-		if 0 <= r <= 53:
+		if 0 <= r < 54:
 			if f == 1:
 				return 'New Customers'
 			elif 2 <= f <= 3:
@@ -60,14 +60,14 @@ class Segment2:
 				return 'Stars'
 			else:
 				return undefined
-		elif 54 <= r <= 107:
+		elif 54 <= r < 108:
 			if f == 1:
 				return 'New Customers'
 			elif f >= 2:
 				return 'Active'
 			else:
 				return undefined
-		elif 108 <= r <= 216:
+		elif 108 <= r < 217:
 			if 1 <= f <= 2:
 				return 'Sleeping'
 			elif f >= 3:

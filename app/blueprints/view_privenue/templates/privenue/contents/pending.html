@@ -1,10 +1,16 @@
 
 
 <div class="jumbotron">
-	{% if has_pending %}<h1 class="display-4">Here's the list of pending</h1>
-	{% else %}<h1 class="display-4">No pending batch found, listing Batches approved today</h1>
+	{% if has_pending %}
+	<h1 class="display-4">Found Pending Payments</h1>
+	<p class="lead">As at {{ results.timestamp | dtAU }}</p>
+	<p>Listing pending payments</p>
+	{% else %}
+	<h1 class="display-4">No Pending Payments</h1>
+	<p class="lead">As at {{ results.timestamp | dtAU }}</p>
+	<p>Listing approved payments instead</p>
 	{% endif %}
-  <p class="lead">As at {{ results.timestamp | dtAU }}</p>
+
   <hr class="my-4">
 
 	<div class="card-group">

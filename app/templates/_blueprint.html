@@ -25,7 +25,8 @@
 
 {# Blueprint Overirde Main and redefine content #}
 {% block main %}
-	{{ request.endpoint | bpName }}
+	{{ request.blueprint}}
+
 {#<div class="wrapper">#}
 {#	{{ include_global('_global_sidebar') }}#}
 {##}
@@ -117,7 +118,7 @@
 
 {# Macros that will be used in each indiviual templates #}
 
-{% set current_blueprint_name = request.endpoint | bpName  %}
+{% set current_blueprint_name = request.blueprint  %}
 
 {% macro bp_include(fname) %}
 	{% include current_blueprint_name + '/' + 'includes' + '/' + fname %}

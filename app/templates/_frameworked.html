@@ -9,7 +9,9 @@
 
 
 {% block js_framework %}
-<script src="{{ url_for('vendor',filename= 'jquery.min.js') }}"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="{{url_for('vendor', filename='jquery.min.js') }}">\x3C/script>')</script>
+{#<script src="{{ url_for('vendor',filename= 'jquery.min.js') }}"></script>#}
 <script src="{{ url_for('vendor',filename= 'popper.min.js') }}"></script>
 <script src="{{ url_for('vendor',filename= 'bootstrap.min.js') }}"></script>
 {#<script src="{{ url_for('vendor',filename= 'jquery.mCustomScrollbar.concat.min.js') }}"></script>#}

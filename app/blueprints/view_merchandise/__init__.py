@@ -5,5 +5,5 @@ ld = LazyLoader(bp)
 
 # LazyLoading View Functions
 ld.url('view_funcs.homepage', ['/'], endpoint='index')
-ld.url('view_funcs.show_rfm_single', ['/rfm/<filename>'])
+ld.url('view_funcs.show_rfm_result_single', ['/rfm/<filename>'], endpoint='rfm_csv')
 ld.url('view_funcs.upload', ['/upload'], methods=['GET', 'POST'])
