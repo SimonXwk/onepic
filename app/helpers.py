@@ -1,6 +1,7 @@
 from werkzeug.utils import import_string, cached_property
-from flask import Blueprint, request, render_template, jsonify
+from flask import Blueprint, request, render_template, jsonify, send_from_directory
 from functools import wraps
+import os
 
 
 class LazyView(object):
@@ -44,7 +45,14 @@ class LazyLoader(object):
 
 
 def create_blueprint(blueprint_name, import_name, prefixed=True, **options):
-	return Blueprint(blueprint_name, import_name, static_folder='static', template_folder='templates', url_prefix='/' + blueprint_name if prefixed else '', **options)
+	bp = Blueprint(blueprint_name, import_name, static_folder='static', template_folder='templates', url_prefix='/' + blueprint_name if prefixed else '', **options)
+	# if not prefixed:
+	# 	def find_static_folder(filename=None):
+	# 		bp.send_static_file()
+	# 		return send_from_directory(os.path.join(bp.root_path, 'static'), filename)
+	# 	bp.add_url_rule(blueprint_name + '/static/<path:filename>', endpoint='static', view_func=find_static_folder)
+
+	return bp
 
 
 def templatified(template=None, absolute=False, extension='.html'):

@@ -1,7 +1,7 @@
 from flask import render_template, current_app, render_template, request, flash, redirect, url_for, send_from_directory, jsonify
 from werkzeug.utils import secure_filename
 import os
-from .rfm_calc import rfm_analysis as rfm, list_all_files as rfm_files
+from .rfm_calc import RFM, list_all_files as rfm_files
 from app.helpers import templatified
 
 
@@ -50,5 +50,5 @@ def upload():
 
 @templatified('rfm_result')
 def show_rfm_result_single(filename):
-	data=rfm(filename)
+	data = RFM(filename).analysis()
 	return dict(title='RFM Result', filename=filename, data=data)

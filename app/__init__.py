@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory, current_app
+from flask import Flask, send_from_directory, current_app, render_template
 import os
 from configuration import app_config_dict as cfg
 from .blueprints import register_blueprints
@@ -51,6 +51,7 @@ def create_app(test_config=None):
 	loader.url('favicon', ['/favicon.ico'], endpoint='favicon')
 	loader.url('find_vendor_folder', ['/static/vendor/<path:filename>'], endpoint='vendor')
 	loader.url('find_highchart_folder', ['/static/vendor/hc/<path:filename>'], endpoint='hc')
+	loader.url('test_page', ['/testpage'])
 
 	# LazyLoad Jinja filter functions
 	loader.filter('jinja_filters.filter_currency', name='currency')
@@ -86,3 +87,7 @@ def find_vendor_folder(filename=None):
 
 def find_highchart_folder(filename=None):
 	return send_from_directory(os.path.join(current_app.root_path, 'static/vendor/hc'), filename)
+
+
+def test_page():
+	return render_template('testpage.html')

@@ -1,12 +1,12 @@
-var gulp            = require('gulp');
-var plumber         = require('gulp-plumber');
-var browserSync     = require('browser-sync').create();
-var rename          = require('gulp-rename');
-var sass            = require('gulp-sass');
-var autoprefixer    = require('gulp-autoprefixer');
+const gulp            = require('gulp');
+const plumber         = require('gulp-plumber');
+const browserSync     = require('browser-sync').create();
+const rename          = require('gulp-rename');
+const sass            = require('gulp-sass');
+const autoprefixer    = require('gulp-autoprefixer');
 
 
-var config = {
+const config = {
     baseDir: '.',
     vendorDir: 'app/static/vendor',
     vendorHighChartDir: 'app/static/vendor/hc',

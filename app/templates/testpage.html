@@ -1,0 +1,12 @@
+{% extends '_blueprint.html' %}
+{% block content %}
+
+<div class="container-fluid">
+	<h1>My Testing Page</h1>
+	<a href="/">Home</a>
+	<hr />
+	{{ request.endpoint|bpName }}
+
+
+</div>
+{% endblock %}

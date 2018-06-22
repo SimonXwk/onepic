@@ -25,7 +25,7 @@
 
 {# Blueprint Overirde Main and redefine content #}
 {% block main %}
-	{{ request.blueprint}}
+	<hr>{{ request.environ['HTTP_USER_AGENT'] }}<hr>{{ request.blueprint }}<hr>{{ request.endpoint }}<hr>{{ request.script_root }}<hr>
 
 {#<div class="wrapper">#}
 {#	{{ include_global('_global_sidebar') }}#}
@@ -106,18 +106,23 @@
 
 {#
 	Param: 'current_blueprint_name': a blueprint context_processor variable name
-	refering to the current blueprint's name attribute
+	refering to the current blueprint's name attribute, or this can also be retreived
+	from request.blueprint if request object exists(hence not suitable for error
+	handling templates)
 
-	with this name the follwing macros know about which is the current
-	blueprint it's dealing with thus accessing it's standard folder
-	structure :
-	blueprint/templates/blueprint
-	blueprint/static/css
-	blueprint/static/js
+	with 'current_blueprint_name' given, the follwing macros know about which is the current
+	blueprint it's dealing with thus accessing it's standard folder structure(assuming same folder
+	structure for all blueprints) as follow:
+
+	blueprint/templates/blueprint_name/*.html
+	blueprint/templates/blueprint_name/includes/*.html
+	blueprint/templates/blueprint_name/contents/*.html
+	blueprint/static/css/*.css
+	blueprint/static/js/*.js
 #}
 
-{# Macros that will be used in each indiviual templates #}
-
+{# Macros that will be used in each indiviual blueprint templates #}
+{# request.blueprint will be None if this template is not rendered from Flask Buleprint Module  #}
 {% set current_blueprint_name = request.blueprint  %}
 
 {% macro bp_include(fname) %}
@@ -128,15 +133,16 @@
 	{% include current_blueprint_name + '/' + 'contents' + '/' + fname %}
 {% endmacro %}
 
-{% macro bp_js(fname) %}
+{% macro bp_css(fname, format='.css') %}
 	{# ! [url_prefix] needed for blueprint.static to work #}
-	<script src="{{ url_for(current_blueprint_name + '.static', filename='js' + '/' + fname + '.js') }}"></script>
+	<link rel="stylesheet" type="text/css" href="{{ url_for(current_blueprint_name + '.static', filename='css' + '/' + fname + format) }}">
 {% endmacro %}
 
-{% macro bp_css(fname) %}
+{% macro bp_js(fname, format='.js') %}
 	{# ! [url_prefix] needed for blueprint.static to work #}
-	<link rel="stylesheet" type="text/css" href="{{ url_for(current_blueprint_name + '.static', filename='css' + '/' + fname + '.css') }}">
+	<script src="{{ url_for(current_blueprint_name + '.static', filename='js' + '/' + fname + format) }}"></script>
 {% endmacro %}
+
 
 
 {# Import global libraries #}

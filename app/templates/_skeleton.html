@@ -26,7 +26,6 @@
   {% block css_embedded %}{% endblock %}
 </head>
 <body>
-	<hr>{{ request.environ['HTTP_USER_AGENT'] }}<hr>{{ request.blueprint }}<hr>{{ request.blueprint }}<hr>{{ request.script_root }}<hr>
 	{% block main %}
 		{# NavBar Primary #}
 		{% block navbar_global %}{%- endblock %}

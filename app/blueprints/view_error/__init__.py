@@ -4,6 +4,8 @@ from app.helpers import create_blueprint
 bp = create_blueprint('error', __name__)
 
 
+# This context is needed for template to know about the blueprint.
+# Request object is not available when abort happens(you can not use {{request.blueprint}} in templates)
 @bp.app_context_processor
 def inject_error_blueprint_name():
 	return dict(err_blueprint_name=bp.name)
