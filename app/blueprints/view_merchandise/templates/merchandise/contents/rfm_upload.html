@@ -1,7 +1,7 @@
 <main role="main" class="container">
 
 	<blockquote class="blockquote">
-		<p class="mb-0">RETAIL EXPRESS RFM ANALYSIS</p>
+		<p class="mb-0">RetailExpress CSV Report Listing For RFM Analysis</p>
 	</blockquote>
 
 	<form method="post"  enctype="multipart/form-data" class="form-inline">
@@ -16,8 +16,6 @@
 			</div>
 		</div>
 	</form>
-
-	<hr />
 
 	<div class="list-group">
 	{% with messages = get_flashed_messages(with_categories=true) %}
@@ -37,14 +35,14 @@
 	{% endwith %}
 	</div>
 
-	<div class="alert alert-dark" role="alert">VALID EXISTING UPLOADS : {{ files|length }} </div>
+	<div class="alert alert-success" role="alert">EXISTING VALID UPLOADS : {{ files|length }} </div>
 	<div class="list-group">
 		{% if files %}
 		{% for file in files %}
-		<a href="{{ url_for('merchandise.rfm_csv', filename= file | fname) }}" class="list-group-item list-group-item-action">
+		<a href="{{ url_for('merchandise.rfm_result', filename= file | fname) }}" class="list-group-item list-group-item-action">
 			<small >
 				<span class="badge badge-info badge-pill">{{ loop.index }}</span>
-				{{ file | fname }}
+				- {{ file | fname }}
 			</small>
 		</a >
 		{% endfor %}

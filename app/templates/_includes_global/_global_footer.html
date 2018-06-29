@@ -1,2 +1,11 @@
 <footer class="footer">
+	<div class="container">
+		<span class="text-muted">&copy; Copyright {{ now.strftime('%Y') }} BY TLMA</span>
+		|<span class="text-muted">{{ request.script_root }} </span>
+		|<span class="text-muted"> {{ request.blueprint }} </span>
+		|<span class="text-muted"> {{ request.endpoint }} </span>
+	</div>
+	<div class="container">
+		<span class="text-muted">{{ request.environ['HTTP_USER_AGENT'] }}</span>
+	</div>
 </footer>

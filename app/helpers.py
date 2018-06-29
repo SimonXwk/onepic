@@ -1,7 +1,6 @@
 from werkzeug.utils import import_string, cached_property
 from flask import Blueprint, request, render_template, jsonify, send_from_directory
 from functools import wraps
-import os
 
 
 class LazyView(object):
@@ -23,6 +22,7 @@ class LazyLoader(object):
 		self.flask_proxy = flask_proxy
 
 	def full_import_name(self, import_name):
+		# Prefix the import name by the app name or blueprint name and '.'
 		return '.'.join((self.flask_proxy.import_name, import_name))
 
 	def url(self, import_name, url_rules=None, **options):

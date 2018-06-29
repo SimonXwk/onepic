@@ -1,5 +1,6 @@
-from flask import request, session, flash, redirect
+from flask import request, session, flash, redirect, url_for
 from app.helpers import templatified
+from flask_dance.contrib.azure import azure
 
 
 @templatified('index')
@@ -50,3 +51,17 @@ def logout():
 	session['user_name'] = None
 	flash('logout successfully', 'success')
 	return redirect('/')
+
+
+def login_as_guest():
+	session['user_name'] = 'Guest'
+	return redirect('/')
+
+#
+# def login():
+# 	print(url_for("azure.login"))
+# 	if not azure.authorized:
+# 		return redirect(url_for("azure.login"))
+# 	resp = azure.get("/v1.0/me")
+# 	assert resp.ok
+# 	return "You are {mail} on Azure AD".format(mail=resp.json()["mail"])

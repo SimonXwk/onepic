@@ -1,4 +1,5 @@
 import os
+import datetime
 from app.tlma import TLMA
 
 
@@ -12,6 +13,10 @@ def filter_datetime_au(value, fmt='%A %d %B %Y %H:%M:%S'):
 
 def filter_date_au(value, fmt='%d %B %Y'):
 	return value.strftime(fmt)
+
+
+def filter_to_date(value, fmt=''):
+	return datetime.datetime.strptime(value,fmt)
 
 
 def filter_month_name(value):
@@ -48,6 +53,3 @@ def filter_email_name(value):
 def filter_mail_excel_month(value):
 	return value.rsplit('.', 2)[0][-6:-3].strip()
 
-
-def request_endpoint_root(value):
-	return value.rsplit('.', 1)[0].replace('.', '/')

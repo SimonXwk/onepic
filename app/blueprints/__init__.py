@@ -1,6 +1,5 @@
 from werkzeug.utils import find_modules, import_string
 from flask.blueprints import Blueprint
-import sys
 
 
 # Circular import in Blueprint is not allowed for this method
@@ -14,6 +13,6 @@ def register_blueprints(app, blueprint_folder='blueprints', blueprint_obj_name='
 			if isinstance(blueprint, Blueprint):
 				print('- Found [{}]-({}:{}), registering to [{}]'.format(blueprint, blueprint_obj_name, blueprint.name, app))
 				app.register_blueprint(blueprint)
-				print('> [{}] Registered !'.format(blueprint.name))
+				print('V [{}] Registered !'.format(blueprint.name))
 		else:
-			print('> Can not found object named [{}]'.format(blueprint_obj_name))
+			print('X Can not found object named [{}]'.format(blueprint_obj_name))

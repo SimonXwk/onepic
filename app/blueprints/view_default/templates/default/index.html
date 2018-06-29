@@ -1,17 +1,4 @@
-{% extends '_blueprint.html' %}
-
-
-{% block css_framework %}{% endblock %}
-{% block css_optional %}{% endblock %}
-{% block css_custom %}
-{#	{{ bp_css('index') }}#}
-{% endblock %}
-
-{% block js_framework %}{% endblock %}
-{% block js_optional %}{% endblock %}
-{% block js_custom %}{% endblock %}
-
-{% block title %}{% if title %}{{ title }}{% else %}Home{% endif %}{% endblock %}
+{% extends framework_template %}
 
 
 {% block css_embedded %}

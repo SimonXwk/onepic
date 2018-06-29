@@ -1,0 +1,29 @@
+{% extends 'app.html' %}
+
+{% block css_framework %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename= 'css/main.min.css') }}">
+{% endblock %}
+
+{% block js_framework %}
+{% for js in framework_js %}<script src="{{ js }}"></script>{% endfor %}
+<script src="{{ url_for('static',filename= 'js/main.js') }}"></script>
+{% endblock %}
+
+{# Clear out css except for framework ones #}
+{% block css_optional %}{% endblock %}
+{% block css_custom %}{% endblock %}
+{% block css_embedded %}{% endblock %}
+{# Clear out javascript except for framework ones #}
+{% block js_optional %}{% endblock %}
+{% block js_custom %}{% endblock %}
+{% block js_embedded_before %}{% endblock %}
+{% block js_embedded_after %}{% endblock %}
+
+
+{# tile comes from render_template 'title' keyword argument #}
+{% block title %}{% if title %}{{ title }}{% else %}{{ request.endpoint }}{% endif %}{% endblock %}
+{# Default #}
+{% block navbar_global %}{% include framework_folder + '_navbar.html' %}{% endblock %}
+{% block footer %}{% include framework_folder + '_footer.html' %}{% endblock %}
+{% block navbar_local %}{% endblock %}
+{% block content %}{% endblock %}

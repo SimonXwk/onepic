@@ -1,15 +1,12 @@
 {% extends '_frameworked.html' %}
-
-{% block js_framework %}
-{{ super() }}
+{# Add Customized Global JavaScript #}
+{% block js_framework %}{{ super() }}
 <script src="{{ url_for('static',filename= 'js/main.js') }}"></script>
 {% endblock %}
-
 {# Clear out css except for framework ones #}
 {% block css_optional %}{% endblock %}
 {% block css_custom %}{% endblock %}
 {% block css_embedded %}{% endblock %}
-
 {# Clear out javascript except for framework ones #}
 {% block js_optional %}{% endblock %}
 {% block js_custom %}{% endblock %}
@@ -18,90 +15,18 @@
 
 
 {# tile comes from render_template 'title' keyword argument #}
-{% block title %}{% if title %}{{ title }}{% else %}{{ current_blueprint_name }}{% endif %}{% endblock %}
-
-{# Nav Bar #}
+{% block title %}{% if title %}{{ title }}{% else %}{{ request.endpoint }}{% endif %}{% endblock %}
+{# Default #}
 {% block navbar_global %}{% include '_includes_global/_global_nvabar.html' %}{% endblock %}
+{% block footer %}{% include '_includes_global/_global_footer.html' %}{% endblock %}
+{% block navbar_local %}{% endblock %}
+<div class="container-fluid">{% block content %}{% endblock %}</div>
 
 {# Blueprint Overirde Main and redefine content #}
-{% block main %}
-	<hr>{{ request.environ['HTTP_USER_AGENT'] }}<hr>{{ request.blueprint }}<hr>{{ request.endpoint }}<hr>{{ request.script_root }}<hr>
-
-{#<div class="wrapper">#}
-{#	{{ include_global('_global_sidebar') }}#}
-{##}
-{#	<div id="content">#}
-{#			<button type="button" id="sidebarCollapse" class=" ">{{ svg('nav_collapse') }}</button>#}
-{#			 NavBar Secondaries #}
-{#			{% block navbar_local %}{% endblock %}#}
-{#			 Nav Bar #}
-{#			{% block content %}{% endblock %}#}
-{#			 Footer #}
-{#			{% block footer %}{{ include_global('_global_footer') }}{% endblock %}#}
-{##}
-{#	</div>#}
-{##}
-{#	<div class="overlay"></div>#}
-{#</div>#}
-
-<div id="wrapper">
-		<!-- Sidebar -->
-	<div id="sidebar-wrapper">
-			<ul class="sidebar-nav">
-					<li class="sidebar-brand">
-							<a href="/">One Picture</a>
-					</li>
-
-					<li>
-							<a href="{{ url_for('dictionary.index') }}">Dictionary</a>
-					</li>
-
-					<li>
-							<a href="#nav-group-mailbox" data-toggle="collapse" aria-expanded="false">Mailbox</a>
-							<ul class="collapse list-unstyled" id="nav-group-mailbox">
-									<li><a href="{{ url_for('mailbox.index') }}">today</a></li>
-									<li><a href="{{ url_for('mailbox.daily') }}">daily</a></li>
-									<li><a href="{{ url_for('mailbox.monthly') }}">Monthly</a></li>
-							</ul>
-					</li>
-
-				<li>
-						<a href="#nav-group-privenue" data-toggle="collapse" aria-expanded="false">Private Revenue</a>
-						<ul class="collapse list-unstyled" id="nav-group-privenue">
-								<li><a href="{{ url_for('privenue.index') }}">Overview</a></li>
-								<li><a href="{{ url_for('privenue.pending') }}">Pending Batches</a></li>
-						</ul>
-				</li>
-
-				<li>
-						<a href="#nav-group-merchandise" data-toggle="collapse" aria-expanded="false">Merchandise</a>
-						<ul class="collapse list-unstyled" id="nav-group-merchandise">
-								<li><a href="{{ url_for('merchandise.upload') }}">RFM Analysis</a></li>
-
-						</ul>
-				</li>
+{#{% block main %}#}
+{#{% endblock %}#}
 
 
-					<li>
-							<a href="{{ url_for('api.index') }}">API</a>
-					</li>
-			</ul>
-	</div>
-	<!-- /#sidebar-wrapper -->
-
-	<!-- Page Content -->
-	<div id="page-content-wrapper">
-		<a href="#menu-toggle" class="btn btn-info" id="menu-toggle">Toggle</a>
-		{% block navbar_local %}{% endblock %}
-		{% block content %}{% endblock %}
-		{% block footer %}{{ include_global('_global_footer') }}{% endblock %}
-	</div>
-	<!-- /#page-content-wrapper -->
-
-</div>
-
-
-{% endblock %}
 
 
 {#
@@ -125,22 +50,22 @@
 {# request.blueprint will be None if this template is not rendered from Flask Buleprint Module  #}
 {% set current_blueprint_name = request.blueprint  %}
 
-{% macro bp_include(fname) %}
+{% macro bp_include(fname, fmt='.html') %}
 	{% include current_blueprint_name + '/' + 'includes' + '/' + fname %}
 {% endmacro %}
 
-{% macro bp_content(fname, format='.html') %}
+{% macro bp_content(fname, fmt='.html') %}
 	{% include current_blueprint_name + '/' + 'contents' + '/' + fname %}
 {% endmacro %}
 
-{% macro bp_css(fname, format='.css') %}
+{% macro bp_css(fname, file_type='.css') %}
 	{# ! [url_prefix] needed for blueprint.static to work #}
-	<link rel="stylesheet" type="text/css" href="{{ url_for(current_blueprint_name + '.static', filename='css' + '/' + fname + format) }}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for(current_blueprint_name + '.static', filename='css' + '/' + fname + file_type) }}">
 {% endmacro %}
 
-{% macro bp_js(fname, format='.js') %}
+{% macro bp_js(fname, file_type='.js') %}
 	{# ! [url_prefix] needed for blueprint.static to work #}
-	<script src="{{ url_for(current_blueprint_name + '.static', filename='js' + '/' + fname + format) }}"></script>
+	<script src="{{ url_for(current_blueprint_name + '.static', filename='js' + '/' + fname + file_type) }}"></script>
 {% endmacro %}
 
 

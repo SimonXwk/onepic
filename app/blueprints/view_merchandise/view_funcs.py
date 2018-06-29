@@ -49,6 +49,5 @@ def upload():
 
 
 @templatified('rfm_result')
-def show_rfm_result_single(filename):
-	data = RFM(filename).analysis()
-	return dict(title='RFM Result', filename=filename, data=data)
+def rfm_result(filename):
+	return dict(title='RFM Result', filename=filename)

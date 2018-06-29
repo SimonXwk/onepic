@@ -24,11 +24,12 @@ gulp.task('vendor-highchart', function() {
   return gulp.src([
       'node_modules/highcharts/highcharts.js',
       'node_modules/highcharts/highcharts-more.js',
+      'node_modules/highcharts/highcharts-3d.js',
       'node_modules/highcharts/modules/exporting.js',
       'node_modules/highcharts/modules/sankey.js',
       'node_modules/highcharts/modules/data.js',
       'node_modules/highcharts/modules/drilldown.js',
-      'node_modules/highcharts/modules/solid-gauge.js',
+      'node_modules/highcharts/modules/solid-gauge.js'
     ])
     .pipe(plumber())
     .pipe(gulp.dest(config.vendorHighChartDir))

@@ -1,0 +1,40 @@
+<div class="container">
+
+	<div class="card text-center">
+		<div class="card-header">
+			<ul class="nav nav-tabs card-header-tabs">
+				<li class="nav-item">
+					<a class="nav-link active" href="#">Definition</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="#">List</a>
+				</li>
+			</ul>
+		</div>
+		<div class="card-body">
+			<h5 class="card-title">JOURNEY FOR MERCHANDISE NEW CUSTOMER (Priority 2.1)</h5>
+			<p class="card-text">Excluding Pure Non-Merchandise Donor and Pure New Merchandise Pledger</p>
+			<a href="#" class="btn btn-primary">Go</a>
+		</div>
+	</div>
+
+
+	<table class="table table-hover table-sm">
+		<thead>
+			<tr>
+				<th scope="col">Serialnumber</th>
+				<th scope="col">First TRX Date</th>
+				<th scope="col">First Order Number</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for row in data %}
+			<tr {% if not row[2] %}class="table-danger"{% endif %}>
+				<th scope="row">{{ row[0]|trim }}</th>
+				<td>{{ row[1] }}</td>
+				<td>{{ row[2] }}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>

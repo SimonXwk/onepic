@@ -1,15 +1,17 @@
-from flask import Flask, send_from_directory, current_app, render_template
+from flask import send_from_directory, current_app, render_template
 import os
 from configuration import app_config_dict as cfg
 from .blueprints import register_blueprints
 from .helpers import LazyLoader
+from .api import ApiFlask
 
 
 def create_app(test_config=None):
 	print("{}".format('-' * 60))
 	import_name = __name__.split('.')[0]
 	# step 1: Create Flask application object
-	app = Flask(import_name, instance_relative_config=True)
+	app = ApiFlask(import_name, instance_relative_config=True)
+	# app.register_api_error_handler()
 	print(">> Import name [{}] applied".format(import_name))
 	# step 2: Builtin/Extensions/MyOwn Flask Configuration
 	app.config.from_object(cfg.get('base'))
@@ -51,12 +53,13 @@ def create_app(test_config=None):
 	loader.url('favicon', ['/favicon.ico'], endpoint='favicon')
 	loader.url('find_vendor_folder', ['/static/vendor/<path:filename>'], endpoint='vendor')
 	loader.url('find_highchart_folder', ['/static/vendor/hc/<path:filename>'], endpoint='hc')
-	loader.url('test_page', ['/testpage'])
+	loader.url('hidden_portal', ['/tp'])
 
 	# LazyLoad Jinja filter functions
 	loader.filter('jinja_filters.filter_currency', name='currency')
 	loader.filter('jinja_filters.filter_datetime_au', name='dtAU')
 	loader.filter('jinja_filters.filter_date_au', name='dAU')
+	loader.filter('jinja_filters.filter_to_date', name='strpdt')
 	loader.filter('jinja_filters.filter_month_name', name='mth')
 	loader.filter('jinja_filters.filter_financial_year', name='FY')
 	loader.filter('jinja_filters.filter_2decimal', name='f')
@@ -65,7 +68,6 @@ def create_app(test_config=None):
 	loader.filter('jinja_filters.filter_filename', name='fname')
 	loader.filter('jinja_filters.filter_email_name', name='emailName')
 	loader.filter('jinja_filters.filter_mail_excel_month', name='mailmonth')
-	loader.filter('jinja_filters.request_endpoint_root', name='bpName')
 
 	# Close the session after each request or application context shutdown
 	@app.teardown_appcontext
@@ -89,5 +91,5 @@ def find_highchart_folder(filename=None):
 	return send_from_directory(os.path.join(current_app.root_path, 'static/vendor/hc'), filename)
 
 
-def test_page():
+def hidden_portal():
 	return render_template('testpage.html')

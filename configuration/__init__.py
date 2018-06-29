@@ -1,6 +1,3 @@
-import os
-
-
 # Default Configuration (inheriting from object is not necessary in python3)
 class BaseConfig(object):
 	""" Builtin Value Configurations
@@ -19,6 +16,18 @@ class ExtensionConfig(BaseConfig):
 class CustomConfig(ExtensionConfig):
 	""" Configurations only apply to this application
 	"""
+	""" Bootstrap Config
+	"""
+	BOOTSTRAP_SERVE_LOCAL = False
+	BOOTSTRAP_USE_PACKAGE_JSON_VERSION = True
+
+	BOOTSTRAP_VERSION = '4.1.1'
+	BOOTSTRAP_JQUERY_VERSION = '3.3.1'
+	BOOTSTRAP_POPPER_VERSION = '1.14.1'
+
+	BOOTSTRAP_JS_CDN = 'https://stackpath.bootstrapcdn.com/bootstrap/{}/js/bootstrap.min.js'
+	BOOTSTRAP_JQUERY_CDN = 'https://ajax.googleapis.com/ajax/libs/jquery/{}/jquery.min.js'
+	BOOTSTRAP_POPPER_CDN = 'https://cdnjs.cloudflare.com/ajax/libs/popper.js/{}/umd/popper.min.js'
 
 	""" ThnakQ ODBC Connection String
 	"""

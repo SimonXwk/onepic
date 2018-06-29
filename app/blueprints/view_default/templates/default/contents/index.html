@@ -5,17 +5,17 @@
 <div id="sketch_logout"></div>
 {% endif %}
 <header class="info">
-	<hgroup class="about">
+	<div class="about">
 			<h1>One Picture &rsaquo;</h1>
 			{% if user %}
-			<h2>welcome back, {{ user|emailName }}</h2>
+			<h2>welcome back, {{ user }}</h2>
 			<h3><a href="/logout"> logout</a></h3>
 			{% else %}
-			<h2>please login</h2>
+			<h2>please login or <a href="/login_as_guest">view as guest</a></h2>
 			<h3>{{ now | dtAU }}</h3>
 			{% endif %}
 
-	</hgroup>
+	</div>
 
 	{% if user %}
 	<nav class="more">

@@ -1,0 +1,49 @@
+/* ---------------------------------------------------
+    General Purpose
+----------------------------------------------------- */
+$body-bg-color: #8efff8;
+$footer-bg-color: #f5f5f5;
+$footer_height: 60px;
+
+//html {
+//  position: relative;
+//  min-height: 100%;
+//}
+
+
+
+body {
+  padding-top: 4rem;
+  //padding-bottom: $footer_height;
+}
+
+//footer {
+//  min-height:100%;
+//  position:relative;
+//}
+
+// Sticky Footer
+.footer {
+  //position: absolute;
+  //bottom: 0;
+  //left:0;
+  //width: 100%;
+  /* Set the fixed height of the footer here */
+  //height:$footer_height;
+  //line-height: $footer_height; /* Vertically center the text there */
+  background-color: $footer-bg-color;
+}
+
+// Navbar Hover effect
+.nav-item::after{
+  content:'';
+  display:block;
+  width:0;
+  height:2px;
+  background: #33fe61;
+  transition: 0.2s;
+}
+
+.nav-item:hover::after{
+  width:100%;
+}

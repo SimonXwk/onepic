@@ -32,9 +32,6 @@ def list_all_files():
 	return glob.glob(mask)
 
 
-
-
-
 class RFM(object):
 	def __init__(self, file_name=None):
 		self.csv_file = file_name
@@ -53,7 +50,6 @@ class RFM(object):
 				return idx + 1 if one_is_worst else max_score - idx  # Bigger than or equal to the current percentile
 		return max_score if one_is_worst else 1  # Could not math in the for loop, then it will be the smallest/biggest score
 
-	# @cached_property
 	def analysis(self):
 		file_name = self.csv_file
 		if file_name:
@@ -145,15 +141,9 @@ class RFM(object):
 			# 	rfm.to_csv(os.path.join(get_result_folder(), '_'.join([filename, 'rfmTable']) + '.csv'), encoding='utf-8-sig')
 			# except PermissionError:
 			# 	print('Permission denied : Attempt to save as CSV')
-
 			# Preparing Output
 			seg_dict = rfm['Segment'].value_counts().to_dict()
-			seg_data = dict(file=file_dict, quantile=quantile, segment=Segment.segments, name=list(seg_dict.keys()), value=list(seg_dict.values()))
-
-			if file_name:
-				data = seg_data
-			else:
-				data[file_dict['filename']] = seg_data
-
-			print('\nRFM calculation finished, check results in folder : {}'.format(os.path.join(os.getcwd(), get_data_folder())))
-			return data
+			seg_data = dict(file=file_dict, quantile=quantile, segments=Segment.segments, segment_actual=list(seg_dict.keys()), segment_count=list(seg_dict.values()),
+			                rfm=rfm.to_json(orient='index', force_ascii=False))
+			# print('\nRFM calculation finished, check results in folder : {}'.format(os.path.join(os.getcwd(), get_data_folder())))
+			return seg_data

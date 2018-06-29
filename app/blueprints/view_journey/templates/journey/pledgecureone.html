@@ -1,0 +1,33 @@
+{% extends framework_template %}
+
+{# Addiditonal Libraries #}
+{% block css_optional %}
+{% endblock %}
+
+{% block js_optional %}
+	{{ import('highchart', ['data','drilldown']) }}
+{% endblock %}
+
+{# My Own js and css #}
+{% block css_custom %}
+{% endblock %}
+
+{% block js_custom %}
+{% endblock %}
+
+
+{# Actual Content #}
+{% block content %}
+	{{ bp_content('pledgecureone.html') }}
+{% endblock %}
+
+
+{# Embedded CSS & Javascript #}
+{% block css_embedded %}
+{% endblock %}
+
+{% block js_embedded_before %}
+{% endblock %}
+
+{% block js_embedded_after %}
+{% endblock %}

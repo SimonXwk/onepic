@@ -14,5 +14,8 @@ ld.url('data_privenue.fy_total_all', ['/cash/fys'])
 ld.url('data_privenue.fy_total_all_ltd', ['/cash/fysltd'])
 ld.url('data_privenue.cfy_platform_type_revenue', ['/cash/cfy/stream'])
 
-ld.url('data_merch.new_fy', ['/merch/new/fy/<int:fy>'])
+# Merchandise related APIs
+ld.url('data_merch.new_fy', ['/merch/new/fy/<string:fy>'])
 ld.url('data_merch.new_cfy_month', ['/merch/new/cfy/<int:month>'])
+ld.url('data_merch.rex_rfm', ['/merch/rfm/<filename>'])
+

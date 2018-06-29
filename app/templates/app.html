@@ -1,0 +1,72 @@
+{% extends '_skeleton.html' %}
+
+{#
+	Param: 'current_blueprint_name': a blueprint context_processor variable name
+	refering to the current blueprint's name attribute, or this can also be retreived
+	from request.blueprint if request object exists(hence not suitable for error
+	handling templates)
+
+	with 'current_blueprint_name' given, the follwing macros know about which is the current
+	blueprint it's dealing with thus accessing it's standard folder structure(assuming same folder
+	structure for all blueprints) as follow:
+
+	blueprint/templates/blueprint_name/*.html
+	blueprint/templates/blueprint_name/includes/*.html
+	blueprint/templates/blueprint_name/contents/*.html
+	blueprint/static/css/*.css
+	blueprint/static/js/*.js
+#}
+
+{# Macros that will be used in each indiviual blueprint templates #}
+{# request.blueprint will be None if this template is not rendered from Flask Buleprint Module  #}
+{% set current_blueprint_name = request.blueprint  %}
+
+{% macro bp_include(fname, fmt='.html') %}
+	{% include current_blueprint_name + '/' + 'includes' + '/' + fname %}
+{% endmacro %}
+
+{% macro bp_content(fname, fmt='.html') %}
+	{% include current_blueprint_name + '/' + 'contents' + '/' + fname %}
+{% endmacro %}
+
+{% macro bp_css(fname, file_type='.css') %}
+	{# ! [url_prefix] needed for blueprint.static to work #}
+	<link rel="stylesheet" type="text/css" href="{{ url_for(current_blueprint_name + '.static', filename='css' + '/' + fname + file_type) }}">
+{% endmacro %}
+
+{% macro bp_js(fname, file_type='.js') %}
+	{# ! [url_prefix] needed for blueprint.static to work #}
+	<script src="{{ url_for(current_blueprint_name + '.static', filename='js' + '/' + fname + file_type) }}"></script>
+{% endmacro %}
+
+
+{# Import global libraries #}
+{% macro include_global(file, file_type='.html') %}
+	{% include ('_includes_global' + '/' + file + file_type) %}
+{% endmacro %}
+
+{# Import svg #}
+{% macro svg(file, file_type='.html') %}
+	{% include ('_svg' + '/' + file + file_type) %}
+{% endmacro %}
+
+
+{# Import global libraries #}
+{% macro import(vendor, vendor_subs=[]) %}
+	{% if vendor == 'echart' %}
+		<script src="{{ url_for('vendor', filename='echarts-en.min.js') }}"></script>
+
+	{% elif vendor == 'highchart' %}
+		<script src="{{ url_for('hc', filename='highcharts.js') }}"></script>
+		<script src="{{ url_for('hc', filename='exporting.js') }}"></script>
+		{% if vendor_subs %}
+			{% for vsub in vendor_subs %}
+			<script src="{{ url_for('hc', filename=vsub+'.js') }}"></script>
+			{% endfor %}
+		{% endif %}
+
+	{% elif vendor == 'sketch' %}
+		<script src="{{ url_for('vendor', filename='sketch.min.js') }}"></script>
+	{% else %}
+	{% endif %}
+{% endmacro %}
