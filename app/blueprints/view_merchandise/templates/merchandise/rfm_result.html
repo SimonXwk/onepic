@@ -39,8 +39,8 @@
 <script>
 const filename = "{{ filename }}";
 const rScoreMax = Number("{{ filename.split('_')[-1].split('.')[0].split('-')[0] }}");
-const	fScoreMax = Number("{{ filename.split('_')[-1].split('.')[0].split('-')[1] }}");
-const	mScoreMax = Number("{{ filename.split('_')[-1].split('.')[0].split('-')[2] }}");
+const fScoreMax = Number("{{ filename.split('_')[-1].split('.')[0].split('-')[1] }}");
+const mScoreMax = Number("{{ filename.split('_')[-1].split('.')[0].split('-')[2] }}");
 console.log('Max R F M scores: ', rScoreMax, fScoreMax, mScoreMax);
 
 
@@ -52,6 +52,17 @@ Highcharts.setOptions({
 	}
 });
 
+
+let chart1 = new Highcharts.Chart({
+	chart: {
+        renderTo: 'chart1',
+        type: 'pie',
+		options3d: {
+			enabled: true,
+			alpha: 45,
+			beta: 0
+			}
+	},
 
 function Chart1(data) {
 	Highcharts.chart('chart1', {

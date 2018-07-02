@@ -60,6 +60,8 @@ def templatified(template=None, absolute=False, extension='.html'):
 		@wraps(f)
 		def decorated_function(*args, **kwargs):
 			template_name = template
+			if template[-len(extension):] != extension:
+				template_name = template + extension
 			""" Process the template variable and construct the template_name for flask.render_template(template_name)
 			Replace '.' in request.endpoint with '/'
 			Case 1: No template provided, use the /endpoint.html
@@ -69,9 +71,7 @@ def templatified(template=None, absolute=False, extension='.html'):
 			if template_name is None:
 				template_name = request.endpoint.replace('.', '/') + extension
 			elif not absolute:
-				template_name = '/'.join((request.endpoint.rsplit('.', 2)[0].replace('.', '/'), template + extension))
-			else:
-				template_name = template + extension
+				template_name = '/'.join((request.endpoint.rsplit('.', 1)[0].replace('.', '/'), template_name))
 			# Run the wrapped function, which should return a dictionary of Parameters
 			dic = f(*args, **kwargs)
 			if dic is None:
