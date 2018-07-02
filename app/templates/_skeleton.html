@@ -13,8 +13,6 @@
   <title>{%- block title -%}{%- endblock -%}</title>
   <!-- favicon -->
   <link rel="shortcut icon" href="{{ url_for('static',filename='favicon.ico')}}">
-	{# Sets a global variable to the prefix to the root of the application.  #}
-	<script type=text/javascript>$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};</script>
 
   {# Framework Required CSS Library #}
   {% block css_framework %}{% endblock %}
@@ -24,6 +22,8 @@
   {% block css_custom %}{% endblock %}
 	{# Embedded CSS #}
   {% block css_embedded %}{% endblock %}
+
+	{% block js_header %}{% endblock %}
 </head>
 <body>
 	{% block main %}

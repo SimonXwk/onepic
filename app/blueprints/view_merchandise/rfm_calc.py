@@ -136,14 +136,20 @@ class RFM(object):
 			# Candidate Columns for RFM Segment Calculation: 'r_score', 'f_score', 'm_score', 'recency', 'frequency', 'monetary_value'
 			rfm['Segment'] = rfm.loc[:, ['recency', 'frequency', 'monetary_value']].apply(lambda x: Segment.calc(x), axis=1)
 
+			# print(rfm.head().reset_index().T.to_dict())
+			rfm['rfm_score'] = (rfm['r_score'].astype(str)) + (rfm['f_score'].astype(str)) + (rfm['m_score'].astype(str))
+
 			# # Save Result
 			# try:
 			# 	rfm.to_csv(os.path.join(get_result_folder(), '_'.join([filename, 'rfmTable']) + '.csv'), encoding='utf-8-sig')
 			# except PermissionError:
 			# 	print('Permission denied : Attempt to save as CSV')
 			# Preparing Output
+
 			seg_dict = rfm['Segment'].value_counts().to_dict()
-			seg_data = dict(file=file_dict, quantile=quantile, segments=Segment.segments, segment_actual=list(seg_dict.keys()), segment_count=list(seg_dict.values()),
-			                rfm=rfm.to_json(orient='index', force_ascii=False))
+			rfm_dict = rfm['rfm_score'].value_counts().to_dict()
+
+			data = dict(file=file_dict, quantile=quantile, segments=dict(definition=Segment.segments, actuals=seg_dict),
+				rfm=dict(excluded_records=excluded_rows, scores=rfm_dict, rows=rfm.reset_index().T.to_dict()) )
 			# print('\nRFM calculation finished, check results in folder : {}'.format(os.path.join(os.getcwd(), get_data_folder())))
-			return seg_data
+			return data

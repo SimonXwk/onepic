@@ -4,7 +4,7 @@ undefined = 'Undefined'
 class Segment1:
 	segments = ('Champions', 'Loyal Customers', 'Potential Loyalist', 'Recent Customers',
 	            'Promising', 'Customers Needing Attention', 'About To Sleep',
-	            'At Risk', 'Can’t Lose Them', 'Hibernating', 'Lost')
+	            'At Risk', 'Can’t Lose Them', 'Hibernating', 'Lost', undefined)
 
 	@classmethod
 	def calc(cls, row):
@@ -42,7 +42,7 @@ class Segment1:
 
 
 class Segment2:
-	segments = ('Rising Customer', 'Rising Customer', 'Stars', 'Active', 'Sleeping', 'Falling', 'Alert')
+	segments = ('New Customers', 'Rising Customer', 'Stars', 'Active', 'Sleeping', 'Falling', 'Alert', undefined)
 
 	@classmethod
 	def calc(cls, row_raw):

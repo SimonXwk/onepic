@@ -5,7 +5,6 @@ from app.api import ApiResult, ApiException
 from app.blueprints.view_merchandise.rfm_calc import RFM
 
 
-# @responsed
 def new_fy(fy=None):
 	results = {}
 	if fy is None:
@@ -33,7 +32,6 @@ def new_fy(fy=None):
 	return ApiResult(results)
 
 
-# @responsed
 def new_cfy_month(month=None):
 	if month is not None and (int(month) < 1 or int(month) > 12):
 		return ApiException('An integer between 1 and 12 representing a month in current financial year is required')
@@ -59,6 +57,5 @@ def new_cfy_month(month=None):
 
 
 def rex_rfm(filename=None):
-	print("*"*100)
 	data = RFM(filename).analysis()
 	return ApiResult(data)

@@ -58,10 +58,11 @@
 
 	{% elif vendor == 'highchart' %}
 		<script src="{{ url_for('hc', filename='highcharts.js') }}"></script>
+		<script src="{{ url_for('hc', filename='highcharts-more.js') }}"></script>
 		<script src="{{ url_for('hc', filename='exporting.js') }}"></script>
 		{% if vendor_subs %}
 			{% for vsub in vendor_subs %}
-			<script src="{{ url_for('hc', filename=vsub+'.js') }}"></script>
+		<script src="{{ url_for('hc', filename=vsub+'.js') }}"></script>
 			{% endfor %}
 		{% endif %}
 
@@ -70,3 +71,15 @@
 	{% else %}
 	{% endif %}
 {% endmacro %}
+
+
+
+
+{# Global Javascript #}
+
+{% block js_header %}
+<script type=text/javascript>
+{# Sets a global variable to the prefix to the root of the application.  #}
+$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+</script>
+{% endblock %}

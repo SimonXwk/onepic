@@ -13,7 +13,7 @@
 {% endblock %}
 
 {% block js_custom %}
-	{{ import('highchart', ['highcharts-3d']) }}
+	{{ import('highchart', ['highcharts-3d', 'boost']) }}
 {#	{{ import('echart') }}#}
 {% endblock %}
 
@@ -38,48 +38,83 @@
 {% block js_embedded_after %}
 <script>
 const filename = "{{ filename }}";
-const endpoint = '/api/merch/rfm/'+ filename;
-console.log('Fetching endpoint : ' + endpoint);
+const rScoreMax = Number("{{ filename.split('_')[-1].split('.')[0].split('-')[0] }}");
+const	fScoreMax = Number("{{ filename.split('_')[-1].split('.')[0].split('-')[1] }}");
+const	mScoreMax = Number("{{ filename.split('_')[-1].split('.')[0].split('-')[2] }}");
+console.log('Max R F M scores: ', rScoreMax, fScoreMax, mScoreMax);
 
 
-fetch(endpoint).then(function(response){
-		if (response.status !== 200) {
-        console.log('Looks like there was a problem. Status Code: ' + response.status);
-        return;
-		}
-		// Examine the text in the response
-    response.json().then(function (json) {
-	    console.log(json);
-	    const rfm  = json.rfm;
-	    console.log(rfm);
-    })
-});
-
-
-
-
-	// Give the points a 3D feel by adding a radial gradient
+// Use HighChart thousand separator in lang
 Highcharts.setOptions({
-    colors: $.map(Highcharts.getOptions().colors, function (color) {
-        return {
-            radialGradient: {
-                cx: 0.4,
-                cy: 0.3,
-                r: 0.5
-            },
-            stops: [
-                [0, color],
-                [1, Highcharts.Color(color).brighten(-0.2).get('rgb')]
-            ]
-        };
-    })
+	lang: {
+		decimalPoint: '.',
+		thousandsSep: ','
+	}
 });
 
-function ThreeDChart(containerID, data) {
+
+function Chart1(data) {
+	Highcharts.chart('chart1', {
+		chart: {
+			type: 'pie',
+			options3d: {
+				enabled: true,
+				alpha: 45,
+				beta: 0
+			}
+		},
+		credits: {
+			text: 'ⒸTLMA',
+			href: '#',
+			enabled: true
+		},
+		title: {
+				text: 'Merchandise RFM Segments'
+		},
+		tooltip: {
+				headerFormat: '<b>{series.name}</b><br>',
+				pointFormat: '{point.name}: <b>{point.y:,.0f} ({point.percentage:.1f}%)</b>'
+		},
+		plotOptions: {
+				pie: {
+						allowPointSelect: true,
+						cursor: 'pointer',
+						depth: 35,
+						dataLabels: {
+								enabled: true,
+								format: '{point.name}: {point.y:,.0f}'
+						}
+				}
+		},
+		series: [{
+				type: 'pie',
+				name: 'Segments',
+				data: data
+		}]
+	});
+}
+
+function Chart2(data) {
+	// Give the points a 3D feel by adding a radial gradient
+	Highcharts.setOptions({
+			colors: $.map(Highcharts.getOptions().colors, function (color) {
+					return {
+							radialGradient: {
+									cx: 0.4,
+									cy: 0.3,
+									r: 0.5
+							},
+							stops: [
+									[0, color],
+									[1, Highcharts.Color(color).brighten(-0.2).get('rgb')]
+							]
+					};
+			})
+	});
 	// Set up the chart
 	let chart = new Highcharts.Chart({
 	    chart: {
-	        renderTo: containerID,
+	        renderTo: 'chart2',
 	        margin: 100,
 	        type: 'scatter3d',
 	        animation: false,
@@ -98,7 +133,7 @@ function ThreeDChart(containerID, data) {
 	        }
 	    },
 	    title: {
-	        text: 'Merchandise Customer Recency Frequency and Monetary Amount'
+	        text: 'Merchandise RFM Score Combinations'
 	    },
 	    subtitle: {
 	        text: ''
@@ -116,27 +151,44 @@ function ThreeDChart(containerID, data) {
 	        }
 	    },
 	    yAxis: {
-	        min: 0,
-	        max: 10,
-	        title: 'Frequency'
+	        min: 1,
+	        max: fScoreMax,
+					title:{
+	        	text: 'Frequency Score'
+					},
+					tickPositioner: function(){
+	        	return Array.from({length:fScoreMax},(v,k)=>k+1)
+					},
 	    },
 	    xAxis: {
-	        min: 0,
-	        max: 10,
-	        title: 'Recency',
-	        gridLineWidth: 1
+	        min: 1,
+	        max: rScoreMax,
+	        gridLineWidth: 1,
+					title:{
+	        	text: 'Recency Score'
+					},
+					tickPositioner: function(){
+	        	return Array.from({length:rScoreMax},(v,k)=>k+1)
+					},
 	    },
 	    zAxis: {
-	        min: 0,
-	        max: 10,
-	        title: 'Monetary Amount',
-	        showFirstLabel: false
+	        min: 1,
+	        max: mScoreMax,
+					title:{
+	        	margin: 10,
+	        	text: 'Monetary Score'
+					},
+	        showFirstLabel: false,
+					tickPositioner: function(){
+	        	return Array.from({length:mScoreMax},(v,k)=>k+1)
+					},
 	    },
 	    legend: {
 	        enabled: false
 	    },
 	    series: [{
-	        name: 'Customers',
+	        name: 'RFM SCORES',
+				 	{#type: 'bubble',#}
 	        colorByPoint: true,
 	        data:data
 	    }]
@@ -146,7 +198,7 @@ function ThreeDChart(containerID, data) {
 	    function dragStart(eStart) {
 	        eStart = chart.pointer.normalize(eStart);
 
-	        var posX = eStart.chartX,
+	        let posX = eStart.chartX,
 	            posY = eStart.chartY,
 	            alpha = chart.options.chart.options3d.alpha,
 	            beta = chart.options.chart.options3d.beta,
@@ -177,28 +229,48 @@ function ThreeDChart(containerID, data) {
 	}(Highcharts));
 }
 
-const data1 = [
-    [1, 6, 5], [8, 7, 9], [1, 3, 4], [4, 6, 8], [5, 7, 7], [6, 9, 6],
-    [7, 0, 5], [2, 3, 3], [3, 9, 8], [3, 6, 5], [4, 9, 4], [2, 3, 3],
-    [6, 9, 9], [0, 7, 0], [7, 7, 9], [7, 2, 9], [0, 6, 2], [4, 6, 7],
-    [3, 7, 7], [0, 1, 7], [2, 8, 6], [2, 3, 7], [6, 4, 8], [3, 5, 9],
-    [7, 9, 5], [3, 1, 7], [4, 4, 2], [3, 6, 2], [3, 1, 6], [6, 8, 5],
-    [6, 6, 7], [4, 1, 1], [7, 2, 7], [7, 7, 0], [8, 8, 9], [9, 4, 1],
-    [8, 3, 4], [9, 8, 9], [3, 5, 3], [0, 2, 4], [6, 0, 2], [2, 1, 3],
-    [5, 8, 9], [2, 1, 1], [9, 7, 6], [3, 0, 2], [9, 9, 0], [3, 4, 8],
-    [2, 6, 1], [8, 9, 2], [7, 6, 5], [6, 3, 1], [9, 3, 1], [8, 9, 3],
-    [9, 1, 0], [3, 8, 7], [8, 0, 0], [4, 9, 7], [8, 6, 2], [4, 3, 0],
-    [2, 3, 5], [9, 1, 4], [1, 1, 4], [6, 0, 2], [6, 1, 6], [3, 8, 8],
-    [8, 8, 7], [5, 5, 0], [3, 9, 6], [5, 4, 3], [6, 8, 3], [0, 1, 5],
-    [6, 7, 3], [8, 3, 2], [3, 8, 3], [2, 1, 6], [4, 6, 7], [8, 9, 9],
-    [5, 4, 2], [6, 1, 3], [6, 9, 5], [4, 8, 2], [9, 7, 4], [5, 4, 2],
-    [9, 6, 1], [2, 7, 3], [4, 5, 4], [6, 8, 1], [3, 4, 0], [2, 2, 6],
-    [5, 1, 2], [9, 9, 7], [6, 9, 9], [8, 4, 3], [4, 1, 7], [6, 2, 5],
-    [0, 4, 9], [3, 5, 9], [6, 9, 1], [1, 9, 2]];
+// Using Fetch API to grab data
+const endpoint = '/api/merch/rfm/'+ filename;
+console.log('Fetching endpoint: ' + endpoint);
+fetch(endpoint).then(function(response){
+		// console.log(response);
+		if (response.status !== 200) {
+        console.log('Looks like there was a problem. Status Code: ' + response.status);
+        return;
+		}
+		console.log('Response: 200');
+		// Examine the text in the response
+    response.json().then(function (json) {
+    	// Process json data after response.json()
+			// ---------------------------------------------------------------------------------
+	    console.log('Response JSON: ', json);
 
+			console.log("-----------------------------");
+			//let raw =  json.rfm.rows;
+			//raw  = Object.keys(raw).map(function (key) {
+			//	return [raw[key]['recency'],raw[key]['frequency'],raw[key]['monetary_value']]
+	  	//});
+			{#console.log(raw);#}
 
-ThreeDChart('chart1', data1);
-ThreeDChart('chart2', data1);
+			console.log("-----------------------------");
+			let segment = json.segments.actuals;
+			segment  = Object.keys(segment).map(function (key) {
+				return [key, segment[key]]
+	  	});
+			console.log(segment);
+			Chart1(segment);
+
+			console.log("-----------------------------");
+			let scores = json.rfm.scores;
+			scores  = Object.keys(scores).map(function (key) {
+				return [Number(String(key).substring(0, 1)),Number(String(key).substring(1, 2)),Number(String(key).substring(2, 3))]
+				//return {x:Number(String(key).substring(0, 1)), y:Number(String(key).substring(1, 2)),z:Number(String(key).substring(2, 3)),w:scores[key]};
+	  	});
+			console.log(scores);
+			Chart2(scores);
+			// ---------------------------------------------------------------------------------
+    }) //end of response.json().then()
+});
 
 
 </script>

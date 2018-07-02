@@ -26,9 +26,10 @@ gulp.task('vendor-highchart', function() {
       'node_modules/highcharts/highcharts-more.js',
       'node_modules/highcharts/highcharts-3d.js',
       'node_modules/highcharts/modules/exporting.js',
-      'node_modules/highcharts/modules/sankey.js',
+      'node_modules/highcharts/modules/boost.js',
       'node_modules/highcharts/modules/data.js',
       'node_modules/highcharts/modules/drilldown.js',
+      'node_modules/highcharts/modules/sankey.js',
       'node_modules/highcharts/modules/solid-gauge.js'
     ])
     .pipe(plumber())
