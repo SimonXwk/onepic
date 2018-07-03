@@ -44,28 +44,27 @@ const mScoreMax = Number("{{ filename.split('_')[-1].split('.')[0].split('-')[2]
 console.log('Max R F M scores: ', rScoreMax, fScoreMax, mScoreMax);
 
 
-// Use HighChart thousand separator in lang
-Highcharts.setOptions({
-	lang: {
-		decimalPoint: '.',
-		thousandsSep: ','
-	}
-});
 
 
-let chart1 = new Highcharts.Chart({
-	chart: {
-        renderTo: 'chart1',
-        type: 'pie',
-		options3d: {
-			enabled: true,
-			alpha: 45,
-			beta: 0
-			}
-	},
+{#let chart1 = new Highcharts.Chart({#}
+{#	chart: {#}
+{#		renderTo: 'chart1',#}
+{#		type: 'pie',#}
+{#		options3d: {#}
+{#			enabled: true,#}
+{#			alpha: 45,#}
+{#			beta: 0#}
+{#			}#}
+{#	},#}
+{#});#}
 
-function Chart1(data) {
-	Highcharts.chart('chart1', {
+function SegmentPie(chartID, data) {
+	// Customize Pie Chart Color
+	Highcharts.setOptions({
+     colors: ['#50B432', '#ED561B', '#DDDF00', '#24CBE5', '#64E572', '#FF9655', '#FFF263',      '#6AF9C4']
+	});
+
+	Highcharts.chart(chartID, {
 		chart: {
 			type: 'pie',
 			options3d: {
@@ -74,11 +73,7 @@ function Chart1(data) {
 				beta: 0
 			}
 		},
-		credits: {
-			text: 'ⒸTLMA',
-			href: '#',
-			enabled: true
-		},
+
 		title: {
 				text: 'Merchandise RFM Segments'
 		},
@@ -100,12 +95,84 @@ function Chart1(data) {
 		series: [{
 				type: 'pie',
 				name: 'Segments',
+				showInLegend: true,
 				data: data
 		}]
 	});
 }
 
-function Chart2(data) {
+
+function RFSegmentScatter(chartID, data) {
+	Highcharts.chart(chartID, {
+			chart: {
+					type: 'scatter',
+					zoomType: 'xy'
+			},
+			title: {
+					text: 'Recency and Frequency by Segments'
+			},
+			xAxis: {
+					title: {
+							enabled: true,
+							text: 'Recency (days)'
+					},
+					min: 0,
+					startOnTick: true,
+					endOnTick: true,
+					showLastLabel: true
+			},
+			yAxis: {
+					title: {
+							text: 'Frequency (number of orders)'
+					},
+					min: 0
+			},
+			legend: {
+					layout: 'vertical',
+					align: 'left',
+					verticalAlign: 'top',
+					x: 100,
+					y: 70,
+					floating: true,
+					backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF',
+					borderWidth: 1
+			},
+			plotOptions: {
+					scatter: {
+							marker: {
+									radius: 5,
+									states: {
+											hover: {
+													enabled: true,
+													lineColor: 'rgb(100,100,100)'
+											}
+									}
+							},
+							states: {
+									hover: {
+											marker: {
+													enabled: false
+											}
+									}
+							},
+							tooltip: {
+									headerFormat: '<b>{series.name}</b><br>',
+									pointFormat: '{point.x} days, {point.y} orders'
+							}
+					}
+			},
+			series: [{
+					name: 'Segment: All',
+					color: 'rgba(223, 83, 83, .5)',
+					data: data
+
+			}]
+	});
+
+
+}
+
+function RFM3dScatter(chartID, data) {
 	// Give the points a 3D feel by adding a radial gradient
 	Highcharts.setOptions({
 			colors: $.map(Highcharts.getOptions().colors, function (color) {
@@ -125,7 +192,7 @@ function Chart2(data) {
 	// Set up the chart
 	let chart = new Highcharts.Chart({
 	    chart: {
-	        renderTo: 'chart2',
+	        renderTo: chartID,
 	        margin: 100,
 	        type: 'scatter3d',
 	        animation: false,
@@ -148,11 +215,6 @@ function Chart2(data) {
 	    },
 	    subtitle: {
 	        text: ''
-	    },
-	    credits: {
-	        text: 'ⒸTLMA',
-	        href: '#',
-	        enabled: true
 	    },
 	    plotOptions: {
 	        scatter: {
@@ -241,44 +303,47 @@ function Chart2(data) {
 }
 
 // Using Fetch API to grab data
-const endpoint = '/api/merch/rfm/'+ filename;
-console.log('Fetching endpoint: ' + endpoint);
-fetch(endpoint).then(function(response){
-		// console.log(response);
+fetch(endpoint('/api/merch/rfm/', filename)).then(function(response){
+		console.log('Response From URL: ', response.url);
 		if (response.status !== 200) {
         console.log('Looks like there was a problem. Status Code: ' + response.status);
         return;
 		}
-		console.log('Response: 200');
+		let msg = "{{ get_flashed_messages(with_categories=true) }}";
 		// Examine the text in the response
     response.json().then(function (json) {
     	// Process json data after response.json()
+			console.log('Response To JSON: ', json);
 			// ---------------------------------------------------------------------------------
-	    console.log('Response JSON: ', json);
+			HighcahrtGlobal();
 
-			console.log("-----------------------------");
-			//let raw =  json.rfm.rows;
-			//raw  = Object.keys(raw).map(function (key) {
-			//	return [raw[key]['recency'],raw[key]['frequency'],raw[key]['monetary_value']]
-	  	//});
-			{#console.log(raw);#}
-
-			console.log("-----------------------------");
+			// Reading Segments
 			let segment = json.segments.actuals;
+			let segmentDef = json.segments.definition;
 			segment  = Object.keys(segment).map(function (key) {
-				return [key, segment[key]]
+				return {name:key, y:segment[key], color:segmentDef[key]['color']}
 	  	});
-			console.log(segment);
-			Chart1(segment);
+			console.log('Segments: ', segment);
+			SegmentPie('chart1', segment);
 
-			console.log("-----------------------------");
+			// Read R, F, and Segment
+			let raw =  json.rfm.rows;
+			raw  = Object.keys(raw).map(function (key) {
+				return [raw[key]['recency'],raw[key]['frequency']]
+	  	});
+			console.log('R F raw: ',raw);
+			RFSegmentScatter('chart2', raw);
+
+			// Reading RFM Scores
 			let scores = json.rfm.scores;
 			scores  = Object.keys(scores).map(function (key) {
 				return [Number(String(key).substring(0, 1)),Number(String(key).substring(1, 2)),Number(String(key).substring(2, 3))]
 				//return {x:Number(String(key).substring(0, 1)), y:Number(String(key).substring(1, 2)),z:Number(String(key).substring(2, 3)),w:scores[key]};
 	  	});
-			console.log(scores);
-			Chart2(scores);
+			console.log('RFM Scores: ', scores);
+			RFM3dScatter('chart3', scores);
+
+
 			// ---------------------------------------------------------------------------------
     }) //end of response.json().then()
 });

@@ -40,16 +40,14 @@ gulp.task('vendor-highchart', function() {
 gulp.task('vendor-general', function() {
   return gulp.src([
       'node_modules/bootstrap/dist/css/bootstrap.min.css',
-      'node_modules/font-awesome/css/font-awesome.min.css',
       'node_modules/bootstrap/dist/js/bootstrap.min.js',
       'node_modules/bootstrap/dist/js/bootstrap.min.js.map',
       'node_modules/jquery/dist/jquery.min.js',
       'node_modules/popper.js/dist/umd/popper.min.js',
       'node_modules/popper.js/dist/umd/popper.min.js.map',
       'node_modules/echarts/dist/echarts-en.min.js',
-      'node_modules/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js',
-      'node_modules/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css',
-      'node_modules/sketch-js/js/sketch.min.js'
+      'node_modules/sketch-js/js/sketch.min.js',
+      'node_modules/font-awesome/css/font-awesome.min.css',
     ])
     .pipe(plumber())
     .pipe(gulp.dest(config.vendorDir))

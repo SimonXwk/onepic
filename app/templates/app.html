@@ -81,5 +81,25 @@
 <script type=text/javascript>
 {# Sets a global variable to the prefix to the root of the application.  #}
 $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+let endpoint = (url, parameter) => $SCRIPT_ROOT + url + parameter;
+
+
+function HighcahrtGlobal() {
+	if(window.Highcharts){
+		// Use HighChart thousand separator in lang
+		Highcharts.setOptions({
+			lang: {
+				decimalPoint: '.',
+				thousandsSep: ','
+			},
+			credits: {
+					text: 'ⒸTLMA',
+					href: '#',
+					enabled: true
+			}
+		});
+	}
+}
+
 </script>
 {% endblock %}

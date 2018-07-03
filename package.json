@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "bootstrap": "^4.1.0",
+    "chartist": "^0.11.0",
     "echarts": "^4.0.4",
     "font-awesome": "^4.7.0",
     "highcharts": "^6.1.0",
