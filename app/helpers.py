@@ -1,5 +1,5 @@
 from werkzeug.utils import import_string, cached_property
-from flask import Blueprint, request, render_template, jsonify, send_from_directory
+from flask import Blueprint, request, render_template, jsonify
 from functools import wraps
 
 
@@ -44,7 +44,7 @@ class LazyLoader(object):
 			self.flask_proxy.add_template_filter(view, name=name)
 
 
-def create_blueprint(blueprint_name, import_name, prefixed=True, **options):
+def create_blueprint(blueprint_name, import_name, prefixed=True, **options) -> Blueprint:
 	bp = Blueprint(blueprint_name, import_name, static_folder='static', template_folder='templates', url_prefix='/' + blueprint_name if prefixed else '', **options)
 	# if not prefixed:
 	# 	def find_static_folder(filename=None):
@@ -82,6 +82,11 @@ def templatified(template=None, absolute=False, extension='.html'):
 			return render_template(template_name, **dic)
 		return decorated_function
 	return decorator
+
+
+def get_current_func_name():
+	import inspect
+	return inspect.currentframe().f_code.co_name
 
 
 def jsonified(f):

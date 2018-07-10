@@ -16,3 +16,23 @@ ld.url('view_funcs.logout', ['/logout'])
 def inject_now():
 	from datetime import datetime
 	return dict(now=datetime.now())
+
+
+@bp.app_context_processor
+def utility_processor():
+	def get_package_json_version(lib_name, dependency='dependencies'):
+		import json
+		import os
+		from flask import current_app
+		# Read package.json
+		base_dir = current_app.root_path.rsplit(os.sep, 1)[0]
+		package_json_path = os.path.join(base_dir, 'package.json')
+
+		with open(package_json_path) as f:
+			package_json = json.load(f)
+			package_json_version = ''
+			for char in package_json[dependency][lib_name]:
+				if char.isdigit() or char == '.':
+					package_json_version += char
+		return package_json_version
+	return dict(versionNPM=get_package_json_version)

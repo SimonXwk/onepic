@@ -1,0 +1,61 @@
+Organizational Level Terms :
+<main>
+	<div class="my-3 p-3 bg-white rounded box-shadow">
+		<h6 class="border-bottom border-gray pb-2 mb-0">On Reporting Period</h6>
+
+		<div class="media text-muted pt-3">
+		  <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+				<strong class="d-block text-gray-dark"><mark>CY</mark>: Calendar Year</strong>
+		    A 12 months period always start from January and end in December
+		  </p>
+		</div>
+
+		<div class="media text-muted pt-3">
+		  <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+				<strong class="d-block text-gray-dark"><mark>CCY</mark>: Current Calendar Year</strong>
+		    Dynamically using today's date to find out the Current Calendar Year : CY{{ now.year }}
+		  </p>
+		</div>
+
+		<div class="media text-muted pt-3">
+		  <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+				<strong class="d-block text-gray-dark"><mark>FY</mark>: Financial Year</strong>
+		    A 12 months period as reckoned for taxing or accounting purpose
+		  </p>
+		</div>
+
+		<div class="media text-muted pt-3">
+		  <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+				<strong class="d-block text-gray-dark"><mark>FY01M</mark>: First Financial Year Month</strong>
+				The first month of TLMA's Financial Year is <mark>{{ tlma.first_fy_month | mth }}</mark> (followed by FY02M: {{ (tlma.first_fy_month + 1) | mth }} etc.)
+		  </p>
+		</div>
+
+		<div class="media text-muted pt-3">
+		  <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+				<strong class="d-block text-gray-dark"><mark>CFY</mark>: Current Financial Year</strong>
+		    Dynamically using today's date({{ now | dAU }}) to find out the Current Financial Year : FY{{ tlma.current_fy }}
+		  </p>
+		</div>
+
+		<h6 class="border-bottom border-gray pb-2 mb-0">On Donor Type :</h6>
+
+		<div class="media text-muted pt-3">
+		  <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+				<strong class="d-block text-gray-dark"><mark>NEW1</mark>: First Year New Donor/Customer</strong>
+		    Donor/Customer that have their first financial contact with TLMA in a given FY
+		  </p>
+		</div>
+
+		<div class="media text-muted pt-3">
+		  <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+				<strong class="d-block text-gray-dark"><mark>NEW2</mark>: Second Year New Donor/Customer</strong>
+		    Donor/Customer that have their first financial contact with TLMA in the FY piror to a given FY
+		  </p>
+		</div>
+
+		<small class="d-block text-right mt-3">
+			<a href="#">All updates</a>
+		</small>
+	</div>
+</main>

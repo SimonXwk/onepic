@@ -5,7 +5,9 @@
 {% endblock %}
 
 {% block js_optional %}
+{{ Highchart(['highcharts-3d'], ['boost']) }}
 {% endblock %}
+{# ------------------------------------------------------------------- #}
 
 
 {# My Own js and css #}
@@ -13,37 +15,30 @@
 {% endblock %}
 
 {% block js_custom %}
-	{{ import('highchart', ['highcharts-3d', 'boost']) }}
-{#	{{ import('echart') }}#}
 {% endblock %}
+{# ------------------------------------------------------------------- #}
 
 
-{# Actual Content #}
-{% block content %}
-	{{ bp_content('rfm_result.html') }}
-{% endblock %}
-
-
-{# Embedded CSS & Javascript #}
+{# Embedded CSS #}
 {% block css_embedded %}
 {% endblock %}
+{# ------------------------------------------------------------------- #}
 
+
+{# Embedded Javascript After Libraries & Before Custom Javascript #}
 {% block js_embedded_before %}
-
-
 {% endblock %}
+{# ------------------------------------------------------------------- #}
 
 
-
+{# Embedded Javascript At the Very End #}
 {% block js_embedded_after %}
 <script>
 const filename = "{{ filename }}";
 const rScoreMax = Number("{{ filename.split('_')[-1].split('.')[0].split('-')[0] }}");
 const fScoreMax = Number("{{ filename.split('_')[-1].split('.')[0].split('-')[1] }}");
 const mScoreMax = Number("{{ filename.split('_')[-1].split('.')[0].split('-')[2] }}");
-console.log('Max R F M scores: ', rScoreMax, fScoreMax, mScoreMax);
-
-
+console.log('Maximum R, F and M scores applied: ', rScoreMax, fScoreMax, mScoreMax);
 
 
 {#let chart1 = new Highcharts.Chart({#}
@@ -302,58 +297,36 @@ function RFM3dScatter(chartID, data) {
 	}(Highcharts));
 }
 
-// Using Fetch API to grab data
-fetch(endpoint('/api/merch/rfm/', filename)).then(function(response){
-		console.log('Response From URL: ', response.url);
-		if (response.status !== 200) {
-        console.log('Looks like there was a problem. Status Code: ' + response.status);
-        return;
-		}
-		let msg = "{{ get_flashed_messages(with_categories=true) }}";
-		// Examine the text in the response
-    response.json().then(function (json) {
-    	// Process json data after response.json()
-			console.log('Response To JSON: ', json);
-			// ---------------------------------------------------------------------------------
-			HighcahrtGlobal();
+// Fetching Data from API and draw charts
+fetchJSON(endpoint('/api/merch/rfm/', filename), function(json){
+	// Reading Segments
+	let segment = json.segments.actuals;
+	let segmentDef = json.segments.definition;
+	segment  = Object.keys(segment).map(function (key) {
+		return {name:key, y:segment[key], color:segmentDef[key]['color']}
+	});
+	console.log('Segments: ', segment);
+	SegmentPie('chart1', segment);
 
-			// Reading Segments
-			let segment = json.segments.actuals;
-			let segmentDef = json.segments.definition;
-			segment  = Object.keys(segment).map(function (key) {
-				return {name:key, y:segment[key], color:segmentDef[key]['color']}
-	  	});
-			console.log('Segments: ', segment);
-			SegmentPie('chart1', segment);
+	// Read R, F, and Segment
+	let raw =  json.rfm.rows;
+	raw  = Object.keys(raw).map(function (key) {
+		return [raw[key]['recency'],raw[key]['frequency']]
+	});
+	console.log('R F raw: ',raw);
+	RFSegmentScatter('chart2', raw);
 
-			// Read R, F, and Segment
-			let raw =  json.rfm.rows;
-			raw  = Object.keys(raw).map(function (key) {
-				return [raw[key]['recency'],raw[key]['frequency']]
-	  	});
-			console.log('R F raw: ',raw);
-			RFSegmentScatter('chart2', raw);
-
-			// Reading RFM Scores
-			let scores = json.rfm.scores;
-			scores  = Object.keys(scores).map(function (key) {
-				return [Number(String(key).substring(0, 1)),Number(String(key).substring(1, 2)),Number(String(key).substring(2, 3))]
-				//return {x:Number(String(key).substring(0, 1)), y:Number(String(key).substring(1, 2)),z:Number(String(key).substring(2, 3)),w:scores[key]};
-	  	});
-			console.log('RFM Scores: ', scores);
-			RFM3dScatter('chart3', scores);
-
-
-			// ---------------------------------------------------------------------------------
-    }) //end of response.json().then()
+	// Reading RFM Scores
+	let scores = json.rfm.scores;
+	scores  = Object.keys(scores).map(function (key) {
+		return [Number(String(key).substring(0, 1)),Number(String(key).substring(1, 2)),Number(String(key).substring(2, 3))]
+		//return {x:Number(String(key).substring(0, 1)), y:Number(String(key).substring(1, 2)),z:Number(String(key).substring(2, 3)),w:scores[key]};
+	});
+	console.log('RFM Scores: ', scores);
+	RFM3dScatter('chart3', scores);
 });
 
 
 </script>
-
-
-{#	{{ bp_js("result") }}#}
 {% endblock %}
-
-
-
+{# ------------------------------------------------------------------- #}

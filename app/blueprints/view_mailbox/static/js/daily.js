@@ -1,5 +1,4 @@
 const endpointPrefix = '/api/mailbox/ymd/';
-let endpoint;
 const mth = today.getMonth()+1;
 const mthName = today.toLocaleString('en-au', { month: "long" });
 
@@ -113,9 +112,9 @@ Highcharts.chart('monthly_item', {
 
 
 function updateChart(chart, endpointVariable){
-  endpoint = endpointPrefix + endpointVariable;
+
   let yearStr = endpointVariable.substring(0, 4);
-  fetch(endpoint).then(function(response){
+  fetch(endpoint('/api/mailbox/ymd/',endpointVariable)).then(function(response){
     console.log(response);
     response.json().then(function (json) {
       console.log(json);

@@ -1,0 +1,51 @@
+<div class="container-fluid">
+	<!-- Header -->
+	<div class="alert alert-primary" role="alert">
+		{% set flist=filename.split('_') %}
+		<h5 class="alert-heading">
+			REX REPORT BETWEEN
+			<span class="badge badge-pill badge-info">{{ flist[1]|strpdt('%Y%m%d')|dAU }}</span> AND <span class="badge badge-pill badge-info">{{ flist[2]|strpdt('%Y%m%d')|dAU }}</span>
+			<span class="mb-0 text-muted">, max RFM score applied: {{ flist[-1].split('.')[0].split('-') }}</span>
+		</h5>
+	</div>
+
+
+	<!-- RFM Raw and Score Chart -->
+	<div class="row">
+		<div class="col-md-6">
+			<div class="card">
+				<div class="card-body">
+					<div class="chart" id="chart1" ></div>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="card">
+				<div class="card-body">
+					<div class="chart" id="chart2" ></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	{#	Second row of Chart #}
+
+	<div class="row">
+		<div class="col-md-6">
+			<div class="card">
+				<div class="card-body">
+					<div class="chart" id="chart3" ></div>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="card">
+				<div class="card-body">
+					<div class="chart" id="chart4" ></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+</div>

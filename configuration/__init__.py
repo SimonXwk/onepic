@@ -16,18 +16,45 @@ class ExtensionConfig(BaseConfig):
 class CustomConfig(ExtensionConfig):
 	""" Configurations only apply to this application
 	"""
-	""" Bootstrap Config
+	""" Bootstrap Configuration
 	"""
 	BOOTSTRAP_SERVE_LOCAL = False
-	BOOTSTRAP_USE_PACKAGE_JSON_VERSION = True
 
+	BOOTSTRAP_USE_PACKAGE_JSON_VERSION = True
 	BOOTSTRAP_VERSION = '4.1.1'
 	BOOTSTRAP_JQUERY_VERSION = '3.3.1'
 	BOOTSTRAP_POPPER_VERSION = '1.14.1'
 
-	BOOTSTRAP_JS_CDN = 'https://stackpath.bootstrapcdn.com/bootstrap/{}/js/bootstrap.min.js'
+	BOOTSTRAP_JS_CDN = 'https://maxcdn.bootstrapcdn.com/bootstrap/{}/js/bootstrap.min.js'
 	BOOTSTRAP_JQUERY_CDN = 'https://ajax.googleapis.com/ajax/libs/jquery/{}/jquery.min.js'
 	BOOTSTRAP_POPPER_CDN = 'https://cdnjs.cloudflare.com/ajax/libs/popper.js/{}/umd/popper.min.js'
+
+	""" HighChart Configuration
+	"""
+	HIGHCHART_SERVE_LOCAL = False
+	HIGHCHART_LOCAL_JS_PATH = 'vendor/hc/{}.js'
+
+	HIGHCHART_USE_PACKAGE_JSON_VERSION = True
+	HIGHCHART_VERSION = '6.1.1'
+
+	# Check http://code.highcharts.com/
+	HIGHCHART_BASE_CDN = 'http://code.highcharts.com/{}/{}.js'
+	HIGHCHART_MODLUE_CDN = 'https://code.highcharts.com/{}/modules/{}.js'
+
+	HIGHSTOCK_BASE_CDN = 'http://code.highcharts.com/stock/{}/{}.js'
+	HIGHSTOCK_MODLUE_CDN = 'http://code.highcharts.com/stock/{}/modules/{}.js'
+
+	HIGHMAP_BASE_CDN = 'http://code.highcharts.com/maps/{}/{}.js'
+	HIGHMAP_MODLUE_CDN = 'http://code.highcharts.com/maps/{}/modules/{}.js'
+
+	""" Chart.js Configuration
+		"""
+	CHARTJS_SERVE_LOCAL = False
+	CHARTJS_USE_PACKAGE_JSON_VERSION = True
+
+	CHARTJS_VERSION = '2.7.2'
+	CHARTJS_BASE_CDN = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/{}/Chart.bundle.min.js'
+
 
 	""" ThnakQ ODBC Connection String
 	"""

@@ -4,8 +4,9 @@ import datetime
 import glob
 import os
 import pandas as pd
-from app.database.excel import read_excel_data
+from app.database.excel import ExcelWorkbook
 from app.helpers import jsonified
+from app.api import ApiResult, ApiException
 
 
 def serialize_mail_data():
@@ -143,7 +144,7 @@ def read_mail_data(file, sheet_name='Sheet1', range_address='A1:A1'):
 	"""
 	rows = None
 	if file:
-		rng = read_excel_data(file, sheet_name, range_address)
+		rng = ExcelWorkbook(file).read_range(sheet_name, range_address)
 		if rng:
 			rows = ((cell.value for cell in row) for row in rng if isinstance(row[0].value, datetime.datetime))
 	return rows
@@ -181,25 +182,24 @@ def year_month(str_yearmonth=None):
 	return dict(file=excel)
 
 
-@jsonified
 def today(year_offset=0):
 	td = datetime.date.today()
 	td = td.replace(year=td.year - year_offset, day=td.day if not(td.month == 2 and td.day == 29) else td.day-1)
 	excels = MailExcel.locate_excel(td.year, td.month)
 	data = []
 	if excels:
-		rng = read_excel_data(excels[0], MailExcel.summary_sheet['name'], MailExcel.summary_sheet['range'])
+		rng = ExcelWorkbook(excels[0]).read_range(MailExcel.summary_sheet['name'],  MailExcel.summary_sheet['range'])
 		if rng:
 			for row in rng:
 				if isinstance(row[0].value, datetime.datetime) \
 					and datetime.datetime.strptime(str(row[0].value), '%Y-%m-%d %H:%M:%S').date() == td:
 					data = {MailExcel.summary_sheet['header'][key]: cell.value for key, cell in enumerate(row)}
-	return data
+
+	return ApiResult(data)
 
 
-@jsonified
 def home():
-	return dict(app='onepic', author='Simon Xue')
+	return ApiResult(dict(app='onepic', author='Simon Xue'))
 
 
 

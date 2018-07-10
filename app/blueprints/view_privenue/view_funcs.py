@@ -8,7 +8,6 @@ def homepage():
 	d1 = datetime.date(today.year-1 if today.month < 7 else today.year, 7, 1)
 	d2 = datetime.date(today.year if today.month < 7 else today.year+1, 6, 30)
 	progress = (today-d1).days/(d2-d1).days
-	# from app.blueprints.api.data_privenue import pending_total
 	return dict(title='Private Revenue Overview', date_progress=progress*100)
 
 

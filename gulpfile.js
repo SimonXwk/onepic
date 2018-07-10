@@ -22,15 +22,10 @@ const config = {
 // Move HighChart Libraries into app/static/vendor/hc folder :
 gulp.task('vendor-highchart', function() {
   return gulp.src([
-      'node_modules/highcharts/highcharts.js',
-      'node_modules/highcharts/highcharts-more.js',
-      'node_modules/highcharts/highcharts-3d.js',
-      'node_modules/highcharts/modules/exporting.js',
-      'node_modules/highcharts/modules/boost.js',
-      'node_modules/highcharts/modules/data.js',
-      'node_modules/highcharts/modules/drilldown.js',
-      'node_modules/highcharts/modules/sankey.js',
-      'node_modules/highcharts/modules/solid-gauge.js'
+      'node_modules/highcharts/*.js',
+      '!node_modules/highcharts/*.src.js',
+      'node_modules/highcharts/modules/*.js',
+      '!node_modules/highcharts/modules/*.src.js',
     ])
     .pipe(plumber())
     .pipe(gulp.dest(config.vendorHighChartDir))
@@ -47,6 +42,7 @@ gulp.task('vendor-general', function() {
       'node_modules/popper.js/dist/umd/popper.min.js.map',
       'node_modules/echarts/dist/echarts-en.min.js',
       'node_modules/sketch-js/js/sketch.min.js',
+      'node_modules/chart.js/dist/Chart.bundle.min.js',
       'node_modules/font-awesome/css/font-awesome.min.css',
     ])
     .pipe(plumber())

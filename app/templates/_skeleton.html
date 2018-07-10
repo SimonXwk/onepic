@@ -1,51 +1,53 @@
-{# Clear out contents in the include html files if they're not applicable in the setup #}
-{# the _skeleton template should remain static #}
+{#- Clear out contents in the include html files if they're not applicable in the setup -#}
+{#- the _skeleton template should remain static -#}
 <!doctype html>
 <html lang="en">
 <head>
-	{# Required meta tags #}
+	{#- Meta tags -#}
+	{% block meta -%}
+	{#- Required meta tags -#}
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-	{# Other meta tags #}
-	{% block meta %}{% endblock %}
+	{%- endblock %}
   <!-- Page title -->
   <title>{%- block title -%}{%- endblock -%}</title>
-  <!-- favicon -->
+  <!-- Favicon -->
   <link rel="shortcut icon" href="{{ url_for('static',filename='favicon.ico')}}">
-
-  {# Framework Required CSS Library #}
+  {#- Framework Required CSS Library -#}
   {% block css_framework %}{% endblock %}
-	{# Optional CSS Library #}
+	{#- Optional CSS Library -#}
   {% block css_optional %}{% endblock %}
-	{# Custom CSS #}
+	{#- Custom CSS -#}
   {% block css_custom %}{% endblock %}
-	{# Embedded CSS #}
+	{#- Embedded CSS -#}
   {% block css_embedded %}{% endblock %}
-
-	{% block js_header %}{% endblock %}
+	<script type=text/javascript>
+	$SCRIPT_ROOT = {{ request.script_root|tojson|safe }}; {#- Sets a global variable to the prefix to the root of the application. -#}
+	</script>
+	{% block js_embedded_header %}{% endblock %}
 </head>
 <body>
 	{% block main %}
-		{# NavBar Primary #}
+		{#- NavBar Primary -#}
 		{% block navbar_global %}{%- endblock %}
-		{# NavBar Secondaries #}
+		{#- NavBar Secondaries -#}
 		{% block navbar_local %}{%- endblock %}
-		{# Content #}
+		{#- Content -#}
 		{% block content %}{% endblock %}
-	 	{# Footer #}
+	 	{#- Footer -#}
 		{% block footer %}{% endblock %}
 	{% endblock %}
 
-	{# Framework Required JavaScript Library #}
+	{#- Framework Required JavaScript Library -#}
   {% block js_framework %}{% endblock %}
-  {# Optional JavaScript Library #}
+  {#- Optional JavaScript Library -#}
 	{% block js_optional %}{% endblock %}
-	{# Embedded JavaScript #}
+	{#- Embedded JavaScript -#}
   {% block js_embedded_before %}{% endblock %}
-  {# Custom JavaScript #}
+  {#- Custom JavaScript -#}
 	{% block js_custom %}{% endblock %}
-	{# Embedded JavaScript #}
+	{#- Embedded JavaScript -#}
   {% block js_embedded_after %}{% endblock %}
   </body>
 </html>

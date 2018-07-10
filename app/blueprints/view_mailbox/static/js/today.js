@@ -1,4 +1,4 @@
-let endpoint = '/api/mailbox/today/';
+
 
 
 // Radialize the colors
@@ -105,7 +105,6 @@ function updateChart(chart, endpoint){
 					],
 				showInLegend: true
 			}
-
 			],
 			"drilldown": {
 				"series": [
@@ -149,6 +148,6 @@ let cht1 = Highcharts.chart(renderTodayMailOption('today0'));
 let cht2 = Highcharts.chart(renderTodayMailOption('today1'));
 let cht3 = Highcharts.chart(renderTodayMailOption('today3'));
 
-updateChart(cht1, endpoint + 0);
-updateChart(cht2, endpoint + 1);
-updateChart(cht3, endpoint + 2);
+updateChart(cht1, endpoint('/api/mailbox/today/','0'));
+updateChart(cht2, endpoint('/api/mailbox/today/','1'));
+updateChart(cht3, endpoint('/api/mailbox/today/','2'));

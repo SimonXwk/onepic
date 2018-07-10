@@ -52,8 +52,7 @@ def create_app(test_config=None):
 	loader = LazyLoader(app)
 	loader.url('favicon', ['/favicon.ico'], endpoint='favicon')
 	loader.url('find_vendor_folder', ['/static/vendor/<path:filename>'], endpoint='vendor')
-	loader.url('find_highchart_folder', ['/static/vendor/hc/<path:filename>'], endpoint='hc')
-	loader.url('hidden_portal', ['/tp'])
+	loader.url('hidden_portal', ['/tt'])
 
 	# LazyLoad Jinja filter functions
 	loader.filter('jinja_filters.filter_currency', name='currency')
@@ -87,9 +86,5 @@ def find_vendor_folder(filename=None):
 	return send_from_directory(os.path.join(current_app.root_path, 'static/vendor'), filename)
 
 
-def find_highchart_folder(filename=None):
-	return send_from_directory(os.path.join(current_app.root_path, 'static/vendor/hc'), filename)
-
-
 def hidden_portal():
-	return render_template('testpage.html')
+	return render_template('test.html')

@@ -1,0 +1,66 @@
+{% macro activeBlueprint(blueprint) %}
+	{% if request.blueprint == blueprint %}active{% endif %}
+{% endmacro %}
+
+{% macro NavLink(endpoint, text, type='dropdown-item') %}
+	<a class="{{ type }} {% if request.endpoint == endpoint %}active{% endif %}" href="{{ url_for(endpoint) }}">{{ text }}</a>
+{% endmacro %}
+{#- -------------------------------- -#}
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+	<a class="navbar-brand" href="/">ONEPIC</a>
+	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#onepic_nav_global" aria-controls="onepic_nav_global" aria-expanded="false" aria-label="Toggle navigation">
+		<span class="navbar-toggler-icon"></span>
+	</button>
+
+	<div class="collapse navbar-collapse" id="onepic_nav_global">
+		<ul class="navbar-nav mr-auto">
+			<!-- Dictionary -->
+			<li class="nav-item {{ activeBlueprint('dictionary') }}">
+				{{ NavLink('dictionary.index', 'Dict', 'nav-link') }}
+			</li>
+			<!-- MailBox -->
+			{% set blueprint = 'mailbox' %}
+			<li class="nav-item dropdown {{ activeBlueprint(blueprint) }}">
+				<a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Mailbox</a>
+				<div class="dropdown-menu" aria-labelledby="dropdown01">
+					{{ NavLink('mailbox.index', 'Today') }}
+					{{ NavLink('mailbox.daily', 'Daily') }}
+					{{ NavLink('mailbox.monthly', 'Monthly') }}
+					{{ NavLink('mailbox.excel_list', 'Excel List') }}
+				</div>
+			</li>
+			<!-- Private Revenue -->
+			<li class="nav-item dropdown {{ activeBlueprint('privenue') }}">
+				<a class="nav-link dropdown-toggle" href="#" id="dropdown02" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Private Revenue</a>
+				<div class="dropdown-menu" aria-labelledby="dropdown02">
+					{{ NavLink('privenue.index', 'Overview') }}
+					{{ NavLink('privenue.pending', 'Pending Batches') }}
+				</div>
+			</li>
+			<!-- Journey -->
+			<li class="nav-item dropdown {{ activeBlueprint('journey') }}">
+				<a class="nav-link dropdown-toggle" href="#" id="dropdown03" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Journey</a>
+				<div class="dropdown-menu" aria-labelledby="dropdown03">
+					{{ NavLink('journey.cure_one', 'Cure One') }}
+					{{ NavLink('journey.general_new', 'General New Donor') }}
+					{{ NavLink('journey.merchandise_new', 'Merchandise New Customer') }}
+				</div>
+			</li>
+			<!-- Private Revenue -->
+			<li class="nav-item dropdown {{ activeBlueprint('merchandise') }}">
+				<a class="nav-link dropdown-toggle" href="#" id="dropdown04" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Merchandise</a>
+				<div class="dropdown-menu" aria-labelledby="dropdown04">
+					{{ NavLink('merchandise.upload', 'RFM') }}
+				</div>
+			</li>
+
+			<!-- API -->
+			<li class="nav-item {{ activeBlueprint('api') }}">
+				{{ NavLink('api.index', 'API', 'nav-link') }}
+			</li>
+		</ul>
+		<form class="form-inline my-2 my-md-0">
+			<a href="/logout" class="btn btn-secondary btn-sm" role="button" aria-pressed="true">Logout</a>
+		</form>
+	</div>
+</nav>

@@ -1,6 +1,3 @@
-const endpoint1 = '/api/cash/fys';
-const endpoint2 = '/api/cash/fysltd';
-const endpoint3 = '/api/cash/cfy/stream';
 const cfy = today.getMonth()+1 < 7 ? today.getFullYear() : today.getFullYear()+1;
 
 let valueChart1 =
@@ -11,11 +8,7 @@ let valueChart1 =
             minWidth: 320
         }
     },
-    credits: {
-      text: 'ⒸTLMA',
-      href: '',
-      enabled: true
-    },
+
     title: {
         text: 'ALL Financial Years\' Total'
     },
@@ -38,11 +31,6 @@ let valueChart2 =
     //         minWidth: 320
     //     }
     // },
-    credits: {
-      text: 'ⒸTLMA',
-      href: '',
-      enabled: true
-    },
     title: {
         text: 'FY' + cfy + ' Cash Revenue Stream Sankey Chart'
     },
@@ -55,65 +43,62 @@ let valueChart2 =
 });
 
 
-function updateLineChart(chart, endpoint, seriesName){
-  fetch(endpoint).then(function(response){
-    response.json().then(function (json) {
-      // console.log(json);
-      chart.addSeries({
-        name: seriesName,
-        data: json.total
-      });
-      chart.update({
-        subtitle: {
-            text: 'Data Captured : ' + json.timestamp
-        },
-	    xAxis: {
-		        categories: json.fy
-        },
-        tooltip: {
-	        shared: true,
-            crosshairs: true,
-	        headerFormat: '<b>{series.name}</b><br>',
-	        pointFormat: '{point.x:%e. %b}: {point.y:.2f} m'
-        },
-      });
-
-    })
+// Fetching Data from API and draw charts
+fetchJSON(endpoint('/api/cash/fys'), function(json){
+  let chart = valueChart1;
+  chart.addSeries({
+    name: 'Full FY',
+    data: json.total
   });
-}
+  chart.update({
+    subtitle: {
+        text: 'Data Captured : ' + json.timestamp
+    },
+    xAxis: {
+        categories: json.fy
+    },
+    tooltip: {
+        shared: true,
+        crosshairs: true,
+        headerFormat: '<b>{series.name}</b><br>',
+        pointFormat: '{point.x:%e. %b}: {point.y:.2f} m'
+    },
+  });
+});
 
-updateLineChart(valueChart1, endpoint1, 'Full FY');
-updateLineChart(valueChart1, endpoint2, 'TLD');
+fetchJSON(endpoint('/api/cash/fysltd'), function(json){
+  let chart = valueChart1;
+  chart.addSeries({
+    name: 'TLD',
+    data: json.total
+  });
+  chart.update({
+    subtitle: {
+        text: 'Data Captured : ' + json.timestamp
+    },
+    xAxis: {
+        categories: json.fy
+    },
+    tooltip: {
+        shared: true,
+        crosshairs: true,
+        headerFormat: '<b>{series.name}</b><br>',
+        pointFormat: '{point.x:%e. %b}: {point.y:.2f} m'
+    },
+  });
+});
 
-
-
-function updateSankeyChart(chart, endpoint){
-  fetch(endpoint).then(function(response){
-    response.json().then(function (json) {
-      // console.log(json);
-      chart.update({
-        subtitle: {
-            text: 'Data Captured :' + json.timestamp
-        },
-        series: [{
+fetchJSON(endpoint('/api/cash/cfy/stream'), function(json){
+  let chart = valueChart2;
+  chart.update({
+    subtitle: {
+        text: 'Data Captured :' + json.timestamp
+    },
+    series: [{
             type: 'sankey',
             name: 'TLMA Revenue Streams',
             keys: ['from', 'to', 'weight'],
             data: json.sankey
-        }]
-      });
-    })
+    }]
   });
-}
-
-
-updateSankeyChart(valueChart2, endpoint3);
-
-
-
-
-
-
-
-
-
+});

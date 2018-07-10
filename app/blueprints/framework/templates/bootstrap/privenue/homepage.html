@@ -1,0 +1,31 @@
+<div class="container-fluid">
+
+	<div class="progress">
+		<div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="{{ date_progress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ date_progress }}%">
+			{{ date_progress |f(1) }}% of FY completed
+		</div>
+	</div>
+
+	<br />
+
+	<!-- RFM Raw and Score Chart -->
+	<div class="row">
+		<div class="col-xl-6">
+			<div class="card">
+				<div class="card-body">
+					<div class="chart" id="fyTotal" ></div>
+				</div>
+			</div>
+		</div>
+		<div class="col-xl-6">
+			<div class="card">
+				<div class="card-body">
+					<div class="chart" id="fyTotalLtd" ></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
+</div>

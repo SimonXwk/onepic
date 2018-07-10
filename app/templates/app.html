@@ -1,5 +1,46 @@
 {% extends '_skeleton.html' %}
 
+{% block js_embedded_header %}
+<script type=text/javascript>
+// Build endpoint String
+let endpoint = (url, parameter) => $SCRIPT_ROOT + url + (parameter ? parameter : '');
+// Using Fetch API to grab JSON data
+function fetchJSON(endpoint, func){
+	console.log('Fetching Endpoint: ', endpoint);
+	fetch(endpoint).then(function(response){
+		console.log(response);
+		if (response.status !== 200) {
+				console.log('Looks like there was a problem. Status Code: ' + response.status);
+				return;
+		}
+		// Examine the text in the response
+		response.json().then(function (json) {
+			// Process json data after response.json()
+			console.log('Response To JSON: ', json);
+			// ---------------------------------------------------------------------------------
+			// Call Processing Function
+			func(json);
+			// ---------------------------------------------------------------------------------
+		}) //end of response.json().then()
+	});
+}
+
+
+<!-- Formatters -->
+const today = new Date();
+const dateFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+function dAU(date) {
+	return date.toLocaleDateString("en-AU", dateFormatOptions)
+}
+function currency(val) {
+	return '$' + String(val.toFixed(2)).split("").reverse().join("")
+                  .replace(/(\d{3}\B)/g, "$1,")
+                  .split("").reverse().join("");
+}
+</script>
+{% endblock %}
+
+
 {#
 	Param: 'current_blueprint_name': a blueprint context_processor variable name
 	refering to the current blueprint's name attribute, or this can also be retreived
@@ -21,28 +62,14 @@
 {# request.blueprint will be None if this template is not rendered from Flask Buleprint Module  #}
 {% set current_blueprint_name = request.blueprint  %}
 
-{% macro bp_include(fname, fmt='.html') %}
-	{% include current_blueprint_name + '/' + 'includes' + '/' + fname %}
-{% endmacro %}
-
-{% macro bp_content(fname, fmt='.html') %}
-	{% include current_blueprint_name + '/' + 'contents' + '/' + fname %}
-{% endmacro %}
-
 {% macro bp_css(fname, file_type='.css') %}
 	{# ! [url_prefix] needed for blueprint.static to work #}
-	<link rel="stylesheet" type="text/css" href="{{ url_for(current_blueprint_name + '.static', filename='css' + '/' + fname + file_type) }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for(current_blueprint_name + '.static', filename='css' + '/' + fname + file_type) }}">
 {% endmacro %}
 
 {% macro bp_js(fname, file_type='.js') %}
 	{# ! [url_prefix] needed for blueprint.static to work #}
-	<script src="{{ url_for(current_blueprint_name + '.static', filename='js' + '/' + fname + file_type) }}"></script>
-{% endmacro %}
-
-
-{# Import global libraries #}
-{% macro include_global(file, file_type='.html') %}
-	{% include ('_includes_global' + '/' + file + file_type) %}
+<script src="{{ url_for(current_blueprint_name + '.static', filename='js' + '/' + fname + file_type) }}"></script>
 {% endmacro %}
 
 {# Import svg #}
@@ -52,54 +79,93 @@
 
 
 {# Import global libraries #}
-{% macro import(vendor, vendor_subs=[]) %}
+{% macro import(vendor, vendor_optionals=[]) %}
+{# -------------------- echart.js -------------------- #}
 	{% if vendor == 'echart' %}
-		<script src="{{ url_for('vendor', filename='echarts-en.min.js') }}"></script>
+<script src="{{ url_for('vendor', filename='echarts-en.min.js') }}"></script>
 
-	{% elif vendor == 'highchart' %}
-		<script src="{{ url_for('hc', filename='highcharts.js') }}"></script>
-		<script src="{{ url_for('hc', filename='highcharts-more.js') }}"></script>
-		<script src="{{ url_for('hc', filename='exporting.js') }}"></script>
-		{% if vendor_subs %}
-			{% for vsub in vendor_subs %}
-		<script src="{{ url_for('hc', filename=vsub+'.js') }}"></script>
-			{% endfor %}
+{# -------------------- chart.js -------------------- #}
+	{% elif vendor == 'chart.js' %}
+		{% set namePackageJSON='chart.js' %}
+		{% if config['CHARTJS_SERVE_LOCAL'] %}
+<script src="{{ url_for('vendor', filename='Chart.bundle.min.js') }}"></script>
+		{% else %}
+			{% if config['CHARTJS_USE_PACKAGE_JSON_VERSION'] %}
+<script src="{{ config['CHARTJS_BASE_CDN'].format(versionNPM(namePackageJSON)) }}"></script>
+			{% else %}
+<script src="{{ config['CHARTJS_BASE_CDN'].format(config['CHARTJS_VERSION']) }}"></script>
+			{% endif %}
 		{% endif %}
 
+{# -------------------- sketch.js -------------------- #}
 	{% elif vendor == 'sketch' %}
-		<script src="{{ url_for('vendor', filename='sketch.min.js') }}"></script>
+<script src="{{ url_for('vendor', filename='sketch.min.js') }}"></script>
 	{% else %}
+		{# Do Nothing	#}
 	{% endif %}
 {% endmacro %}
 
 
 
+{# High Chart #}
+{% macro Highchart(bases=None, modules=None, CSM=(true,false,false)) %}
+	{% set defaultBases, defaultModules = [], ['exporting'] %}
+	{% if bases %}{% set bases = defaultBases|list + bases|list %}{% else %}{% set bases = defaultBases %}{% endif %}
+	{% if modules %}{% set modules = defaultModules|list + modules|list %}{% else %}{% set modules = defaultModules %}{% endif %}
+	{# ---------- Serve from local files ---------- #}
+	{% if config['HIGHCHART_SERVE_LOCAL'] %}
+		{# Basic Includes	#}
+		{% set JSPath = config['HIGHCHART_LOCAL_JS_PATH'] %}
+		{% if CSM[0] %}<script src="{{ url_for('static', filename=JSPath.format('highcharts')) }}"></script>{% endif %}
+		{% if CSM[1] %}<script src="{{ url_for('static', filename=JSPath.format('highstock')) }}"></script>{% endif %}
+		{% if CSM[2] %}<script src="{{ url_for('static', filename=JSPath.format('highmaps')) }}"></script>{% endif %}
 
-{# Global Javascript #}
+		{# Other Level1 Includes #}
+		{% if bases %}{% for base in bases %}
+<script src="{{ url_for('static', filename= JSPath.format(base)) }}"></script>
+		{% endfor %}{% endif %}
+		{# Modules #}
+		{% if modules %}{% for module in modules %}
+<script src="{{ url_for('static', filename=JSPath.format(module)) }}"></script>
+		{% endfor %}{% endif %}
 
-{% block js_header %}
-<script type=text/javascript>
-{# Sets a global variable to the prefix to the root of the application.  #}
-$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-let endpoint = (url, parameter) => $SCRIPT_ROOT + url + parameter;
+	{# ---------- Serve from CDN ---------- #}
+	{% else %}
+		{% if config['HIGHCHART_USE_PACKAGE_JSON_VERSION'] %}
+			{% set version=versionNPM('highcharts') %}{% else %}
+			{% set version=config['HIGHCHART_VERSION'] %}
+		{% endif %}
+		{# Basic Includes	#}
+		{% if CSM[0] %}<script src="{{ config['HIGHCHART_BASE_CDN'].format(version,'highcharts') }}"></script>{% endif %}
+		{% if CSM[1] %}<script src="{{ config['HIGHSTOCK_BASE_CDN'].format(version,'highstock') }}"></script>{% endif %}
+		{% if CSM[2] %}<script src="{{ config['HIGHMAP_BASE_CDN'].format(version,'highmaps') }}"></script>{% endif %}
 
+		{# Other Level1 Includes #}
+		{% if bases %}{% for base in bases %}
+<script src="{{ config['HIGHCHART_BASE_CDN'].format(version,base) }}"></script>
+		{% endfor %}{% endif %}
+		{# Modules #}
+		{% if modules %}{% for module in modules %}
+<script src="{{ config['HIGHCHART_MODLUE_CDN'].format(version,module) }}"></script>
+		{% endfor %}{% endif %}
+	{% endif %}
 
-function HighcahrtGlobal() {
-	if(window.Highcharts){
-		// Use HighChart thousand separator in lang
-		Highcharts.setOptions({
-			lang: {
-				decimalPoint: '.',
-				thousandsSep: ','
-			},
-			credits: {
-					text: 'ⒸTLMA',
-					href: '#',
-					enabled: true
-			}
-		});
-	}
-}
-
+{# Set High Chart Global Defaults #}
+<script type="text/javascript">
+console.log('Highchart ready to serve: ', "{{ bases|safe }}{{ modules|safe }}");
+Highcharts.setOptions({
+		lang: {
+			decimalPoint: '.',
+			thousandsSep: ','
+		},
+		credits: {
+				text: 'ⒸTLMA',
+				href: '#',
+				enabled: true
+		}
+	});
 </script>
-{% endblock %}
+{% endmacro %}
+
+
+

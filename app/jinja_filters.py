@@ -52,4 +52,3 @@ def filter_email_name(value):
 
 def filter_mail_excel_month(value):
 	return value.rsplit('.', 2)[0][-6:-3].strip()
-

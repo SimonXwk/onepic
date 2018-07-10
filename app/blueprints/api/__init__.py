@@ -6,7 +6,7 @@ ld = LazyLoader(bp)
 # LazyLoading View Functions
 ld.url('data_mail.home', ['/'], endpoint='index')
 
-ld.url('data_mail.today', ['/mailbox/today', '/mailbox/today/', '/mailbox/today/<int:year_offset>'])
+ld.url('data_mail.today', ['/mailbox/today', '/mailbox/today/<int:year_offset>'])
 ld.url('data_mail.date', ['/mailbox/ymd', '/mailbox/ymd/<string:str_date>'])
 ld.url('data_mail.year_month', ['/mailbox/ym/<string:str_yearmonth>'])
 
