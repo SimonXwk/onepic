@@ -14,7 +14,7 @@ class ODBCResult:
 		return 'data retrieved at {} :\n{}'.format(self.timestamp, self.rows)
 
 
-class ThankQODBC:
+class ThankqODBC:
 	connection_string_reporter1 = current_app.config.get('TQ_PRT1_CONNECTION_STRING')
 	connection_string_reporter2 = current_app.config.get('TQ_PRT2_CONNECTION_STRING')
 	connection_string = connection_string_reporter1
@@ -22,11 +22,11 @@ class ThankQODBC:
 	cached_timeout_seconds = 2 * 60  # Set Cache timeout in seconds
 
 	@classmethod
-	def date(cls, value, fmt='%Y/%m/%d'):
+	def format_date(cls, value, fmt='%Y/%m/%d'):
 		return value.strftime(fmt)
 
 	@classmethod
-	def query(cls, file_name, *parameters):
+	def query(cls, file_name, *parameters, cached_timeout=2*60):
 		cache_item = '.'.join((__name__, file_name))
 		result = cache.get(cache_item)
 		if result is None:
@@ -43,7 +43,7 @@ class ThankQODBC:
 					rows = cursor.execute(script, *parameters).fetchall()  # A List
 					# stamp = cursor.execute('SELECT CURRENT_TIMESTAMP').fetchone()[0]  # A Tuple
 					result = ODBCResult(rows)
-					cache.set(cache_item, result, timeout=cls.cached_timeout_seconds)  # Set Cache for 5 minutes
+					cache.set(cache_item, result, timeout=cached_timeout)  # Set Cache for 5 minutes
 		else:
-			print('> Using Cached Data for ODBC result [{}] (maximun cached for {} minutes) '.format(cache_item, int(cls.cached_timeout_seconds/60)))
+			print('> Cached ODBC result used for [{}] (cached for {} minutes {} seconds) '.format(cache_item, int(cached_timeout/60), int(cached_timeout % 60)))
 		return result

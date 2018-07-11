@@ -8,6 +8,16 @@ def index():
 	return dict(title='OnePic')
 
 
+@templatified('logged')
+def logged():
+	return dict(title='Logged')
+
+
+def login_as_guest():
+	session['user_name'] = 'Guest'
+	return redirect('/logged')
+
+
 @templatified('test')
 def test():
 	from datetime import datetime
@@ -40,6 +50,7 @@ def login():
 		pwd = request.form['password']
 		if usr != '' and pwd != '':
 			session['user_name'] = usr
+			return redirect('/logged')
 		elif usr is None and pwd is None:
 			flash('empty fields')
 		else:
@@ -53,9 +64,7 @@ def logout():
 	return redirect('/')
 
 
-def login_as_guest():
-	session['user_name'] = 'Guest'
-	return redirect('/')
+
 
 #
 # def login():

@@ -1,5 +1,8 @@
 {% extends framework_template %}
 
+{# Clear out the whole content #}
+{% block navbar_global %}{% endblock %}{% block footer %}{% endblock %}
+
 {# Addiditonal Libraries #}
 {% block css_optional %}
 {% endblock %}
@@ -42,8 +45,3 @@
 	{% endif %}
 {% endblock %}
 {# ------------------------------------------------------------------- #}
-
-
-{# Clear out Nav and Footer #}
-{% block navbar_global %}{% endblock %}
-{% block footer %}{% endblock %}

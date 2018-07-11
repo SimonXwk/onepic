@@ -1,4 +1,4 @@
-from app.database.odbc import ThankQODBC as tq
+from app.database.odbc import ThankqODBC as tq
 from marshmallow import Schema, fields
 import datetime
 from app.helpers import jsonified

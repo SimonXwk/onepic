@@ -6,6 +6,7 @@ ld = LazyLoader(bp)
 # LazyLoading View Functions
 ld.url('view_funcs.index', ['/'])
 ld.url('view_funcs.test', ['/test'])
+ld.url('view_funcs.logged', ['/logged'])
 ld.url('view_funcs.login', ['/login'], methods=['POST'])
 ld.url('view_funcs.login_as_guest', ['/login_as_guest'])
 ld.url('view_funcs.logout', ['/logout'])

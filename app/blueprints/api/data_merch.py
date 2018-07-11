@@ -1,6 +1,6 @@
 import datetime
 import calendar
-from app.database.odbc import ThankQODBC as tq
+from app.database.odbc import ThankqODBC as tq
 from app.api import ApiResult, ApiException
 from app.blueprints.view_merchandise.rfm_calc import RFM
 
@@ -16,8 +16,8 @@ def new_fy(fy=None):
 	else:
 		try:
 			fy = int(fy)
-			date1 = tq.date(datetime.date(fy-1, 7, 1))
-			date2 = tq.date(datetime.date(fy, 6, 30))
+			date1 = tq.format_date(datetime.date(fy - 1, 7, 1))
+			date2 = tq.format_date(datetime.date(fy, 6, 30))
 			rows = tq.query('MERCH_NEW', date1, date2).rows
 			fystr = 'FY' + str(fy)
 			results[fystr] = []
@@ -40,8 +40,8 @@ def new_cfy_month(month=None):
 		month = datetime.date.today().month if month is None else month
 		cy = datetime.date.today().year
 		cfy = cy if datetime.date.today().month < 7 else cy + 1
-		date1 = tq.date(datetime.date(cy if month < 7 else cy-1, month, 1))
-		date2 = tq.date(datetime.date(cy if month < 7 else cy-1, month, calendar.monthrange(cy, month)[1]))
+		date1 = tq.format_date(datetime.date(cy if month < 7 else cy - 1, month, 1))
+		date2 = tq.format_date(datetime.date(cy if month < 7 else cy - 1, month, calendar.monthrange(cy, month)[1]))
 		rows = tq.query('MERCH_NEW', date1, date2).rows
 		fystr = 'FY' + str(cfy)
 		results[fystr] = []

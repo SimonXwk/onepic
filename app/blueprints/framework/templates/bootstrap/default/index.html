@@ -8,29 +8,14 @@
 	<div class="about">
 			<h1>One Picture &rsaquo;</h1>
 			{% if user %}
-			<h2>welcome back, {{ user }}</h2>
-			<h3><a href="/logout"> logout</a></h3>
+			<h2>Welcome Back, Dear {{ user }}</h2>
 			{% else %}
-			<h2>please login or <a href="/login_as_guest">view as guest</a></h2>
 			<h3>{{ now | dtAU }}</h3>
 			{% endif %}
-
 	</div>
-
-	{% if user %}
-	<nav class="more">
-		<a href="{{ url_for('mailbox.index') }}">&rsaquo; Mailbox</a>
-	</nav>
-	<nav class="more">
-		<a href="{{ url_for('privenue.index') }}">&rsaquo; Private Revenue</a>
-	</nav>
-	<nav class="more">
-		<a href="{{ url_for('merchandise.index') }}">&rsaquo; Merchandise</a>
-	</nav>
-	<nav class="more">
-		<a href="{{ url_for('dictionary.index') }}">&rsaquo; Glossary</a>
-	</nav>
-
+	{% if  user %}
+		<a class="btn btn-lg btn-secondary btn-block" href="/logout" role="button">Logout</a>
+		<a class="btn btn-lg btn-success btn-block" href="/logged" role="button">Go Back</a>
 	{% else %}
 	<form action="/login" method="POST" class="form-signin">
 
@@ -67,6 +52,7 @@
 		</div>
 
 		<button class="btn btn-lg btn-info btn-block" type="submit">Sign in</button>
+		<a class="btn btn-lg btn-warning btn-block" href="/login_as_guest" role="button">I'm Guest</a>
 	</form>
 
 	{% endif %}

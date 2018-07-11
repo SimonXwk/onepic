@@ -7,8 +7,10 @@
 {% endmacro %}
 {#- -------------------------------- -#}
 <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-	<a class="navbar-brand" href="/">ONEPIC</a>
-	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#onepic_nav_global" aria-controls="onepic_nav_global" aria-expanded="false" aria-label="Toggle navigation">
+	<a class="navbar-brand" href="/logged">
+		ONEPIC
+	</a>
+	<button class="navbar-toggler custom-toggler" type="button" data-toggle="collapse" data-target="#onepic_nav_global" aria-controls="onepic_nav_global" aria-expanded="false" aria-label="Toggle navigation">
 		<span class="navbar-toggler-icon"></span>
 	</button>
 
@@ -34,6 +36,7 @@
 				<a class="nav-link dropdown-toggle" href="#" id="dropdown02" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Private Revenue</a>
 				<div class="dropdown-menu" aria-labelledby="dropdown02">
 					{{ NavLink('privenue.index', 'Overview') }}
+					{{ NavLink('privenue.sourcecode1', 'Current Source Codes') }}
 					{{ NavLink('privenue.pending', 'Pending Batches') }}
 				</div>
 			</li>
@@ -59,6 +62,8 @@
 				{{ NavLink('api.index', 'API', 'nav-link') }}
 			</li>
 		</ul>
+
+
 		<form class="form-inline my-2 my-md-0">
 			<a href="/logout" class="btn btn-secondary btn-sm" role="button" aria-pressed="true">Logout</a>
 		</form>
