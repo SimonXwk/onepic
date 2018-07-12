@@ -13,7 +13,7 @@
   <p>Listing Source Code created between <span class="badge badge-dark">{{ d1|dAU }}</span> and <span class="badge badge-dark">{{ d2|dAU }}</span>
 	,sorted newest to oldest(date of creation)
 	</p>
-	Color Coding :
+	<p>
 	{% for group in data.rows|groupby('CLASS')%}
 		{% if group.grouper|int == 20 %}
 		<button type="button" class="btn btn-light" onclick="findSourceCode(this, 3, 20)">
@@ -37,6 +37,7 @@
 		</button>
 		{% endif %}
 	{% endfor %}
+	</p>
 	<!-- Search -->
 	<hr />
 	<div class="input-group">
@@ -45,9 +46,6 @@
 
 		<div class="input-group-prepend"><span class="input-group-text" id="" >Search By Account: </span></div>
 		<input type="text" id="byAccount" class="form-control" onkeyup="findSourceCode(this, 2)" placeholder="...">
-
-		<div class="input-group-prepend"><span class="input-group-text" id="" >Search By Class: </span></div>
-		<input type="text" id="byClass" class="form-control" onkeyup="findSourceCode(this, 3)" placeholder="...">
 
 		<div class="input-group-prepend"><span class="input-group-text" id="" >Search By Source Type: </span></div>
 		<input type="text" id="byType" class="form-control" onkeyup="findSourceCode(this, 4)" placeholder="...">
@@ -68,8 +66,22 @@
 				<th scope="col">CLASS</th>
 				<th scope="col">SOURCETYPE</th>
 				<th scope="col">CAMPAIGN CODE</th>
+				<th scope="col" tabindex="0" data-toggle="popover" data-placement="top" data-trigger="focus"
+						title ='This Life to Date Total Includes: (literally everything from batch item split)'
+						data-content='
+							<ul>
+								<li>normal payments(approved)</li>
+								<li>fully reversed payments(approved)</li>
+								<li>partially reversed payments(approved)</li>
+								<li>re-entered payments</li>
+								<li>payments still being processed</li>
+							</ul>
+							'>
+					LTD TOTAL
+				</th>
+				<th scope="col">STATUS</th>
 				<th scope="col">START DATE</th>
-				<th scope="col">CREATED BY</th>
+				<th scope="col">CREATEDBY</th>
 			</tr>
 		</thead>
 		<tbody>{% for row in data.rows %}
@@ -77,20 +89,27 @@
 				<th scope="row"
 				tabindex="0" data-toggle="popover" data-placement="top" data-trigger="focus"
 						title='<strong >{{ row.SOURCEDESCRIPTION }}</strong>'
-						data-content='{{ row.SOURCENOTES }}
-						<br />
-						<span class="text-muted"><em>Created: {{ row.CREATED|dtAU|string }}<em></span>
-						<br />
-						{% if row.ARCHIVE==-1 %}<span class="badge badge-pill badge-secondary">Archived</span>{% endif %}
-						{% if row.EXCLUDEFROMDROPDOWN==-1 %}<span class="badge badge-pill badge-warning">Invisible</span>{% endif %}
-						{% if row.TAXDEDUCTIBLE!=-1 %}<span class="badge badge-pill badge-danger">Not Deductible</span>{% endif %}
-						{% if row.GOODSTAXAPPLICABLE==-1 %}<span class="badge badge-pill badge-info">GST</span>{% endif %}
+						data-content='{{ row.SOURCENOTES }}<br />
+						<span class="text-primary"><small>Default Destinations: </small><u>{{ row.DDES1 }}/{{ row.DDES2 }}</u></span><br />
+						<span class=" text-success"><em><small>Created by </small>{{ row.CREATEDBY }}@<small>{{ row.CREATED|dtAU|string }}</small><em></span><br />
+						<span class="text-info"><em><small>Modified by </small>{{ row.MODIFIEDBY }}@<small>{{ row.MODIFIED|dtAU|string }}</small><em></span><br />
+
 						'
 				>{{row.SOURCECODE}}</th>
 				<td>{{row.ACCOUNT}}</td>
 				<td>{{row.CLASS}}</td>
 				<td>{{row.SOURCETYPE}}</td>
-				<td>{{row.CAMPAIGNCODE}}</td>
+				<td>{% if (not row.CAMPAIGNCODE) and row.SOURCETYPE[-11:]|upper == 'SPONSORSHIP' %}<span class="text-black-50"><del>[Not Applicable]</del></span>
+						{% elif row.CAMPAIGNCODE and row.SOURCETYPE[-11:]|upper == 'SPONSORSHIP' %}<span class="text-danger">{{row.CAMPAIGNCODE}}</span>
+						{% else %}{{row.CAMPAIGNCODE}}{% endif %}
+				</td>
+				<td>{% if row.TOTAL %}{{row.TOTAL|currency}}{% endif %}</td>
+				<td>
+					{% if row.ARCHIVE==-1 %}<span class="badge badge-pill badge-secondary"><small>Archived</span>{% endif %}
+					{% if row.EXCLUDEFROMDROPDOWN==-1 %}<span class="badge badge-pill badge-warning">Invisible</span>{% endif %}
+					{% if row.TAXDEDUCTIBLE!=-1 %}<span class="badge badge-pill badge-danger">!Deduct</span>{% endif %}
+					{% if row.GOODSTAXAPPLICABLE==-1 %}<span class="badge badge-pill badge-info">GST</span>{% endif %}
+				</td>
 				<td>{{row.SOURCESTARTDATE|dAU}}</td>
 				<td>{{row.CREATEDBY}}</td>
 			</tr>

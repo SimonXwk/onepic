@@ -1,6 +1,6 @@
 import os
 import datetime
-from app.tlma import TLMA
+from app.database.tlma import TLMA
 
 
 def filter_currency(value):

@@ -17,14 +17,20 @@
 	<div class="collapse navbar-collapse" id="onepic_nav_global">
 		<ul class="navbar-nav mr-auto">
 			<!-- Dictionary -->
-			<li class="nav-item {{ activeBlueprint('dictionary') }}">
-				{{ NavLink('dictionary.index', 'Dict', 'nav-link') }}
+			{% set blueprint = 'dictionary' %}
+			<li class="nav-item dropdown {{ activeBlueprint(blueprint) }}">
+				<a class="nav-link dropdown-toggle" href="#" id="{{ blueprint }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ blueprint|title }}</a>
+				<div class="dropdown-menu" aria-labelledby="{{ blueprint }}">
+					{{ NavLink('dictionary.index', 'General') }}
+					{{ NavLink('dictionary.donor_type', 'On Donor Type') }}
+					{{ NavLink('dictionary.marketing_cycle', 'On Marketing Cycle') }}
+				</div>
 			</li>
 			<!-- MailBox -->
 			{% set blueprint = 'mailbox' %}
 			<li class="nav-item dropdown {{ activeBlueprint(blueprint) }}">
-				<a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Mailbox</a>
-				<div class="dropdown-menu" aria-labelledby="dropdown01">
+				<a class="nav-link dropdown-toggle" href="#" id="{{ blueprint }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ blueprint|title }}</a>
+				<div class="dropdown-menu" aria-labelledby="{{ blueprint }}">
 					{{ NavLink('mailbox.index', 'Today') }}
 					{{ NavLink('mailbox.daily', 'Daily') }}
 					{{ NavLink('mailbox.monthly', 'Monthly') }}
@@ -32,27 +38,30 @@
 				</div>
 			</li>
 			<!-- Private Revenue -->
-			<li class="nav-item dropdown {{ activeBlueprint('privenue') }}">
-				<a class="nav-link dropdown-toggle" href="#" id="dropdown02" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Private Revenue</a>
-				<div class="dropdown-menu" aria-labelledby="dropdown02">
+			{% set blueprint = 'privenue' %}
+			<li class="nav-item dropdown {{ activeBlueprint(blueprint) }}">
+				<a class="nav-link dropdown-toggle" href="#" id="{{ blueprint }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ blueprint|title }}</a>
+				<div class="dropdown-menu" aria-labelledby="{{ blueprint }}">
 					{{ NavLink('privenue.index', 'Overview') }}
-					{{ NavLink('privenue.sourcecode1', 'Current Source Codes') }}
+					{{ NavLink('privenue.sourcecode1', 'Source Codes Created (June-June)') }}
 					{{ NavLink('privenue.pending', 'Pending Batches') }}
 				</div>
 			</li>
 			<!-- Journey -->
-			<li class="nav-item dropdown {{ activeBlueprint('journey') }}">
-				<a class="nav-link dropdown-toggle" href="#" id="dropdown03" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Journey</a>
-				<div class="dropdown-menu" aria-labelledby="dropdown03">
+			{% set blueprint = 'journey' %}
+			<li class="nav-item dropdown {{ activeBlueprint(blueprint) }}">
+				<a class="nav-link dropdown-toggle" href="#" id="{{ blueprint }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ blueprint|title }}</a>
+				<div class="dropdown-menu" aria-labelledby="{{ blueprint }}">
 					{{ NavLink('journey.cure_one', 'Cure One') }}
 					{{ NavLink('journey.general_new', 'General New Donor') }}
 					{{ NavLink('journey.merchandise_new', 'Merchandise New Customer') }}
 				</div>
 			</li>
 			<!-- Private Revenue -->
-			<li class="nav-item dropdown {{ activeBlueprint('merchandise') }}">
-				<a class="nav-link dropdown-toggle" href="#" id="dropdown04" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Merchandise</a>
-				<div class="dropdown-menu" aria-labelledby="dropdown04">
+			{% set blueprint = 'merchandise' %}
+			<li class="nav-item dropdown {{ activeBlueprint(blueprint) }}">
+				<a class="nav-link dropdown-toggle" href="#" id="{{ blueprint }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ blueprint|title }}</a>
+				<div class="dropdown-menu" aria-labelledby="{{ blueprint }}">
 					{{ NavLink('merchandise.upload', 'RFM') }}
 				</div>
 			</li>
