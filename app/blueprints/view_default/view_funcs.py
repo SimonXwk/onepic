@@ -1,6 +1,5 @@
-from flask import request, session, flash, redirect, url_for
+from flask import request, session, flash, redirect
 from app.helpers import templatified
-from flask_dance.contrib.azure import azure
 
 
 @templatified('index')
@@ -10,12 +9,33 @@ def index():
 
 @templatified('logged')
 def logged():
-	return dict(title='Logged')
+	username = session['user_name']
+	return dict(title='Logged', username=username)
 
 
 def login_as_guest():
 	session['user_name'] = 'Guest'
 	return redirect('/logged')
+
+
+def logout():
+	session['user_name'] = None
+	flash('logout successfully', 'success')
+	return redirect('/')
+
+
+def login():
+	if request.method == 'POST':
+		usr = request.form['username']
+		pwd = request.form['password']
+		if usr != '' and pwd != '':
+			session['user_name'] = usr
+			return redirect('/logged')
+		elif usr is None and pwd is None:
+			flash('empty fields')
+		else:
+			flash('wrong login detail', 'error')
+	return redirect('/')
 
 
 @templatified('test')
@@ -42,35 +62,3 @@ def test():
 	# session.close()
 
 	return dict(title='test page', data=d)
-
-
-def login():
-	if request.method == 'POST':
-		usr = request.form['username']
-		pwd = request.form['password']
-		if usr != '' and pwd != '':
-			session['user_name'] = usr
-			return redirect('/logged')
-		elif usr is None and pwd is None:
-			flash('empty fields')
-		else:
-			flash('wrong login detail', 'error')
-	return redirect('/')
-
-
-def logout():
-	session['user_name'] = None
-	flash('logout successfully', 'success')
-	return redirect('/')
-
-
-
-
-#
-# def login():
-# 	print(url_for("azure.login"))
-# 	if not azure.authorized:
-# 		return redirect(url_for("azure.login"))
-# 	resp = azure.get("/v1.0/me")
-# 	assert resp.ok
-# 	return "You are {mail} on Azure AD".format(mail=resp.json()["mail"])

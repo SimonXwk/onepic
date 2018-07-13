@@ -21,6 +21,70 @@
 
 {# Embedded CSS #}
 {% block css_embedded %}
+<style>
+svg {
+    display: block;
+    font: 12em 'Montserrat';
+    width: 960px;
+    height: 100px;
+    margin: 0 auto;
+}
+@media (min-width: 280px) {
+  svg {
+    max-width: 280px;
+  }
+}
+@media (min-width: 576px) {
+  svg {
+    max-width: 540px;
+  }
+}
+@media (min-width: 768px) {
+  svg {
+    max-width: 720px;
+  }
+}
+@media (min-width: 992px) {
+  svg {
+    max-width: 960px;
+  }
+}
+
+.svg_anime_text {
+    fill: none;
+    stroke: #ffffff;
+    stroke-dasharray: 7% 28%;
+    stroke-width: 6px;
+    stroke-dashoffset: 0%;
+    animation: stroke-offset 8s infinite linear;
+		-webkit-animation: stroke-offset 8s infinite linear;
+}
+
+.svg_anime_text:nth-child(1){
+	stroke: #69D2E7;
+	animation-delay: -1;
+}
+.svg_anime_text:nth-child(2){
+	stroke:  #9de868;
+	animation-delay: -2s;
+}
+.svg_anime_text:nth-child(3){
+	stroke:  #F38630;
+	animation-delay: -3s;
+}
+.svg_anime_text:nth-child(4){
+	stroke:   #FF4E50;
+	animation-delay: -4s;
+}
+.svg_anime_text:nth-child(5){
+	stroke:  #F9D423;
+	animation-delay: -5s;
+}
+
+@keyframes stroke-offset{
+	100% {stroke-dashoffset: -35%;}
+}
+</style>
 {% endblock %}
 {# ------------------------------------------------------------------- #}
 

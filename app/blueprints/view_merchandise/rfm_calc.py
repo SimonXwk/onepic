@@ -5,6 +5,7 @@ import pandas as pd
 from flask import current_app
 from .rfm_segment import Segment1 as Segment
 from app.cache import cache, cached_key
+from app.helpers import cached
 
 
 def get_data_folder():
@@ -21,6 +22,7 @@ def get_result_folder():
 	return folder
 
 
+@cached(cached_timeout=10)
 def list_all_files():
 	sep1 = current_app.config['RFM_SECTOR_SEP']
 	sep2 = current_app.config['RFM_SCORE_SEP']
@@ -53,30 +55,34 @@ class RFM(object):
 		self.file_full_path = os.path.join(get_data_folder(), self.csv_file)
 		self.file_dict = self.read_file_name(file_name)
 
-	def read_file_name(self, file_name):
-		file_dict = {}
-		if self.csv_file:
-			print('> Analysing File {}'.format(file_name))
-			# Analysing CSV File Name
-			sep1 = current_app.config['RFM_SECTOR_SEP']
-			sep2 = current_app.config['RFM_SCORE_SEP']
+	def read_file_name(self, fname):
+		@cached(fname, cached_timeout=15)
+		def cached_read_filename(file_name):
+			file_dict = {}
+			if self.csv_file:
+				print('> Analysing File {}'.format(file_name))
+				# Analysing CSV File Name
+				sep1 = current_app.config['RFM_SECTOR_SEP']
+				sep2 = current_app.config['RFM_SCORE_SEP']
 
-			file_path_exc_extension, file_extension = os.path.splitext(self.file_full_path)
-			folder, filename = file_path_exc_extension.rsplit(os.sep, 1)
+				file_path_exc_extension, file_extension = os.path.splitext(self.file_full_path)
+				folder, filename = file_path_exc_extension.rsplit(os.sep, 1)
 
-			# Interpreting the special file naming structure
-			file_dict = {
-				'folder': folder,
-				'filename': filename,
-				'format': file_extension,
-				'start': datetime.datetime.strptime(filename.split(sep1)[1], '%Y%m%d'),
-				'end': datetime.datetime.strptime(filename.split(sep1)[2], '%Y%m%d'),
-				'now': datetime.datetime.strptime(filename.split(sep1)[2], '%Y%m%d').date() + datetime.timedelta(days=1),
-				'r_score_max': int(filename.split(sep1)[3].split(sep2)[0]),
-				'f_score_max': int(filename.split(sep1)[3].split(sep2)[1]),
-				'm_score_max': int(filename.split(sep1)[3].split(sep2)[2]),
-			}
-		return file_dict
+				# Interpreting the special file naming structure
+				file_dict = {
+					'folder': folder,
+					'filename': filename,
+					'format': file_extension,
+					'start': datetime.datetime.strptime(filename.split(sep1)[1], '%Y%m%d'),
+					'end': datetime.datetime.strptime(filename.split(sep1)[2], '%Y%m%d'),
+					'now': datetime.datetime.strptime(filename.split(sep1)[2], '%Y%m%d').date() + datetime.timedelta(days=1),
+					'r_score_max': int(filename.split(sep1)[3].split(sep2)[0]),
+					'f_score_max': int(filename.split(sep1)[3].split(sep2)[1]),
+					'm_score_max': int(filename.split(sep1)[3].split(sep2)[2]),
+				}
+			return file_dict
+		return cached_read_filename(fname)
+
 
 	def analysis(self):
 		file_name = self.csv_file

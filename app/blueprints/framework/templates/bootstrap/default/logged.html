@@ -1,10 +1,24 @@
 <div class="jumbotron jumbotron-fluid">
   <div class="container">
-		{% if session['user_name'] %}<p class="lead">Dear {{ session['user_name'] }}</p>{% endif %}
-		<hr class="my-lg-41">
-		<h1 class="display-4"><div class="typewrite" data-type='["WELCOME TO ONEPIC","START EXPLORING NOW"]'></div></h1>
-		<hr class="my-lg-41">
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 200">
+    	<symbol id="s-text">
+				<text text-anchor="middle" x="50%" y="80%">ONEPIC</text>
+			</symbol>
 
+			<g class = "g-ants">
+				<use xlink:href="#s-text" class="svg_anime_text"></use>
+				<use xlink:href="#s-text" class="svg_anime_text"></use>
+				<use xlink:href="#s-text" class="svg_anime_text"></use>
+				<use xlink:href="#s-text" class="svg_anime_text"></use>
+				<use xlink:href="#s-text" class="svg_anime_text"></use>
+			</g>
+		</svg>
+
+
+		<hr class="my-lg-41">
+		{% if username %}<p class="lead text-center">Dear {{ username }},</p>{% endif %}
+		<h1 class="display-4 text-center"><div class="typewrite" data-type='["WELCOME TO ONEPIC PORTAL","START EXPLORING"]'></div></h1>
+		<hr class="my-lg-41">
   </div>
 </div>
 

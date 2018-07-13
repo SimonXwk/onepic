@@ -19,6 +19,13 @@ def inject_now():
 	return dict(now=datetime.now())
 
 
+# App context
+@bp.app_context_processor
+def inject_cfy():
+	from app.database.tlma import TLMA
+	return dict(cfy=TLMA.cfy)
+
+
 @bp.app_context_processor
 def utility_processor():
 	def get_package_json_version(lib_name, dependency='dependencies'):

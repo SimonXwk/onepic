@@ -58,7 +58,7 @@
 <!-- Table -->
 <div class="table-responsive-lg">
 	<table class="table table-sm table-hover" id="sourcecodes">
-		<caption><strong>Data Captured : </strong>{{ data.timestamp|dtAU }}</caption>
+		<caption><strong>Data Captured : </strong>{{ data.timestamp|dtAU }}, result will be cached for {{ '{:,}'.format(data.cached_timeout) }} seconds</caption>
 		<thead>
 			<tr class="table-dark">
 				<th scope="col">S1(Clickable)</th>
@@ -92,8 +92,9 @@
 						data-content='{{ row.SOURCENOTES }}<br />
 						<span class="text-primary"><small>Default Destinations: </small><u>{{ row.DDES1 }}/{{ row.DDES2 }}</u></span><br />
 						<span class=" text-success"><em><small>Created by </small>{{ row.CREATEDBY }}@<small>{{ row.CREATED|dtAU|string }}</small><em></span><br />
-						<span class="text-info"><em><small>Modified by </small>{{ row.MODIFIEDBY }}@<small>{{ row.MODIFIED|dtAU|string }}</small><em></span><br />
-
+						{% if row.CREATED == row.MODIFIED %}<span class="text-info"><em>No Modification Afterwards<em></span><br />
+						{% else %}<span class="text-info"><em><small>Modified by </small>{{ row.MODIFIEDBY }}@<small>{{ row.MODIFIED|dtAU|string }}</small><em></span><br />
+						{% endif %}
 						'
 				>{{row.SOURCECODE}}</th>
 				<td>{{row.ACCOUNT}}</td>

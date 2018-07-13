@@ -27,7 +27,7 @@ Organizational Level Terms :
 		<div class="media text-muted pt-3">
 		  <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
 				<strong class="d-block text-gray-dark"><mark>FY01M</mark>: First Financial Year Month</strong>
-				The first month of TLMA's Financial Year is <mark>{{ tlma.first_fy_month | mth }}</mark> (followed by FY02M: {{ (tlma.first_fy_month + 1) | mth }} etc.)
+				The first month of TLMA's Financial Year is <mark>{{ tlma.fy1m | mth }}</mark> (followed by FY02M: {{ (tlma.fy1m + 1) | mth }} etc.)
 		  </p>
 		</div>
 
@@ -38,24 +38,22 @@ Organizational Level Terms :
 		  </p>
 		</div>
 
-		<h6 class="border-bottom border-gray pb-2 mb-0">On Donor Type :</h6>
+{#		<h6 class="border-bottom border-gray pb-2 mb-0">On Donor Type :</h6>#}
+{##}
+{#		<div class="media text-muted pt-3">#}
+{#		  <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">#}
+{#				<strong class="d-block text-gray-dark"><mark>NEW1</mark>: First Year New Donor/Customer</strong>#}
+{#		    Donor/Customer that have their first financial contact with TLMA in a given FY#}
+{#		  </p>#}
+{#		</div>#}
+{##}
+{#		<div class="media text-muted pt-3">#}
+{#		  <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">#}
+{#				<strong class="d-block text-gray-dark"><mark>NEW2</mark>: Second Year New Donor/Customer</strong>#}
+{#		    Donor/Customer that have their first financial contact with TLMA in the FY piror to a given FY#}
+{#		  </p>#}
+{#		</div>#}
 
-		<div class="media text-muted pt-3">
-		  <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
-				<strong class="d-block text-gray-dark"><mark>NEW1</mark>: First Year New Donor/Customer</strong>
-		    Donor/Customer that have their first financial contact with TLMA in a given FY
-		  </p>
-		</div>
 
-		<div class="media text-muted pt-3">
-		  <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
-				<strong class="d-block text-gray-dark"><mark>NEW2</mark>: Second Year New Donor/Customer</strong>
-		    Donor/Customer that have their first financial contact with TLMA in the FY piror to a given FY
-		  </p>
-		</div>
-
-		<small class="d-block text-right mt-3">
-			<a href="#">All updates</a>
-		</small>
 	</div>
 </main>

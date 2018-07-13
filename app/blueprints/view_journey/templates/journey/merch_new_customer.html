@@ -26,6 +26,13 @@
 
 {# Embedded Javascript After Libraries & Before Custom Javascript #}
 {% block js_embedded_before %}
+<script>
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip({
+		html:true
+	});
+});
+</script>
 {% endblock %}
 {# ------------------------------------------------------------------- #}
 

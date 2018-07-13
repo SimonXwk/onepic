@@ -1,7 +1,7 @@
 from werkzeug.utils import import_string, cached_property
 from flask import Blueprint, request, render_template, jsonify
 from functools import wraps
-
+from app.cache import cache
 
 class LazyView(object):
 	def __init__(self, import_name):
@@ -85,9 +85,21 @@ def templatified(template=None, absolute=False, extension='.html'):
 	return decorator
 
 
-def get_current_func_name():
-	import inspect
-	return inspect.currentframe().f_code.co_name
+def cached(func_params='no_parameters', cached_timeout=2*60):
+	def decorator(f):
+		@wraps(f)
+		def decorated_function(*args, **kwargs):
+			cache_item = '.'.join((f.__module__, f.__name__, func_params))
+			result = cache.get(cache_item)
+			if result is not None:
+				print('>> using cached result for [{}] (cached for {} seconds) '.format(cache_item, cached_timeout))
+				return result
+			result = f(*args, **kwargs)
+			cache.set(cache_item, result, timeout=cached_timeout)
+			print('>> recalculated result for [{}] is cached for {} seconds from now'.format(cache_item, cached_timeout))
+			return result
+		return decorated_function
+	return decorator
 
 
 def jsonified(f):

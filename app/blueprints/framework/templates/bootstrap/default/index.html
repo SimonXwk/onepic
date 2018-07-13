@@ -19,26 +19,29 @@
 	{% else %}
 	<form action="/login" method="POST" class="form-signin">
 
-		<div class="form-label-group">
-			<input type="email" name="username" id="inputEmail" class="form-control" placeholder="E-mail" required autofocus>
+{#		<div class="form-label-group">#}
+{#			<input type="email" name="username" id="inputEmail" class="form-control" placeholder="E-mail" required autofocus>#}
 {#			<label for="inputEmail">Email Address</label>#}
-		</div>
+{#		</div>#}
 
 {#		<div class="form-label-group">#}
 {#			<input type="text" name="username" id="inputUsername" class="form-control" placeholder="Username" required autofocus>#}
 {#			<label for="inputEmail">Username</label>#}
 {#		</div>#}
 
-		<div class="form-label-group">
-			<input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required>
+{#		<div class="form-label-group">#}
+{#			<input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required>#}
 {#			<label for="inputPassword">Password</label>#}
-		</div>
+{#		</div>#}
 
-		<div class="checkbox mb-3">
-			<label>
-				<input type="checkbox" value="remember-me"> Remember me
-			</label>
-			{% with messages = get_flashed_messages(with_categories=true) %}
+{#		<div class="checkbox mb-3">#}
+{#			<label>#}
+{#				<input type="checkbox" value="remember-me"> Remember me#}
+{#			</label>#}
+{#		</div>#}
+{#		<button class="btn btn-lg btn-info btn-block" type="submit">Sign in</button>#}
+
+		{% with messages = get_flashed_messages(with_categories=true) %}
 			{% if messages %}
 				{% for category, message in messages %}
 				{% if category == 'error' %}
@@ -49,10 +52,10 @@
 				{% endfor %}
 			{% endif %}
 			{% endwith %}
-		</div>
 
-		<button class="btn btn-lg btn-info btn-block" type="submit">Sign in</button>
-		<a class="btn btn-lg btn-warning btn-block" href="/login_as_guest" role="button">I'm Guest</a>
+
+		<a class="btn btn-lg btn-success btn-block" href="/login_via_azure" role="button">Via Sharepoint</a>
+		<a class="btn btn-lg btn-warning btn-block" href="/login_as_guest" role="button">Just Have a Look</a>
 	</form>
 
 	{% endif %}

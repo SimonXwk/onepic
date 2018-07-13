@@ -1,40 +1,117 @@
-<div class="container">
+<div class="container-fluid">
 
 	<div class="card text-center">
-		<div class="card-header">
-			<ul class="nav nav-tabs card-header-tabs">
-				<li class="nav-item">
-					<a class="nav-link active" href="#">Definition</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="#">List</a>
-				</li>
-			</ul>
-		</div>
+{#		<div class="card-header">#}
+{#			<ul class="nav nav-tabs card-header-tabs">#}
+{#				<li class="nav-item"><a class="nav-link active" href="#">Processing List</a></li>#}
+{#				<li class="nav-item"><a class="nav-link" href="#">Exc Non-Merch</a></li>#}
+{#				<li class="nav-item"><a class="nav-link" href="#">Exc Pure Merch Pledger</a></li>#}
+{#				<li class="nav-item"><a class="nav-link" href="#">Exc Pure Merch Donor</a></li>#}
+{#			</ul>#}
+{#		</div>#}
 		<div class="card-body">
-			<h5 class="card-title">JOURNEY FOR MERCHANDISE NEW CUSTOMER (Priority 2.1)</h5>
-			<p class="card-text">Excluding Pure Non-Merchandise Donor and Pure New Merchandise Pledger</p>
-			<a href="#" class="btn btn-primary">Go</a>
+			<h5 class="card-title text-primary"><strong>JOURNEY FOR MERCHANDISE NEW CUSTOMER</strong> (Priority 2.1)</h5>
+			<p class="card-text">
+				All New Donor in FY{{ cfy }} Excluding Pure Non-Merchandise Donor :
+				<span class="card-title text-primary"><strong>{% if data.rows %}{{ '{:,}'.format(data.rows|length) }}{% else %}No{% endif %}</strong></span> Contacts Found
+			</p>
 		</div>
+		<div class="card-footer text-muted">
+    	<span class="badge badge-pill badge-secondary">ORG: Organization</span>
+			<span class="badge badge-pill badge-danger">ESTATE</span>
+			<span class="badge badge-pill badge-danger">DECD: Deceased</span>
+			<span class="badge badge-pill badge-warning">!MAIL: Do not mail</span>
+			<span class="badge badge-pill badge-warning">!CALL: DO not call</span>
+			<span class="badge badge-pill badge-success">HOUSEHOLD ROLE</span>
+			<span class="badge badge-pill badge-dark">PURE PLEDGE</span>
+			<span class="badge badge-pill badge-dark">PURE DONOR</span>
+  	</div>
 	</div>
 
-
-	<table class="table table-hover table-sm">
-		<thead>
-			<tr>
-				<th scope="col">Serialnumber</th>
-				<th scope="col">First TRX Date</th>
-				<th scope="col">First Order Number</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for row in data %}
-			<tr {% if not row[2] %}class="table-danger"{% endif %}>
-				<th scope="row">{{ row[0]|trim }}</th>
-				<td>{{ row[1] }}</td>
-				<td>{{ row[2] }}</td>
-			</tr>
-			{% endfor %}
-		</tbody>
-	</table>
+	<div class="table-responsive-lg">
+		<table class="table table-hover table-sm" id="merchandise-new-customer">
+			<caption><strong>Data Captured : </strong>{{ data.timestamp|dtAU }}, result will be cached for {{ '{:,}'.format(data.cached_timeout) }} seconds</caption>
+			<thead>
+				<tr class="table-bordered table-dark">
+					<th scope="col">THANKQID</th>
+					<th scope="col">FIRST DATE</th>
+					<th scope="col">FIRST ORDER</th>
+					<th scope="col">TOTAL PURCHASE</th>
+					<th scope="col">STATUS</th>
+					<th scope="col">ONBOARD</th>
+					<th scope="col">DELIVERED</th>
+					<th scope="col">THANK YOU</th>
+					<th scope="col">WELCOME PACK</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for row in data.rows %}
+				<tr {% if not row[2] %}class=""{% endif %}>
+					<th scope="row">{{ row.SERIALNUMBER }}</th>
+					<td>{{ row.FIRSTDATE|dAU }}</td>
+					<td>
+						{% if row.FIRSTORDER %}
+							{% if row.FIRSTORDERS|int > 1 %}
+							<span class="text-primary" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
+										title='Plus other <span class="text-success"><strong>{{ (row.FIRSTORDERS|int)-1 }}</strong></span> more orders'>
+								<strong>{{ row.FIRSTORDER }}</strong>
+							</span>
+							{% else %}
+							{{ row.FIRSTORDER }}
+							{% endif %}
+						{% endif %}
+					</td>
+					<td>{{ row.MERCHANDISE_TOTAL|currency }}</td>
+					<td>
+							{% if row.CONTACTTYPE|trim|upper == 'ORGANISATION' %}<span class="badge badge-pill badge-secondary">ORG</span>{% endif %}
+							{% if row.PRIMARYCATEGORY|trim|upper == 'ESTATE' %}<span class="badge badge-pill badge-danger">ESTATE</span>{% endif %}
+							{% if row.DONOTMAILREASON|trim|upper == 'DECEASED' %}<span class="badge badge-pill badge-danger">DECD</span>{% endif %}
+							{% if row.DONOTMAIL|int == -1 %}
+								<span class="badge badge-pill badge-warning" data-toggle="tooltip" data-html="true" data-placement="top" tabindex="0"
+											title="{{ row.DONOTMAILREASON }}">
+									!MAIL
+								</span>
+							{% endif %}
+							{% if row.DONOTCALL|int == -1 %}<span class="badge badge-pill badge-warning">!CALL</span>{% endif %}
+							{% if row.SORTKEYREF1 %}
+								<span class="badge badge-pill badge-success" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
+											title="{{ row.SORTKEYREFREL1 }} : {{ row.SORTKEYREF1 }}">
+									{{ row.SORTKEYREFREL2 }}
+								</span>
+							{% endif %}
+							{% if row.MERCHANDISE_TOTAL==row.MERCHANDISE_PLEDGE %}<span class="badge badge-pill badge-dark">PURE PLEDGE</span>{% endif %}
+							{% if row.MERCHANDISE_PURCHASE==0 %}<span class="badge badge-pill badge-dark">PURE DONOR</span>{% endif %}
+					</td>
+					<td>
+						{% if row.PARAMETERNAME %}
+							{% if row.EFFECTIVEFROM != row.EFFECTIVETO %}
+								{% if row.PARAMETERVALUE == row.FIRSTORDER %}
+									<span class="text-success" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
+												title='{{ row.PARAMETERNOTE }}'>
+										YES (from {{ row.EFFECTIVEFROM|dAU }})
+									</span>
+								{% else %}
+									<span class="text-warning" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
+												title='{{ row.PARAMETERNOTE }}'>
+										{{ row.PARAMETERVALUE }} (from {{ row.EFFECTIVEFROM|dAU }})
+									</span>
+								{% endif %}
+							{% else %}
+								<span class="text-secondary" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
+											title='{{ row.PARAMETERNOTE }}'>
+									Canceled
+								</span>
+							{% endif %}
+						{% else %}
+							<span class="text-danger">Not Yet</span>
+						{% endif %}
+					</td>
+					<td></td>
+					<td><span class="text-muted"><s>{{ now }}</s></span></td>
+					<td>{{ now }}</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
 </div>

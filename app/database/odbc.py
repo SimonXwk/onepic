@@ -6,9 +6,10 @@ from app.cache import cache
 
 
 class ODBCResult:
-	def __init__(self, data):
+	def __init__(self, data, cached_timeout):
 		self.rows = data
 		self.timestamp = datetime.datetime.now()
+		self.cached_timeout = cached_timeout
 
 	def __repr__(self):
 		return 'data retrieved at {} :\n{}'.format(self.timestamp, self.rows)
@@ -42,7 +43,7 @@ class ThankqODBC:
 					# Row objects are similar to tuples, but they also allow access to columns by name: row[1]/row.colname
 					rows = cursor.execute(script, *parameters).fetchall()  # A List
 					# stamp = cursor.execute('SELECT CURRENT_TIMESTAMP').fetchone()[0]  # A Tuple
-					result = ODBCResult(rows)
+					result = ODBCResult(rows, cached_timeout)
 					cache.set(cache_item, result, timeout=cached_timeout)  # Set Cache for 5 minutes
 		else:
 			print('> Cached ODBC result used for [{}] (cached for {} minutes {} seconds) '.format(cache_item, int(cached_timeout/60), int(cached_timeout % 60)))
