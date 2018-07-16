@@ -36,7 +36,7 @@
 					<th scope="col">THANKQID</th>
 					<th scope="col">FIRST DATE</th>
 					<th scope="col">FIRST ORDER</th>
-					<th scope="col">TOTAL PURCHASE</th>
+					<th scope="col">TOTAL MERCH</th>
 					<th scope="col">STATUS</th>
 					<th scope="col">ONBOARD</th>
 					<th scope="col">DELIVERED</th>
@@ -61,7 +61,28 @@
 							{% endif %}
 						{% endif %}
 					</td>
-					<td>{{ row.MERCHANDISE_TOTAL|currency }}</td>
+					<td>
+						{% if row.TOTAL == row.MERCHANDISE_TOTAL %}
+						<span class="text-info" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
+												title='
+												Pure Merchandise Customer<hr>
+												Purchase : {{ row.MERCHANDISE_PURCHASE|currency }}<br>
+												Pledge : {{ row.MERCHANDISE_PLEDGE|currency }}<br>
+												Donation+GOL : {{ (row.MERCHANDISE_TOTAL - row.MERCHANDISE_PURCHASE - row.MERCHANDISE_PLEDGE)|currency }}<br>
+												'
+						>
+						<strong>{{ row.MERCHANDISE_TOTAL|currency }}</strong>
+						</span>
+						{% else %}
+							<span data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
+										title='
+												Non Merchandise Total {{ (row.TOTAL - row.MERCHANDISE_TOTAL)|currency }}
+												'
+								>
+								{{ row.MERCHANDISE_TOTAL|currency }}
+							</span>
+						{% endif %}
+					</td>
 					<td>
 							{% if row.CONTACTTYPE|trim|upper == 'ORGANISATION' %}<span class="badge badge-pill badge-secondary">ORG</span>{% endif %}
 							{% if row.PRIMARYCATEGORY|trim|upper == 'ESTATE' %}<span class="badge badge-pill badge-danger">ESTATE</span>{% endif %}
@@ -107,8 +128,26 @@
 						{% endif %}
 					</td>
 					<td></td>
-					<td><span class="text-muted"><s>{{ now }}</s></span></td>
-					<td>{{ now }}</td>
+					<td>
+						{% if row.PARAMETERNAME and row.EFFECTIVEFROM != row.EFFECTIVETO and row.PARAMETERVALUE == row.FIRSTORDER %}
+							X
+							/ <span class="text-{% if row.THANKYOU_DUE.date() > now.date() %}success{% elif row.THANKYOU_DUE.date()==now.date() %}warning{% else %}danger{% endif %}">{{ row.THANKYOU_DUE|dAU }}</span>
+						{% else %}
+							<span class="text-muted">
+								X
+								/ <s>On Boarding</s></span>
+						{% endif %}
+					</td>
+					<td>
+						{% if row.PARAMETERNAME and row.EFFECTIVEFROM != row.EFFECTIVETO and row.PARAMETERVALUE == row.FIRSTORDER %}
+							X
+							/ <span class="text-{% if row.WELCOMPACK_DUE.date() > now.date() %}success{% elif row.WELCOMPACK_DUE.date()==now.date() %}warning{% else %}danger{% endif %}">{{ row.WELCOMPACK_DUE|dAU }}</span>
+						{% else %}
+							<span class="text-muted">
+								X
+								/ <s>On Boarding</s></span>
+						{% endif %}
+					</td>
 				</tr>
 				{% endfor %}
 			</tbody>

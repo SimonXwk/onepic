@@ -1,7 +1,6 @@
 from app.helpers import templatified
-from app.database.odbc import ThankqODBC as TQ
+from app.database.odbc import ThankqODBC as Tq
 from app.database.tlma import TLMA
-import datetime
 
 
 @templatified('pledgecureone')
@@ -16,6 +15,6 @@ def general_new():
 
 @templatified('merch_new_customer')
 def merchandise_new():
-	date1, date2 = TQ.format_date(TLMA.fy_start_date), TQ.format_date(TLMA.fy_end_date)
-	data = TQ.query('NEW_CUSTOMER', *(date1, date2), cached_timeout=20)
+	params = (Tq.format_date(TLMA.cfy_start_date), Tq.format_date(TLMA.cfy_end_date))
+	data = Tq.query('NEW_CUSTOMER', *params, cached_timeout=20)
 	return dict(title='Merchandise New Customer Journey', data=data)

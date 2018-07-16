@@ -23,7 +23,6 @@ def login_azure():
 		'job_title': resp_json["jobTitle"],
 		'offcie': resp_json["officeLocation"],
 	}
-	print(resp)
 	print(resp_json)
 	session['user_name'] = user["display"]
 	return redirect(url_for("default.logged"))

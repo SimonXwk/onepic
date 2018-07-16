@@ -20,8 +20,8 @@ class CustomConfig(ExtensionConfig):
 	"""
 	BOOTSTRAP_SERVE_LOCAL = False
 
-	BOOTSTRAP_USE_PACKAGE_JSON_VERSION = True
-	BOOTSTRAP_VERSION = '4.1.1'
+	BOOTSTRAP_USE_PACKAGE_JSON_VERSION = False
+	BOOTSTRAP_VERSION = '4.1.2'
 	BOOTSTRAP_JQUERY_VERSION = '3.3.1'
 	BOOTSTRAP_POPPER_VERSION = '1.14.1'
 
@@ -55,19 +55,13 @@ class CustomConfig(ExtensionConfig):
 	CHARTJS_VERSION = '2.7.2'
 	CHARTJS_BASE_CDN = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/{}/Chart.bundle.min.js'
 
-
 	""" ThnakQ ODBC Connection String
 	"""
 	TQ_ODBC_CONNECTION_STRING = 'DRIVER={SQL Server};SERVER=xxx.xxx.xxx.xxx;DATABASE=xxx_xxx;UID=xxx;PWD=xxx'
 
 	""" Mail Opening Location
 	"""
-
 	DAILY_MAIL_DATA_RANGE = 'B3:S33'
-
-	""" TLMA DICTIONARY
-	"""
-	TLMA_FY1M = 7  # Number in range [1,12] without leading zero
 
 	""" Merchandise RFM
 	"""

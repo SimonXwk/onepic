@@ -33,6 +33,8 @@ def table(tbl_name):
 
 """ Database system (and SQL) abstraction layer
 """
+#  Contact
+contact = table('CONTACT')
 
 #  Pledge
 pledge_header = table('PLEDGEHEADER')

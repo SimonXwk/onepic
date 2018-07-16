@@ -1,0 +1,56 @@
+<div class="container-fluid">
+	<div class="row">
+		<div class="col">
+			<div class="card text-center">
+{#				<div class="card-header">Fishing Pool</div>#}
+				<div class="card-body">
+					<h3 class="card-title">Fishing Pool</h3>
+					<p class="card-text">Date 1 Selected: {{ d1|dAU }}, Date 2 Selected: {{ d2|dAU }}</p>
+				</div>
+				<div class="card-footer text-muted">
+					<strong>Data Captured : </strong>{{ data.timestamp|dtAU }}, result will be cached for {{ '{:,}'.format(data.cached_timeout) }} seconds
+				</div>
+			</div>
+
+			<ul>
+			{{ data.rows|length|number }} contacts found as of {{ data.timestamp|dtAU }}
+			{% for group in data.rows|groupby('DECD') %}
+				<li>
+				{% if group.grouper == -1 %}Deceased
+				{% else %}
+					Alive
+				{% endif %}
+				: {{ group.list|length|number }}
+				</li>
+			{% endfor %}
+			</ul>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-sm-6">
+			<div class="card border-secondary mb-3">
+				<div class="card-header">Contact that were not existing</div>
+				<div class="card-body text-secondary">
+					<h5 class="card-title">
+						{{ data.rows|selectattr("SEL1_EXIST", "ne", -1)|list|length }}
+					</h5>
+					<p class="card-text">Contacts that exist in database but created before {{ d1|dAU }}</p>
+				</div>
+			</div>
+		</div><!--End of Column-->
+		<div class="col-sm-6">
+
+			<div class="card border-secondary mb-3" >
+				<div class="card-header">Contacts that were not existing</div>
+				<div class="card-body text-secondary">
+					<h5 class="card-title">
+						{{ data.rows|selectattr("SEL2_EXIST", "ne", -1)|list|length }}
+					</h5>
+					<p class="card-text">Contacts that exist in database but created before {{ d2|dAU }}</p>
+				</div>
+			</div>
+
+		</div><!--End of Column-->
+	</div><!--End of Row-->
+</div>

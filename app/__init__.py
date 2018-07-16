@@ -56,6 +56,7 @@ def create_app(test_config=None):
 
 	# LazyLoad Jinja filter functions
 	loader.filter('jinja_filters.filter_currency', name='currency')
+	loader.filter('jinja_filters.filter_number', name='number')
 	loader.filter('jinja_filters.filter_datetime_au', name='dtAU')
 	loader.filter('jinja_filters.filter_date_au', name='dAU')
 	loader.filter('jinja_filters.filter_to_date', name='strpdt')

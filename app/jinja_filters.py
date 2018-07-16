@@ -4,7 +4,11 @@ from app.database.tlma import TLMA
 
 
 def filter_currency(value):
-	return "${:,.2f}".format(value)
+	return "${:,.2f}".format(value) if value else "${:,.2f}".format(0)
+
+
+def filter_number(value):
+	return "{:,}".format(value) if value else 0
 
 
 def filter_datetime_au(value, fmt='%A %d %B %Y %H:%M:%S'):
@@ -16,7 +20,7 @@ def filter_date_au(value, fmt='%d %B %Y'):
 
 
 def filter_to_date(value, fmt=''):
-	return datetime.datetime.strptime(value,fmt)
+	return datetime.datetime.strptime(value, fmt)
 
 
 def filter_month_name(value):

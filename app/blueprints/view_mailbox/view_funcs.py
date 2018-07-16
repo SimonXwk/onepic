@@ -1,6 +1,7 @@
 from flask import send_from_directory
 import os
 from app.helpers import templatified
+from app.cache import cached
 from app.blueprints.api.data_mail import MailExcel
 
 
@@ -11,6 +12,7 @@ def excel_download(filename):
 
 
 @templatified('excels')
+@cached(5)
 def excel_list():
 	# excels = MailExcel.locate_excel()
 	# excel_display = [(e.rsplit(os.path.sep, 3)[-2], e.rsplit(os.path.sep, 3)[-1]) for e in excels]

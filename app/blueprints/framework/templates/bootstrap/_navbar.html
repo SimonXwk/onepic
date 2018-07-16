@@ -47,6 +47,14 @@
 					{{ NavLink('privenue.pending', 'Pending Batches') }}
 				</div>
 			</li>
+			<!-- Donor Statistics -->
+			{% set blueprint = 'stats' %}
+			<li class="nav-item dropdown {{ activeBlueprint(blueprint) }}">
+				<a class="nav-link dropdown-toggle" href="#" id="{{ blueprint }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ blueprint|title }}</a>
+				<div class="dropdown-menu" aria-labelledby="{{ blueprint }}">
+					{{ NavLink('stats.fishing_pool', 'Fishing Pool') }}
+				</div>
+			</li>
 			<!-- Journey -->
 			{% set blueprint = 'journey' %}
 			<li class="nav-item dropdown {{ activeBlueprint(blueprint) }}">

@@ -1,7 +1,7 @@
 from werkzeug.utils import import_string, cached_property
 from flask import Blueprint, request, render_template, jsonify
 from functools import wraps
-from app.cache import cache
+
 
 class LazyView(object):
 	def __init__(self, import_name):
@@ -10,7 +10,7 @@ class LazyView(object):
 
 	@cached_property
 	def view(self):
-		print('--> Lazy Loading Function : [{}]'.format(self.import_name))
+		print('--> {{Lazy Loading Function}} - <{}>'.format(self.import_name))
 		return import_string(self.import_name)
 
 	def __call__(self, *args, **kwargs):
@@ -26,8 +26,8 @@ class LazyLoader(object):
 		return '.'.join((self.flask_proxy.import_name, import_name))
 
 	def url(self, import_name, url_rules=None, **options):
-		view = LazyView(self.full_import_name(import_name))
 		url_rules = [] if url_rules is None else url_rules
+		view = LazyView(self.full_import_name(import_name))
 		# Flask object and Blueprint object share the same function add_url_rule(rule, endpoint=None, view_func=None, **options)
 		for url_rule in url_rules:
 			# If multiple URL map to single view function, put all URLs to a list and call this function only once
@@ -81,23 +81,6 @@ def templatified(template=None, absolute=False, extension='.html'):
 				return dic
 			# Render the template
 			return render_template(template_name, **dic)
-		return decorated_function
-	return decorator
-
-
-def cached(func_params='no_parameters', cached_timeout=2*60):
-	def decorator(f):
-		@wraps(f)
-		def decorated_function(*args, **kwargs):
-			cache_item = '.'.join((f.__module__, f.__name__, func_params))
-			result = cache.get(cache_item)
-			if result is not None:
-				print('>> using cached result for [{}] (cached for {} seconds) '.format(cache_item, cached_timeout))
-				return result
-			result = f(*args, **kwargs)
-			cache.set(cache_item, result, timeout=cached_timeout)
-			print('>> recalculated result for [{}] is cached for {} seconds from now'.format(cache_item, cached_timeout))
-			return result
 		return decorated_function
 	return decorator
 
