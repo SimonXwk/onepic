@@ -1,7 +1,7 @@
 from app.database.odbc import ThankqODBC as tq
 from marshmallow import Schema, fields
 import datetime
-from app.helpers import jsonified
+from app.helper import jsonified
 
 
 class FyTotalSchema(Schema):

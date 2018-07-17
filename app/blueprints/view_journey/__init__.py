@@ -1,4 +1,4 @@
-from app.helpers import create_blueprint, LazyLoader
+from app.helper import create_blueprint, LazyLoader
 
 bp = create_blueprint('journey', __name__)
 ld = LazyLoader(bp)

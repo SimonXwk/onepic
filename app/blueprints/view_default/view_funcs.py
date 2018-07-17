@@ -1,5 +1,7 @@
 from flask import request, session, flash, redirect
-from app.helpers import templatified
+from app.helper import templatified
+from app.extension import login_user, logout_user, current_user
+from app.user import users
 
 
 @templatified('index')
@@ -9,17 +11,19 @@ def index():
 
 @templatified('logged')
 def logged():
-	username = session['user_name']
-	return dict(title='Logged', username=username)
+	print(dir(current_user))
+	if current_user.is_authenticated:
+		print('current_user.is_authenticated')
+	return dict(title='Logged')
 
 
 def login_as_guest():
-	session['user_name'] = 'Guest'
+	login_user(users['anonymous'])
 	return redirect('/logged')
 
 
 def logout():
-	session['user_name'] = None
+	logout_user()
 	flash('logout successfully', 'success')
 	return redirect('/')
 

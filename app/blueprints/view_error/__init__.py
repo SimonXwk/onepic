@@ -1,5 +1,5 @@
 from flask import render_template, abort
-from app.helpers import create_blueprint
+from app.helper import create_blueprint
 
 bp = create_blueprint('error', __name__)
 

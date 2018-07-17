@@ -1,6 +1,6 @@
 from flask import send_from_directory
 import os
-from app.helpers import templatified
+from app.helper import templatified
 from app.cache import cached
 from app.blueprints.api.data_mail import MailExcel
 

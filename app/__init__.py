@@ -2,7 +2,7 @@ from flask import send_from_directory, current_app, render_template
 import os
 from configuration import app_config_dict as cfg
 from .blueprints import register_blueprints
-from .helpers import LazyLoader
+from .helper import LazyLoader
 from .api import ApiFlask
 
 
@@ -39,7 +39,7 @@ def create_app(test_config=None):
 	with app.app_context():
 		# step 4:
 		# Initialize extensions to current app object, this should be done after the flask object configuration
-		from .extensions import init_app_extensions
+		from .extension import init_app_extensions
 		init_app_extensions(app)
 		# step 5: Register Blueprints
 		register_blueprints(app, 'blueprints', 'bp', include_packages=True, recursive=False)

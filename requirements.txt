@@ -3,6 +3,7 @@ pandas
 pyodbc
 openpyxl
 SQLAlchemy
+blinker
 
 
 flask_login

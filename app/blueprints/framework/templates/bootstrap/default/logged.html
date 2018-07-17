@@ -16,7 +16,10 @@
 
 
 		<hr class="my-lg-41">
-		{% if username %}<p class="lead text-center">Dear {{ username }},</p>{% endif %}
+		{% if current_user.is_authenticated %}
+			<p class="lead text-center">Dear <span class="text-primary"><strong>{{ current_user.name }}</strong></span>
+				from {{ current_user.email }}</p>
+		{% endif %}
 		<h1 class="display-4 text-center"><div class="typewrite" data-type='["WELCOME TO ONEPIC PORTAL","START EXPLORING"]'></div></h1>
 		<hr class="my-lg-41">
   </div>

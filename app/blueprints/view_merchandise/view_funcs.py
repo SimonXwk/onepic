@@ -2,7 +2,7 @@ from flask import render_template, current_app, render_template, request, flash,
 from werkzeug.utils import secure_filename
 import os
 from .rfm_calc import RFM, list_all_files as rfm_files
-from app.helpers import templatified
+from app.helper import templatified
 
 
 def rfm_upload_allowed_file(filename):

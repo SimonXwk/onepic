@@ -1,4 +1,4 @@
-from app.helpers import templatified
+from app.helper import templatified
 from app.database.odbc import ThankqODBC as Tq
 from app.database.tlma import TLMA
 
