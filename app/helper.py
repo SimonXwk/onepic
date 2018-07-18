@@ -1,7 +1,7 @@
 from werkzeug.utils import import_string, cached_property
 from flask import Blueprint, request, render_template, jsonify
 from functools import wraps
-
+from flask_login import login_required
 
 class LazyView(object):
 	def __init__(self, import_name):
@@ -55,7 +55,7 @@ def create_blueprint(blueprint_name, import_name, prefixed=True, **options) -> B
 	return bp
 
 
-def templatified(template=None, absolute=False, extension='.html'):
+def templatified(template=None, absolute=False, extension='.html', require_login=False):
 	def decorator(f):
 		@wraps(f)
 		def decorated_function(*args, **kwargs):
@@ -81,6 +81,10 @@ def templatified(template=None, absolute=False, extension='.html'):
 				return dic
 			# Render the template
 			return render_template(template_name, **dic)
+
+		if require_login:
+			decorated_function = login_required(decorated_function)
+
 		return decorated_function
 	return decorator
 

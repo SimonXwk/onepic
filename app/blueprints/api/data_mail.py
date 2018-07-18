@@ -197,10 +197,3 @@ def today(year_offset=0):
 
 	return ApiResult(data)
 
-
-def home():
-	return ApiResult(dict(app='onepic', author='Simon Xue'))
-
-
-
-

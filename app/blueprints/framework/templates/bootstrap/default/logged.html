@@ -1,27 +1,26 @@
 <div class="jumbotron jumbotron-fluid">
   <div class="container">
+		<!--SVG-->
+
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 200">
     	<symbol id="s-text">
 				<text text-anchor="middle" x="50%" y="80%">ONEPIC</text>
 			</symbol>
 
 			<g class = "g-ants">
+			{% for i in range(6) %}
 				<use xlink:href="#s-text" class="svg_anime_text"></use>
-				<use xlink:href="#s-text" class="svg_anime_text"></use>
-				<use xlink:href="#s-text" class="svg_anime_text"></use>
-				<use xlink:href="#s-text" class="svg_anime_text"></use>
-				<use xlink:href="#s-text" class="svg_anime_text"></use>
+			{% endfor %}
 			</g>
-		</svg>
 
+		</svg>
 
 		<hr class="my-lg-41">
 		{% if current_user.is_authenticated %}
-			<p class="lead text-center">Dear <span class="text-primary"><strong>{{ current_user.name }}</strong></span>
-				from {{ current_user.email }}</p>
+			<p class="lead text-center">Hi, <span class="text-primary"><strong>{{ current_user.name }}</strong></span>
+				{% if current_user.email %}( {{ current_user.email }} ){% endif %}</p>
 		{% endif %}
-		<h1 class="display-4 text-center"><div class="typewrite" data-type='["WELCOME TO ONEPIC PORTAL","START EXPLORING"]'></div></h1>
-		<hr class="my-lg-41">
+		<h3 class="text-center text-info"><div class="typewrite" data-type='["WELCOME TO ONEPIC PORTAL {{ current_user.name|upper }}","START EXPLORING"]'></div></h3>
   </div>
 </div>
 

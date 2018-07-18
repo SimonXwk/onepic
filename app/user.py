@@ -1,8 +1,11 @@
 class User:
-	def __init__(self, identity, name, email, active=True):
-		self.id = identity
-		self.name = name
-		self.email = email
+	def __init__(self, user_dict, active=True):
+		self.id = user_dict['id']
+		self.name = user_dict['name']
+		self.email = user_dict.get('email', None)
+
+		self.user_dict = user_dict
+
 		self.active = active
 		self.anonymous = False
 		self.authenticated = True
@@ -24,6 +27,4 @@ class User:
 		return self.anonymous
 
 
-users = {
-	'anonymous': User('anonymous', 'Guest Anonymous', None)
-}
+anonymous_user = User(dict(id='anonymous', name='Guest Anonymous'), None)

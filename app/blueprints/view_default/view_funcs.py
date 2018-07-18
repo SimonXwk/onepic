@@ -1,24 +1,23 @@
-from flask import request, session, flash, redirect
+from flask import flash, redirect
 from app.helper import templatified
-from app.extension import login_user, logout_user, current_user
-from app.user import users
+from flask_login import login_user, logout_user, current_user
+from app.user import anonymous_user
 
 
 @templatified('index')
 def index():
+	if current_user.is_authenticated:
+		redirect('/logged')
 	return dict(title='OnePic')
 
 
-@templatified('logged')
+@templatified('logged', require_login=True)
 def logged():
-	print(dir(current_user))
-	if current_user.is_authenticated:
-		print('current_user.is_authenticated')
 	return dict(title='Logged')
 
 
 def login_as_guest():
-	login_user(users['anonymous'])
+	login_user(anonymous_user)
 	return redirect('/logged')
 
 
@@ -28,18 +27,18 @@ def logout():
 	return redirect('/')
 
 
-def login():
-	if request.method == 'POST':
-		usr = request.form['username']
-		pwd = request.form['password']
-		if usr != '' and pwd != '':
-			session['user_name'] = usr
-			return redirect('/logged')
-		elif usr is None and pwd is None:
-			flash('empty fields')
-		else:
-			flash('wrong login detail', 'error')
-	return redirect('/')
+# def login():
+# 	if request.method == 'POST':
+# 		usr = request.form['username']
+# 		pwd = request.form['password']
+# 		if usr != '' and pwd != '':
+# 			session['user_name'] = usr
+# 			return redirect('/logged')
+# 		elif usr is None and pwd is None:
+# 			flash('empty fields')
+# 		else:
+# 			flash('wrong login detail', 'error')
+# 	return redirect('/')
 
 
 @templatified('test')

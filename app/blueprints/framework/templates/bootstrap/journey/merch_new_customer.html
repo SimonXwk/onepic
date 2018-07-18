@@ -61,7 +61,7 @@
 							{% endif %}
 						{% endif %}
 					</td>
-					<td>
+					<td><!--MERCHANDISE TOTAL-->
 						{% if row.TOTAL == row.MERCHANDISE_TOTAL %}
 						<span class="text-info" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
 												title='
@@ -83,7 +83,7 @@
 							</span>
 						{% endif %}
 					</td>
-					<td>
+					<td><!--STATUS-->
 							{% if row.CONTACTTYPE|trim|upper == 'ORGANISATION' %}<span class="badge badge-pill badge-secondary">ORG</span>{% endif %}
 							{% if row.PRIMARYCATEGORY|trim|upper == 'ESTATE' %}<span class="badge badge-pill badge-danger">ESTATE</span>{% endif %}
 							{% if row.DONOTMAILREASON|trim|upper == 'DECEASED' %}<span class="badge badge-pill badge-danger">DECD</span>{% endif %}
@@ -103,13 +103,13 @@
 							{% if row.MERCHANDISE_TOTAL==row.MERCHANDISE_PLEDGE %}<span class="badge badge-pill badge-dark">PURE PLEDGE</span>{% endif %}
 							{% if row.MERCHANDISE_PURCHASE==0 %}<span class="badge badge-pill badge-dark">PURE DONOR</span>{% endif %}
 					</td>
-					<td>
+					<td><!--ON BOARDING STATUS-->
 						{% if row.PARAMETERNAME %}
 							{% if row.EFFECTIVEFROM != row.EFFECTIVETO %}
 								{% if row.PARAMETERVALUE == row.FIRSTORDER %}
 									<span class="text-success" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
 												title='{{ row.PARAMETERNOTE }}'>
-										YES (from {{ row.EFFECTIVEFROM|dAU }})
+										ON BOARD (from {{ row.EFFECTIVEFROM|dAU }})
 									</span>
 								{% else %}
 									<span class="text-warning" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"

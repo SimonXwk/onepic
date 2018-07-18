@@ -4,7 +4,7 @@ bp = create_blueprint('api', __name__)
 ld = LazyLoader(bp)
 
 # LazyLoading View Functions
-ld.url('data_mail.home', ['/'], endpoint='index')
+ld.url('data_user.get_current_user', ['/'], endpoint='index')
 
 ld.url('data_mail.today', ['/mailbox/today', '/mailbox/today/<int:year_offset>'])
 ld.url('data_mail.date', ['/mailbox/ymd', '/mailbox/ymd/<string:str_date>'])
