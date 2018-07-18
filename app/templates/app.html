@@ -3,7 +3,10 @@
 {% block js_embedded_header %}
 <script type=text/javascript>
 // Build endpoint String
-let endpoint = (url, parameter) => $SCRIPT_ROOT + url + (parameter ? parameter : '');
+function endpoint (url, parameter) {
+	return $SCRIPT_ROOT + url + (parameter ? parameter : '')
+}
+//let endpoint = (url, parameter) => $SCRIPT_ROOT + url + (parameter ? parameter : '');
 // Using Fetch API to grab JSON data
 function fetchJSON(endpoint, func){
 	console.log('Fetching Endpoint: ', endpoint);

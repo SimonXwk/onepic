@@ -4,9 +4,11 @@ pyodbc
 openpyxl
 SQLAlchemy
 blinker
+pyopenssl
 
 
 flask_login
 flask_sqlalchemy
 flask_marshmallow
 flask-dance
+flask-SSLify

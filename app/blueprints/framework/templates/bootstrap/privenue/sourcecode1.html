@@ -9,7 +9,7 @@
 {% else %}
 <!-- Banner -->
 <div class="alert alert-light" role="alert">
-	<h3 class="alert-heading">Source Code 1 : <mark>{{ "{:,}".format(data.rows|length) }}</mark> found</h3>
+	<h3 class="alert-heading">Source Code 1 : <mark>{{ data.rows|length|number }}</mark> found</h3>
   <p>Listing Source Code created between <span class="badge badge-dark">{{ d1|dAU }}</span> and <span class="badge badge-dark">{{ d2|dAU }}</span>
 	,sorted newest to oldest(date of creation)
 	</p>

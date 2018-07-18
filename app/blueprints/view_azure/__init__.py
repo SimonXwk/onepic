@@ -1,4 +1,4 @@
-from flask import redirect, url_for, current_app, flash, session, request
+from flask import redirect, url_for, request, current_app, session, flash
 from flask_dance.contrib.azure import make_azure_blueprint, azure
 from oauthlib.oauth2.rfc6749.errors import TokenExpiredError, InvalidGrantError
 from flask_login import login_user
@@ -11,7 +11,7 @@ bp = make_azure_blueprint(client_id=azure_app_id, client_secret=azure_app_pwd, r
 
 
 @bp.route("/auth_azure", methods=['GET', 'POST'])
-def login_azure():
+def authenticate_azure():
 	if not azure.authorized:
 		return redirect(url_for("azure.login"))
 	try:
@@ -45,7 +45,6 @@ def login_azure():
 	flash("Successfully signed in with Azure.")
 
 	session[user['id']] = user
-	# print(session[user['id']])
 
 	next_url = request.args.get('next')
 	if next_url:
