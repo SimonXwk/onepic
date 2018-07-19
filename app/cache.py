@@ -34,7 +34,7 @@ def cached(cached_timeout=2*60):
 				return result
 			result = f(*args, **kwargs)
 			cache.set(cache_key, result, timeout=cached_timeout)
-			print('*** {{cache}} * <{} seconds, {}> recalculated for [{}]'.format(cached_timeout, cache_key, calc_key))
+			print('*** {{cache}} * <{} seconds, {}> created for [{}]'.format(cached_timeout, cache_key, calc_key))
 			return result
 		return decorated_function
 	return decorator

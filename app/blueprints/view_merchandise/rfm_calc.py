@@ -80,7 +80,7 @@ class RFM(object):
 			}
 		return file_dict
 
-	@cached(20)
+	@cached(30)
 	def analysis(self):
 		file_name = self.csv_file
 		data = {}  # A dictionary that will hold all database

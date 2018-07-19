@@ -28,11 +28,3 @@ def sourcecode1():
 	params = (Tq.format_date(d1), Tq.format_date(d2))
 	data = Tq.query('SOURCECODE_CREATED', *params, cached_timeout=10)
 	return dict(title='Source Code 1 Created', data=data, d1=d1, d2=d2)
-
-
-@templatified()
-def pledges(fy_offset=0):
-	update = [('FY_OFFSET', fy_offset)]
-	data = Tq.query('PRIVENUE_PLEDGES', updates=update, cached_timeout=10)
-	return dict(title='Pledge Overview', data=data, fy=TLMA.cfy-fy_offset)
-

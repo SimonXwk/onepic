@@ -97,233 +97,278 @@ function SegmentPie(chartID, data) {
 }
 
 
-function RFSegmentScatter(chartID, data) {
+function RFSegmentScatter(chartID, dataSet) {
 	Highcharts.chart(chartID, {
-			chart: {
-					type: 'scatter',
-					zoomType: 'xy'
-			},
+		chart: {
+			type: 'scatter',
+			zoomType: 'xy'
+		},
+		title: {
+			text: dataSet.title
+		},
+		subtitle: {
+			text: dataSet.subtitle
+		},
+		xAxis: {
 			title: {
-					text: 'Recency and Frequency by Segments'
+				enabled: true,
+				text: dataSet.rng.x.label + ' (' + dataSet.rng.x.measure +' )'
 			},
-			xAxis: {
-					title: {
+			min: 0,
+			startOnTick: true,
+			endOnTick: true,
+			showLastLabel: true
+		},
+		yAxis: {
+			title: {
+				text: dataSet.rng.y.label + ' (' + dataSet.rng.y.measure +' )'
+			},
+			min: 0
+		},
+		plotOptions: {
+			scatter: {
+				marker: {
+					radius: 3.5,
+					states: {
+						hover: {
 							enabled: true,
-							text: 'Recency (days)'
-					},
-					min: 0,
-					startOnTick: true,
-					endOnTick: true,
-					showLastLabel: true
-			},
-			yAxis: {
-					title: {
-							text: 'Frequency (number of orders)'
-					},
-					min: 0
-			},
-			legend: {
-					layout: 'vertical',
-					align: 'left',
-					verticalAlign: 'top',
-					x: 100,
-					y: 70,
-					floating: true,
-					backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF',
-					borderWidth: 1
-			},
-			plotOptions: {
-					scatter: {
-							marker: {
-									radius: 5,
-									states: {
-											hover: {
-													enabled: true,
-													lineColor: 'rgb(100,100,100)'
-											}
-									}
-							},
-							states: {
-									hover: {
-											marker: {
-													enabled: false
-											}
-									}
-							},
-							tooltip: {
-									headerFormat: '<b>{series.name}</b><br>',
-									pointFormat: '{point.x} days, {point.y} orders'
-							}
+							lineColor: 'rgb(100,100,100)'
+						}
 					}
-			},
-			series: [{
-					name: 'Segment: All',
-					color: 'rgba(223, 83, 83, .5)',
-					data: data
-
-			}]
+				},
+				states: {
+					hover: {
+						marker: {
+							enabled: false
+						}
+					}
+				},
+				tooltip: {
+					headerFormat: '<b>{series.name}</b><br>',
+					pointFormat: '{point.x} ' + dataSet.rng.x.measure + ', {point.y} ' + dataSet.rng.y.measure
+				}
+			}
+		},
+		series: [{
+			name: 'Segment: All',
+			color: 'rgba(223, 83, 83, .5)',
+			data: dataSet.data
+		}]
 	});
 
 
 }
 
-function RFM3dScatter(chartID, data) {
+function RFM3dScatter(chartID, dataSet) {
 	// Give the points a 3D feel by adding a radial gradient
 	Highcharts.setOptions({
-			colors: $.map(Highcharts.getOptions().colors, function (color) {
-					return {
-							radialGradient: {
-									cx: 0.4,
-									cy: 0.3,
-									r: 0.5
-							},
-							stops: [
-									[0, color],
-									[1, Highcharts.Color(color).brighten(-0.2).get('rgb')]
-							]
-					};
-			})
+		colors: $.map(Highcharts.getOptions().colors, function (color) {
+			return {
+				radialGradient: {
+					cx: 0.4,
+					cy: 0.3,
+					r: 0.5
+				},
+				stops: [
+					[0, color],
+					[1, Highcharts.Color(color).brighten(-0.2).get('rgb')]
+				]
+			};
+		})
 	});
 	// Set up the chart
 	let chart = new Highcharts.Chart({
-	    chart: {
-	        renderTo: chartID,
-	        margin: 100,
-	        type: 'scatter3d',
-	        animation: false,
-	        options3d: {
-	            enabled: true,
-	            alpha: 10,
-	            beta: 30,
-	            depth: 250,
-	            viewDistance: 5,
-	            fitToPlot: false,
-	            frame: {
-	                bottom: { size: 1, color: 'rgba(0,0,0,0.02)' },
-	                back: { size: 1, color: 'rgba(0,0,0,0.04)' },
-	                side: { size: 1, color: 'rgba(0,0,0,0.06)' }
-	            }
-	        }
-	    },
-	    title: {
-	        text: 'Merchandise RFM Score Combinations'
-	    },
-	    subtitle: {
-	        text: ''
-	    },
-	    plotOptions: {
-	        scatter: {
-	            width: 10,
-	            height: 10,
-	            depth: 10
-	        }
-	    },
-	    yAxis: {
-	        min: 1,
-	        max: fScoreMax,
-					title:{
-	        	text: 'Frequency Score'
-					},
-					tickPositioner: function(){
-	        	return Array.from({length:fScoreMax},(v,k)=>k+1)
-					},
-	    },
-	    xAxis: {
-	        min: 1,
-	        max: rScoreMax,
-	        gridLineWidth: 1,
-					title:{
-	        	text: 'Recency Score'
-					},
-					tickPositioner: function(){
-	        	return Array.from({length:rScoreMax},(v,k)=>k+1)
-					},
-	    },
-	    zAxis: {
-	        min: 1,
-	        max: mScoreMax,
-					title:{
-	        	margin: 10,
-	        	text: 'Monetary Score'
-					},
-	        showFirstLabel: false,
-					tickPositioner: function(){
-	        	return Array.from({length:mScoreMax},(v,k)=>k+1)
-					},
-	    },
-	    legend: {
-	        enabled: false
-	    },
-	    series: [{
-	        name: 'RFM SCORES',
-				 	{#type: 'bubble',#}
-	        colorByPoint: true,
-	        data:data
-	    }]
+		chart: {
+			renderTo: chartID,
+			margin: 100,
+			type: 'scatter3d',
+			animation: false,
+			options3d: {
+				enabled: true,
+				alpha: 10,
+				beta: 30,
+				depth: 250,
+				viewDistance: 5,
+				fitToPlot: false,
+				frame: {
+					bottom: { size: 1, color: 'rgba(0,0,0,0.02)' },
+					back: { size: 1, color: 'rgba(0,0,0,0.04)' },
+					side: { size: 1, color: 'rgba(0,0,0,0.06)' }
+				}
+			}
+		},
+		title: {
+			text: dataSet.title
+		},
+		subtitle: {
+			text: dataSet.subtitle
+		},
+		plotOptions: {
+			scatter: {
+				width: 10,
+				height: 10,
+				depth: 10
+			}
+		},
+		yAxis: {
+			min: dataSet.rng.y.min,
+			max: dataSet.rng.y.max,
+			title:{
+				text: dataSet.rng.y.label
+			},
+			tickPositioner: function(){
+				return Array.from({length:fScoreMax},(v,k)=>k+1)
+			},
+		},
+		xAxis: {
+			min: dataSet.rng.x.min,
+			max: dataSet.rng.x.max,
+			gridLineWidth: 1,
+			title:{
+				text: dataSet.rng.x.label
+			},
+			tickPositioner: function(){
+				return Array.from({length:rScoreMax},(v,k)=>k+1)
+			},
+		},
+		zAxis: {
+			min: dataSet.rng.z.min,
+			max: dataSet.rng.z.max,
+			title:{
+				margin: 10,
+				text: dataSet.rng.z.label
+			},
+			showFirstLabel: false,
+			tickPositioner: function(){
+				return Array.from({length:mScoreMax},(v,k)=>k+1)
+			},
+		},
+		legend: {
+			enabled: false
+		},
+		series: [{
+			name: 'RFM',
+			colorByPoint: true,
+			data:dataSet.data
+		}]
 	});
 	// Add mouse and touch events for rotation
 	(function (H) {
-	    function dragStart(eStart) {
-	        eStart = chart.pointer.normalize(eStart);
+		function dragStart(eStart) {
+			eStart = chart.pointer.normalize(eStart);
 
-	        let posX = eStart.chartX,
-	            posY = eStart.chartY,
-	            alpha = chart.options.chart.options3d.alpha,
-	            beta = chart.options.chart.options3d.beta,
-	            sensitivity = 5; // lower is more sensitive
+			let posX = eStart.chartX,
+					posY = eStart.chartY,
+					alpha = chart.options.chart.options3d.alpha,
+					beta = chart.options.chart.options3d.beta,
+					sensitivity = 5; // lower is more sensitive
 
-	        function drag(e) {
-	            // Get e.chartX and e.chartY
-	            e = chart.pointer.normalize(e);
+			function drag(e) {
+				// Get e.chartX and e.chartY
+				e = chart.pointer.normalize(e);
+				chart.update({
+					chart: {
+						options3d: {
+							alpha: alpha + (e.chartY - posY) / sensitivity,
+							beta: beta + (posX - e.chartX) / sensitivity
+						}
+					}
+				}, undefined, undefined, false);
+			}
 
-	            chart.update({
-	                chart: {
-	                    options3d: {
-	                        alpha: alpha + (e.chartY - posY) / sensitivity,
-	                        beta: beta + (posX - e.chartX) / sensitivity
-	                    }
-	                }
-	            }, undefined, undefined, false);
-	        }
+			chart.unbindDragMouse = H.addEvent(document, 'mousemove', drag);
+			chart.unbindDragTouch = H.addEvent(document, 'touchmove', drag);
 
-	        chart.unbindDragMouse = H.addEvent(document, 'mousemove', drag);
-	        chart.unbindDragTouch = H.addEvent(document, 'touchmove', drag);
-
-	        H.addEvent(document, 'mouseup', chart.unbindDragMouse);
-	        H.addEvent(document, 'touchend', chart.unbindDragTouch);
-	    }
-	    H.addEvent(chart.container, 'mousedown', dragStart);
-	    H.addEvent(chart.container, 'touchstart', dragStart);
+			H.addEvent(document, 'mouseup', chart.unbindDragMouse);
+			H.addEvent(document, 'touchend', chart.unbindDragTouch);
+		}
+		H.addEvent(chart.container, 'mousedown', dragStart);
+		H.addEvent(chart.container, 'touchstart', dragStart);
 	}(Highcharts));
 }
 
 // Fetching Data from API and draw charts
 fetchJSON(endpoint('/api/merch/rfm/', filename), function(json){
+	let dataSet, data, raw;
 	// Reading Segments
-	let segment = json.segments.actuals;
 	let segmentDef = json.segments.definition;
-	segment  = Object.keys(segment).map(function (key) {
-		return {name:key, y:segment[key], color:segmentDef[key]['color']}
+	raw = json.segments.actuals;
+	data = Object.keys(raw).map(function (key) {
+		return {name:key, y:raw[key], color:segmentDef[key]['color']}
 	});
-	console.log('Segments: ', segment);
-	SegmentPie('chart1', segment);
-
-	// Read R, F, and Segment
-	let raw =  json.rfm.rows;
-	raw  = Object.keys(raw).map(function (key) {
-		return [raw[key]['recency'],raw[key]['frequency']]
-	});
-	console.log('R F raw: ',raw);
-	RFSegmentScatter('chart2', raw);
+	//console.log('Segments: ', data);
+	SegmentPie('chart1', data);
 
 	// Reading RFM Scores
-	let scores = json.rfm.scores;
-	scores  = Object.keys(scores).map(function (key) {
+	raw = json.rfm.scores;
+	data  = Object.keys(raw).map(function (key) {
 		return [Number(String(key).substring(0, 1)),Number(String(key).substring(1, 2)),Number(String(key).substring(2, 3))]
 		//return {x:Number(String(key).substring(0, 1)), y:Number(String(key).substring(1, 2)),z:Number(String(key).substring(2, 3)),w:scores[key]};
 	});
-	console.log('RFM Scores: ', scores);
-	RFM3dScatter('chart3', scores);
+
+	dataSet = {
+		title:'Merchandise RFM Score Combinations',
+		subtitle:'',
+		rng:{x:{min:1, max:rScoreMax, label:'Recency Score'},y:{min:1, max:fScoreMax, label:'Frequency Score'},z:{min:1, max:mScoreMax, label:'Monetary Score'}},
+		data:data
+	};
+	//console.log('RFM Score Data Set: ', dataSet);
+	RFM3dScatter('chart2', dataSet);
+
+
+	// Read R, F, and Segment
+	raw = json.rfm.rows;
+
+	data  = Object.keys(raw).map(function (key) {
+		return [raw[key]['recency'],raw[key]['frequency']]
+	});
+	dataSet = {
+		title:'Recency and Frequency',
+		subtitle:'',
+		rng:{x:{label:'Recency', measure:'days'},y:{label:'Frequency', measure:'orders'}},
+		data:data
+	};
+	// console.log('R F raw: ', dataSet);
+	RFSegmentScatter('chart3', dataSet);
+
+	data  = Object.keys(raw).map(function (key) {
+		return [raw[key]['recency'],Math.round(raw[key]['monetary_value'] * 100) / 100]
+	});
+	dataSet = {
+		title:'Recency and Monetary Value',
+		subtitle:'',
+		rng:{x:{label:'Recency', measure:'days'},y:{label:'Monetary Total', measure:'AUD'}},
+		data:data
+	};
+	// console.log('R M raw: ', dataSet);
+	RFSegmentScatter('chart4', dataSet);
+
+	data  = Object.keys(raw).map(function (key) {
+		return [ raw[key]['frequency'], Math.round(raw[key]['monetary_value'] * 100) / 100]
+	});
+	dataSet = {
+		title:'Frequency and Monetary Value',
+		subtitle:'',
+		rng:{x:{label:'Frequency', measure:'orders'},y:{label:'Monetary Total', measure:'AUD'}},
+		data:data
+	};
+	//console.log('F M raw: ', dataSet);
+	RFSegmentScatter('chart5', dataSet);
+
+
+	{#raw = json.rfm.rows;#}
+	{#data  = Object.keys(raw).map(function (key) {#}
+	{#	return [raw[key]['recency'],raw[key]['frequency'],raw[key]['monetary_value']]#}
+	{#});#}
+	{#dataSet = {#}
+	{#	title:'Merchandise RFM Values',#}
+	{#	subtitle:'',#}
+	{#	rng:{x:{min:1, max:600, label:'Recency'},y:{min:1, max:20, label:'Frequency'},z:{min:1, max:9999, label:'Value'}},#}
+	{#	data:data#}
+	{#};#}
+	{#console.log('RFM Value Data Set: ', dataSet);#}
+	{#RFM3dScatter('chart4', dataSet);#}
+
 });
 
 

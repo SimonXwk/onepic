@@ -2,8 +2,8 @@
 	{% if request.blueprint == blueprint %}active{% endif %}
 {% endmacro %}
 
-{% macro NavLink(endpoint, text, type='dropdown-item') %}
-	<a class="{{ type }} {% if request.endpoint == endpoint %}active{% endif %}" href="{{ url_for(endpoint) }}">{{ text }}</a>
+{% macro NavLink(blueprint, endpoint, text, type='dropdown-item') %}
+	<a class="{{ type }} {% if request.endpoint == blueprint+'.'+endpoint %}active{% endif %}" href="{{ url_for(blueprint+'.'+endpoint) }}">{{ text }}</a>
 {% endmacro %}
 {#- -------------------------------- -#}
 <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
@@ -21,9 +21,9 @@
 			<li class="nav-item dropdown {{ activeBlueprint(blueprint) }}">
 				<a class="nav-link dropdown-toggle" href="#" id="{{ blueprint }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ blueprint|title }}</a>
 				<div class="dropdown-menu" aria-labelledby="{{ blueprint }}">
-					{{ NavLink('dictionary.index', 'General') }}
-					{{ NavLink('dictionary.donor_type', 'On Donor Type') }}
-					{{ NavLink('dictionary.marketing_cycle', 'On Marketing Cycle') }}
+					{{ NavLink(blueprint, 'index', 'General') }}
+					{{ NavLink(blueprint, 'donor_type', 'On Donor Type') }}
+					{{ NavLink(blueprint, 'marketing_cycle', 'On Marketing Cycle') }}
 				</div>
 			</li>
 			<!-- MailBox -->
@@ -31,10 +31,10 @@
 			<li class="nav-item dropdown {{ activeBlueprint(blueprint) }}">
 				<a class="nav-link dropdown-toggle" href="#" id="{{ blueprint }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ blueprint|title }}</a>
 				<div class="dropdown-menu" aria-labelledby="{{ blueprint }}">
-					{{ NavLink('mailbox.index', 'Today') }}
-					{{ NavLink('mailbox.daily', 'Daily') }}
-					{{ NavLink('mailbox.monthly', 'Monthly') }}
-					{{ NavLink('mailbox.excel_list', 'Excel List') }}
+					{{ NavLink(blueprint, 'index', 'Today') }}
+					{{ NavLink(blueprint, 'daily', 'Daily') }}
+					{{ NavLink(blueprint, 'monthly', 'Monthly') }}
+					{{ NavLink(blueprint, 'excel_list', 'Excel List') }}
 				</div>
 			</li>
 			<!-- Private Revenue -->
@@ -42,10 +42,9 @@
 			<li class="nav-item dropdown {{ activeBlueprint(blueprint) }}">
 				<a class="nav-link dropdown-toggle" href="#" id="{{ blueprint }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ blueprint|title }}</a>
 				<div class="dropdown-menu" aria-labelledby="{{ blueprint }}">
-					{{ NavLink('privenue.index', 'Overview') }}
-					{{ NavLink('privenue.pledges', 'Pledges') }}
-					{{ NavLink('privenue.sourcecode1', 'Source Codes Created (June-June)') }}
-					{{ NavLink('privenue.pending', 'Pending Batches') }}
+					{{ NavLink(blueprint, 'index', 'Overview') }}
+					{{ NavLink(blueprint, 'sourcecode1', 'Source Codes Created (June-June)') }}
+					{{ NavLink(blueprint, 'pending', 'Pending Batches') }}
 				</div>
 			</li>
 			<!-- Donor Statistics -->
@@ -53,7 +52,15 @@
 			<li class="nav-item dropdown {{ activeBlueprint(blueprint) }}">
 				<a class="nav-link dropdown-toggle" href="#" id="{{ blueprint }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ blueprint|title }}</a>
 				<div class="dropdown-menu" aria-labelledby="{{ blueprint }}">
-					{{ NavLink('stats.fishing_pool', 'Fishing Pool') }}
+					{{ NavLink(blueprint, 'fishing_pool', 'Fishing Pool') }}
+				</div>
+			</li>
+			<!-- Donor Statistics -->
+			{% set blueprint = 'sponsorship' %}
+			<li class="nav-item dropdown {{ activeBlueprint(blueprint) }}">
+				<a class="nav-link dropdown-toggle" href="#" id="{{ blueprint }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ blueprint|title }}</a>
+				<div class="dropdown-menu" aria-labelledby="{{ blueprint }}">
+					{{ NavLink(blueprint, 'pledges', 'Pledges') }}
 				</div>
 			</li>
 			<!-- Journey -->
@@ -61,9 +68,9 @@
 			<li class="nav-item dropdown {{ activeBlueprint(blueprint) }}">
 				<a class="nav-link dropdown-toggle" href="#" id="{{ blueprint }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ blueprint|title }}</a>
 				<div class="dropdown-menu" aria-labelledby="{{ blueprint }}">
-					{{ NavLink('journey.cure_one', 'Cure One') }}
-					{{ NavLink('journey.general_new', 'General New Donor') }}
-					{{ NavLink('journey.merchandise_new', 'New Merchandise Customer') }}
+					{{ NavLink(blueprint, 'cure_one', 'Cure One') }}
+					{{ NavLink(blueprint, 'general_new', 'General New Donor') }}
+					{{ NavLink(blueprint, 'merchandise_new', 'New Merchandise Customer') }}
 				</div>
 			</li>
 			<!-- Private Revenue -->
@@ -71,13 +78,14 @@
 			<li class="nav-item dropdown {{ activeBlueprint(blueprint) }}">
 				<a class="nav-link dropdown-toggle" href="#" id="{{ blueprint }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ blueprint|title }}</a>
 				<div class="dropdown-menu" aria-labelledby="{{ blueprint }}">
-					{{ NavLink('merchandise.upload', 'RFM') }}
+					{{ NavLink(blueprint, 'upload', 'RFM') }}
 				</div>
 			</li>
 
 			<!-- API -->
-			<li class="nav-item {{ activeBlueprint('api') }}">
-				{{ NavLink('api.index', 'API', 'nav-link') }}
+			{% set blueprint = 'api' %}
+			<li class="nav-item {{ activeBlueprint(blueprint) }}">
+				{{ NavLink(blueprint, 'index', 'API', 'nav-link') }}
 			</li>
 		</ul>
 

@@ -1,0 +1,110 @@
+<div class="container-fluid">
+	<!-- Header -->
+	<div class="alert alert-light" role="alert">
+		<h3 class="alert-heading">Pledges : <mark>{{ data.rows|length|number }}</mark> created in FY{{ this_fy }}</h3>
+		<p>Listing pledges created in FY{{ this_fy }}, sorted newest to oldest (date of pledge creation)
+		</p>
+	</div>
+	<!-- Pagination -->
+	{% if not request.view_args['fy'] %}
+		{% set active_fy = this_fy  %}
+	{% else %}
+		{% set active_fy = request.view_args['fy']  %}
+	{% endif %}
+
+	<nav aria-label="...">
+		<ul class="pagination pagination-sm">
+			<li class="page-item {% if created_fys[0][0] == active_fy %}disabled{% endif %}">
+				<a class="page-link" href="{{ url_for(request.endpoint, fy=active_fy - 1) }}" aria-label="Previous">
+					<span aria-hidden="true">&laquo;</span>
+					<span class="sr-only">Previous</span>
+				</a>
+			</li> <!-- End of Pagination[Previous] -->
+			{% for fy in created_fys %}
+				{% if fy[0] == this_fy %}
+					<li class="page-item active">
+						<a class="page-link" href="{{ url_for(request.endpoint, fy=fy[0]) }}">{{ fy[0] }}<span class="sr-only">(current)</span></a>
+					</li>
+				{% else %}
+					<li class="page-item">
+						<a class="page-link" href="{{ url_for(request.endpoint, fy=fy[0]) }}">{{ fy[0] }}</a>
+					</li>
+				{% endif %}
+			{% endfor %}
+			<li class="page-item {% if created_fys[-1][0] == active_fy or not request.view_args['fy'] %}disabled{% endif %}">
+				<a class="page-link" href="{{ url_for(request.endpoint, fy=active_fy + 1) }}" aria-label="Next">
+					<span aria-hidden="true">&raquo;</span>
+					<span class="sr-only">Next</span>
+				</a>
+			</li>
+		</ul>
+	</nav><!-- End of Pagination[Next] -->
+
+
+	<!-- Table -->
+	<div class="table-responsive-lg">
+		<table class="table table-sm table-hover" id="pledges">
+			<caption><strong>Data Captured : </strong>{{ data.timestamp|dtAU }}, result will be cached for {{ '{:,}'.format(data.cached_timeout) }} seconds</caption>
+			<thead>
+				<tr class="table-dark">
+					{% for header in data.headers %}
+					<th scope="col">{{ header|title }}</th>
+					{% endfor %}
+				</tr>
+			</thead><!-- End of Table Head -->
+			<tbody>{% for row in data.rows %}
+
+{#				{% set err_tring = ':BLANK' %}#}
+{#				{% if row.DESCRIPTION == err_tring or row.RECRUITCAMPAIGN == err_tring  or row.STATUS == err_tring or row.PLAN == err_tring or row.TYPE == err_tring or row.PAYMENTFREQUENCY == err_tring or row.PAYMENTTYPE == err_tring %}#}
+{#					{% set row_type = 'table-danger' %}#}
+{#				{% elif row.SOURCECODES|int != 1 or row.RECRUITMETHOD == err_tring %}#}
+{#					{% set row_type = 'table-warning' %}#}
+{#				{% else %}#}
+{#					{% set row_type = 'table-light' %}#}
+{#				{% endif %}#}
+
+				<tr class="">
+
+					{% for col in row %}
+					{% if loop.index == 1 %}
+						<th scope="row">
+							{{ col }}
+						</th>
+					{% else %}
+						<td>
+							{% if col == ':BLANK'  %}
+							<span class="badge badge-danger">{{ col }}</span>
+							{% else %}
+								{% if data.headers[loop.index - 1]|upper == 'STATUS' %}
+									{% if row.FIRST_DUE and row.FIRST_DUE < now %}
+										{% if row[loop.index - 1]|upper == 'ACTIVE' %}
+										<span class="badge badge-danger">{{ col }}</span>
+										{% else %}
+										<span class="badge badge-warning">{{ col }}</span>
+										{% endif %}
+									{% else %}
+										{% if row[loop.index - 1]|upper == 'ACTIVE' %}
+										<span class="badge badge-success">{{ col }}</span>
+										{% elif row[loop.index - 1]|upper == 'WRITTEN DOWN' %}
+										<span class="badge badge-dark">{{ col }}</span>
+										{% elif row[loop.index - 1]|upper == 'CLOSED' %}
+										<span class="badge badge-secondary">{{ col }}</span>
+										{% elif row[loop.index - 1]|upper == 'ON HOLD' %}
+										<span class="badge badge-warning">{{ col }}</span>
+										{% else %}
+										<span class="badge badge-light">{{ col }}</span>
+										{% endif %}
+									{% endif %}
+								{% else %}
+								<span>{{ col }}</span>
+								{% endif %}
+							{% endif %}
+						</td>
+					{% endif %}
+					{% endfor %}
+				</tr>
+			{% endfor %}
+			</tbody><!-- End of Table Body -->
+		</table><!-- End of Table -->
+	</div><!-- End of Table Responsive -->
+</div><!-- End Container -->

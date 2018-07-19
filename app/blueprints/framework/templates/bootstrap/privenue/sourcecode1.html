@@ -14,18 +14,18 @@
 	,sorted newest to oldest(date of creation)
 	</p>
 	<p>
-	{% for group in data.rows|groupby('CLASS')%}
-		{% if group.grouper|int == 20 %}
+	{% for group in data.rows|groupby('DEP')%}
+		{% if group.grouper|string == '20' %}
 		<button type="button" class="btn btn-light" onclick="findSourceCode(this, 3, 20)">
 			Marketing & Fundraising Code <span class="badge badge-light">{{ group.list|length }}</span>
 			<span class="sr-only">Number of Sourcecodes</span>
 		</button>
-		{% elif group.grouper|int == 18 %}
+		{% elif group.grouper|string == '18' %}
 		<button type="button" class="btn btn-warning" onclick="findSourceCode(this, 3, 18)">
 			Engagement Code <span class="badge badge-light">{{ group.list|length }}</span>
 			<span class="sr-only">Number of Sourcecodes</span>
 		</button>
-		{% elif group.grouper|int == 15 %}
+		{% elif group.grouper|string  == '15' %}
 		<button type="button" class="btn btn-info" onclick="findSourceCode(this, 3, 15)">
 			Merchandise Code <span class="badge badge-light">{{ group.list|length }}</span>
 			<span class="sr-only">Number of Sourcecodes</span>
@@ -85,7 +85,7 @@
 			</tr>
 		</thead>
 		<tbody>{% for row in data.rows %}
-			<tr class="{% if row.CLASS|int == 15 %}table-info{% elif row.CLASS|int == 18 %}table-warning{% elif row.CLASS|int == 20 %}{% else %}table-danger{% endif %}">
+			<tr class="{% if row.DEP|string == '15' %}table-info{% elif row.DEP|string == '18' %}table-warning{% elif row.DEP|string == '20' %}{% else %}table-danger{% endif %}">
 				<th scope="row"
 				tabindex="0" data-toggle="popover" data-placement="top" data-trigger="focus"
 						title='<strong >{{ row.SOURCEDESCRIPTION }}</strong>'

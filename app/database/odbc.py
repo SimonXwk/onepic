@@ -5,7 +5,7 @@ import datetime
 from app.cache import cached
 
 
-class ODBCResult:
+class ODBCResult(object):
 	def __init__(self, data, cached_timeout):
 		self.headers, self.rows = data
 		self.cached_timeout = cached_timeout
@@ -15,7 +15,7 @@ class ODBCResult:
 		return 'data retrieved at {} :\n{}'.format(self.timestamp, self.rows)
 
 
-class ThankqODBC:
+class ThankqODBC(object):
 	connection_string = current_app.config.get('TQ_PRT1_CONNECTION_STRING')
 	script_folder = os.path.join(current_app.root_path, 'database\scripts')
 

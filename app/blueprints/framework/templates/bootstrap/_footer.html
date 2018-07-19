@@ -9,7 +9,7 @@
 		|<span class="text-muted"> Endpoint: {{ request.endpoint }} </span>
 
 		{% if current_user.is_authenticated %}
-			|<span class="text-muted"> {{ current_user.email }} </span>
+			|<span class="text-muted"> {{ current_user.email or 'anonymous' }} </span>
 		{% else %}
 			|<span class="text-muted"> Not Authenticated </span>
 		{% endif %}
