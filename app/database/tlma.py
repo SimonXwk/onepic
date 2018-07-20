@@ -1,4 +1,5 @@
 import datetime
+import calendar
 
 FIRST_FY_MONTH_DEFAULT = 7
 
@@ -26,17 +27,29 @@ class TLMA:
 		cls.fy1m = month if isinstance(month, int) and month in range(1, 13) else cls.fy1m
 
 	@classmethod
-	def cy(cls, fy_month):
+	def fy_range(cls, fy):
+		return datetime.date(cls.cy(fy, 1), cls.fy1m, 1), (datetime.date(cls.cy(fy, 12), cls.fy1m, 1) - datetime.timedelta(days=1))
+
+	@classmethod
+	def cy(cls, fy, fy_month):
+		return fy if fy_month >= cls.fy1m else fy - 1
+
+	@classmethod
+	def cy_month_range(cls, cy, cy_month):
+		return calendar.monthrange(cy, cy_month)
+
+	@classmethod
+	def ccy(cls, fy_month):
 		return cls.cfy_start_date.year if fy_month < cls.fy1m or fy_month == 1 else cls.cfy_start_date.year + 1
 
 	@classmethod
-	def cy_date(cls, fy_month, day):
-		return datetime.date(cls.cy(fy_month), fy_month, day)
+	def ccy_date(cls, fy_month, day):
+		return datetime.date(cls.ccy(fy_month), fy_month, day)
 
 	@classmethod
 	def fy(cls, date):
 		return int(date.year + (0 if date.month < cls.fy1m or cls.fy1m == 1 else 1))
 
 	@classmethod
-	def fy_mth(cls, date):
-		return date.month + (cls.fy1m-1 if date.month < cls.fy1m or cls.fy1m == 1 else 1-cls.fy1m)
+	def fy_mth(cls, cy_month):
+		return cy_month + (cls.fy1m-1 if cy_month < cls.fy1m or cls.fy1m == 1 else 1-cls.fy1m)

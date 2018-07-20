@@ -21,6 +21,9 @@ class ApiException(Exception):
 	def to_result(self):
 		return ApiResult({'message': self.message}, status=self.status)
 
+	def __call__(self, *args, **kwargs):
+		return self.to_result()
+
 
 class ApiFlask(Flask):
 	""" This is an API Response Converter by subclassing Flask class """

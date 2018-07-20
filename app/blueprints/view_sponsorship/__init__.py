@@ -5,3 +5,4 @@ ld = LazyLoader(bp)
 
 # LazyLoading View Functions
 ld.url('view_funcs.pledges', ['/pledges', '/pledges/<int:fy>'])
+ld.url('view_funcs.delinquency', ['/delinquency'])

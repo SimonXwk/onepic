@@ -24,7 +24,7 @@ def pending():
 
 @templatified('sourcecode1')
 def sourcecode1():
-	d1, d2 = TLMA.cy_date(TLMA.fy12m, 1), TLMA.cfy_end_date
+	d1, d2 = TLMA.ccy_date(TLMA.fy12m, 1), TLMA.cfy_end_date
 	params = (Tq.format_date(d1), Tq.format_date(d2))
 	data = Tq.query('SOURCECODE_CREATED', *params, cached_timeout=10)
 	return dict(title='Source Code 1 Created', data=data, d1=d1, d2=d2)

@@ -18,8 +18,7 @@ cte_pledge_source as (
 -- --------------------------------------------------------------
 , cte_pledge_sourcetype as (
   SELECT
-    cps.PLEDGEID, cps.FIRST_SOURCECODE1, cps.SOURCECODES, cps.FIRST_SOURCECODE2, cps.FIRST_DESTINATION1, cps.FIRST_DESTINATION2
-    ,TBL_SOURCECODE.SOURCETYPE
+    cps.*, TBL_SOURCECODE.SOURCETYPE
   FROM cte_pledge_source cps LEFT JOIN TBL_SOURCECODE ON (cps.FIRST_SOURCECODE1 = TBL_SOURCECODE.SOURCECODE)
 )
 -- --------------------------------------------------------------

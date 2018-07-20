@@ -54,14 +54,14 @@ class ThankqODBC(object):
 	@classmethod
 	def change_parameter(cls, script, update_list):
 		for item in update_list:
-			opening_tag = f'/*<{item[0]}>*/'
-			closing_tag = f'/*</{item[0]}>*/'
+			tag, value = item[0], item[1]
+			opening_tag, closing_tag = f'/*<{tag}>*/', f'/*</{tag}>*/'
 
 			start = script.index(opening_tag) + len(opening_tag)
 			end = script.index(closing_tag, start)
 
 			old_value = f'{opening_tag}{script[start:end]}{closing_tag}'
-			new_value = f'{opening_tag}{item[1]}{closing_tag}'
+			new_value = f'{opening_tag}{value}{closing_tag}'
 
 			script = script.replace(old_value, new_value)
 

@@ -152,9 +152,9 @@ class RFM(object):
 			# # Save Result
 			try:
 				rfm.to_csv(os.path.join(get_result_folder(), '_'.join([file_dict['filename'], 'rfmTable']) + '.csv'), encoding='utf-8-sig')
-				print('Success : RFM result saved as CSV')
+				print('> Success : RFM result saved as CSV')
 			except PermissionError:
-				print('Permission denied : Attempt to save as CSV')
+				print('> Permission denied : Attempt to save as CSV')
 
 			# Preparing Output
 			seg_dict = rfm['Segment'].value_counts().to_dict()

@@ -3,6 +3,7 @@ from flask import Blueprint, request, render_template, jsonify
 from functools import wraps
 from flask_login import login_required
 
+
 class LazyView(object):
 	def __init__(self, import_name):
 		self.__module__, self.__name__ = import_name.rsplit('.', 1)

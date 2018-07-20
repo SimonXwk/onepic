@@ -15,6 +15,7 @@ def general_new():
 
 @templatified('merch_new_customer')
 def merchandise_new():
-	params = (Tq.format_date(TLMA.cfy_start_date), Tq.format_date(TLMA.cfy_end_date))
+	d1, d2 = TLMA.fy_range(TLMA.cfy)
+	params = (Tq.format_date(d1), Tq.format_date(d2))
 	data = Tq.query('NEW_CUSTOMER', *params, cached_timeout=20)
-	return dict(title='Merchandise New Customer Journey', data=data)
+	return dict(title='Merchandise New Customer Journey', data=data, dates=(d1, d2))

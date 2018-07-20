@@ -14,3 +14,8 @@ def pledges(fy=TLMA.cfy):
 	data = Tq.query('PRIVENUE_PLEDGES', updates=update, cached_timeout=10)
 	created_fys = pledge_created_fys()
 	return dict(title='Pledge Overview', data=data, this_fy=fy, created_fys=created_fys)
+
+
+@templatified()
+def delinquency():
+	return dict(title='Delinquency Check')
