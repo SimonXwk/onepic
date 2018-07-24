@@ -18,7 +18,7 @@
 		</div>
 		<div class="card-footer text-muted">
 			<span class="badge badge-pill badge-success">PM: Pure Merch Customer</span>
-    	<span class="badge badge-pill badge-secondary">ORG: Organization</span>
+    	<span class="badge badge-pill badge-dark">ORG: Organization</span>
 			<span class="badge badge-pill badge-danger">ESTATE</span>
 			<span class="badge badge-pill badge-danger">DECD: Deceased</span>
 			<span class="badge badge-pill badge-warning">!MAIL: Do not mail</span>
@@ -95,7 +95,7 @@
 					</td>
 					<td><!--STATUS-->
 							{% if row.TOTAL == row.MERCHANDISE_TOTAL %}<span class="badge badge-pill badge-success">PM</span>{% endif %}
-							{% if row.CONTACTTYPE|trim|upper == 'ORGANISATION' %}<span class="badge badge-pill badge-secondary">ORG</span>{% endif %}
+							{% if row.CONTACTTYPE|trim|upper == 'ORGANISATION' %}<span class="badge badge-pill badge-dark">ORG</span>{% endif %}
 							{% if row.PRIMARYCATEGORY|trim|upper == 'ESTATE' %}<span class="badge badge-pill badge-danger">ESTATE</span>{% endif %}
 							{% if row.DONOTMAILREASON|trim|upper == 'DECEASED' %}<span class="badge badge-pill badge-danger">DECD</span>{% endif %}
 							{% if row.DONOTMAIL|int == -1 %}

@@ -27,11 +27,16 @@
 {# tile comes from render_template 'title' keyword argument #}
 {% block title %}{% if title %}{{ title }}{% else %}{{ request.endpoint }}{% endif %}{% endblock %}
 {# Default Nav Bar and Footer #}
-{% block navbar_global %}{% include framework_folder + '_navbar.html' %}{% endblock %}
-{% block footer %}{% include framework_folder + '_footer.html' %}{% endblock %}
+{% block navbar_global %}{% include (framework_folder,'_navbar.html' )|join('/') %}{% endblock %}
+{% block footer %}{% include  (framework_folder,'_footer.html' )|join('/') %}{% endblock %}
 
 {# Actual Content Will Be using the same file name but in framework folder/to_current_path  #}
 {# self._TemplateReference__context.name gives the current templat path  #}
 {% block content %}
 {% include (framework_folder,self._TemplateReference__context.name)|join('/') %}
 {% endblock %}
+
+
+{% macro prototype(name, filte_type = '.html') %}
+		{% include (framework_folder, '_prototype', name + filte_type)|join('/') %}
+{% endmacro %}

@@ -38,28 +38,4 @@ $(function () {
 
 {# Embedded Javascript At the Very End #}
 {% block js_embedded_after %}
-<script>
-function findSourceCode(element, col, value="") {
-  let filter, table, trs, td, i;
-	if(value === ""){
-		filter = document.getElementById(element.id).value.toUpperCase();
-	}else{
-		filter = value;
-	}
-  table = document.getElementById("sourcecodes");
-  trs = table.getElementsByTagName("tr");
-	//console.log(filter, tr.length );
-  for (i = 0; i < trs.length; i++) {
-  	//console.log(trs[i]);
-    td = trs[i].cells[col-1];
-    if (td) {
-      if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
-        trs[i].style.display = "";
-      } else {
-        trs[i].style.display = "none";
-      }
-    }
-  }
-}
-</script>
 {% endblock %}

@@ -1,0 +1,34 @@
+<!-- Table -->
+<div class="table-responsive-lg">
+	<table class="table table-sm table-hover" id="pledges">
+		<caption>
+			<strong>Data Captured : </strong>{{ data.timestamp|dtAU }}, result will be cached for {{ '{:,}'.format(data.cached_timeout) }} seconds
+		</caption><!-- End of Table Caption -->
+
+		<thead>
+			<tr class="table-dark">
+				{% for header in data.headers %}
+				<th scope="col">{{ header|title }}</th>
+				{% endfor %}
+			</tr>
+		</thead><!-- End of Table Head -->
+
+		<tbody>
+			{% for row in data.rows %}
+			<tr>
+				{% for col in row %}
+				{% if loop.index == 1 %}
+				<th scope="row">
+					{{ col }}
+				</th>
+				{% else %}
+				<td>
+					<span>{{ col }}</span>
+				</td>
+				{% endif %}
+				{% endfor %}
+			</tr>
+			{% endfor %}
+		</tbody><!-- End of Table Body -->
+	</table><!-- End of Table -->
+</div><!-- End of Table Responsive -->

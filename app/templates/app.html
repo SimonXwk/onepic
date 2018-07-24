@@ -28,6 +28,47 @@ function fetchJSON(endpoint, func){
 	});
 }
 
+// Table Filters
+function filterTable(tableID, col, value="", element) {
+  let filter, table, tbody, trs, td, i;
+  // IF no filter value provided use calling element's value instead
+	if(value === ""){
+		filter = document.getElementById(element.id).value.toUpperCase().trim();
+	}else{
+		filter = value.toUpperCase().trim();
+	}
+	// Locate the Table objects
+  table = document.getElementById(tableID);
+	tbody = table.getElementsByTagName("tbody").item(0);
+  trs = tbody.getElementsByTagName("tr");
+	//console.log(filter, trs.length, 'rows, searching in column', col);
+	// Only show <tr> that has the value in its <td>
+  for (i = 0; i < trs.length; i++) {
+  	//console.log(trs[i]);
+    td = trs[i].cells[col-1];
+    if (td) {
+      if (td.innerText.toUpperCase().indexOf(filter) > -1) {
+      	// DO nothing
+        //trs[i].style.display = "";
+      } else {
+        trs[i].style.display = "none";
+      }
+    }
+  }
+}
+// Table Show All
+function showTableAll(tableID){
+ 	let table, tbody, trs, td, i, j;
+	// Locate the Table objects
+  table = document.getElementById(tableID);
+	tbody = table.getElementsByTagName("tbody").item(0);
+  trs = tbody.getElementsByTagName("tr");
+	// Show All <td> in <tr>
+  for (i = 0; i < trs.length; i++) {
+		trs[i].style.display = "";
+  }
+}
+
 
 <!-- Formatters -->
 const today = new Date();
@@ -40,6 +81,7 @@ function currency(val) {
                   .replace(/(\d{3}\B)/g, "$1,")
                   .split("").reverse().join("");
 }
+
 </script>
 {% endblock %}
 
