@@ -23,6 +23,12 @@ class TLMA:
 	]
 
 	@classmethod
+	def get_fy_month_list(cls):
+		if cls.fy1m == 1:
+			return [i for i in range(1, 13)]
+		return [(cls.fy1m + i) if (cls.fy1m + i) < 13 else (cls.fy1m + i - 12) for i in range(12)]
+
+	@classmethod
 	def set_fy1m(cls, month):
 		cls.fy1m = month if isinstance(month, int) and month in range(1, 13) else cls.fy1m
 

@@ -1,5 +1,5 @@
 <div class="container-fluid">
-	{% set table_name = 'pledges' %}
+	{% set table_name = 'data_table' %}
 	{% macro filterTable(col, value) %}
 		filterTable('{{ table_name }}', {{ col }}, '{{ value }}', this)
 	{% endmacro %}
@@ -24,22 +24,22 @@
 		{% for group in data.rows|groupby('STATUS')%}
 		{% if group.grouper|string|upper == 'ACTIVE' %}
 		<button type="button" class="btn btn-success" onclick="{{ filterTable(search_col, 'ACTIVE') }}">
-			ACTIVE <span class="badge-pill badge-light">{{ group.list|length }}</span>
+			{{  group.grouper|upper }} <span class="badge-pill badge-light">{{ group.list|length }}</span>
 			<span class="sr-only">Number of Sourcecodes</span>
 		</button>
 		{% elif group.grouper|string|upper == 'CLOSED' %}
 		<button type="button" class="btn btn-secondary" onclick="{{ filterTable(search_col, 'CLOSED') }}">
-			CLOSED <span class="badge-pill badge-light">{{ group.list|length }}</span>
+			{{  group.grouper|upper }} <span class="badge-pill badge-light">{{ group.list|length }}</span>
 			<span class="sr-only">Number of Sourcecodes</span>
 		</button>
 		{% elif group.grouper|string|upper  == 'ON HOLD' %}
 		<button type="button" class="btn btn-warning" onclick="{{ filterTable(search_col, 'ON HOLD') }}">
-			ON HOLD <span class="badge-pill badge-light">{{ group.list|length }}</span>
+			{{  group.grouper|upper }} <span class="badge-pill badge-light">{{ group.list|length }}</span>
 			<span class="sr-only">Number of Sourcecodes</span>
 		</button>
 		{% elif group.grouper|string|upper  == 'WRITTEN DOWN' %}
 		<button type="button" class="btn btn-dark" onclick="{{ filterTable(search_col, 'WRITTEN DOWN') }}">
-			WRITTEN DOWN <span class="badge-pill badge-light">{{ group.list|length }}</span>
+			{{  group.grouper|upper }} <span class="badge-pill badge-light">{{ group.list|length }}</span>
 			<span class="sr-only">Number of Sourcecodes</span>
 		</button>
 		{% else %}

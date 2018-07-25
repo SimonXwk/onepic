@@ -5,6 +5,7 @@
 {% endblock %}
 
 {% block js_optional %}
+{{ Highchart([],['variable-pie']) }}
 {% endblock %}
 
 
@@ -38,5 +39,95 @@ $(function () {
 
 {# Embedded Javascript At the Very End #}
 {% block js_embedded_after %}
+<script>
+console.log(pledgeType1);
+
+Highcharts.chart('chart1', {
+	chart: {
+		type: 'variablepie'
+	},
+	title: {
+		text: 'Total Revenue by Pledge Types'
+	},
+	tooltip: {
+		headerFormat: '',
+		pointFormat: '<span style="color:{point.color}">\u25CF</span><b> {point.name}</b><br/>' +
+				'Total Income (AUD): $<b>{point.y}</b><br/>' +
+				'<b>{point.percentage:.1f} %</b> of Total Revenue'
+	},
+	plotOptions: {
+		variablepie: {
+			allowPointSelect: true,
+			cursor: 'pointer',
+			innerSize: 50,
+			depth: 35,
+			dataLabels: {
+				enabled: true,
+				distance: 10,
+				color: 'black',
+				format: '{point.name}<span style="font-size:0.55rem; color:{point.color}">: ${point.y:,f} ({point.percentage:.1f}%)</span>'
+			},
+			showInLegend: true,
+		}
+	},
+	series: [{
+			minPointSize: 10,
+			innerSize: '20%',
+			zMin: 0,
+			name: 'pledge types',
+			data: pledgeType1
+	}]
+});
+
+// Stacked BarChart
+Highcharts.chart('chart2', {
+	chart: {
+		type: 'column'
+	},
+	title: {
+		text: 'Monthly Revenue by Pledge Types'
+	},
+	xAxis: {
+		categories: $FY_MONTH_LIST
+	},
+	yAxis: {
+		title: {
+			text: 'Total Pledge Revenue (AUD)'
+		},
+		stackLabels: {
+			enabled: true,
+			style: {
+				fontWeight: 'bold',
+				color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+			}
+		}
+	},
+	legend: {
+		floating: false,
+		borderColor: '#CCC',
+		borderWidth: 0,
+		shadow: false
+	},
+	tooltip: {
+		headerFormat: '<b>{point.x}</b><br/>',
+		pointFormat: '<span style="color:{point.color}">\u25CF</span><b> {series.name}</b><br/>' +
+			'{series.name} Total: ${point.y}<br/>' +
+			'All Types Total: ${point.stackTotal}'
+	},
+	plotOptions: {
+		column: {
+			stacking: 'normal',
+			dataLabels: {
+				enabled: true,
+				color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white'
+			}
+		}
+	},
+	"series": pledgeMonthlyType1
+});
+
+
+
+</script>
 {% endblock %}
 

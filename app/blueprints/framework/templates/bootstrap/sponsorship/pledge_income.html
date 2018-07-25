@@ -1,10 +1,8 @@
 <div class="container-fluid">
-{% set table_name = 'pledges' %}
+{% set data_table_id = 'data_table' %}
 {% macro filterTable(col, value) %}
-	filterTable('{{ table_name }}', {{ col }}, '{{ value }}', this)
+	filterTable('{{ data_table_id }}', {{ col }}, '{{ value }}', this)
 {% endmacro %}
-	<p class="lead">FY{{ this_fy }} Total Sponsorship Income : {{ data.rows|sum(attribute='ACTUAL_TOTAL')|currency }}</p>
-
 	<!-- Pagination -->
 	{% with  %}
 		{#	Find Current Item	#}
@@ -106,8 +104,131 @@
 				</a>
 			</li> <!-- End of Pagination[Last] -->
 		</ul>
-	</nav><!-- End of Pagination -->
-	{% endwith  %}
+	</nav>
+	{% endwith  %}<!-- End of Pagination -->
 
-	{{ prototype('data_table') }}
+	<!-- Total Income Headline-->
+	{% set total_fy =  data.rows|sum(attribute='ACTUAL_TOTAL')  %}
+	<p class="lead"><strong>FY{{ this_fy }} Total Sponsorship Income : {{ total_fy|currency }}</strong></p>
+
+	<div class="row">
+		<div class="col-sm">
+			<!-- Big Type Income Report -->
+			<div class="card">
+				<div class="table-responsive">
+				<table class="table table-hover table-sm table-striped table-bordered">
+					<caption><strong>Data Captured : </strong>{{ data.timestamp|dtAU }}, cached for {{ '{:,}'.format(data.cached_timeout) }} seconds
+					</caption><!-- End of Table Caption -->
+					<thead class="thead-dark">
+						<tr>
+							<th scope="col">
+								<span class="text-warning"
+									data-toggle="popover" tabindex="0" data-trigger="focus"
+									data-placement="right"
+									title="Definition Rules"
+									data-content="Interpreting the 1st Sourcecode1 associated to a pledge using following rules from top to bottom<br>
+									<ul>
+									<li>If it's [TLCSPON] -> [TLC]</li>
+									<li>If it's [SACTIONP] -> [ACTION PARTNER]</li>
+									<li>If it's [SPERSON] -> [PERSONAL SUPPORT]</li>
+									<li>If it's [SCOUNTRY] -> [COUNTRY SUPPORT]</li>
+									<li>If it contains [SCURE] -> [CURE ONE]</li>
+									<li>If this first sourcecode1 exists --> [_AMBIGUOUS]</li>
+									<li>If this first sourcecode1 does not exist --> [_PLEDGE MISSING]</li>
+									</ul>
+									"
+								>
+									Sponsorship Type
+								</span>
+							</th>
+							<th scope="col">Total</th>
+							<th scope="col">Per Month</th>
+							{% for m in fymlist|map("mthname", abbr=True) %}
+								<th scope="col">
+								{{ m }}
+								</th>
+							{% endfor %}
+						</tr>
+					</thead>
+					<tbody>
+						{% for group in data.rows|groupby('SPONSORSHIP1')%}
+						<tr>
+							{% set type_total = group.list|sum(attribute='ACTUAL_TOTAL')  %}
+							<th scope="col" >
+								{{ group.grouper }}
+							</th>
+							<td><span class="text-primary"><strong>{{ type_total|currency }}</strong></span></td>
+							<td><span class="text-primary"><strong>{{ (type_total/12)|currency }}</strong></span></td>
+
+							{% for m in fymlist %}
+							<td scope="col">
+								{% for group_mth in group.list|groupby('DATEOFPAYMENT.month') %}
+									{% set month_total = group_mth.list|sum(attribute='ACTUAL_TOTAL') %}
+									{% if group_mth.grouper == m %}
+										{{ month_total|currency }}
+									{% endif %}
+								{% endfor %}
+							</td>
+							{% endfor %}
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+				</div>
+			</div>
+	 	</div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-4">
+			<div class="chart" id="chart1" ></div>
+		</div>
+
+		<div class="col-md-8">
+			<div class="chart" id="chart2" ></div>
+		</div>
+
+	</div>
+
+{#	{{ prototype('data_table') }}#}
 </div>
+
+<script>
+
+	let pledgeType1 = [], pledgeMonthlyType1 = [], tempData = [];
+	let tempTotal;
+	{% for group in data.rows|groupby('SPONSORSHIP1') %}
+		{% with %}
+			{% set total_type1 = group.list|sum(attribute='ACTUAL_TOTAL') %}
+			{% set color_type1 = group.list[0].SPONSORSHIP1_COLOR %}
+			pledgeType1[{{ loop.index - 1 }}] = {
+				name: '{{ group.grouper }}',
+				y: {{ total_type1 }},
+				z:{{ (total_type1/total_fy) * 300 + 50 }},
+				color: '{{ color_type1  }}'
+			};
+
+			tempData = [];
+			{% for m in fymlist %}
+				{% set month_loop_index = loop.index %}
+				tempTotal = null;
+					{% for group_mth in group.list|groupby('DATEOFPAYMENT.month') %}
+						{% set month_total = group_mth.list|sum(attribute='ACTUAL_TOTAL') %}
+						{% if group_mth.grouper == m %}
+								{% set total_matched = month_total %}
+								tempTotal = {{ month_total }}
+						{% endif %}
+					{% endfor %}
+				tempData[{{ month_loop_index - 1 }}] = tempTotal;
+			{% endfor %}
+
+			pledgeMonthlyType1[{{ loop.index - 1 }}] = {
+		  name: '{{ group.grouper }}',
+		  data: tempData,
+			color: '{{ color_type1  }}'
+	  };
+
+		{% endwith %}
+	{% endfor %}
+
+</script>

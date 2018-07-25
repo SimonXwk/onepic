@@ -61,14 +61,13 @@ def create_app(test_config=None):
 	loader.filter('jinja_filters.filter_number', name='number')
 	loader.filter('jinja_filters.filter_datetime_au', name='dtAU')
 	loader.filter('jinja_filters.filter_date_au', name='dAU')
+	loader.filter('jinja_filters.filter_month_name', name='mthname')
 	loader.filter('jinja_filters.filter_to_date', name='strpdt')
-	loader.filter('jinja_filters.filter_month_name', name='mth')
 	loader.filter('jinja_filters.filter_financial_year', name='FY')
 	loader.filter('jinja_filters.filter_2decimal', name='f')
 	loader.filter('jinja_filters.filter_datetime_offset', name='dtOffset')
 	loader.filter('jinja_filters.filter_percentage', name='pct')
 	loader.filter('jinja_filters.filter_filename', name='fname')
-	loader.filter('jinja_filters.filter_email_name', name='emailName')
 	loader.filter('jinja_filters.filter_mail_excel_month', name='mailmonth')
 
 	# Close the session after each request or application context shutdown

@@ -27,6 +27,12 @@ def inject_cfy():
 
 
 @bp.app_context_processor
+def inject_fy_month_list():
+	from app.database.tlma import TLMA
+	return dict(fymlist=TLMA.get_fy_month_list())
+
+
+@bp.app_context_processor
 def utility_processor():
 	def get_package_json_version(lib_name, dependency='dependencies'):
 		import json

@@ -2,6 +2,8 @@
 
 {% block js_embedded_header %}
 <script type=text/javascript>
+
+let $FY_MONTH_LIST = {{ fymlist|map("mthname", abbr=True)|list|safe }};
 // Build endpoint String
 function endpoint (url, parameter) {
 	return $SCRIPT_ROOT + url + (parameter ? parameter : '')
@@ -41,7 +43,7 @@ function filterTable(tableID, col, value="", element) {
   table = document.getElementById(tableID);
 	tbody = table.getElementsByTagName("tbody").item(0);
   trs = tbody.getElementsByTagName("tr");
-	//console.log(filter, trs.length, 'rows, searching in column', col);
+  console.log(filter, trs.length, 'rows, searching in column', col);
 	// Only show <tr> that has the value in its <td>
   for (i = 0; i < trs.length; i++) {
   	//console.log(trs[i]);
@@ -72,9 +74,8 @@ function showTableAll(tableID){
 
 <!-- Formatters -->
 const today = new Date();
-const dateFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 function dAU(date) {
-	return date.toLocaleDateString("en-AU", dateFormatOptions)
+	return date.toLocaleDateString("en-AU", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
 }
 function currency(val) {
 	return '$' + String(val.toFixed(2)).split("").reverse().join("")
@@ -157,6 +158,8 @@ function currency(val) {
 	{% set defaultBases, defaultModules = [], ['exporting'] %}
 	{% if bases %}{% set bases = defaultBases|list + bases|list %}{% else %}{% set bases = defaultBases %}{% endif %}
 	{% if modules %}{% set modules = defaultModules|list + modules|list %}{% else %}{% set modules = defaultModules %}{% endif %}
+
+
 	{# ---------- Serve from local files ---------- #}
 	{% if config['HIGHCHART_SERVE_LOCAL'] %}
 		{# Basic Includes	#}
@@ -173,6 +176,7 @@ function currency(val) {
 		{% if modules %}{% for module in modules %}
 <script src="{{ url_for('static', filename=JSPath.format(module)) }}"></script>
 		{% endfor %}{% endif %}
+
 
 	{# ---------- Serve from CDN ---------- #}
 	{% else %}
@@ -207,8 +211,16 @@ Highcharts.setOptions({
 				text: 'ⒸTLMA',
 				href: '#',
 				enabled: true
+		},
+		chart:{
+			borderWidth:0,
 		}
 	});
+function setHighchartColors(colorList) {
+	Highcharts.setOptions({
+ 		colors: colorList
+	});
+}
 </script>
 {% endmacro %}
 

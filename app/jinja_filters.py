@@ -12,24 +12,26 @@ def filter_number(value):
 
 
 def filter_datetime_au(value, fmt='%A %d %B %Y %H:%M:%S'):
-	return value.strftime(fmt)
+	return value.strftime(fmt) if value else None
 
 
 def filter_date_au(value, fmt='%d %B %Y'):
-	return value.strftime(fmt)
+	return value.strftime(fmt) if value else None
 
 
 def filter_to_date(value, fmt=''):
 	return datetime.datetime.strptime(value, fmt)
 
 
-def filter_month_name(value):
+def filter_month_name(value, abbr=False):
 	import calendar
+	if abbr:
+		return calendar.month_abbr[value] if isinstance(value, int) and value in range(1, 13) else 'undefined'
 	return calendar.month_name[value] if isinstance(value, int) and value in range(1, 13) else 'undefined'
 
 
 def filter_financial_year(value):
-	return "FY{:d}".format(TLMA.fy(value))
+	return "{:d}".format(TLMA.fy(value)) if value else None
 
 
 def filter_2decimal(value, decimal=2):
@@ -47,11 +49,6 @@ def filter_percentage(value, denominator, digits=2):
 
 def filter_filename(value):
 	return os.path.splitext(value)[0].split('\\')[-1] + os.path.splitext(value)[1]
-
-
-def filter_email_name(value):
-	name_part = str(value).rsplit('@', 2)[0]
-	return name_part.title()[:-1] + name_part[-1].upper()
 
 
 def filter_mail_excel_month(value):

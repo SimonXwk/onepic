@@ -7,9 +7,8 @@ from app.cache import cached
 
 class ODBCResult(object):
 	def __init__(self, data, cached_timeout):
-		self.headers, self.rows = data
+		self.headers, self.rows, self.timestamp = data
 		self.cached_timeout = cached_timeout
-		self.timestamp = datetime.datetime.now()
 
 	def __str__(self):
 		return 'data retrieved at {} :\n{}'.format(self.timestamp, self.rows)
@@ -33,8 +32,19 @@ class ThankqODBC(object):
 		return script
 
 	@classmethod
-	def query(cls, file_name, *parameters, cached_timeout=120, updates=None):
-		script = cls.get_script(file_name)
+	def merge_script(cls, file_list):
+		output = ''
+		for file in file_list:
+			output = output + " \n" + cls.get_script(file)
+		return output
+
+	@classmethod
+	def query(cls, file_names, *parameters, cached_timeout=120, updates=None):
+		script = ''
+		if isinstance(file_names, list):
+			script = cls.merge_script(file_names)
+		else:
+			script = cls.get_script(file_names)
 
 		if updates:
 			script = cls.change_parameter(script, updates)
@@ -48,7 +58,9 @@ class ThankqODBC(object):
 				rows = cursor.execute(sql, *params).fetchall()  # A List
 				headers = [column[0] for column in cursor.description]
 				# stamp = cursor.execute('SELECT CURRENT_TIMESTAMP').fetchone()[0]  # A Tuple
-				return headers, rows  # returning a comma separated set of elements creates a tuple
+				timestamp = datetime.datetime.now()
+				return headers, rows, timestamp  # returning a comma separated set of elements creates a tuple
+
 		return ODBCResult(run(cls.connection_string, script, *parameters), cached_timeout)
 
 	@classmethod
