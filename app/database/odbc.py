@@ -41,7 +41,7 @@ class ThankqODBC(object):
 	@classmethod
 	def query(cls, file_names, *parameters, cached_timeout=120, updates=None):
 		script = ''
-		if isinstance(file_names, list):
+		if isinstance(file_names, list) or isinstance(file_names, tuple):
 			script = cls.merge_script(file_names)
 		else:
 			script = cls.get_script(file_names)

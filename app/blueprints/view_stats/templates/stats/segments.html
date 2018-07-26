@@ -1,0 +1,90 @@
+{% extends framework_template %}
+
+{# Addiditonal Libraries #}
+{% block css_optional %}
+{% endblock %}
+
+{% block js_optional %}
+{{ Highchart([],['export-data']) }}
+{% endblock %}
+
+
+{# My Own js and css #}
+{% block css_custom %}
+{% endblock %}
+
+{% block js_custom %}
+{% endblock %}
+
+
+{# Embedded CSS #}
+{% block css_embedded %}
+{% endblock %}
+
+
+{# Embedded Javascript After Libraries & Before Custom Javascript #}
+{% block js_embedded_before %}
+{% endblock %}
+
+
+{# Embedded Javascript At the Very End #}
+{% block js_embedded_after %}
+<script>
+
+// Stacked BarChart
+function drawStactedBar(id, title, xAxis, series){
+	Highcharts.chart(id, {
+		chart: {
+			type: 'column'
+		},
+		title: {
+			text: title
+		},
+		xAxis: {
+			categories: xAxis
+		},
+		yAxis: {
+			title: {
+				text: 'Number of contacts'
+			},
+			stackLabels: {
+				enabled: true,
+				style: {
+					fontWeight: 'bold',
+					color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+				}
+			}
+		},
+		legend: {
+			floating: false,
+			borderColor: '#CCC',
+			borderWidth: 0,
+			shadow: false
+		},
+		tooltip: {
+			headerFormat: '<b>{point.x}</b><br/>',
+			pointFormat: '<span style="color:{point.color}">\u25CF</span><b> {series.name}</b><br/>' +
+				'{series.name}: {point.y}<br/>' +
+				'All Segments: {point.stackTotal}'
+		},
+		plotOptions: {
+			column: {
+				stacking: 'normal',
+				dataLabels: {
+					enabled: true,
+					color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white'
+				}
+			}
+		},
+		"series": series
+	});
+}
+
+drawStactedBar('chart1', 'No. Active Donor By Segments&Fys', xAxis, series1);
+drawStactedBar('chart2', 'No. Contacts By Segments&Fys', xAxis, series2);
+</script>
+
+
+
+{% endblock %}
+

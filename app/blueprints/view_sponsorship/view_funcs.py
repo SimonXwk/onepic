@@ -16,15 +16,15 @@ def pledge_dop_fys():
 @templatified()
 def pledges(fy=TLMA.cfy):
 	update = [('FY', fy)]
-	data = Tq.query(['PLEDGE_BASE', 'PLEDGES_DETAIL'], updates=update, cached_timeout=10)
+	data = Tq.query(('PLEDGE__BASE', 'PLEDGE_DETAIL'), updates=update, cached_timeout=10)
 	fys = pledge_created_fys()
 	return dict(title='Pledge Overview', data=data, this_fy=fy, fys=fys)
 
 
 @templatified()
-def pledge_income(fy=TLMA.cfy):
+def pledge_income_fy(fy=TLMA.cfy):
 	update = [('FY', fy)]
-	data = Tq.query(['PLEDGE_BASE', 'PLEDGE_INCOME'], updates=update, cached_timeout=25)
+	data = Tq.query(('PLEDGE__BASE', 'PLEDGE_INCOME'), updates=update, cached_timeout=25)
 	fys = pledge_dop_fys()
 	return dict(title='Pledge Income', data=data, this_fy=fy, fys=fys)
 

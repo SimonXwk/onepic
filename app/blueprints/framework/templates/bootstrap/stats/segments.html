@@ -1,0 +1,116 @@
+<div class="container-fluid">
+{% set group_by_fy = data.rows|groupby('FY')|reverse  %}
+{% set group_by_seg = data.rows|groupby('SEGMENT') %}
+
+	<p class="lead"><strong>Segments By Financial Years</strong>
+	(data captured : {{ data.timestamp|dtAU }}, cached for {{ '{:,}'.format(data.cached_timeout) }} seconds)</p>
+
+	<!-- ROW2 -->
+	<div class="row">
+		<div class="col-12">
+			<div class="chart" id="chart1" ></div>
+		</div>
+	</div> <!-- END OF ROW2 -->
+
+	<!-- ROW2 -->
+	<div class="row">
+		<div class="col-12">
+			<div class="chart" id="chart2" ></div>
+		</div>
+	</div> <!-- END OF ROW2 -->
+
+	<!-- ROW1 -->
+	<div class="row">
+		<div class="col-sm">
+			<!-- Segment Data Table -->
+			<div class="table-responsive">
+			<table class="table table-hover table-sm table-bordered table-striped">
+				<thead class="thead-dark">
+					<tr>
+						<th scope="col">
+							<span class="text-warning">FY\SEG</span>
+						</th>
+						<th scope="col">Total</th>
+						{% for segs in group_by_seg %}
+						<th scope="col">{{ (segs.grouper|string) }}</th>
+						{% endfor %}
+					</tr>
+				</thead>
+				<tbody>
+					{% for fy, fy_list in group_by_fy %}
+					<tr>
+						<th scope="col">FY{{ fy }}</th>
+						{% set row_total_donor, row_total_contact = fy_list|sum(attribute='DONORS'), fy_list|sum(attribute='CONTACTS') %}
+						<td scope="col">
+							<span class="text-success"><small><strong>{{ row_total_donor|number }}</strong>({{ row_total_donor|pct(row_total_donor) }})</small></span>
+								<hr class="my-1" />
+							<span class="text-primary"><small><strong>{{ row_total_contact|number }}</strong>({{ row_total_donor|pct(row_total_donor) }})</small></span>
+						</td>
+
+						{% for segs in group_by_seg %}
+						<td scope="col">
+						{% for  grouper, list in fy_list|groupby('SEGMENT') %}
+							{% if grouper == segs.grouper %}
+							{% set contacts, donors = list|sum(attribute='CONTACTS'), list|sum(attribute='DONORS') %}
+							<span class="text-{% if donors == 0 %}secondary {% else %}success{% endif %}"><small><strong>{{ donors|number }}</strong> (<em>{{ donors|pct(row_total_donor) }}</em>)</small></span>
+								<hr class="my-1" />
+							<span class="text-{% if contacts == 0 %}secondary{% else %}primary{% endif %}"><small><strong>{{ contacts|number }}</strong> (<em>{{ contacts|pct(row_total_contact) }}</em>)
+							</small></span>
+							{% endif %}
+						{% endfor %}
+						</td>
+						{% endfor %}
+					</tr>
+					{% endfor %}
+
+				</tbody>
+			</table>
+			</div>
+		</div>
+	</div><!-- END OF ROW1 -->
+
+
+</div>
+
+<script>
+let xCnt, xAxis = [], series;
+let series1=[], data1=[], value1;
+let series2=[], data2=[], value2;
+{% set group_by_fy = data.rows|groupby('FY') %}
+{% set group_by_seg = data.rows|groupby('SEGMENT') %}
+
+{% for fys in group_by_fy %}xAxis[{{ loop.index - 1 }}]='FY{{ (fys.grouper|string)[-2:] }}';{% endfor %}
+xCnt = xAxis.length;
+{% for seg, seglist in group_by_seg %}
+data1=[];data2=[];
+	{% for fys in group_by_fy %}
+	value1 = null;
+	value2 = null;
+		{% for  grouper, list in seglist|groupby('FY') %}
+				{% if grouper == fys.grouper %}
+				{% set contacts, donors = list|sum(attribute='CONTACTS'), list|sum(attribute='DONORS') %}
+				value1={{ donors }};
+				value2={{ contacts }};
+				{% endif %}
+		{% endfor %}
+	data1[{{ loop.index - 1 }}] = value1;
+	data2[{{ loop.index - 1 }}] = value2;
+	{% endfor %}
+
+series1[{{ loop.index - 1 }}] ={
+	name: '{{ seg }}',
+	data: data1,
+	stack: 'Active Donors'
+};
+series2[{{ loop.index - 1 }}] ={
+	name: '{{ seg }}',
+	data: data2,
+	stack: 'Contacts'
+};
+
+
+{% endfor %}
+
+series = series2;
+
+</script>

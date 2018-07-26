@@ -30,6 +30,16 @@ def filter_month_name(value, abbr=False):
 	return calendar.month_name[value] if isinstance(value, int) and value in range(1, 13) else 'undefined'
 
 
+def filter_percentage(value, denominator, digits=2):
+	if denominator == 0:
+		return 'inf'
+	elif value == denominator:
+		return '100%'
+	elif value == 0:
+		return '0%'
+	return '{1:.{0}f}%'.format(digits, (value/denominator) * (10 ** digits))
+
+
 def filter_financial_year(value):
 	return "{:d}".format(TLMA.fy(value)) if value else None
 
@@ -41,10 +51,6 @@ def filter_2decimal(value, decimal=2):
 
 def filter_datetime_offset(value, year=0, month=0, day=0):
 	return value.replace(year=value.year + year, month=value.month + month, day=value.day + day)
-
-
-def filter_percentage(value, denominator, digits=2):
-	return '{1:.{0}f}%'.format(digits, (value/denominator) * (10 ** digits)) if denominator != 0 else 'inf'
 
 
 def filter_filename(value):
