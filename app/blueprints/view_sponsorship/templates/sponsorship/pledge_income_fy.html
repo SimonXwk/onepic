@@ -51,7 +51,7 @@ Highcharts.chart('chart1', {
 	tooltip: {
 		headerFormat: '',
 		pointFormat: '<span style="color:{point.color}">\u25CF</span><b> {point.name}</b><br/>' +
-				'Total Income (AUD): $<b>{point.y}</b><br/>' +
+				'Total Income (AUD): $<b>{point.y}</b> ({point.percentage:.1f}%)<br/>' +
 				'<b>{point.percentage:.1f} %</b> of Total Revenue'
 	},
 	plotOptions: {

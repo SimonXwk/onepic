@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block js_optional %}
-{{ Highchart([],['export-data']) }}
+{{ Highchart([],[]) }}
 {% endblock %}
 
 
@@ -44,6 +44,7 @@ function drawStactedBar(id, title, xAxis, series){
 			categories: xAxis
 		},
 		yAxis: {
+			allowDecimals: false,
 			title: {
 				text: 'Number of contacts'
 			},
@@ -64,14 +65,14 @@ function drawStactedBar(id, title, xAxis, series){
 		tooltip: {
 			headerFormat: '<b>{point.x}</b><br/>',
 			pointFormat: '<span style="color:{point.color}">\u25CF</span><b> {series.name}</b><br/>' +
-				'{series.name}: {point.y}<br/>' +
-				'All Segments: {point.stackTotal}'
+				'{series.name}: {point.y} ({point.percentage:.1f}%)<br/>' +
+				'All Segments: {point.stackTotal:,.0f}'
 		},
 		plotOptions: {
 			column: {
 				stacking: 'normal',
 				dataLabels: {
-					enabled: true,
+					enabled: false,
 					color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white'
 				}
 			}
@@ -80,8 +81,9 @@ function drawStactedBar(id, title, xAxis, series){
 	});
 }
 
-drawStactedBar('chart1', 'No. Active Donor By Segments&Fys', xAxis, series1);
-drawStactedBar('chart2', 'No. Contacts By Segments&Fys', xAxis, series2);
+console.log(series2);
+drawStactedBar('chart1', 'No. Active Donor by Segments across FYs', xAxis, series1);
+drawStactedBar('chart2', 'No. Contacts by Segments across FYs', xAxis, series2);
 </script>
 
 

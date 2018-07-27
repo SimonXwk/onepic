@@ -155,7 +155,7 @@ function currency(val) {
 
 {# High Chart #}
 {% macro Highchart(bases=None, modules=None, CSM=(true,false,false)) %}
-	{% set defaultBases, defaultModules = [], ['exporting'] %}
+	{% set defaultBases, defaultModules = [], ['exporting','export-data'] %}
 	{% if bases %}{% set bases = defaultBases|list + bases|list %}{% else %}{% set bases = defaultBases %}{% endif %}
 	{% if modules %}{% set modules = defaultModules|list + modules|list %}{% else %}{% set modules = defaultModules %}{% endif %}
 
@@ -170,11 +170,11 @@ function currency(val) {
 
 		{# Other Level1 Includes #}
 		{% if bases %}{% for base in bases %}
-<script src="{{ url_for('static', filename= JSPath.format(base)) }}"></script>
+		<script src="{{ url_for('static', filename= JSPath.format(base)) }}"></script>
 		{% endfor %}{% endif %}
 		{# Modules #}
 		{% if modules %}{% for module in modules %}
-<script src="{{ url_for('static', filename=JSPath.format(module)) }}"></script>
+		<script src="{{ url_for('static', filename=JSPath.format(module)) }}"></script>
 		{% endfor %}{% endif %}
 
 
@@ -191,11 +191,11 @@ function currency(val) {
 
 		{# Other Level1 Includes #}
 		{% if bases %}{% for base in bases %}
-<script src="{{ config['HIGHCHART_BASE_CDN'].format(version,base) }}"></script>
+		<script src="{{ config['HIGHCHART_BASE_CDN'].format(version,base) }}"></script>
 		{% endfor %}{% endif %}
 		{# Modules #}
 		{% if modules %}{% for module in modules %}
-<script src="{{ config['HIGHCHART_MODLUE_CDN'].format(version,module) }}"></script>
+		<script src="{{ config['HIGHCHART_MODLUE_CDN'].format(version,module) }}"></script>
 		{% endfor %}{% endif %}
 	{% endif %}
 
@@ -203,18 +203,25 @@ function currency(val) {
 <script type="text/javascript">
 console.log('Highchart ready to serve: ', "{{ bases|safe }}{{ modules|safe }}");
 Highcharts.setOptions({
-		lang: {
-			decimalPoint: '.',
-			thousandsSep: ','
-		},
-		credits: {
-				text: 'ⒸTLMA',
-				href: '#',
-				enabled: true
-		},
-		chart:{
-			borderWidth:0,
-		}
+	lang: {
+		decimalPoint: '.',
+		thousandsSep: ','
+	},
+	credits: {
+		text: 'ⒸTLMA',
+		href: '#',
+		enabled: true
+	},
+	chart:{
+		borderWidth:0,
+	},
+	exporting: {
+  	buttons: {
+    	contextButton: {
+      	menuItems: Highcharts.getOptions().exporting.buttons.contextButton.menuItems.filter(item => item !== 'openInCloud')
+    	}
+  }
+}
 	});
 function setHighchartColors(colorList) {
 	Highcharts.setOptions({

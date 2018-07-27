@@ -73,25 +73,44 @@
 </div>
 
 <script>
-let xCnt, xAxis = [], series;
-let series1=[], data1=[], value1;
-let series2=[], data2=[], value2;
+let xAxis = [];
+let series1=[], data1, value1;
+let series2=[], data2, value2;
 {% set group_by_fy = data.rows|groupby('FY') %}
-{% set group_by_seg = data.rows|groupby('SEGMENT') %}
+{#{% set group_by_seg = data.rows|groupby('SEGMENT') %}#}
 
+let colorMap = {
+	'00.New Contacts': '#8ee000',
+	'01.Pledge Givers': '#ee4c58',
+	'02.Major Donors': '#c63527',
+	'03.Premium Donors': '#f38654',
+	'04.High Value Donors': '#fdb94e',
+	'05.General Donors': '#f5df2e',
+	'06.LYBUNT Donors': '#0d9ddb',
+	'07.SYBUNT Donors': '#166a8f',
+	'08.Groups': '#0f723a',
+	'09.Merchandise Only': '#a560e8',
+	'10.Never Given': '#cee3f8',
+	'11.Third Party': '#84754e',
+	'98.Estate': '#f7afff',
+	'99.Deceased': '#282828',
+	'SNF': '#d1cdb8'
+};
+
+//Axis being the FYs
 {% for fys in group_by_fy %}xAxis[{{ loop.index - 1 }}]='FY{{ (fys.grouper|string)[-2:] }}';{% endfor %}
-xCnt = xAxis.length;
+//Series being each categories having all FYs' data
 {% for seg, seglist in group_by_seg %}
 data1=[];data2=[];
 	{% for fys in group_by_fy %}
 	value1 = null;
 	value2 = null;
 		{% for  grouper, list in seglist|groupby('FY') %}
-				{% if grouper == fys.grouper %}
-				{% set contacts, donors = list|sum(attribute='CONTACTS'), list|sum(attribute='DONORS') %}
-				value1={{ donors }};
-				value2={{ contacts }};
-				{% endif %}
+			{% if grouper == fys.grouper %}
+			{% set contacts, donors = list|sum(attribute='CONTACTS'), list|sum(attribute='DONORS') %}
+			value1={{ donors }};
+			value2={{ contacts }};
+			{% endif %}
 		{% endfor %}
 	data1[{{ loop.index - 1 }}] = value1;
 	data2[{{ loop.index - 1 }}] = value2;
@@ -100,17 +119,16 @@ data1=[];data2=[];
 series1[{{ loop.index - 1 }}] ={
 	name: '{{ seg }}',
 	data: data1,
+	color: colorMap['{{ seg }}'],
 	stack: 'Active Donors'
 };
 series2[{{ loop.index - 1 }}] ={
 	name: '{{ seg }}',
 	data: data2,
+	color: colorMap['{{ seg }}'],
 	stack: 'Contacts'
 };
-
-
 {% endfor %}
 
-series = series2;
 
 </script>
