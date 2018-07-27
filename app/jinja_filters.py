@@ -40,6 +40,18 @@ def filter_percentage(value, denominator, digits=2):
 	return '{1:.{0}f}%'.format(digits, (value/denominator) * (10 ** digits))
 
 
+def filter_add_working_days(value, add_days):
+	if isinstance(add_days, int):
+		move = 1 if add_days > 0 else -1
+		while abs(add_days) > 0:
+			value += datetime.timedelta(days=move)
+			if value.weekday() > 4:
+				continue
+			add_days -= move
+		return value
+	return value
+
+
 def filter_financial_year(value):
 	return "{:d}".format(TLMA.fy(value)) if value else None
 

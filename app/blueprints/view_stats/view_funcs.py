@@ -14,5 +14,5 @@ def fishing_pool():
 
 @templatified('segments')
 def segments():
-	data = Tq.query('STATS_SEGMENT', cached_timeout=60)
+	data = Tq.query('STATS_SEGMENT', cached_timeout=120)
 	return dict(title='Segments', data=data)

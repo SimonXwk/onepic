@@ -32,7 +32,7 @@
 <script>
 
 // Stacked BarChart
-function drawStactedBar(id, title, xAxis, series){
+function drawStactedBar(id, title, yAxisTitle, xAxis, series){
 	Highcharts.chart(id, {
 		chart: {
 			type: 'column'
@@ -46,7 +46,7 @@ function drawStactedBar(id, title, xAxis, series){
 		yAxis: {
 			allowDecimals: false,
 			title: {
-				text: 'Number of contacts'
+				text: yAxisTitle
 			},
 			stackLabels: {
 				enabled: true,
@@ -82,8 +82,10 @@ function drawStactedBar(id, title, xAxis, series){
 }
 
 console.log(series2);
-drawStactedBar('chart1', 'No. Active Donor by Segments across FYs', xAxis, series1);
-drawStactedBar('chart2', 'No. Contacts by Segments across FYs', xAxis, series2);
+drawStactedBar('chart1', 'No. Active Donors by Segments across FYs', 'Number of active donors', xAxis, series1);
+drawStactedBar('chart2', 'No. Transactions from Active Donors by Segments across FYs', 'Number of transactions', xAxis, series2);
+drawStactedBar('chart3', 'No. Contacts by Segments across FYs', 'Number of contacts', xAxis, series3);
+
 </script>
 
 

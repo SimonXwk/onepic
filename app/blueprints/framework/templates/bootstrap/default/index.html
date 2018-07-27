@@ -6,7 +6,7 @@
 <header class="info">
 	<div class="about">
 			<h1>One Picture &rsaquo;</h1>
-			{% if user %}
+			{% if current_user.name %}
 			<h2>Welcome Back, Dear {{ current_user.name }}</h2>
 			{% else %}
 			<h3>{{ now | dtAU }}</h3>

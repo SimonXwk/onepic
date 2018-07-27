@@ -12,6 +12,9 @@ def create_app(test_config=None):
 	import_name = __name__.split('.')[0]
 	# step 1: Create Flask application object
 	app = ApiFlask(import_name, instance_relative_config=True)
+	# Stop Jinja2 from keeping white spaces
+	app.jinja_env.trim_blocks = True
+	app.jinja_env.lstrip_blocks = True
 	# app.register_api_error_handler()
 	# app.wsgi_app = ProxyFix(app.wsgi_app)
 	print(">> Import name [{}] applied".format(import_name))
@@ -62,6 +65,7 @@ def create_app(test_config=None):
 	loader.filter('jinja_filters.filter_datetime_au', name='dtAU')
 	loader.filter('jinja_filters.filter_date_au', name='dAU')
 	loader.filter('jinja_filters.filter_month_name', name='mthname')
+	loader.filter('jinja_filters.filter_add_working_days', name='addworkingdays')
 	loader.filter('jinja_filters.filter_to_date', name='strpdt')
 	loader.filter('jinja_filters.filter_financial_year', name='FY')
 	loader.filter('jinja_filters.filter_2decimal', name='f')

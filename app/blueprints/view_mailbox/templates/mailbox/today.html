@@ -150,12 +150,12 @@ fetchJSON(endpoint('/api/mailbox/today/', '0'), function(json){
 
 	let title, subtitle;
 	// Today 1 Value and Count
-	title = (json.Recorder == null ? 'No Mail Opened on '+dAU(new Date(json.Date)): '' + currency(json.Total) + ' from ' + dAU(new Date(json.Date)));
-	subtitle =  json.Recorder == null ? 'No Mail Opened' : 'Opened by ' + json.Recorder + (json.Cash == null || json.Cash === 0 ? ', no cash found' :', cash received: ' + currency(json.Cash)) ;
+	title = (json.Recorder == null ? 'No Opener found on '+dAU(new Date(json.Date)): '' + currency(json.Total) + ' from ' + dAU(new Date(json.Date)));
+	subtitle =  json.Recorder == null ? 'No Opener found' : 'Opened by ' + json.Recorder + (json.Cash == null || json.Cash === 0 ? ', no cash found' :', cash received: ' + currency(json.Cash)) ;
 	PieChart3D('today11', json, true, title, subtitle);
 
-	title = (json.Recorder == null ? 'No Mail Opened on '+dAU(new Date(json.Date)) : '' + json.No + ' items from ' + dAU(new Date(json.Date)));
-	subtitle =  json.Recorder == null ? 'No Mail Opened' : 'Opened by ' + json.Recorder ;
+	title = (json.Recorder == null ? 'No Opener found on '+dAU(new Date(json.Date)) : '' + json.No + ' items from ' + dAU(new Date(json.Date)));
+	subtitle =  json.Recorder == null ? 'No Opener found' : 'Opened by ' + json.Recorder ;
 	PieChart3D('today21', json, false, title, subtitle);
 });
 
@@ -165,12 +165,12 @@ fetchJSON(endpoint('/api/mailbox/today/', '1'), function(json){
 
 	let title, subtitle;
 	// Today 1 Value and Count
-	title = (json.Recorder == null ? 'No Mail Opened on '+dAU(new Date(json.Date)) : '' + currency(json.Total) + ' from ' + dAU(new Date(json.Date)));
-	subtitle =  json.Recorder == null ? 'No Mail Opened' : 'Opened by ' + json.Recorder + (json.Cash == null || json.Cash === 0 ? ', no cash found' :', cash received: ' + currency(json.Cash)) ;
+	title = (json.Recorder == null ? 'No Opener found on '+dAU(new Date(json.Date)) : '' + currency(json.Total) + ' from ' + dAU(new Date(json.Date)));
+	subtitle =  json.Recorder == null ? 'No Opener found' : 'Opened by ' + json.Recorder + (json.Cash == null || json.Cash === 0 ? ', no cash found' :', cash received: ' + currency(json.Cash)) ;
 	PieChart3D('today12', json, true, title, subtitle);
 
-	title = (json.Recorder == null ? 'No Mail Opened on '+dAU(new Date(json.Date)) : '' + json.No + ' items from ' + dAU(new Date(json.Date)));
-	subtitle =  json.Recorder == null ? 'No Mail Opened' : 'Opened by ' + json.Recorder ;
+	title = (json.Recorder == null ? 'No Opener found on '+dAU(new Date(json.Date)) : '' + json.No + ' items from ' + dAU(new Date(json.Date)));
+	subtitle =  json.Recorder == null ? 'No Opener found' : 'Opened by ' + json.Recorder ;
 	PieChart3D('today22', json, false, title, subtitle);
 });
 
@@ -180,12 +180,12 @@ fetchJSON(endpoint('/api/mailbox/today/', '2'), function(json){
 
 	let title, subtitle;
 	// Today 1 Value and Count
-	title = (json.Recorder == null ? 'No Mail Opened on '+dAU(new Date(json.Date)) : '' + currency(json.Total) + ' from ' + dAU(new Date(json.Date)));
-	subtitle =  json.Recorder == null ? 'No Mail Opened' : 'Opened by ' + json.Recorder + (json.Cash == null || json.Cash === 0 ? ', no cash found' :', cash received: ' + currency(json.Cash)) ;
+	title = (json.Recorder == null ? 'No Opener found on '+dAU(new Date(json.Date)) : '' + currency(json.Total) + ' from ' + dAU(new Date(json.Date)));
+	subtitle =  json.Recorder == null ? 'No Opener found' : 'Opened by ' + json.Recorder + (json.Cash == null || json.Cash === 0 ? ', no cash found' :', cash received: ' + currency(json.Cash)) ;
 	PieChart3D('today13', json, true, title, subtitle);
 
-	title = (json.Recorder == null ? 'No Mail Opened on '+dAU(new Date(json.Date)) : '' + json.No + ' items from ' + dAU(new Date(json.Date)));
-	subtitle =  json.Recorder == null ? 'No Mail Opened' : 'Opened by ' + json.Recorder ;
+	title = (json.Recorder == null ? 'No Opener found on '+dAU(new Date(json.Date)) : '' + json.No + ' items from ' + dAU(new Date(json.Date)));
+	subtitle =  json.Recorder == null ? 'No Opener found' : 'Opened by ' + json.Recorder ;
 	PieChart3D('today23', json, false, title, subtitle);
 });
 

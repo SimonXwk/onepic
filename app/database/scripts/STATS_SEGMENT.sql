@@ -15,39 +15,39 @@
 
 WITH
 -- ------------------------------------------------------------------------
-cte_payments AS(
-SELECT B1.SERIALNUMBER, B1.SOURCECODE , B1.PAYMENTAMOUNT
-  , B2.DATEOFPAYMENT
-  , [FY] = YEAR(B2.DATEOFPAYMENT) + IIF(MONTH(B2.DATEOFPAYMENT)<7,0,1)
-  , S1.SOURCETYPE
-  , [ACCOUNT] = S1.ADDITIONALCODE1
-  , [CLASS] = S1.ADDITIONALCODE3
-  , [CAMPAIGNCODE] = S1.ADDITIONALCODE3
-  , [REVERSED] = ISNULL(B2.REVERSED, 0)
-FROM
-  dbo.TBL_BATCHITEMSPLIT B1
-  LEFT JOIN dbo.TBL_BATCHITEM B2 ON (B2.SERIALNUMBER=B2.SERIALNUMBER AND B1.ADMITNAME=B2.ADMITNAME AND B1.RECEIPTNO=B2.RECEIPTNO)
-  LEFT JOIN dbo.TBL_BATCHHEADER B4 ON (B1.ADMITNAME=B4.ADMITNAME)
-  LEFT JOIN dbo.TBL_SOURCECODE S1 ON (B1.SOURCECODE=S1.SOURCECODE)
-WHERE
-  B4.STAGE='Batch Approved' AND (B2.REVERSED IS NULL OR (B2.REVERSED NOT IN (1,-1)))
-)
--- ------------------------------------------------------------------------
-, cte_segments AS (
+cte_segments AS (
 SELECT SERIALNUMBER
-, [FY] = CAST(RIGHT(PARAMETERNAME, 4) AS INT)
+, [FY] = RIGHT(PARAMETERNAME, 4)
 , [SEGMENT] = CONCAT(PARAMETERVALUE,'.',PARAMETERNOTE)
 FROM dbo.TBL_CONTACTPARAMETER
 WHERE PARAMETERNAME LIKE 'FY____'
 )
 -- ------------------------------------------------------------------------
-, cte_fy_active_donors_with_segment AS(
-SELECT ac1.FY,ac2.SEGMENT
-, [DONORS]=COUNT(DISTINCT ac1.SERIALNUMBER)
-FROM cte_payments ac1
-  LEFT JOIN cte_segments ac2 ON (ac1.SERIALNUMBER = ac2.SERIALNUMBER and ac1.FY = ac2.FY)
-WHERE ac1.REVERSED <> 2
-GROUP BY ac1.FY, ac2.SEGMENT
+,cte_payments AS(
+SELECT B1.SERIALNUMBER, B1.SOURCECODE , B1.PAYMENTAMOUNT
+  , B2.DATEOFPAYMENT
+  , [FY] = (YEAR(B2.DATEOFPAYMENT) + CASE WHEN MONTH(B2.DATEOFPAYMENT)<7 THEN 0 ELSE 1 END)
+  , B2.REVERSED
+--   , B2.RECEIPTNO ,B2.ADMITNAME
+--   , S1.SOURCETYPE
+--   , [ACCOUNT] = S1.ADDITIONALCODE1
+--   , [CLASS] = S1.ADDITIONALCODE3
+--   , [CAMPAIGNCODE] = S1.ADDITIONALCODE3
+  , [TRXID] = CONCAT(B2.SERIALNUMBER, B2.ADMITNAME, B2.RECEIPTNO)
+FROM
+  dbo.TBL_BATCHITEMSPLIT B1
+  LEFT JOIN dbo.TBL_BATCHITEM B2 ON (B1.SERIALNUMBER=B2.SERIALNUMBER AND B1.ADMITNAME=B2.ADMITNAME AND B1.RECEIPTNO=B2.RECEIPTNO)
+  LEFT JOIN dbo.TBL_BATCHHEADER B4 ON (B1.ADMITNAME=B4.ADMITNAME)
+  -- LEFT JOIN dbo.TBL_SOURCECODE S1 ON (B1.SOURCECODE=S1.SOURCECODE)
+WHERE
+  B4.STAGE='Batch Approved' AND (B2.REVERSED IS NULL OR (B2.REVERSED NOT IN (1,-1)))
+)
+-- ------------------------------------------------------------------------
+, cte_payments_with_segments AS (
+SELECT tp.*, ts.SEGMENT
+--   , [DONOR_COUNT] = DENSE_RANK() OVER (PARTITION BY tp.FY, ts.SEGMENT ORDER BY tp.SERIALNUMBER ASC) -- This doesn't speed things up
+  , [TRX_COUNT] = IIF(tp.REVERSED =2, 0, DENSE_RANK() OVER (PARTITION BY tp.FY, ts.SEGMENT, (CASE WHEN tp.REVERSED=2 THEN 2 ELSE NULL END) ORDER BY tp.TRXID))
+FROM cte_payments tp LEFT JOIN cte_segments ts ON (tp.SERIALNUMBER = ts.SERIALNUMBER AND tp.FY = ts.FY)
 )
 -- ------------------------------------------------------------------------
 , cte_fy_segments AS(
@@ -56,18 +56,29 @@ FROM cte_segments
 GROUP BY FY, SEGMENT
 )
 -- ------------------------------------------------------------------------
+, cte_fy_active_donors_with_segment AS(
+SELECT FY, SEGMENT
+  , [DONORS] = COUNT(DISTINCT SERIALNUMBER)
+--   , [DONORS] = MAX(DONOR_COUNT) -- This doesn't speed things up
+  , [TRXS] = MAX(TRX_COUNT)  -- This adds another 2s
+-- , [TRXS] = COUNT(DISTINCT TRXID)  -- This is slow adding about 25+ seconds
+FROM cte_payments_with_segments ac1
+WHERE REVERSED <> 2 OR REVERSED IS NULL
+GROUP BY FY, SEGMENT
+)
+-- ------------------------------------------------------------------------
 
 select
-  [FY]= IIF(t1.FY IS NULL AND t2.FY IS NOT NULL, t2.FY
-      ,IIF(t2.FY IS NULL AND t1.FY IS NOT NULL, t1.FY, t1.FY))
-  , [SEGMENT] = ISNULL(t1.SEGMENT,'SNF')
-  , [CONTACTS] = ISNULL(t1.CONTACTS,0)
-  , [DONORS] = ISNULL(t2.DONORS,0)
+  [FY] = ISNULL(ts.FY, t1.FY)
+  , [SEGMENT] = ISNULL(ts.SEGMENT,'SNF')
+  , [CONTACTS] = ISNULL(ts.CONTACTS,0)
+  , [DONORS] = ISNULL(t1.DONORS,0)
+  , [TRXS] = ISNULL(t1.TRXS,0)
 from
-  cte_fy_segments t1
-  full outer join cte_fy_active_donors_with_segment t2 on (t1.FY = t2.FY and t1.SEGMENT=t2.SEGMENT)
+  cte_fy_segments ts
+  full outer join cte_fy_active_donors_with_segment t1 on (ts.FY = t1.FY and ts.SEGMENT=t1.SEGMENT)
 order by
-  t2.fy asc, t1.SEGMENT asc
+  ts.fy asc, ts.SEGMENT asc
 
 
 -- select

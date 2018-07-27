@@ -1,178 +1,172 @@
-<div class="container-fluid">
+<div<div class="container-fluid">
 
-	<div class="card text-center">
-{#		<div class="card-header">#}
-{#			<ul class="nav nav-tabs card-header-tabs">#}
-{#				<li class="nav-item"><a class="nav-link active" href="#">Processing List</a></li>#}
-{#				<li class="nav-item"><a class="nav-link" href="#">Exc Non-Merch</a></li>#}
-{#				<li class="nav-item"><a class="nav-link" href="#">Exc Pure Merch Pledger</a></li>#}
-{#				<li class="nav-item"><a class="nav-link" href="#">Exc Pure Merch Donor</a></li>#}
-{#			</ul>#}
-{#		</div>#}
-		<div class="card-body">
-			<h5 class="card-title text-primary"><strong>FY{{ cfy }} [ON BOARDING] JOURNEY</strong> FOR MERCHANDISE NEW CUSTOMER (Priority 2.1)</h5>
-			<p class="card-text">
-				All New Donor in FY{{ cfy }} Excluding Pure Non-Merchandise Donors :
-				<span class="card-title text-primary"><strong>{% if data.rows %}{{ '{:,}'.format(data.rows|length) }}{% else %}No{% endif %}</strong></span> Contacts Found
-			</p>
-		</div>
-		<div class="card-footer text-muted">
-			<span class="badge badge-pill badge-success">PM: Pure Merch Customer</span>
-    	<span class="badge badge-pill badge-dark">ORG: Organization</span>
-			<span class="badge badge-pill badge-danger">ESTATE</span>
-			<span class="badge badge-pill badge-danger">DECD: Deceased</span>
-			<span class="badge badge-pill badge-warning">!MAIL: Do not mail</span>
-			<span class="badge badge-pill badge-warning">!CALL: DO not call</span>
-			<span class="badge badge-pill badge-info">HOUSEHOLD ROLE</span>
-			<span class="badge badge-pill badge-dark">PMP: Pure Merch Pledger</span>
-			<span class="badge badge-pill badge-dark">PMD: Pure Merch Donor</span>
-  	</div>
-	</div>
+     <div class="card text-center">
+          <div class="card-body">
+               <h5 class="card-title text-primary"><strong>FY{{ cfy }} [ON BOARDING] JOURNEY</strong> FOR MERCHANDISE NEW CUSTOMER (Priority 2.1)</h5>
+               <p class="card-text">
+                    All New Donor in FY{{ cfy }}, Excluding Pure Non-Merchandise Donors :
+                    <span class="card-title text-primary"><strong>{% if data.rows %}{{ '{:,}'.format(data.rows|length) }}{% else %}No{% endif %}</strong></span> Contacts Found
+               </p>
+          </div>
 
-	<div class="table-responsive-lg">
-		<table class="table table-hover table-sm" id="merchandise-new-customer">
-			<caption><strong>Data Captured : </strong>{{ data.timestamp|dtAU }}, result will be cached for {{ '{:,}'.format(data.cached_timeout) }} seconds</caption>
-			<thead>
-				<tr class="table-bordered table-dark">
-					<th scope="col">THANKQID</th>
-					<th scope="col">FIRST DATE</th>
-					<th scope="col">FIRST ORDER</th>
-					<th scope="col">TOTAL MERCH</th>
-					<th scope="col">STATUS</th>
-					<th scope="col">ONBOARD</th>
-					<th scope="col">DELIVERED</th>
-					<th scope="col">THANK YOU</th>
-					<th scope="col">WELCOME PACK</th>
-				</tr>
-			</thead>
-			<tbody>
-				{% for row in data.rows %}
-				<tr {% if not row[2] %}class=""{% endif %}>
-					<th scope="row">{{ row.SERIALNUMBER }}</th>
-					<td>{{ row.FIRSTDATE|dAU }}</td>
-					<td><!--First Order ID-->
-						{% if row.FIRSTORDER %}
-							{% if row.FIRSTORDERS|int > 1 %}
-							<span class="text-primary" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
-										title='
-										Order ID was retrieved from <span class="text-warning">{{ row.FIRST_ORDER_SOURCE }}</span><hr />
-										Plus other <span class="text-success"><strong>{{ (row.FIRSTORDERS|int) - 1 }}</strong></span> more orders
-													'
-							>
-								<strong>{{ row.FIRSTORDER }}</strong>
-							</span>
-							{% else %}
-							<span class="text-primary" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
-										title='
-										Order ID was retrieved from <span class="text-warning">{{ row.FIRST_ORDER_SOURCE }}</span>'
-							>
-								{{ row.FIRSTORDER }}
-							</span>
-							{% endif %}
-						{% endif %}
-					</td>
-					<td><!--MERCHANDISE TOTAL-->
-						{% if row.TOTAL == row.MERCHANDISE_TOTAL %}
-						<span class="text-info" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
-												title='
-												Pure Merchandise Customer<hr>
-												Purchase : {{ row.MERCHANDISE_PURCHASE|currency }}<br>
-												Pledge : {{ row.MERCHANDISE_PLEDGE|currency }}<br>
-												Donation+GOL : {{ (row.MERCHANDISE_TOTAL - row.MERCHANDISE_PURCHASE - row.MERCHANDISE_PLEDGE)|currency }}<br>
-												'
-						>
-						<strong>{{ row.MERCHANDISE_TOTAL|currency }}</strong>
-						</span>
-						{% else %}
-							<span data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
-										title='
-												Non Merchandise Total {{ (row.TOTAL - row.MERCHANDISE_TOTAL)|currency }}
-												'
-								>
-								{{ row.MERCHANDISE_TOTAL|currency }}
-							</span>
-						{% endif %}
-					</td>
-					<td><!--STATUS-->
-							{% if row.TOTAL == row.MERCHANDISE_TOTAL %}<span class="badge badge-pill badge-success">PM</span>{% endif %}
-							{% if row.CONTACTTYPE|trim|upper == 'ORGANISATION' %}<span class="badge badge-pill badge-dark">ORG</span>{% endif %}
-							{% if row.PRIMARYCATEGORY|trim|upper == 'ESTATE' %}<span class="badge badge-pill badge-danger">ESTATE</span>{% endif %}
-							{% if row.DONOTMAILREASON|trim|upper == 'DECEASED' %}<span class="badge badge-pill badge-danger">DECD</span>{% endif %}
-							{% if row.DONOTMAIL|int == -1 %}
-								<span class="badge badge-pill badge-warning" data-toggle="tooltip" data-html="true" data-placement="top" tabindex="0"
-											title="{{ row.DONOTMAILREASON }}">
-									!MAIL
-								</span>
-							{% endif %}
-							{% if row.DONOTCALL|int == -1 %}<span class="badge badge-pill badge-warning">!CALL</span>{% endif %}
-							{% if row.SORTKEYREF1 %}
-								<span class="badge badge-pill badge-info" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
-											title="{{ row.SORTKEYREFREL1 }} : {{ row.SORTKEYREF1 }}">
-									{{ row.SORTKEYREFREL2 }}
-								</span>
-							{% endif %}
-							{% if row.MERCHANDISE_TOTAL==row.MERCHANDISE_PLEDGE %}<span class="badge badge-pill badge-dark">PMP</span>{% endif %}
-							{% if row.MERCHANDISE_PURCHASE==0 %}<span class="badge badge-pill badge-dark">PMD</span>{% endif %}
-					</td>
-					<td><!--ON BOARDING STATUS-->
-						{% if row.PARAMETERNAME %}
-							{% if row.EFFECTIVEFROM != row.EFFECTIVETO %}
-								{% if row.PARAMETERVALUE == row.FIRSTORDER %}
-									<span class="text-success" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
-												title='{{ row.PARAMETERNOTE or '' }}'>
-										Boarded From {{ row.EFFECTIVEFROM|dAU }}
-									</span>
-								{% else %}
-									<span class="text-warning" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
-												title='{{ row.PARAMETERNOTE }}'>
-										{{ row.PARAMETERVALUE }} (from {{ row.EFFECTIVEFROM|dAU }})
-									</span>
-								{% endif %}
-							{% else %}
-								<span class="text-secondary" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
-											title='{{ row.PARAMETERNOTE }}'>
-									<s>Cancelled</s>
-								</span>
-							{% endif %}
-						{% else %}
-							<span class="text-danger">Not Yet</span>
-						{% endif %}
-					</td>
-					<td><!--AUS POST-->
-						{% if row.MERCHANDISE_TOTAL==row.MERCHANDISE_PLEDGE %}<span class="text-muted"><s>[Skipped]</s></span>
-						{% elif row.MERCHANDISE_PURCHASE==0 %}<span class="text-muted"><s>[Skipped]</s></span>
-						{% elif row.CONTACTTYPE|trim|upper == 'ORGANISATION' %}<span class="text-muted"><s>[Skipped]</s></span>
-						{% elif row.PRIMARYCATEGORY|trim|upper == 'ESTATE' %}<span class="text-muted"><s>[Skipped]</s></span>
-						{% elif row.DONOTMAILREASON|trim|upper == 'DECEASED' %}<span class="text-muted"><s>[Skipped]</s></span>
-						{% else %}
-							<span class="text-warning">Waiting AUS Pos API</span>
-						{% endif %}
-					</td>
-					{% if row.PARAMETERNAME and row.EFFECTIVEFROM != row.EFFECTIVETO and row.PARAMETERVALUE == row.FIRSTORDER %}
-					{% set valid_profile = true  %}
-					{% else %}{% set valid_profile = false  %}
-					{% endif %}
-					<td><!--ACTION1-->
-						{% if valid_profile %}
-							X
-							/ <span class="text-{% if row.THANKYOU_DUE.date() > now.date() %}info{% elif row.THANKYOU_DUE.date()==now.date() %}warning{% else %}danger{% endif %}">{{ row.THANKYOU_DUE|dAU }}</span>
-						{% else %}
-							<span class="text-muted">
-								<s>No Valid Boarding Profile</s></span>
-						{% endif %}
-					</td>
-					<td><!--ACTION2-->
-						{% if valid_profile %}
-							X
-							/ <span class="text-{% if row.WELCOMPACK_DUE.date() > now.date() %}info{% elif row.WELCOMPACK_DUE.date()==now.date() %}warning{% else %}danger{% endif %}">{{ row.WELCOMPACK_DUE|dAU }}</span>
-						{% else %}
-							<span class="text-muted">
-								<s>No Valid Boarding Profile</s></span>
-						{% endif %}
-					</td>
-				</tr>
-				{% endfor %}
-			</tbody>
-		</table>
-	</div>
+          <div class="card-footer text-muted">
+               <span class="badge badge-pill badge-success">PM: Pure Merch Customer</span>
+     <span class="badge badge-pill badge-dark">ORG: Organization</span>
+               <span class="badge badge-pill badge-danger">ESTATE</span>
+               <span class="badge badge-pill badge-danger">DECD: Deceased</span>
+               <span class="badge badge-pill badge-warning">!MAIL: Do not mail</span>
+               <span class="badge badge-pill badge-warning">!CALL: DO not call</span>
+               <span class="badge badge-pill badge-info">HOUSEHOLD ROLE</span>
+               <span class="badge badge-pill badge-dark">PMP: Pure Merch Pledger</span>
+               <span class="badge badge-pill badge-dark">PMD: Pure Merch Donor</span>
+     </div>
+     </div>
+     <div class="table-responsive-lg">
+          <table class="table table-hover table-sm" id="merchandise-new-customer">
+               <caption><strong>Data Captured : </strong>{{ data.timestamp|dtAU }}, result will be cached for {{ '{:,}'.format(data.cached_timeout) }} seconds</caption>
+               <thead>
+                    <tr class="table-bordered table-dark">
+                         <th scope="col">THANKQID</th>
+                         <th scope="col">FIRST DATE</th>
+                         <th scope="col">FIRST ORDER</th>
+                         <th scope="col">TOTAL MERCH</th>
+                         <th scope="col">STATUS</th>
+                         <th scope="col">ONBOARD</th>
+                         <th scope="col">DELIVERED</th>
+                         <th scope="col">THANK YOU</th>
+                         <th scope="col">WELCOME PACK</th>
+                    </tr>
+               </thead>
+               <tbody>
+                    {% for row in data.rows %}
+                    <tr {% if not row[2] %}class=""{% endif %}>
+                         <th scope="row">{{ row.SERIALNUMBER }}</th>
+                         <td>{{ row.FIRSTDATE|dAU }}</td>
+                         <td><!--First Order ID-->
+                              {% if row.FIRSTORDER %}
+                                   {% if row.FIRSTORDERS|int > 1 %}
+                                   <span class="text-primary" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
+                                                  title='
+                                                  Order ID was retrieved from <span class="text-warning">{{ row.FIRST_ORDER_SOURCE }}</span><hr />
+                                                  Plus other <span class="text-success"><strong>{{ (row.FIRSTORDERS|int) - 1 }}</strong></span> more orders
+                                                                 '
+                                   >
+                                        <strong>{{ row.FIRSTORDER }}</strong>
+                                   </span>
+                                   {% else %}
+                                   <span class="text-primary" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
+                                                  title='
+                                                  Order ID was retrieved from <span class="text-warning">{{ row.FIRST_ORDER_SOURCE }}</span>'
+                                   >
+                                        {{ row.FIRSTORDER }}
+                                   </span>
+                                   {% endif %}
+                              {% endif %}
+                         </td>
+                         <td><!--MERCHANDISE TOTAL-->
+                              {% if row.TOTAL == row.MERCHANDISE_TOTAL %}
+                              <span class="text-info" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
+                                                            title='
+                                                            Pure Merchandise Customer<hr>
+                                                            Purchase : {{ row.MERCHANDISE_PURCHASE|currency }}<br>
+                                                            Pledge : {{ row.MERCHANDISE_PLEDGE|currency }}<br>
+                                                            Donation+GOL : {{ (row.MERCHANDISE_TOTAL - row.MERCHANDISE_PURCHASE - row.MERCHANDISE_PLEDGE)|currency }}<br>
+                                                            '
+                              >
+                              <strong>{{ row.MERCHANDISE_TOTAL|currency }}</strong>
+                              </span>
+                              {% else %}
+                                   <span data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
+                                                  title='
+                                                            Non Merchandise Total {{ (row.TOTAL - row.MERCHANDISE_TOTAL)|currency }}
+                                                            '
+                                        >
+                                        {{ row.MERCHANDISE_TOTAL|currency }}
+                                   </span>
+                              {% endif %}
+                         </td>
+                         <td><!--STATUS-->
+                                   {% if row.TOTAL == row.MERCHANDISE_TOTAL %}<span class="badge badge-pill badge-success">PM</span>{% endif %}
+                                   {% if row.CONTACTTYPE|trim|upper == 'ORGANISATION' %}<span class="badge badge-pill badge-dark">ORG</span>{% endif %}
+                                   {% if row.PRIMARYCATEGORY|trim|upper == 'ESTATE' %}<span class="badge badge-pill badge-danger">ESTATE</span>{% endif %}
+                                   {% if row.DONOTMAILREASON|trim|upper == 'DECEASED' %}<span class="badge badge-pill badge-danger">DECD</span>{% endif %}
+                                   {% if row.DONOTMAIL|int == -1 %}
+                                        <span class="badge badge-pill badge-warning" data-toggle="tooltip" data-html="true" data-placement="top" tabindex="0"
+                                                       title="{{ row.DONOTMAILREASON }}">
+                                             !MAIL
+                                        </span>
+                                   {% endif %}
+                                   {% if row.DONOTCALL|int == -1 %}<span class="badge badge-pill badge-warning">!CALL</span>{% endif %}
+                                   {% if row.SORTKEYREF1 %}
+                                        <span class="badge badge-pill badge-info" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
+                                                       title="{{ row.SORTKEYREFREL1 }} : {{ row.SORTKEYREF1 }}">
+                                             {{ row.SORTKEYREFREL2 }}
+                                        </span>
+                                   {% endif %}
+                                   {% if row.MERCHANDISE_TOTAL==row.MERCHANDISE_PLEDGE %}<span class="badge badge-pill badge-dark">PMP</span>{% endif %}
+                                   {% if row.MERCHANDISE_PURCHASE==0 %}<span class="badge badge-pill badge-dark">PMD</span>{% endif %}
+                         </td>
+                         <td><!--ON BOARDING STATUS-->
+                              {% if row.PARAMETERNAME %}
+                                   {% if row.EFFECTIVEFROM != row.EFFECTIVETO %}
+                                        {% if row.PARAMETERVALUE == row.FIRSTORDER and row.EFFECTIVEFROM == row.FIRSTDATE  %}
+                                             <span class="text-success" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
+                                                            title='{{ row.PARAMETERNOTE or '' }}'>
+                                                  <span class="badge badge-success">Boarded &#10084;</span>
+                                             </span>
+                                        {% else %}
+                                             <span class="text-warning" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
+                                                            title='{{ row.PARAMETERNOTE }}'>
+                                                  <span class="badge badge-info">Boarded {{ row.PARAMETERVALUE }} (from {{ row.EFFECTIVEFROM|dAU }})</span>
+                                             </span>
+                                        {% endif %}
+                                   {% else %}
+                                        <span class="text-secondary" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
+                                                       title='{{ row.PARAMETERNOTE }}'>
+                                             <span class="badge badge-secondary">Cancelled &#9785;</span>
+                                        </span>
+                                   {% endif %}
+                              {% else %}
+                                   <span class="text-danger">Please On Board this contact</span>
+                              {% endif %}
+                         </td>
+                         <td><!--AUS POST-->
+                              {% if row.MERCHANDISE_TOTAL==row.MERCHANDISE_PLEDGE %}<span class="text-muted"><s>[Skipped]</s></span>
+                              {% elif row.MERCHANDISE_PURCHASE==0 %}<span class="text-muted"><s>[Skipped]</s></span>
+                              {% elif row.CONTACTTYPE|trim|upper == 'ORGANISATION' %}<span class="text-muted"><s>[Skipped]</s></span>
+                              {% elif row.PRIMARYCATEGORY|trim|upper == 'ESTATE' %}<span class="text-muted"><s>[Skipped]</s></span>
+                              {% elif row.DONOTMAILREASON|trim|upper == 'DECEASED' %}<span class="text-muted"><s>[Skipped]</s></span>
+                              {% else %}
+                                   <span class="text-warning">Waiting AUS Pos API</span>
+                              {% endif %}
+                         </td>
+                         {% if row.PARAMETERNAME and row.EFFECTIVEFROM != row.EFFECTIVETO %}
+                         {% set valid_profile = true  %}
+                         {% else %}
+                              {% set valid_profile = false  %}
+                         {% endif %}
+                         <td><!--ACTION1-->
+                              {% if valid_profile %}
+                              {% set thankyou_due = row.EFFECTIVEFROM|addworkingdays(7) %}
+                                   X
+                                   / <span class="text-{% if thankyou_due.date() > now.date() %}info{% elif thankyou_due.date()==now.date() %}warning{% else %}danger{% endif %}">{{ thankyou_due|dAU }}</span>
+                              {% else %}
+                                   <span class="text-muted">
+                                        <s>No Valid Boarding Profile</s></span>
+                              {% endif %}
+                         </td>
+                         <td><!--ACTION2-->
+                              {% if valid_profile %}
+                                   X
+                                   / <span class="text-info">Check PickingSlip</span>
+                              {% else %}
+                                   <span class="text-muted">
+                                        <s>No Valid Boarding Profile</s></span>
+                              {% endif %}
+                         </td>
+                    </tr>
+                    {% endfor %}
+               </tbody>
+          </table>
+     </div>
 </div>

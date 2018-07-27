@@ -19,6 +19,13 @@
 		</div>
 	</div> <!-- END OF ROW2 -->
 
+	<!-- ROW2 -->
+	<div class="row">
+		<div class="col-12">
+			<div class="chart" id="chart3" ></div>
+		</div>
+	</div> <!-- END OF ROW2 -->
+
 	<!-- ROW1 -->
 	<div class="row">
 		<div class="col-sm">
@@ -30,7 +37,7 @@
 						<th scope="col">
 							<span class="text-warning">FY\SEG</span>
 						</th>
-						<th scope="col">Total</th>
+						<th scope="col">Contacts</th>
 						{% for segs in group_by_seg %}
 						<th scope="col">{{ (segs.grouper|string) }}</th>
 						{% endfor %}
@@ -69,26 +76,28 @@
 		</div>
 	</div><!-- END OF ROW1 -->
 
-
+{#	{{ prototype('data_table') }}#}
 </div>
 
 <script>
 let xAxis = [];
 let series1=[], data1, value1;
 let series2=[], data2, value2;
+let series3=[], data3, value3;
+
 {% set group_by_fy = data.rows|groupby('FY') %}
 {#{% set group_by_seg = data.rows|groupby('SEGMENT') %}#}
 
 let colorMap = {
 	'00.New Contacts': '#8ee000',
-	'01.Pledge Givers': '#ee4c58',
+	'01.Pledge Givers': '#ed008c',
 	'02.Major Donors': '#c63527',
 	'03.Premium Donors': '#f38654',
 	'04.High Value Donors': '#fdb94e',
 	'05.General Donors': '#f5df2e',
 	'06.LYBUNT Donors': '#0d9ddb',
 	'07.SYBUNT Donors': '#166a8f',
-	'08.Groups': '#0f723a',
+	'08.Groups': '#00b388',
 	'09.Merchandise Only': '#a560e8',
 	'10.Never Given': '#cee3f8',
 	'11.Third Party': '#84754e',
@@ -101,19 +110,21 @@ let colorMap = {
 {% for fys in group_by_fy %}xAxis[{{ loop.index - 1 }}]='FY{{ (fys.grouper|string)[-2:] }}';{% endfor %}
 //Series being each categories having all FYs' data
 {% for seg, seglist in group_by_seg %}
-data1=[];data2=[];
+data1=[];data2=[];data3=[];
 	{% for fys in group_by_fy %}
-	value1 = null;
-	value2 = null;
+	value1 = null;value2 = null;value3 = null;
 		{% for  grouper, list in seglist|groupby('FY') %}
 			{% if grouper == fys.grouper %}
 			{% set contacts, donors = list|sum(attribute='CONTACTS'), list|sum(attribute='DONORS') %}
+			{% set trxs = list|sum(attribute='TRXS') %}
 			value1={{ donors }};
-			value2={{ contacts }};
+			value2={{ trxs }};
+			value3={{ contacts }};
 			{% endif %}
 		{% endfor %}
-	data1[{{ loop.index - 1 }}] = value1;
-	data2[{{ loop.index - 1 }}] = value2;
+	data1[{{ loop.index - 1 }}] = value1 === 0 || value1 === null ? null : value1 ;
+	data2[{{ loop.index - 1 }}] = value2 === 0 || value2 === null ? null : value2 ;
+	data3[{{ loop.index - 1 }}] = value3 === 0 || value3 === null ? null : value3 ;
 	{% endfor %}
 
 series1[{{ loop.index - 1 }}] ={
@@ -125,6 +136,12 @@ series1[{{ loop.index - 1 }}] ={
 series2[{{ loop.index - 1 }}] ={
 	name: '{{ seg }}',
 	data: data2,
+	color: colorMap['{{ seg }}'],
+	stack: 'Transactions'
+};
+series3[{{ loop.index - 1 }}] ={
+	name: '{{ seg }}',
+	data: data3,
 	color: colorMap['{{ seg }}'],
 	stack: 'Contacts'
 };

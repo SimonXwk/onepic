@@ -7,10 +7,15 @@ $footer_height: 60px;
 
 
 
-
 body {
-  padding-top: 4rem;
+  padding-top: 4rem;  // Leaving Space for Fixed NavBar
   //padding-bottom: $footer_height;
+  // Flushing footer to bottom
+  position: relative;
+  padding-bottom: 6rem;
+  min-height: 100%;
+
+
 }
 
 //footer {
@@ -20,9 +25,13 @@ body {
 
 // Sticky Footer
 .footer {
-  //position: absolute;
-  //bottom: 0;
-  //left:0;
+
+  position: absolute;
+  bottom: 0;
+  right:0;
+  left: 0;
+  text-align: center;
+  padding: 1rem;
   //width: 100%;
   /* Set the fixed height of the footer here */
   //height:$footer_height;
