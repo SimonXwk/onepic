@@ -4,7 +4,7 @@ from configuration import app_config_dict as cfg
 from .blueprints import register_blueprints
 from .helper import LazyLoader
 from .api import ApiFlask
-# from werkzeug.contrib.fixers import ProxyFix
+from werkzeug.contrib.fixers import ProxyFix
 
 
 def create_app(test_config=None):
@@ -16,7 +16,7 @@ def create_app(test_config=None):
 	app.jinja_env.trim_blocks = True
 	app.jinja_env.lstrip_blocks = True
 	# app.register_api_error_handler()
-	# app.wsgi_app = ProxyFix(app.wsgi_app)
+	app.wsgi_app = ProxyFix(app.wsgi_app)
 	print(">> Import name [{}] applied".format(import_name))
 	# step 2: Builtin/Extensions/MyOwn Flask Configuration
 	app.config.from_object(cfg.get('base'))

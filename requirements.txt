@@ -3,6 +3,8 @@ pandas
 pyodbc
 openpyxl
 SQLAlchemy
+
+requests
 blinker
 pyopenssl
 

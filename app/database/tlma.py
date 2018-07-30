@@ -42,7 +42,9 @@ class TLMA:
 
 	@classmethod
 	def cy_month_range(cls, cy, cy_month):
-		return calendar.monthrange(cy, cy_month)
+		date1 = datetime.date(cy, cy_month, 1)
+		date2 = datetime.date(cy, cy_month, calendar.monthrange(cy, cy_month)[1])
+		return date1, date2
 
 	@classmethod
 	def ccy(cls, fy_month):

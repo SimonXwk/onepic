@@ -38,15 +38,15 @@ def new_cfy_month(month=None):
 		return ApiException('An integer between 1 and 12 representing a month in current financial year is required')
 	else:
 		results = {}
-
-		date1, date2 = TLMA.cy_month_range(TLMA.cy(TLMA.cfy, TLMA.fy_mth(month)), month)
-
-		params = (Tq.format_date(date1), Tq.format_date(date2))
+		ccy = TLMA.cy(TLMA.cfy, TLMA.fy_mth(month))
+		date1, date2 = TLMA.cy_month_range(ccy, month)
+		params = map(lambda x: Tq.format_date(x), (date1, date2))
 		rows = Tq.query('NEW_CUSTOMER', *params, cached_timeout=10).rows
 		fystr = 'FY' + str(TLMA.cfy)
-		results[fystr] = []
+		results[fystr] = {}
+		results[fystr][month] = []
 		for r in rows:
-			results[fystr].append({
+			results[fystr][month].append({
 				'searialNumber': r[0],
 				'firstDate': r[1],
 				'firstOrder': r[2],
