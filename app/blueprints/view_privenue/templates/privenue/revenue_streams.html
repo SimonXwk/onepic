@@ -1,0 +1,126 @@
+{% extends framework_template %}
+
+{# Addiditonal Libraries #}
+{% block css_optional %}
+{% endblock %}
+
+{% block js_optional %}
+	{{ Highchart([], ['sankey']) }}
+{% endblock %}
+
+
+{# My Own js and css #}
+{% block css_custom %}
+{% endblock %}
+
+{% block js_custom %}
+{% endblock %}
+
+
+{# Embedded CSS #}
+{% block css_embedded %}
+<style>
+#chart1,#chart2 {
+min-width: 310px;
+}
+#chart1 {
+min-height: 600px;
+}
+#chart2 {
+min-height: 850px;
+}
+	</style>
+{% endblock %}
+
+
+{# Embedded Javascript After Libraries & Before Custom Javascript #}
+{% block js_embedded_before %}
+{% endblock %}
+
+
+{# Embedded Javascript At the Very End #}
+{% block js_embedded_after %}
+<script>
+// Highlight All Paths of Current Node
+function linksHover(point, state) {
+  if (point.isNode) {
+    point.linksFrom.forEach(function(l) {
+      l.setState(state);
+    });
+  }
+}
+
+function drawSankey(chart){
+	Highcharts.chart(chart.elementID, {
+		chart: {
+			inverted: false
+		},
+		title: {
+			text: chart.title
+		},
+		subtitle: {
+        text: chart.subtitle
+    },
+		plotOptions: {
+			series: {
+			},
+			sankey: {
+		 		point: {
+					events: {
+						mouseOver: function() {
+							linksHover(this, 'hover');
+						},
+						mouseOut: function() {
+							linksHover(this, '');
+						}
+        	}
+      	},
+      	dataLabels:{
+		 			enabled: true,
+					useHTML: false,
+					nodeFormat: '<b>{point.name}</b>: <span style="font-size:0.6rem">${point.sum:,.2f}</span>',
+					format: '<span style="color:{point.color}">${point.weight:,.2f}</span>',
+				},
+				tooltip: {
+
+					valueDecimals: 2,
+					valuePrefix: '$',
+					valueSuffix: ' AUD'
+				},
+			}
+    },
+
+		series: [{
+			keys: ['from', 'to', 'weight'],
+			data: chart.data,
+			nodes: chart.nodes,
+			type: 'sankey',
+			name: 'Revenue Stream'
+		}]
+
+	});
+}
+
+drawSankey({
+	elementID: 'chart1',
+	title: 'FY' + fy + ' Revenue Stream Sankey Diagram',
+	subtitle: '',
+	data:sankeyData1,
+	nodes:sankeyNodes1
+});
+
+
+drawSankey({
+	elementID: 'chart2',
+	title: 'FY' + fy + ' Revenue - Destinations Sankey Diagram',
+	subtitle: '',
+	data:sankeyData2,
+	nodes: sankeyNodes2
+});
+
+
+
+
+</script>
+{% endblock %}
+

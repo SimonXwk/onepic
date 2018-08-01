@@ -1,0 +1,270 @@
+<div class="container-fluid">
+
+	<!-- Pagination -->
+	{% with  %}
+		{#	Find Current Item	#}
+		{% if not request.view_args['fy'] %} {% set active_item = thisfy  %}
+		{% else %} {% set active_item = request.view_args['fy']  %}
+		{% endif %}
+		{#	Find Page List	#}
+		{% set items = fys|map(attribute='FY')|list %}
+		{# How to display each page #}
+		{% macro page_dispaly(pagination_item) %}
+			FY{{ (pagination_item|string)[-2:] }}
+		{% endmacro %}
+		{#	--------- End of Input --------- #}
+
+		{# Middle Items #}
+		{% set middle_item = items[((items|length)/2)|int] %}
+		{#	Find Page List	#}
+		{% set is_first = (items[0] == active_item) %}
+		{% set is_last = (items[-1] == active_item) %}
+
+	<nav aria-label="...">
+		<ul class="pagination pagination-sm mt-3 mr-3">
+			<li class="page-item {% if is_first %}disabled{% endif %}">
+				<a class="page-link" href="{{ url_for(request.endpoint, fy=items[0]) }}" aria-label="Previous">
+					<span aria-hidden="true">&laquo;&laquo;</span>
+					<span class="sr-only">First</span>
+				</a>
+			</li> <!-- End of Pagination[First] -->
+
+			{% if not  is_first %}
+			<li class="page-item {% if is_first %}disabled{% endif %}">
+				<a class="page-link" href="{{ url_for(request.endpoint, fy=active_item - 1) }}" aria-label="Previous">
+					<span aria-hidden="true">&laquo;</span>
+					<span class="sr-only">Previous</span>
+				</a>
+			</li> <!-- End of Pagination[Previous] -->
+			{% endif %}
+
+			{% if items|length < 5 %}
+				{% for item in items %}
+					<li class="page-item {% if item == active_item %}active{% endif %}">
+						<a class="page-link" href="{{ url_for(request.endpoint, fy=item) }}">
+							 {% if item == this_fy %}<span class="sr-only">(current)</span>{% endif %}{{ page_dispaly(item) }}
+						</a>
+					</li>
+				{% endfor %}
+
+			{% else %}
+				{% if active_item in (items[0], items[1], items[2]) %}
+					{% for item in items[:3] %}
+					<li class="page-item {% if item == active_item %}active{% endif %}">
+						<a class="page-link" href="{{ url_for(request.endpoint, fy=item) }}">
+							 {% if item == active_item %}<span class="sr-only">(current)</span>{% endif %}{{ page_dispaly(item) }}
+						</a>
+					</li>
+					{% endfor %}
+					<li class="page-item disabled"><a class="page-link" href="">...</a></li>
+				{% elif active_item in (items[-1], items[-2], items[-3]) %}
+					<li class="page-item disabled"><a class="page-link" href="">...</a></li>
+					{% for item in items[-3:] %}
+					<li class="page-item {% if item == active_item %}active{% endif %}">
+						<a class="page-link" href="{{ url_for(request.endpoint, fy=item) }}">
+							 {% if item == active_item %}<span class="sr-only">(current)</span>{% endif %}{{ page_dispaly(item) }}
+						</a>
+					</li>
+					{% endfor %}
+				{% else %}
+					<li class="page-item disabled"><a class="page-link" href="">..</a></li>
+					<li class="page-item">
+						<a class="page-link" href="{{ url_for(request.endpoint, fy=active_item - 1) }}">
+							<span class="sr-only">(current)</span>{{ page_dispaly(active_item - 1) }}
+						</a>
+					</li>
+					<li class="page-item active">
+						<a class="page-link" href="{{ url_for(request.endpoint, fy=active_item) }}">
+							<span class="sr-only">(current)</span>{{ page_dispaly(active_item) }}
+						</a>
+					</li>
+					<li class="page-item">
+						<a class="page-link" href="{{ url_for(request.endpoint, fy=active_item + 1) }}">
+							<span class="sr-only">(current)</span>{{ page_dispaly(active_item + 1) }}
+						</a>
+					</li>
+					<li class="page-item disabled"><a class="page-link" href="">..</a></li>
+				{% endif %}
+			{% endif %}
+
+			{% if not  is_last %}
+			<li class="page-item {% if is_last %}disabled{% endif %}">
+				<a class="page-link" href="{{ url_for(request.endpoint, fy=active_item + 1) }}" aria-label="Next">
+					<span aria-hidden="true">&raquo;</span>
+					<span class="sr-only">Next</span>
+				</a>
+			</li><!-- End of Pagination[Next] -->
+			{% endif %}
+			<li class="page-item {% if is_last %}disabled{% endif %}">
+				<a class="page-link" href="{{ url_for(request.endpoint, fy=items[-1]) }}" aria-label="Previous">
+					<span aria-hidden="true">&raquo;&raquo;</span>
+					<span class="sr-only">Last</span>
+				</a>
+			</li> <!-- End of Pagination[Last] -->
+		</ul>
+	</nav>
+	{% endwith  %}<!-- End of Pagination -->
+
+
+	<p class="lead">
+		<h5>TLMA Revenue Streams for FY{{ thisfy }} <span class="text-info">{# (Total {{ data.rows|sum(attribute='TOTAL')|currency }})  #}</span>
+		</h5>
+		(data captured : {{ data.timestamp|dtAU }}, cached for {{ '{:,}'.format(data.cached_timeout) }} seconds)
+	</p>
+
+	<!-- ROW -->
+	<div class="row">
+		<div class="col-md-12">
+			<div class="chart" id="chart1" ></div>
+		</div>
+	</div> <!-- END OF ROW -->
+
+	<hr	/>
+
+	<!-- ROW -->
+	<div class="row">
+		<div class="col-md-12">
+			<div class="chart" id="chart2" ></div>
+		</div>
+	</div> <!-- END OF ROW -->
+
+{#	{{ prototype('data_table') }}#}
+
+
+
+</div>
+
+
+<script>
+let fy = {{ thisfy }} ;
+let nodes = {
+	'TLMA': {
+		color: '#be0027',
+  },
+	'Solicited': {
+		color: '#3be8b0',
+  },
+	'Unsolicited': {
+		color: '#cccccc',
+  },
+	'Merchandise Platform': {
+		color: '#a560e8',
+  },
+	'Non-Merchandise Platform': {
+		color: '#ffb900',
+  },
+	'Donation': {
+		color: '#05cc47',
+  },
+	'Bequest': {
+		color: '#0d9ddb',
+  },
+	'Group': {
+		color: '#7d0100',
+  },
+	'Purchase-Postage': {
+		color: '#2f6f7e',
+  },
+	'Pledge': {
+		color: '#ed008c',
+  },
+
+	'General 1': {
+		color: '#f5de50',
+  },
+	'General 2': {
+		color: '#f5de50',
+  },
+	'Merchandise': {
+		color: '#a560e8',
+  },
+	'Gift of Love': {
+		color: '#ff4400',
+  },
+	'DONKIND': {
+		color: '#79afc1',
+  },
+	'ELF': {
+		color: '#c6af92',
+  },
+	'India': {
+		color: '#bf5b20',
+  },
+	'Myanmar': {
+		color: '#ed008c',
+  },
+	'Nepal': {
+		color: '#5851db',
+  },
+	'Nigeria': {
+		color: '#f9a541',
+  },
+	'Personal': {
+		color: '#606c76',
+  },
+	'PNG': {
+		color: '#56b881',
+  },
+	'Thailand': {
+		color: '#e0d86e',
+  },
+	'Timor Leste': {
+		color: '#00a1e4',
+  },
+};
+
+let sankeyData1 = [], sankeyNodes1 = {};
+let sankeyData2 = [], sankeyNodes2 = {};
+
+{% for grouper, list in data.rows|groupby('STREAM') %}
+		{% if grouper|int == 1 %}
+			{% for row in list %}
+			sankeyData1[{{ loop.index - 1 }}] = {
+				from:'{{ row.ATTR1 }}',
+				to: '{{ row.ATTR2 }}',
+				weight: {{ row.TOTAL|float(0.00) }},
+			};
+			if(!('{{ row.ATTR1 }}' in sankeyNodes1)){
+				sankeyNodes1['{{ row.ATTR1 }}'] = {
+					column: {{ row.COLMUN }}
+				}
+			}
+			if(('{{ row.ATTR1 }}' in nodes)){
+				sankeyNodes1['{{ row.ATTR1 }}'].color = nodes['{{ row.ATTR1 }}'].color;
+			}
+			{% endfor %}
+		{% elif grouper|int == 2 %}
+			{% for row in list %}
+			sankeyData2[{{ loop.index - 1 }}] = {
+				from:'{{ row.ATTR1 }}',
+				to: '{{ row.ATTR2 }}',
+				weight: {{ row.TOTAL|float(0.00) }},
+			};
+			if(!('{{ row.ATTR1 }}' in sankeyNodes2)){
+				sankeyNodes2['{{ row.ATTR1 }}'] = {
+					column: {{ row.COLMUN }}
+				}
+			}
+			if(('{{ row.ATTR1 }}' in nodes)){
+				sankeyNodes2['{{ row.ATTR1 }}'].color = nodes['{{ row.ATTR1 }}'].color;
+			}
+			{% endfor %}
+
+		{% else %}
+		{% endif %}
+
+{% endfor %}
+
+function objToArray(obj){
+	let newObj = Object.keys(obj).map(function(key) {
+		return {id: key, color:  obj[key].color, column: obj[key].column};
+	});
+	return newObj
+}
+sankeyNodes1 = objToArray(sankeyNodes1);
+sankeyNodes2 = objToArray(sankeyNodes2);
+
+console.log(sankeyData1, sankeyNodes1);
+console.log(sankeyData2, sankeyNodes2);
+
+</script>

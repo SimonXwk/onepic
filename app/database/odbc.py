@@ -20,6 +20,8 @@ class ThankqODBC(object):
 
 	@classmethod
 	def format_date(cls, value, fmt='%Y/%m/%d'):
+		if isinstance(value, list) or isinstance(value, tuple):
+			return map(lambda x: x.strftime(fmt), value)
 		return value.strftime(fmt)
 
 	@classmethod
