@@ -2,9 +2,9 @@ flask
 pandas
 pyodbc
 openpyxl
-SQLAlchemy
-
 requests
+
+SQLAlchemy
 blinker
 pyopenssl
 

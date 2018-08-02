@@ -1,0 +1,130 @@
+{% extends framework_template %}
+
+{# Addiditonal Libraries #}
+{% block css_optional %}
+{% endblock %}
+
+{% block js_optional %}
+{% endblock %}
+
+
+{# My Own js and css #}
+{% block css_custom %}
+<style>
+.loader {
+	position: relative;
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #bc87ff;
+  border-bottom: 16px solid #90ffa6;
+  width: 60px;
+  height: 60px;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
+{% endblock %}
+
+{% block js_custom %}
+{% endblock %}
+
+
+{# Embedded CSS #}
+{% block css_embedded %}
+{% endblock %}
+
+
+{# Embedded Javascript After Libraries & Before Custom Javascript #}
+{% block js_embedded_before %}
+{% endblock %}
+
+
+{# Embedded Javascript At the Very End #}
+{% block js_embedded_after %}
+<script>
+document.getElementById('ssi-search').onclick = function (){
+	let phrase = document.getElementById('ssi-search-text').value.trim();
+	let card = document.getElementById("ssi-order-detail");
+
+	let headerTag =  card.children[0],
+				bodyTag = card.children[1],
+				footerTag = card.children[2],
+				bodyTag1 = bodyTag.children[0],
+				bodyTag2 = bodyTag.children[1],
+				spinner = '<div class="container h-100"><div class="row h-100 justify-content-center align-items-center"><div class="loader"></div></div></div>'
+				;
+	headerTag.innerHTML = null;
+	footerTag.innerHTML = null;
+	bodyTag1.innerHTML = null;
+	bodyTag2.innerHTML = null;
+
+	if(phrase !== ''){
+		let url = '/api/ssi/orders/search/' + phrase;
+		bodyTag1.innerHTML = spinner;
+
+		// Fetching Data from API and draw charts
+		fetchJSON(endpoint(url), function(json){
+			let isSuccess = json.success;
+			let orders = json.orders;
+
+			if (orders.length > 0 ) {
+				let firstOrder = orders[0];
+				let carrier = firstOrder.carrier_name,
+						country = firstOrder.country,
+						customer_name = firstOrder.name,
+						order_id = firstOrder.order_id,
+						tracking_number = firstOrder.tracking_number,
+						order_date = firstOrder.order_date;
+
+				headerTag.innerHTML = '<h4>Rex Order ID : ' + '<span class="text-primary"><strong>' + phrase + '</strong></span>' + '</h4>'
+															+ '<h5>&#9875 Starshipit Order ID : ' + '<span class="text-info">' + order_id + '</span>' + '</h5>'
+															+ 'Order placed ' + order_date
+															+ ' in <span class="text-primary">' + country + '</span> using carrier <span class="text-danger">' + carrier + '</span>'
+															;
+				bodyTag1.innerHTML = '<p class="lead"><strong>Tracking Number Found &#9758 </span><span class="badge badge-warning">' + tracking_number + '</span></p>'
+																				+ '<p class="lead">❤ ordered by <span class="text-info"><strong>' + customer_name + '<strong></span></p>'
+													;
+				bodyTag2.innerHTML = spinner;
+				footerTag.innerHTML = Date();
+				// Check Status
+				fetchJSON(endpoint('/api/ssi/track/' + tracking_number), function(json2){
+					if (json2.success === true) {
+						bodyTag2.innerHTML = '<p>&#9977Tracking Details Found :</p><div class="table-responsive"><table class="table table-hover table-sm">'
+							+ '<tbody>'
+							+ '<tr>' + '<th scope="row">' + 'Order Status' + '</th>' + '<td><span class="badge badge-pill badge-info">' + json2.results.order_status + '</span></td>' + '</tr>'
+							+ '<tr>' + '<th scope="row">' + 'Tracking Status' + '</th>' + '<td><span class="badge badge-pill badge-info">' + json2.results.tracking_status + '</span></td>' + '</tr>'
+							+ '<tr>' + '<th scope="row">' + 'Last Updated' + '</th>' + '<td>' + json2.results.last_updated_date + '</td>' + '</tr>'
+							+ '<tr>' + '<th scope="row">' + 'Shipment Date' + '</th>' + '<td>' + json2.results.shipment_date + '</td>' + '</tr>'
+							+ '<tr>' + '<th scope="row">' + 'Carrier Service' + '</th>' + '<td>' + json2.results.carrier_service + '</td>' + '</tr>'
+							+ '</tbody></table></div>';
+					} else {
+						bodyTag2.innerHTML = '<h1><span class="text-danger">&#9785; Could not find any detail from starshipit ! </span></h1>'
+					}
+				});
+			}else{
+				headerTag.innerHTML = '<span class="text-danger"><strong>No Results Found</strong> for order </span>' + phrase;
+				bodyTag1.innerHTML = '<h1><span class="text-danger">&#9785;</span></h1>';
+				footerTag.innerHTML = Date();
+
+			}
+		});
+	} else {
+		headerTag.innerHTML = '<span class="text-danger"><strong>Do Not Leave Order ID Empty</strong></span>';
+		bodyTag1.innerHTML = '<h1><span class="text-danger">&#9785;</span></h1>';
+		footerTag.innerHTML = Date();
+	}
+}
+
+
+</script>
+{% endblock %}

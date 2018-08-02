@@ -51,3 +51,8 @@ def upload():
 @templatified('rfm_result')
 def rfm_result(filename):
 	return dict(title='RFM Result', filename=filename)
+
+
+@templatified('track_order')
+def track_order():
+	return dict(title='Track Rex Order')

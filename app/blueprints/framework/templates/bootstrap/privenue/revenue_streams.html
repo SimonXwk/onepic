@@ -131,7 +131,6 @@
 {#	{{ prototype('data_table') }}#}
 
 
-
 </div>
 
 
@@ -144,7 +143,7 @@ let nodes = {
 	'Solicited': {
 		color: '#3be8b0',
   },
-	'Unsolicited': {
+	'Unlv1ed': {
 		color: '#cccccc',
   },
 	'Merchandise Platform': {
@@ -213,58 +212,85 @@ let nodes = {
   },
 };
 
-let sankeyData1 = [], sankeyNodes1 = {};
-let sankeyData2 = [], sankeyNodes2 = {};
+let sankeyData = {
+	cht1: {
+		data:[],
+		nodes: {}
+	},
+	cht2: {
+		data:[],
+		nodes: {}
+	}
+};
+let currentCht;
 
-{% for grouper, list in data.rows|groupby('STREAM') %}
-		{% if grouper|int == 1 %}
-			{% for row in list %}
-			sankeyData1[{{ loop.index - 1 }}] = {
-				from:'{{ row.ATTR1 }}',
-				to: '{{ row.ATTR2 }}',
-				weight: {{ row.TOTAL|float(0.00) }},
+function updateSankeyData(sankeyID, col, v1, v2, w, path, isLast) {
+	let sankey = sankeyData[sankeyID];
+	let idx1 = sankey.data.length;
+
+	sankey.data[idx1] = {
+		from: v1,
+		to: v2,
+		weight: w,
+		path: path
+	};
+	if (!(v1 in sankey.nodes)){
+		sankey.nodes[v1] = {
+			column: col
+		};
+		if (v1 in nodes) {
+			sankey.nodes[v1].color = nodes[v1].color
+		}
+	}
+	if (isLast){
+		if (!(v2 in sankey.nodes)){
+			sankey.nodes[v2] = {
+			column: col + 1
 			};
-			if(!('{{ row.ATTR1 }}' in sankeyNodes1)){
-				sankeyNodes1['{{ row.ATTR1 }}'] = {
-					column: {{ row.COLMUN }}
-				}
-			}
-			if(('{{ row.ATTR1 }}' in nodes)){
-				sankeyNodes1['{{ row.ATTR1 }}'].color = nodes['{{ row.ATTR1 }}'].color;
-			}
-			{% endfor %}
-		{% elif grouper|int == 2 %}
-			{% for row in list %}
-			sankeyData2[{{ loop.index - 1 }}] = {
-				from:'{{ row.ATTR1 }}',
-				to: '{{ row.ATTR2 }}',
-				weight: {{ row.TOTAL|float(0.00) }},
-			};
-			if(!('{{ row.ATTR1 }}' in sankeyNodes2)){
-				sankeyNodes2['{{ row.ATTR1 }}'] = {
-					column: {{ row.COLMUN }}
-				}
-			}
-			if(('{{ row.ATTR1 }}' in nodes)){
-				sankeyNodes2['{{ row.ATTR1 }}'].color = nodes['{{ row.ATTR1 }}'].color;
-			}
-			{% endfor %}
-
-		{% else %}
-		{% endif %}
-
-{% endfor %}
+		}
+		if (v2 in nodes) {
+			sankey.nodes[v2].color = nodes[v2].color
+		}
+	}
+}
 
 function objToArray(obj){
-	let newObj = Object.keys(obj).map(function(key) {
-		return {id: key, color:  obj[key].color, column: obj[key].column};
-	});
-	return newObj
+	 return  Object.keys(obj).map(function(key) {
+				return {id: key, color:  obj[key].color, column: obj[key].column};
+	 })
 }
-sankeyNodes1 = objToArray(sankeyNodes1);
-sankeyNodes2 = objToArray(sankeyNodes2);
 
-console.log(sankeyData1, sankeyNodes1);
-console.log(sankeyData2, sankeyNodes2);
+currentCht = 'cht1';
+{% for lv1, lv1List in data.rows|groupby('SOLICIT') %}
+updateSankeyData(currentCht, 0, 'TLMA', '{{ lv1 }}', {{ lv1List|sum(attribute='TOTAL') }}, '{{ ('TLMA',lv1)|join(' -> ')|safe }}', false);
+	{% for lv2, lv2List in lv1List|groupby('PLATFORM')  %}
+	updateSankeyData(currentCht, 1, '{{ lv1 }}', '{{ lv2 }}', {{ lv2List|sum(attribute='TOTAL') }}, '{{ ('TLMA',lv1,lv2)|join(' -> ')|safe }}', false);
+		{% for lv3, lv3List in lv2List|groupby('TQTYPE')  %}
+		updateSankeyData(currentCht, 2, '{{ lv2 }}', '{{ lv3 }}', {{ lv3List|sum(attribute='TOTAL') }}, '{{ ('TLMA',lv1,lv2,lv3)|join(' -> ')|safe }}', false);
+			{% for lv4, lv4List in lv3List|groupby('ACCOUNT')  %}
+			updateSankeyData(currentCht, 3, '{{ lv3 }}', '{{ lv4 }}', {{ lv4List|sum(attribute='TOTAL') }}, '{{ ('TLMA',lv1,lv2,lv3,lv4)|join(' -> ')|safe }}', true);
+			{% endfor	 %}
+		{% endfor	 %}
+	{% endfor	 %}
+{% endfor	 %}
+sankeyData[currentCht].nodes = objToArray(sankeyData[currentCht].nodes);
 
+currentCht = 'cht2';
+{% for lv1, lv1List in data.rows|groupby('SOLICIT') %}
+updateSankeyData(currentCht, 0, 'TLMA', '{{ lv1 }}', {{ lv1List|sum(attribute='TOTAL') }}, '{{ ('TLMA',lv1)|join(' -> ')|safe }}', false);
+	{% for lv2, lv2List in lv1List|groupby('PLATFORM')  %}
+	updateSankeyData(currentCht, 1, '{{ lv1 }}', '{{ lv2 }}', {{ lv2List|sum(attribute='TOTAL') }}, '{{ ('TLMA',lv1,lv2)|join(' -> ')|safe }}', false);
+		{% for lv3, lv3List in lv2List|groupby('DES1')  %}
+		updateSankeyData(currentCht, 2, '{{ lv2 }}', '{{ lv3 }}', {{ lv3List|sum(attribute='TOTAL') }}, '{{ ('TLMA',lv1,lv2,lv3)|join(' -> ')|safe }}', false);
+			{% for lv4, lv4List in lv3List|groupby('DES2')  %}
+			updateSankeyData(currentCht, 3, '{{ lv3 }}', '{{ lv4 }}', {{ lv4List|sum(attribute='TOTAL') }}, '{{ ('TLMA',lv1,lv2,lv3,lv4)|join(' -> ')|safe }}', true);
+			{% endfor	 %}
+		{% endfor	 %}
+	{% endfor	 %}
+{% endfor	 %}
+sankeyData[currentCht].nodes = objToArray(sankeyData[currentCht].nodes);
+
+
+
+console.log(sankeyData);
 </script>

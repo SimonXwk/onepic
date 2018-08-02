@@ -61,6 +61,7 @@ function drawSankey(chart){
 		subtitle: {
         text: chart.subtitle
     },
+
 		plotOptions: {
 			series: {
 			},
@@ -75,18 +76,22 @@ function drawSankey(chart){
 						}
         	}
       	},
+				tooltip: {
+		 			headerFormat: '<span style="color:{point.color}" class="highcharts-header">{series.name}</span><br/>',
+					footerFormat: '<hr>{series.path}',
+					nodeFormat: '<b>{point.name}</b> -> <span style="font-size:1em">${point.sum:,.2f}</span>',
+					pointFormat: '{point.path}<br><b><span style="">${point.weight:,.2f}</span></b>',
+				},
       	dataLabels:{
 		 			enabled: true,
 					useHTML: false,
+					style: {
+                fontSize: '1.4em'
+					},
 					nodeFormat: '<b>{point.name}</b>: <span style="font-size:0.6rem">${point.sum:,.2f}</span>',
-					format: '<span style="color:{point.color}">${point.weight:,.2f}</span>',
+					format: '<span style="color:{point.color}; font-size:0.6rem">${point.weight:,.2f}</span>',
 				},
-				tooltip: {
 
-					valueDecimals: 2,
-					valuePrefix: '$',
-					valueSuffix: ' AUD'
-				},
 			}
     },
 
@@ -95,7 +100,7 @@ function drawSankey(chart){
 			data: chart.data,
 			nodes: chart.nodes,
 			type: 'sankey',
-			name: 'Revenue Stream'
+			name: chart.seriesName
 		}]
 
 	});
@@ -105,8 +110,9 @@ drawSankey({
 	elementID: 'chart1',
 	title: 'FY' + fy + ' Revenue Stream Sankey Diagram',
 	subtitle: '',
-	data:sankeyData1,
-	nodes:sankeyNodes1
+	data:sankeyData.cht1.data,
+	nodes:sankeyData.cht1.nodes,
+	seriesName: 'Revenue Stream'
 });
 
 
@@ -114,8 +120,9 @@ drawSankey({
 	elementID: 'chart2',
 	title: 'FY' + fy + ' Revenue - Destinations Sankey Diagram',
 	subtitle: '',
-	data:sankeyData2,
-	nodes: sankeyNodes2
+	data:sankeyData.cht2.data,
+	nodes:sankeyData.cht2.nodes,
+	seriesName: 'Revenue Stream to Destinations'
 });
 
 

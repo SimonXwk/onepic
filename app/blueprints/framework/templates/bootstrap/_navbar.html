@@ -83,6 +83,7 @@
 			<li class="nav-item dropdown {{ activeBlueprint(blueprint) }}">
 				<a class="nav-link dropdown-toggle" href="#" id="{{ blueprint }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ blueprint|title }}</a>
 				<div class="dropdown-menu" aria-labelledby="{{ blueprint }}">
+					{{ NavLink(blueprint, 'track_order', 'Track Rex Order') }}
 					{{ NavLink(blueprint, 'upload', 'RFM') }}
 				</div>
 			</li>

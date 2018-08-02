@@ -13,13 +13,15 @@ class StarShipItAPI(object):
 	star_ship_it_api_host = 'api.starshipit.com'
 	star_ship_it_api_url = 'https://api.starshipit.com'
 	api_key = current_app.config['STARSHIPIT_API_KEY']
-	subscription_key_primary = current_app.config['STARSHIPIT_OCP_APIM_SUBSCRIPTION_PRIMARY_KEY']
-	subscription_key_secondary = current_app.config['STARSHIPIT_OCP_APIM_SUBSCRIPTION_SECONDARY_KEY']
+	subscription_development_key_primary = current_app.config['STARSHIPIT_OCP_APIM_SUBSCRIPTION_DEVELOPMENT_PRIMARY_KEY']
+	subscription_development_key_secondary = current_app.config['STARSHIPIT_OCP_APIM_SUBSCRIPTION_DEVELOPMENT_SECONDARY_KEY']
+	subscription_production_key_primary = current_app.config['STARSHIPIT_OCP_APIM_SUBSCRIPTION_PRODUCTION_PRIMARY_KEY']
+	subscription_production_key_secondary = current_app.config['STARSHIPIT_OCP_APIM_SUBSCRIPTION_PRODUCTION_SECONDARY_KEY']
 
 	# Request Headers
 	headers = {
 		'StarShipIT-Api-Key': api_key,
-		'Ocp-Apim-Subscription-Key': subscription_key_primary,
+		'Ocp-Apim-Subscription-Key': subscription_production_key_primary,
 	}
 
 	# Function that returns the API result
@@ -34,7 +36,7 @@ class StarShipItAPI(object):
 
 	# Using Requests Library
 	@classmethod
-	@cached(3600)
+	@cached(300)
 	def use_request(cls, method, endpoint, params, decode):
 		if cls.star_ship_it_api_url[-1] != '/' and endpoint[0] != '/':
 			url = '/'.join((cls.star_ship_it_api_url, endpoint))
@@ -52,7 +54,7 @@ class StarShipItAPI(object):
 
 	# Using Standard Libraries
 	@classmethod
-	@cached(3600)
+	@cached(300)
 	def use_urllib(cls, method, endpoint, params, decode):
 		if params:
 			endpoint = endpoint + '?' + urllib.parse.urlencode(params)

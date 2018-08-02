@@ -50,5 +50,6 @@ def revenue_streams():
 	# Prepare for SQL parameters
 	d1, d2 = TLMA.fy_range(fy)
 	params = Tq.format_date((d1, d2))
-	data = Tq.query(['PRIVENUE_REVENUE_STREAMS__BASE', 'PRIVENUE_REVENUE_STREAMS_UNION'], *params, cached_timeout=timeout)
+	# data = Tq.query(['PRIVENUE_REVENUE_STREAMS__BASE', 'PRIVENUE_REVENUE_STREAMS_UNION'], *params, cached_timeout=timeout)
+	data = Tq.query('PRIVENUE_REVENUE_STREAMS__BASE', *params, cached_timeout=timeout)
 	return dict(title='Revenue Streams', data=data, thisfy=fy, fys=date_of_payments_fy())

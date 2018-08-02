@@ -1,6 +1,5 @@
 DECLARE @UNSOLICITED AS VARCHAR(15) = 'Unsolicited'
-      , @SOLICITED AS VARCHAR(15) = 'Solicited'
-      , @ARCHIVED AS VARCHAR(15) = 'Archived';
+      , @SOLICITED AS VARCHAR(15) = 'Solicited';
 WITH
 -- --------------------------------------------------------------
 cet_mysourcecode AS (
@@ -27,8 +26,8 @@ cet_mysourcecode AS (
     , S1.PLATFORM
     , S1.TQTYPE
     , S1.ACCOUNT
-    , ISNULL(IIF(D1.ARCHIVE = -1, @ARCHIVED, IIF(B1.DESTINATIONCODE IN ('General','Merchandise'), 'General 1',B1.DESTINATIONCODE)), NULL) AS [DES1]
-    , ISNULL(IIF(D2.ARCHIVE = -1, @ARCHIVED, IIF(B1.DESTINATIONCODE2 IN ('General','Merchandise', 'DONKIND'), 'General 2',B1.DESTINATIONCODE2)), NULL) AS [DES2]
+    , ISNULL(IIF(D1.ARCHIVE = -1, 'Archived 1', IIF(B1.DESTINATIONCODE IN ('General','Merchandise'), 'General 1',B1.DESTINATIONCODE)), 'Missing') AS [DES1]
+    , ISNULL(IIF(D2.ARCHIVE = -1, 'Archived 2', IIF(B1.DESTINATIONCODE2 IN ('General','Merchandise','DONKIND'), 'General 2',B1.DESTINATIONCODE2)), 'Missing') AS [DES2]
 
   FROM
     TBL_BATCHITEMSPLIT        B1
@@ -48,3 +47,5 @@ cet_mysourcecode AS (
     , D1.ARCHIVE, D2.ARCHIVE
 )
 -- --------------------------------------------------------------
+select * from cte_sankey_attributes
+order by TOTAL desc -- !Important for sankey chart

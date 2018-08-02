@@ -9,26 +9,37 @@ function endpoint (url, parameter) {
 	return $SCRIPT_ROOT + url + (parameter ? parameter : '')
 }
 //let endpoint = (url, parameter) => $SCRIPT_ROOT + url + (parameter ? parameter : '');
+
+
 // Using Fetch API to grab JSON data
-function fetchJSON(endpoint, func){
-	console.log('Fetching Endpoint: ', endpoint);
-	fetch(endpoint).then(function(response){
+function fetchJSON(endpoint, func) {
+	function status(response) {
 		console.log(response);
-		if (response.status !== 200) {
-				console.log('Looks like there was a problem. Status Code: ' + response.status);
-				return;
+		if (response.status >= 200 && response.status < 300) {
+			return Promise.resolve(response)
+		} else {
+			return Promise.reject(new Error(response.statusText))
 		}
-		// Examine the text in the response
-		response.json().then(function (json) {
-			// Process json data after response.json()
-			console.log('Response To JSON: ', json);
+	}
+	function json(response) {
+		return response.json()
+	}
+	console.log('Fetching Endpoint: ', endpoint);
+	fetch(endpoint)
+		.then(status)
+		.then(json)
+		.then(function (data) {
+			console.log('Response To JSON: ', data);
 			// ---------------------------------------------------------------------------------
 			// Call Processing Function
-			func(json);
-			// ---------------------------------------------------------------------------------
-		}) //end of response.json().then()
-	});
+			func(data);
+
+		}).catch(function(error) {
+    	console.log('Request failed', error);
+  	});
+
 }
+
 
 // Table Filters
 function filterTable(tableID, col, value="", element) {
