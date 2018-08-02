@@ -92,7 +92,7 @@ document.getElementById('ssi-search').onclick = function (){
 															+ ' in <span class="text-primary">' + country + '</span> using carrier <span class="text-danger">' + carrier + '</span>'
 															;
 				bodyTag1.innerHTML = '<p class="lead"><strong>Tracking Number Found &#9758 </span><span class="badge badge-warning">' + tracking_number + '</span></p>'
-																				+ '<p class="lead">❤ ordered by <span class="text-info"><strong>' + customer_name + '<strong></span></p>'
+																				+ '<p class="lead">&#10084 ordered by <span class="text-info"><strong>' + customer_name + '<strong></span></p>'
 													;
 				bodyTag2.innerHTML = spinner;
 				footerTag.innerHTML = Date();
@@ -120,7 +120,7 @@ document.getElementById('ssi-search').onclick = function (){
 		});
 	} else {
 		headerTag.innerHTML = '<span class="text-danger"><strong>Do Not Leave Order ID Empty</strong></span>';
-		bodyTag1.innerHTML = '<h1><span class="text-danger">&#9785;</span></h1>';
+		bodyTag1.innerHTML = '<h1><span class="text-danger">&#10060;</span></h1>';
 		footerTag.innerHTML = Date();
 	}
 }

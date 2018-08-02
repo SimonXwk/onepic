@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block js_optional %}
-	{{ Highchart([], ['sankey']) }}
+	{{ Highchart([], ['sankey', 'wordcloud']) }}
 {% endblock %}
 
 
@@ -20,7 +20,7 @@
 {# Embedded CSS #}
 {% block css_embedded %}
 <style>
-#chart1,#chart2 {
+#chart1 #chart2 {
 min-width: 310px;
 }
 #chart1 {
@@ -28,6 +28,15 @@ min-height: 600px;
 }
 #chart2 {
 min-height: 850px;
+}
+#chart3 {
+min-height: 600px;
+}
+#chart4 {
+min-height: 600px;
+}
+#chart7 {
+min-height: 500px;
 }
 	</style>
 {% endblock %}
@@ -53,7 +62,7 @@ function linksHover(point, state) {
 function drawSankey(chart){
 	Highcharts.chart(chart.elementID, {
 		chart: {
-			inverted: false
+			inverted: chart.invert
 		},
 		title: {
 			text: chart.title
@@ -78,7 +87,6 @@ function drawSankey(chart){
       	},
 				tooltip: {
 		 			headerFormat: '<span style="color:{point.color}" class="highcharts-header">{series.name}</span><br/>',
-					footerFormat: '<hr>{series.path}',
 					nodeFormat: '<b>{point.name}</b> -> <span style="font-size:1em">${point.sum:,.2f}</span>',
 					pointFormat: '{point.path}<br><b><span style="">${point.weight:,.2f}</span></b>',
 				},
@@ -86,12 +94,12 @@ function drawSankey(chart){
 		 			enabled: true,
 					useHTML: false,
 					style: {
-                fontSize: '1.4em'
+							fontSize: '1.4em'
 					},
-					nodeFormat: '<b>{point.name}</b>: <span style="font-size:0.6rem">${point.sum:,.2f}</span>',
+					nodeFormat: '<b>{point.name}</b>: <span style="font-size:0.5rem">${point.sum:,.2f}</span>',
 					format: '<span style="color:{point.color}; font-size:0.6rem">${point.weight:,.2f}</span>',
+					rotation:chart.rotation
 				},
-
 			}
     },
 
@@ -109,24 +117,96 @@ function drawSankey(chart){
 drawSankey({
 	elementID: 'chart1',
 	title: 'FY' + fy + ' Revenue Stream Sankey Diagram',
-	subtitle: '',
+	subtitle: stamp,
 	data:sankeyData.cht1.data,
 	nodes:sankeyData.cht1.nodes,
-	seriesName: 'Revenue Stream'
+	seriesName: 'Revenue Stream',
+	invert: false,
+	rotation: 0
+});
+
+drawSankey({
+	elementID: 'chart2',
+	title: 'FY' + fy + ' Revenue - Destination 1 Sankey Diagram',
+	subtitle: stamp,
+	data:sankeyData.cht2.data,
+	nodes:sankeyData.cht2.nodes,
+	seriesName: 'Revenue Stream Destination One',
+	invert: false,
+	rotation: 0
+});
+
+drawSankey({
+	elementID: 'chart3',
+	title: 'FY' + fy + ' Revenue - Payment Type Sankey Diagram',
+	subtitle: stamp,
+	data:sankeyData.cht3.data,
+	nodes:sankeyData.cht3.nodes,
+	seriesName: 'Revenue Stream',
+	invert: false,
+	rotation: 0
 });
 
 
 drawSankey({
-	elementID: 'chart2',
-	title: 'FY' + fy + ' Revenue - Destinations Sankey Diagram',
-	subtitle: '',
-	data:sankeyData.cht2.data,
-	nodes:sankeyData.cht2.nodes,
-	seriesName: 'Revenue Stream to Destinations'
+	elementID: 'chart4',
+	title: 'FY' + fy + ' Revenue - Source 2 Sankey Diagram',
+	subtitle: stamp,
+	data:sankeyData.cht4.data,
+	nodes:sankeyData.cht4.nodes,
+	seriesName: 'Revenue Stream',
+	invert: false,
+	rotation: 0
+});
+
+drawSankey({
+	elementID: 'chart7',
+	title: 'FY' + fy + ' Campaign Sankey Diagram',
+	subtitle: stamp,
+	data:sankeyData.cht5.data,
+	nodes:sankeyData.cht5.nodes,
+	seriesName: 'Revenue Stream',
+	invert: true,
+	rotation: 330
 });
 
 
+const text = 'Lorem ipsum d:d:d:olor sit amet, consectetur adipiscing elit. Aenean bibendum erat ac justo sollicitudin, quis lacinia ligula fringilla. Pellentesque hendrerit, nisi vitae posuere condimentum, lectus urna accumsan libero, rutrum commodo mi lacus pretium erat. Phasellus pretium ultrices mi sed semper. Praesent ut tristique magna. Donec nisl tellus, sagittis ut tempus sit amet, consectetur eget erat. Sed ornare gravida lacinia. Curabitur iaculis metus purus, eget pretium est laoreet ut. Quisque tristique augue ac eros malesuada, vitae facilisis mauris sollicitudin. Mauris ac molestie nulla, vitae facilisis quam. Curabitur placerat ornare sem, in mattis purus posuere eget. Praesent non condimentum odio. Nunc aliquet, odio nec auctor congue, sapien justo dictum massa, nec fermentum massa sapien non tellus. Praesent luctus eros et nunc pretium hendrerit. In consequat et eros nec interdum. Ut neque dui, maximus id elit ac, consequat pretium tellus. Nullam vel accumsan lorem.';
+function wordColudCalc(text){
+	let lines  = text.split(/[:,\. ]+/g);
+	return Highcharts.reduce(lines, function (arr, word) {
+		let obj = Highcharts.find(arr, function (obj) {
+				return obj.name === word;
+		});
+		if (obj) {
+				obj.weight += 1;
+		} else {
+				obj = {
+						name: word,
+						weight: 1
+				};
+				arr.push(obj);
+		}
+		return arr;
+}, []);
+}
 
+
+function drawWordCloud (element, data, seriesName, title){
+	Highcharts.chart(element, {
+    series: [{
+        type: 'wordcloud',
+        data: data,
+        name: seriesName
+    }],
+    title: {
+        text: title
+    },
+	});
+
+}
+drawWordCloud('chart5', des1Total, 'Total Value','Destination 1 Total Value Word Cloud (Exc General)' );
+drawWordCloud('chart6', des2Total, 'Total Value','Destination 2 Total Value Word Cloud (Exc General & Donkind)' );
 
 </script>
 {% endblock %}

@@ -1,126 +1,25 @@
 <div class="container-fluid">
-
-	<!-- Pagination -->
-	{% with  %}
-		{#	Find Current Item	#}
-		{% if not request.view_args['fy'] %} {% set active_item = thisfy  %}
-		{% else %} {% set active_item = request.view_args['fy']  %}
-		{% endif %}
-		{#	Find Page List	#}
-		{% set items = fys|map(attribute='FY')|list %}
-		{# How to display each page #}
-		{% macro page_dispaly(pagination_item) %}
+	{% macro page_dispaly(pagination_item) %}
 			FY{{ (pagination_item|string)[-2:] }}
-		{% endmacro %}
-		{#	--------- End of Input --------- #}
+	{% endmacro %}
+	{{ PAGINATION('fy', thisfy, 'FY', page_dispaly) }}
 
-		{# Middle Items #}
-		{% set middle_item = items[((items|length)/2)|int] %}
-		{#	Find Page List	#}
-		{% set is_first = (items[0] == active_item) %}
-		{% set is_last = (items[-1] == active_item) %}
-
-	<nav aria-label="...">
-		<ul class="pagination pagination-sm mt-3 mr-3">
-			<li class="page-item {% if is_first %}disabled{% endif %}">
-				<a class="page-link" href="{{ url_for(request.endpoint, fy=items[0]) }}" aria-label="Previous">
-					<span aria-hidden="true">&laquo;&laquo;</span>
-					<span class="sr-only">First</span>
-				</a>
-			</li> <!-- End of Pagination[First] -->
-
-			{% if not  is_first %}
-			<li class="page-item {% if is_first %}disabled{% endif %}">
-				<a class="page-link" href="{{ url_for(request.endpoint, fy=active_item - 1) }}" aria-label="Previous">
-					<span aria-hidden="true">&laquo;</span>
-					<span class="sr-only">Previous</span>
-				</a>
-			</li> <!-- End of Pagination[Previous] -->
-			{% endif %}
-
-			{% if items|length < 5 %}
-				{% for item in items %}
-					<li class="page-item {% if item == active_item %}active{% endif %}">
-						<a class="page-link" href="{{ url_for(request.endpoint, fy=item) }}">
-							 {% if item == this_fy %}<span class="sr-only">(current)</span>{% endif %}{{ page_dispaly(item) }}
-						</a>
-					</li>
-				{% endfor %}
-
-			{% else %}
-				{% if active_item in (items[0], items[1], items[2]) %}
-					{% for item in items[:3] %}
-					<li class="page-item {% if item == active_item %}active{% endif %}">
-						<a class="page-link" href="{{ url_for(request.endpoint, fy=item) }}">
-							 {% if item == active_item %}<span class="sr-only">(current)</span>{% endif %}{{ page_dispaly(item) }}
-						</a>
-					</li>
-					{% endfor %}
-					<li class="page-item disabled"><a class="page-link" href="">...</a></li>
-				{% elif active_item in (items[-1], items[-2], items[-3]) %}
-					<li class="page-item disabled"><a class="page-link" href="">...</a></li>
-					{% for item in items[-3:] %}
-					<li class="page-item {% if item == active_item %}active{% endif %}">
-						<a class="page-link" href="{{ url_for(request.endpoint, fy=item) }}">
-							 {% if item == active_item %}<span class="sr-only">(current)</span>{% endif %}{{ page_dispaly(item) }}
-						</a>
-					</li>
-					{% endfor %}
-				{% else %}
-					<li class="page-item disabled"><a class="page-link" href="">..</a></li>
-					<li class="page-item">
-						<a class="page-link" href="{{ url_for(request.endpoint, fy=active_item - 1) }}">
-							<span class="sr-only">(current)</span>{{ page_dispaly(active_item - 1) }}
-						</a>
-					</li>
-					<li class="page-item active">
-						<a class="page-link" href="{{ url_for(request.endpoint, fy=active_item) }}">
-							<span class="sr-only">(current)</span>{{ page_dispaly(active_item) }}
-						</a>
-					</li>
-					<li class="page-item">
-						<a class="page-link" href="{{ url_for(request.endpoint, fy=active_item + 1) }}">
-							<span class="sr-only">(current)</span>{{ page_dispaly(active_item + 1) }}
-						</a>
-					</li>
-					<li class="page-item disabled"><a class="page-link" href="">..</a></li>
-				{% endif %}
-			{% endif %}
-
-			{% if not  is_last %}
-			<li class="page-item {% if is_last %}disabled{% endif %}">
-				<a class="page-link" href="{{ url_for(request.endpoint, fy=active_item + 1) }}" aria-label="Next">
-					<span aria-hidden="true">&raquo;</span>
-					<span class="sr-only">Next</span>
-				</a>
-			</li><!-- End of Pagination[Next] -->
-			{% endif %}
-			<li class="page-item {% if is_last %}disabled{% endif %}">
-				<a class="page-link" href="{{ url_for(request.endpoint, fy=items[-1]) }}" aria-label="Previous">
-					<span aria-hidden="true">&raquo;&raquo;</span>
-					<span class="sr-only">Last</span>
-				</a>
-			</li> <!-- End of Pagination[Last] -->
-		</ul>
-	</nav>
-	{% endwith  %}<!-- End of Pagination -->
-
-
-	<p class="lead">
-		<h5>TLMA Revenue Streams for FY{{ thisfy }} <span class="text-info">{# (Total {{ data.rows|sum(attribute='TOTAL')|currency }})  #}</span>
-		</h5>
-		(data captured : {{ data.timestamp|dtAU }}, cached for {{ '{:,}'.format(data.cached_timeout) }} seconds)
-	</p>
+	<h3 class="text-center">TLMA Revenue Streams for FY{{ thisfy }} <span class="text-info"> (Total {{ ((data.rows|groupby('TLMA'))[0][1]) |sum(attribute='TOTAL')|currency }} <small>as at {{ data.timestamp|dtAU }})</small></span></h3>
+	<p class="text-center"><span class=" text-muted"><em>This result will be cached for {{ '{:,}'.format(data.cached_timeout) }} seconds</em></span></pcla>
 
 	<!-- ROW -->
+	<div class="alert alert-info text-center" role="alert">
+		<h4 class="text-danger">&#10024 Stream: ThankQ & Reckon Revenue Type</h4>
+	</div>
 	<div class="row">
 		<div class="col-md-12">
 			<div class="chart" id="chart1" ></div>
 		</div>
 	</div> <!-- END OF ROW -->
 
-	<hr	/>
-
+	<div class="alert alert-info text-center" role="alert">
+		<h4 class="text-danger">&#10024 Stream: Destination Code 1</h4>
+	</div>
 	<!-- ROW -->
 	<div class="row">
 		<div class="col-md-12">
@@ -128,14 +27,53 @@
 		</div>
 	</div> <!-- END OF ROW -->
 
+
+	<div class="alert alert-info text-center" role="alert">
+		<h4 class="text-danger">&#10024 Streams: Payment Types & Source code 2</h4>
+	</div>
+	<!-- ROW -->
+	<div class="row">
+		<div class="col-md-6">
+			<div class="chart" id="chart3" ></div>
+		</div>
+
+		<div class="col-md-6">
+			<div class="chart" id="chart4" ></div>
+		</div>
+	</div> <!-- END OF ROW -->
+
+	<div class="alert alert-info text-center" role="alert">
+		<h4 class="text-danger">&#9729 Cloud: Destination Codes ( 1 & 2 )</h4>
+	</div>
+	<!-- ROW -->
+	<div class="row">
+		<div class="col-md-6">
+			<div class="chart" id="chart5" ></div>
+		</div>
+
+		<div class="col-md-6">
+			<div class="chart" id="chart6" ></div>
+		</div>
+	</div> <!-- END OF ROW -->
+
+
+	<div class="alert alert-info text-center" role="alert">
+		<h4 class="text-danger">&#9889 Stream: Campaign Codes</h4>
+	</div>
+	<!-- ROW -->
+	<div class="row">
+		<div class="col-md-12">
+			<div class="chart" id="chart7" ></div>
+		</div>
+	</div> <!-- END OF ROW -->
+
+
 {#	{{ prototype('data_table') }}#}
-
-
 </div>
 
 
 <script>
-let fy = {{ thisfy }} ;
+let fy = {{ thisfy }}, stamp = 'Data captured :' + '{{ data.timestamp|dtAU }}' ;
 let nodes = {
 	'TLMA': {
 		color: '#be0027',
@@ -143,8 +81,8 @@ let nodes = {
 	'Solicited': {
 		color: '#3be8b0',
   },
-	'Unlv1ed': {
-		color: '#cccccc',
+	'Unsolicited': {
+		color: '#bfc2f4',
   },
 	'Merchandise Platform': {
 		color: '#a560e8',
@@ -168,10 +106,10 @@ let nodes = {
 		color: '#ed008c',
   },
 
-	'General 1': {
+	'General1': {
 		color: '#f5de50',
   },
-	'General 2': {
+	'General2': {
 		color: '#f5de50',
   },
 	'Merchandise': {
@@ -220,14 +158,24 @@ let sankeyData = {
 	cht2: {
 		data:[],
 		nodes: {}
+	},
+	cht3: {
+		data:[],
+		nodes: {}
+	},
+	cht4: {
+		data:[],
+		nodes: {}
+	},
+	cht5: {
+		data:[],
+		nodes: {}
 	}
 };
-let currentCht;
 
 function updateSankeyData(sankeyID, col, v1, v2, w, path, isLast) {
 	let sankey = sankeyData[sankeyID];
 	let idx1 = sankey.data.length;
-
 	sankey.data[idx1] = {
 		from: v1,
 		to: v2,
@@ -260,37 +208,103 @@ function objToArray(obj){
 	 })
 }
 
-currentCht = 'cht1';
-{% for lv1, lv1List in data.rows|groupby('SOLICIT') %}
-updateSankeyData(currentCht, 0, 'TLMA', '{{ lv1 }}', {{ lv1List|sum(attribute='TOTAL') }}, '{{ ('TLMA',lv1)|join(' -> ')|safe }}', false);
-	{% for lv2, lv2List in lv1List|groupby('PLATFORM')  %}
-	updateSankeyData(currentCht, 1, '{{ lv1 }}', '{{ lv2 }}', {{ lv2List|sum(attribute='TOTAL') }}, '{{ ('TLMA',lv1,lv2)|join(' -> ')|safe }}', false);
-		{% for lv3, lv3List in lv2List|groupby('TQTYPE')  %}
-		updateSankeyData(currentCht, 2, '{{ lv2 }}', '{{ lv3 }}', {{ lv3List|sum(attribute='TOTAL') }}, '{{ ('TLMA',lv1,lv2,lv3)|join(' -> ')|safe }}', false);
-			{% for lv4, lv4List in lv3List|groupby('ACCOUNT')  %}
-			updateSankeyData(currentCht, 3, '{{ lv3 }}', '{{ lv4 }}', {{ lv4List|sum(attribute='TOTAL') }}, '{{ ('TLMA',lv1,lv2,lv3,lv4)|join(' -> ')|safe }}', true);
-			{% endfor	 %}
-		{% endfor	 %}
-	{% endfor	 %}
+{% with cht='cht1', flows = ['TLMA', 'SOLICIT','PLATFORM', 'TQTYPE', 'ACCOUNT'], lv0='TLMA' , lv0List = data.rows, calc='TOTAL' %}
+{% for lv1, lv1List in lv0List|groupby(flows[1]) %}
+updateSankeyData('{{ cht }}', 0, '{{ lv0 }}', '{{ lv1 }}', {{ lv1List|sum(attribute=calc) }}, '{{ (lv0,lv1)|join(' -> ')|safe }}', false);
+{% for lv2, lv2List in lv1List|groupby(flows[2]) %}
+updateSankeyData('{{ cht }}', 1, '{{ lv1 }}', '{{ lv2 }}', {{ lv2List|sum(attribute=calc) }}, '{{ (lv0,lv1,lv2)|join(' -> ')|safe }}', false);
+{% for lv3, lv3List in lv2List|groupby(flows[3]) %}
+updateSankeyData('{{ cht }}', 2, '{{ lv2 }}', '{{ lv3 }}', {{ lv3List|sum(attribute=calc) }}, '{{ (lv0,lv1,lv2,lv3)|join(' -> ')|safe }}', false);
+{% for lv4, lv4List in lv3List|groupby(flows[4]) %}
+updateSankeyData('{{ cht }}', 3, '{{ lv3 }}', '{{ lv4 }}', {{ lv4List|sum(attribute=calc) }}, '{{ (lv0,lv1,lv2,lv3,lv4)|join(' -> ')|safe }}', true);
 {% endfor	 %}
-sankeyData[currentCht].nodes = objToArray(sankeyData[currentCht].nodes);
-
-currentCht = 'cht2';
-{% for lv1, lv1List in data.rows|groupby('SOLICIT') %}
-updateSankeyData(currentCht, 0, 'TLMA', '{{ lv1 }}', {{ lv1List|sum(attribute='TOTAL') }}, '{{ ('TLMA',lv1)|join(' -> ')|safe }}', false);
-	{% for lv2, lv2List in lv1List|groupby('PLATFORM')  %}
-	updateSankeyData(currentCht, 1, '{{ lv1 }}', '{{ lv2 }}', {{ lv2List|sum(attribute='TOTAL') }}, '{{ ('TLMA',lv1,lv2)|join(' -> ')|safe }}', false);
-		{% for lv3, lv3List in lv2List|groupby('DES1')  %}
-		updateSankeyData(currentCht, 2, '{{ lv2 }}', '{{ lv3 }}', {{ lv3List|sum(attribute='TOTAL') }}, '{{ ('TLMA',lv1,lv2,lv3)|join(' -> ')|safe }}', false);
-			{% for lv4, lv4List in lv3List|groupby('DES2')  %}
-			updateSankeyData(currentCht, 3, '{{ lv3 }}', '{{ lv4 }}', {{ lv4List|sum(attribute='TOTAL') }}, '{{ ('TLMA',lv1,lv2,lv3,lv4)|join(' -> ')|safe }}', true);
-			{% endfor	 %}
-		{% endfor	 %}
-	{% endfor	 %}
 {% endfor	 %}
-sankeyData[currentCht].nodes = objToArray(sankeyData[currentCht].nodes);
+{% endfor	 %}
+{% endfor	 %}
+sankeyData['{{ cht }}'].nodes = objToArray(sankeyData['{{ cht }}'].nodes);
+{% endwith %}
+
+
+{% with cht='cht2', flows = ['TLMA', 'SOLICIT','PLATFORM', 'TQTYPE', 'DES1'], lv0='TLMA', lv0List = data.rows, calc='TOTAL' %}
+{% for lv1, lv1List in lv0List|groupby(flows[1]) %}
+updateSankeyData('{{ cht }}', 0, '{{ lv0 }}', '{{ lv1 }}', {{ lv1List|sum(attribute=calc) }}, '{{ (lv0,lv1)|join(' -> ')|safe }}', false);
+{% for lv2, lv2List in lv1List|groupby(flows[2]) %}
+updateSankeyData('{{ cht }}', 1, '{{ lv1 }}', '{{ lv2 }}', {{ lv2List|sum(attribute=calc) }}, '{{ (lv0,lv1,lv2)|join(' -> ')|safe }}', false);
+{% for lv3, lv3List in lv2List|groupby(flows[3]) %}
+updateSankeyData('{{ cht }}', 2, '{{ lv2 }}', '{{ lv3 }}', {{ lv3List|sum(attribute=calc) }}, '{{ (lv0,lv1,lv2,lv3)|join(' -> ')|safe }}', false);
+{% for lv4, lv4List in lv3List|groupby(flows[4]) %}
+updateSankeyData('{{ cht }}', 3, '{{ lv3 }}', '{{ lv4 }}', {{ lv4List|sum(attribute=calc) }}, '{{ (lv0,lv1,lv2,lv3,lv4)|join(' -> ')|safe }}', true);
+{% endfor	 %}
+{% endfor	 %}
+{% endfor	 %}
+{% endfor	 %}
+sankeyData['{{ cht }}'].nodes = objToArray(sankeyData['{{ cht }}'].nodes);
+{% endwith %}
+
+
+{% with cht='cht3', flows = ['TLMA', 'PAYMENTTYPE', 'TQTYPE'], lv0='TLMA', lv0List = data.rows, calc='TOTAL' %}
+{% for lv1, lv1List in lv0List|groupby(flows[1]) %}
+updateSankeyData('{{ cht }}', 0, '{{ lv0 }}', '{{ lv1 }}', {{ lv1List|sum(attribute=calc) }}, '{{ (lv0,lv1)|join(' -> ')|safe }}', false);
+{% for lv2, lv2List in lv1List|groupby(flows[2]) %}
+updateSankeyData('{{ cht }}', 1, '{{ lv1 }}', '{{ lv2 }}', {{ lv2List|sum(attribute=calc) }}, '{{ (lv0,lv1,lv2)|join(' -> ')|safe }}', false);
+{#{% for lv3, lv3List in lv2List|groupby(flows[3]) %}#}
+{#updateSankeyData('{{ cht }}', 2, '{{ lv2 }}', '{{ lv3 }}', {{ lv3List|sum(attribute=calc) }}, '{{ (lv0,lv1,lv2,lv3)|join(' -> ')|safe }}', false);#}
+{#{% for lv4, lv4List in lv3List|groupby(flows[4]) %}#}
+{#updateSankeyData('{{ cht }}', 3, '{{ lv3 }}', '{{ lv4 }}', {{ lv4List|sum(attribute=calc) }}, '{{ (lv0,lv1,lv2,lv3,lv4)|join(' -> ')|safe }}', true);#}
+{#{% endfor	 %}#}
+{#{% endfor	 %}#}
+{% endfor	 %}
+{% endfor	 %}
+sankeyData['{{ cht }}'].nodes = objToArray(sankeyData['{{ cht }}'].nodes);
+{% endwith %}
+
+
+{% with cht='cht4', flows = ['TLMA', 'SRC2', 'TQTYPE'], lv0='TLMA', lv0List = data.rows, calc='TOTAL' %}
+{% for lv1, lv1List in lv0List|groupby(flows[1]) %}
+updateSankeyData('{{ cht }}', 0, '{{ lv0 }}', '{{ lv1 }}', {{ lv1List|sum(attribute=calc) }}, '{{ (lv0,lv1)|join(' -> ')|safe }}', false);
+{% for lv2, lv2List in lv1List|groupby(flows[2]) %}
+updateSankeyData('{{ cht }}', 1, '{{ lv1 }}', '{{ lv2 }}', {{ lv2List|sum(attribute=calc) }}, '{{ (lv0,lv1,lv2)|join(' -> ')|safe }}', true);
+{#{% for lv3, lv3List in lv2List|groupby(flows[3]) %}#}
+{#updateSankeyData('{{ cht }}', 2, '{{ lv2 }}', '{{ lv3 }}', {{ lv3List|sum(attribute=calc) }}, '{{ (lv0,lv1,lv2,lv3)|join(' -> ')|safe }}', false);#}
+{#{% for lv4, lv4List in lv3List|groupby(flows[4]) %}#}
+{#updateSankeyData('{{ cht }}', 3, '{{ lv3 }}', '{{ lv4 }}', {{ lv4List|sum(attribute=calc) }}, '{{ (lv0,lv1,lv2,lv3,lv4)|join(' -> ')|safe }}', true);#}
+{#{% endfor	 %}#}
+{#{% endfor	 %}#}
+{% endfor	 %}
+{% endfor	 %}
+sankeyData['{{ cht }}'].nodes = objToArray(sankeyData['{{ cht }}'].nodes);
+{% endwith %}
+
+{% with cht='cht5', flows = ['TLMA', 'CAMPAIGNCODE', ], lv0='TLMA', lv0List = data.rows, calc='TOTAL' %}
+{% for lv1, lv1List in lv0List|groupby(flows[1]) %}
+updateSankeyData('{{ cht }}', 0, '{{ lv1 }}', '{{ lv0 }}', {{ lv1List|sum(attribute=calc) }}, '{{ (lv1, lv0)|join(' -> ')|safe }}', true);
+{% endfor	 %}
+sankeyData['{{ cht }}'].nodes = objToArray(sankeyData['{{ cht }}'].nodes);
+{% endwith %}
+
+
+let des1Total = [], des2Total=[];
+{% for cate, row in data.rows|groupby('DES1') %}
+	{% if (cate|trim|upper)[:7] != 'GENERAL' %}
+			des1Total.push({
+					name: '{{ cate|trim }}',
+					weight: {{ row|sum(attribute='TOTAL') }}
+			});
+	{% endif %}
+{% endfor %}
+{% for cate, row in data.rows|groupby('DES2') %}
+	{% if (cate|trim|upper)[:7] != 'GENERAL' %}
+			des2Total.push({
+					name: '{{ cate|trim }}',
+					weight: {{ row|sum(attribute='TOTAL') }}
+			});
+	{% endif %}
+{% endfor %}
 
 
 
-console.log(sankeyData);
+
+
+
+{#console.log(sankeyData);#}
 </script>

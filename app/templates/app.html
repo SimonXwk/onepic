@@ -219,21 +219,44 @@ Highcharts.setOptions({
 		thousandsSep: ','
 	},
 	credits: {
+		enabled: true,
 		text: 'ⒸTLMA',
-		href: '#',
-		enabled: true
+		href: '#'
 	},
 	chart:{
-		borderWidth:0,
+		borderWidth:0
 	},
 	exporting: {
   	buttons: {
     	contextButton: {
-      	menuItems: Highcharts.getOptions().exporting.buttons.contextButton.menuItems.filter(item => item !== 'openInCloud')
-    	}
-  }
-}
-	});
+    		symbolFill: '#666666',
+      	menuItems: Highcharts.getOptions().exporting.buttons.contextButton.menuItems.filter(item => item !== 'openInCloud'),
+				theme: {
+					states: {
+						hover: {
+							fill: '#cee3f8'
+						},
+						select: {
+							stroke: '#a1cd3d',
+							fill: '#fffaec'
+						}
+					}
+				}
+    	},
+  	}
+	},
+	navigation: {
+		buttonOptions: {
+			enabled: true,
+			symbolStroke: '#988f8c'
+		},
+		menuItemHoverStyle: {
+			fontWeight: 'normal',
+			background: '#be0027',
+			color: '#fffc00'
+		}
+	}
+});
 function setHighchartColors(colorList) {
 	Highcharts.setOptions({
  		colors: colorList
