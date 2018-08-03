@@ -2,27 +2,30 @@
 
 
 	<div class="input-group mb-3">
-
 		<input type="text" class="form-control" id="ssi-search-text" placeholder="rex order number (eg 18-00003724)" aria-label="Rex Order Number" aria-describedby="ssi-search">
 		<div class="input-group-prepend">
 			<button class="btn btn-outline-info" type="button" id="ssi-search" onclick="searchOrder()">Search Order</button>
 		</div>
 	</div>
 
+	<div id="track-info">
+		<div class="card text-center" id="ssi-order-detail" >
+			<div class="card-header">
+				<span v-if="state === 'wait'"><< headerBefore >> ... &#9749</span>
+			</div>
+			<div class="card-body">
+				<h5 class="card-title">
+					<span v-if="state === 'wait'"><< bodyBefore >></span>
+				</h5>
+				<p class="card-text"></p>
+				<p class="card-text"></p>
+			</div>
+			<div class="card-footer text-muted"></div>
+		</div>
 
-	<div class="card text-center" id="ssi-order-detail">
-		<div class="card-header">tracking rex number ? ... &#9749</div>
-		<div class="card-body">
-			<h5 class="card-title"></h5>
-			<p class="card-text"></p>
-			<p class="card-text"></p>
-		</div>
-		<div class="card-footer text-muted">
-		</div>
-	</div>
+
+
 
 	</div>
 
 </div>
-
-

@@ -5,6 +5,7 @@
 {% endblock %}
 
 {% block js_optional %}
+{{ import('vue') }}
 {% endblock %}
 
 
@@ -52,8 +53,18 @@
 {# Embedded Javascript At the Very End #}
 {% block js_embedded_after %}
 <script>
-document.getElementById('ssi-search').onclick = function (){
-	let phrase = document.getElementById('ssi-search-text').value.trim();
+new Vue({
+  el: '#track-info',
+  data: {
+  	state: 'wait',
+  	headerBefore: 'looking for rex order tracking status ? ',
+		bodyBefore: 'enter one rex order number and click search ... '
+  }
+});
+
+function process(){
+	let searchTextBox = document.getElementById('ssi-search-text');
+	let phrase = searchTextBox.value.trim();
 	let card = document.getElementById("ssi-order-detail");
 
 	let headerTag =  card.children[0],
@@ -68,7 +79,7 @@ document.getElementById('ssi-search').onclick = function (){
 	bodyTag1.innerHTML = null;
 	bodyTag2.innerHTML = null;
 
-	if(phrase !== ''){
+	if(phrase !== '' && phrase.length === 11 ){
 		let url = '/api/ssi/orders/search/' + phrase;
 		bodyTag1.innerHTML = spinner;
 
@@ -118,13 +129,19 @@ document.getElementById('ssi-search').onclick = function (){
 
 			}
 		});
-	} else {
+	} else if(phrase !== '' && phrase.length !== 11){
+		headerTag.innerHTML = '<strong>' + phrase + '</strong> <span class="text-danger">does not look like a Rex Order ID</span>';
+		bodyTag1.innerHTML = '<h1><span class="text-danger">&#9888;</span></h1>';
+		footerTag.innerHTML = Date();
+	} else if(phrase === '') {
 		headerTag.innerHTML = '<span class="text-danger"><strong>Do Not Leave Order ID Empty</strong></span>';
 		bodyTag1.innerHTML = '<h1><span class="text-danger">&#10060;</span></h1>';
 		footerTag.innerHTML = Date();
 	}
 }
 
+document.getElementById('ssi-search').onclick = process;
+document.getElementById('ssi-search-text').addEventListener("keyup",  process);
 
 </script>
 {% endblock %}

@@ -43,6 +43,7 @@ gulp.task('vendor-general', function() {
       'node_modules/echarts/dist/echarts-en.min.js',
       'node_modules/sketch-js/js/sketch.min.js',
       'node_modules/chart.js/dist/Chart.bundle.min.js',
+      'node_modules/vue/dist/vue.min.js',
       'node_modules/font-awesome/css/font-awesome.min.css',
     ])
     .pipe(plumber())

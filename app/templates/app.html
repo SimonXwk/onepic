@@ -157,6 +157,11 @@ function currency(val) {
 {# -------------------- sketch.js -------------------- #}
 	{% elif vendor == 'sketch' %}
 <script src="{{ url_for('vendor', filename='sketch.min.js') }}"></script>
+
+{# -------------------- vue.js -------------------- #}
+	{% elif vendor == 'vue' %}
+<script src="{{ url_for('vendor', filename='vue.min.js') }}"></script>
+<script>Vue.options.delimiters = ['<<', '>>'];</script>
 	{% else %}
 		{# Do Nothing	#}
 	{% endif %}
