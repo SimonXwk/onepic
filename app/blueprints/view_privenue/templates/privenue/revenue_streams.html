@@ -70,7 +70,6 @@ function drawSankey(chart){
 		subtitle: {
         text: chart.subtitle
     },
-
 		plotOptions: {
 			series: {
 			},
@@ -87,7 +86,7 @@ function drawSankey(chart){
       	},
 				tooltip: {
 		 			headerFormat: '<span style="color:{point.color}" class="highcharts-header">{series.name}</span><br/>',
-					nodeFormat: '<b>{point.name}</b> -> <span style="font-size:1em">${point.sum:,.2f}</span>',
+					nodeFormat: '<b>{point.name}</b> : <span style="font-size:1em">${point.sum:,.2f}</span>',
 					pointFormat: '{point.path}<br><b><span style="">${point.weight:,.2f}</span></b>',
 				},
       	dataLabels:{

@@ -1,3 +1,4 @@
+from flask import request
 from app.helper import templatified
 from app.database.odbc import ThankqODBC as Tq
 from app.database.tlma import TLMA
@@ -11,6 +12,19 @@ def cure_one():
 @templatified('general_new_donor')
 def general_new():
 	return dict(title='New DonorJourney')
+
+
+@templatified('cureone_acquisition')
+def cure_one_acquisition():
+	arg_name = 'CampaignCode'
+	campaign_code = '19AC.Cure One Acquisition'
+	campaign_code = '19DV.August Appeal'
+
+	# if not request.view_args[arg_name]:
+	# 	campaign_code = request.view_args[arg_name]
+
+	return dict(title='Cure One Acquisition')
+
 
 
 @templatified('merch_new_customer')

@@ -1,0 +1,150 @@
+{% extends framework_template %}
+
+{# Addiditonal Libraries #}
+{% block css_optional %}
+{% endblock %}
+
+{% block js_optional %}
+{{ Highchart([],['variable-pie']) }}
+{% endblock %}
+
+
+{# My Own js and css #}
+{% block css_custom %}
+<style type="text/css">
+.card{
+	margin: 2px;
+	animation: winanime 0.5s;
+	{#-webkit-backface-visibility:visible;#}
+}
+
+.card:hover {
+	box-shadow: 0 12px 16px 0 rgba(0,0,0,.24),0 17px 50px 0 rgba(0,0,0,.19);
+}
+
+.card .card-footer{
+	border: 0;
+}
+
+@keyframes winanime {
+	0%{ opacity:0; transform:scale3d(.3,.3,.3) }
+	50%{ opacity:1 }
+}
+
+#pills-tab .nav-link.active{
+	background-color: #fff41f;
+ 	font-weight: bold;
+	transition-duration: 0.5s;
+	box-shadow: 0 12px 16px 0 rgba(0,0,0,.24),0 17px 50px 0 rgba(0,0,0,.19);
+}
+
+#pills-tab .nav-link{
+	 border: 1px solid #c3c3c3;
+}
+
+</style>
+{% endblock %}
+
+{% block js_custom %}
+{% endblock %}
+
+
+{# Embedded CSS #}
+{% block css_embedded %}
+{% endblock %}
+
+
+{# Embedded Javascript After Libraries & Before Custom Javascript #}
+{% block js_embedded_before %}
+<script>
+</script>
+{% endblock %}
+
+
+{# Embedded Javascript At the Very End #}
+{% block js_embedded_after %}
+<script>
+
+Highcharts.chart('chart1', {
+	chart: {
+		type: 'column'
+	},
+	title: {
+		text: ' Monthly Total : ' + campaigncode
+	},
+	subtitle: {
+		text: stamp
+	},
+	xAxis: {
+		categories: $FY_MONTH_LIST_NAME,
+		crosshair: true
+	},
+	yAxis: {
+		min: 0,
+		title: {
+			text: 'Total Revenue (AUD)'
+		}
+	},
+	tooltip: {
+		headerFormat: '<span style="font-size:1rem">{point.key}</span><table>',
+		pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name} :</td>' +
+			'<td style="padding:0"> $ <b>{point.y:,.2f} / <span style="color:blue">{point.pct:.1f} %</span> of FY Total ${point.fy:,.2f}</b></td></tr>',
+		footerFormat: '</table>',
+		shared: true,
+		useHTML: true
+	},
+	plotOptions: {
+		column: {
+			pointPadding: 0.2,
+			borderWidth: 0
+		}
+	},
+	series: dataFYTotals
+});
+
+
+Highcharts.chart('chart2', {
+	chart: {
+		type: 'variablepie'
+	},
+	title: {
+		text: 'Sourcecode 1 Breakdown (Area: Value, Radius: No.Contacts) : ' + campaigncode
+	},
+	subtitle: {
+			text: stamp
+	},
+	tooltip: {
+		headerFormat: '',
+		pointFormat: '<span style="color:{point.color}">\u25CF</span><b> {point.name}</b><br/>' +
+				'Total Revenue: $<b>{point.y}</b>  (<span style="color:blue">{point.percentage:.1f}%</span>)<br/>' +
+				'No.Donors: <b>{point.donors:,0f}</b>  (<span style="color:blue">{point.donorsPct:.1f}%</span>)<br/>'
+	},
+	plotOptions: {
+		variablepie: {
+			allowPointSelect: true,
+			cursor: 'pointer',
+			innerSize: 50,
+			depth: 35,
+			dataLabels: {
+				enabled: true,
+				distance: 10,
+				color: 'black',
+				format: '{point.name}<span style="font-size:0.55rem; color:{point.color}">: {point.percentage:.1f}%</span>'
+			},
+			showInLegend: false,
+		}
+	},
+	series: [{
+		minPointSize: 10,
+		innerSize: '20%',
+		zMin: 0,
+		name: 'sourcecode1',
+		data: src1Totals
+	}]
+});
+
+
+
+</script>
+{% endblock %}
+

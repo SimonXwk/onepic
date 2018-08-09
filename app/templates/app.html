@@ -2,8 +2,8 @@
 
 {% block js_embedded_header %}
 <script type=text/javascript>
-
-let $FY_MONTH_LIST = {{ fymths|map("mthname", abbr=True)|list|safe }};
+let $FY_MONTH_LIST_NUMBER = {{ fymths }};
+let $FY_MONTH_LIST_NAME = {{ fymths|map("mthname", abbr=True)|list|safe }};
 // Build endpoint String
 function endpoint (url, parameter) {
 	return $SCRIPT_ROOT + url + (parameter ? parameter : '')

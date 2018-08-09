@@ -5,7 +5,7 @@
 	{{ PAGINATION('fy', thisfy, 'FY', page_dispaly) }}
 
 	<h3 class="text-center">TLMA Revenue Streams for FY{{ thisfy }} <span class="text-info"> (Total {{ ((data.rows|groupby('TLMA'))[0][1]) |sum(attribute='TOTAL')|currency }} <small>as at {{ data.timestamp|dtAU }})</small></span></h3>
-	<p class="text-center"><span class=" text-muted"><em>This result will be cached for {{ '{:,}'.format(data.cached_timeout) }} seconds</em></span></pcla>
+	<p class="text-center"><span class=" text-muted"><em>This result will be cached for {{ '{:,}'.format(data.cached_timeout) }} seconds</em></span></p>
 
 	<!-- ROW -->
 	<div class="alert alert-info text-center" role="alert">
@@ -208,7 +208,7 @@ function objToArray(obj){
 	 })
 }
 
-{% with cht='cht1', flows = ['TLMA', 'SOLICIT','PLATFORM', 'TQTYPE', 'ACCOUNT'], lv0='TLMA' , lv0List = data.rows, calc='TOTAL' %}
+{% with cht='cht1', flows = ['TLMA', 'SOLICIT','PLATFORM', 'TQTYPE', 'ACCOUNT', 'CLASS'], lv0='TLMA' , lv0List = data.rows, calc='TOTAL' %}
 {% for lv1, lv1List in lv0List|groupby(flows[1]) %}
 updateSankeyData('{{ cht }}', 0, '{{ lv0 }}', '{{ lv1 }}', {{ lv1List|sum(attribute=calc) }}, '{{ (lv0,lv1)|join(' -> ')|safe }}', false);
 {% for lv2, lv2List in lv1List|groupby(flows[2]) %}
@@ -217,6 +217,9 @@ updateSankeyData('{{ cht }}', 1, '{{ lv1 }}', '{{ lv2 }}', {{ lv2List|sum(attrib
 updateSankeyData('{{ cht }}', 2, '{{ lv2 }}', '{{ lv3 }}', {{ lv3List|sum(attribute=calc) }}, '{{ (lv0,lv1,lv2,lv3)|join(' -> ')|safe }}', false);
 {% for lv4, lv4List in lv3List|groupby(flows[4]) %}
 updateSankeyData('{{ cht }}', 3, '{{ lv3 }}', '{{ lv4 }}', {{ lv4List|sum(attribute=calc) }}, '{{ (lv0,lv1,lv2,lv3,lv4)|join(' -> ')|safe }}', true);
+{% for lv5, lv5List in lv4List|groupby(flows[5]) %}
+updateSankeyData('{{ cht }}', 4, '{{ lv4 }}', '{{ lv5 }}', {{ lv5List|sum(attribute=calc) }}, '{{ (lv0,lv1,lv2,lv3,lv4,lv5)|join(' -> ')|safe }}', true);
+{% endfor	 %}
 {% endfor	 %}
 {% endfor	 %}
 {% endfor	 %}

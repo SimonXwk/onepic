@@ -1,0 +1,278 @@
+<div class="container-fluid">
+{% if thiscampaign %}
+	<h3>
+		<strong>&#9889 Campaign Code : <span class="text-primary">{{ thiscampaign }}</span></strong>
+	 	<span class="text-muted"><small>, or</small></span>
+		<div class="btn-group">
+			<button type="button" class="btn btn-outline-info btn-sm dropdown-toggle" id="dropdownMenuOffset"
+							data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-offset="0,10">
+				checkout another campaign code in FY{{ thisfy }}
+			</button>
+			<div class="dropdown-menu" aria-labelledby="dropdownMenuOffset">
+				<h6 class="dropdown-header">Select a campaign code</h6>
+				{% for campcode in campaigncodes.rows %}
+				<a class="dropdown-item {% if thiscampaign|trim == campcode[0]|trim %}active{% endif %}" href="{{ url_for(request.endpoint, campaign_code=campcode[0]|string) }}">{{ campcode[0] }}</a>
+				{% endfor %}
+			</div>
+
+			<div class="dropdown-menu">
+				<h6 class="dropdown-header">Select a financial year</h6>
+				<a class="dropdown-item" href="#">Action</a>
+				<a class="dropdown-item" href="#">Another action</a>
+				<a class="dropdown-item" href="#">Something else here</a>
+			</div>
+		</div>
+
+		<span class="text-muted"><small>, or reset <a class="badge badge-info" href="{{ url_for(request.endpoint) }}">Focal FY</a></small></span>
+	</h3>
+	<p class=""><em><span class=" text-muted">Data captured on {{ data.timestamp|dtAU }}, and this result will be cached for {{ '{:,}'.format(data.cached_timeout) }} seconds</span></em></p>
+
+
+	{% set total = data.rows|sum(attribute='PAYMENTAMOUNT')  %}
+	{% set donors = data.rows|groupby(attribute='SERIALNUMBER')|length  %}
+	{% set trxs = data.rows|map(attribute='TRXID')|list|max  %}
+	{% set pledgeids = data.rows|map(attribute='PLEDGEID')|list|unique %}
+	{% set pledges = data.rows|map(attribute='PLEDGEID')|list|unique|list|length - 1 if None in data.rows|map(attribute='PLEDGEID')|list else data.rows|map(attribute='PLEDGEID')|list|unique|list|length %}
+
+	<!-- ROW -->
+	<div class="row">
+		<div class="col-md-3">
+			<div class="callout callout-primary">
+
+				<h4>&#9970 Total Revenue:  {{ total|currency }}</h4>
+			</div>
+		</div>
+
+		<div class="col-md-3">
+			<div class="callout callout-danger">
+				<h4>&#10084 No.Donors: {{ donors|number }}</h4>
+			</div>
+		</div>
+
+		<div class="col-md-3">
+			<div class="callout callout-info">
+				<h4>&#10160 No.Transactions: {{ trxs|number }}</h4>
+			</div>
+		</div>
+
+		<div class="col-md-3">
+			<div class="callout callout-warning">
+				<h4>&#9995 No.Pledges: {{ pledges|number }}</h4>
+			</div>
+		</div>
+	</div> <!-- END OF ROW -->
+
+
+	<!-- ROW -->
+	<div class="row">
+		<div class="col-md-3">
+			<div class="callout callout-success">
+				{% set first_date = data.rows|min(attribute='DATEOFPAYMENT')|attr('DATEOFPAYMENT') %}
+				<h6>&#9969 First Date:  {{ first_date|dAU }}, FY{{ first_date|FY }}</h6>
+			</div>
+		</div>
+
+		<div class="col-md-3">
+			<div class="callout callout-success">
+				<h6>&#9973 Value/Contact : {{ (total/donors)|currency }}</h6>
+			</div>
+		</div>
+
+		<div class="col-md-3">
+			<div class="callout callout-success">
+				<h64>&#9973 Value/Transaction: {{ (total/trxs)|currency }}</h64>
+			</div>
+		</div>
+
+		<div class="col-md-3">
+			<div class="callout callout-success">
+				{% set last_date = data.rows|max(attribute='DATEOFPAYMENT')|attr('DATEOFPAYMENT') %}
+				<h6>&#9969 Last Date: {{ last_date|dAU }}, FY{{ last_date|FY }}</h6>
+			</div>
+		</div>
+	</div> <!-- END OF ROW -->
+
+
+
+	<!-- ROW -->
+	<div class="row">
+		<div class="col-md-6">
+			<div class="chart" id="chart1" ></div>
+		</div>
+
+		<div class="col-md-6">
+			<div class="chart" id="chart2" ></div>
+		</div>
+	</div> <!-- END OF ROW -->
+
+
+
+{#	{{ prototype('data_table') }}#}
+{% else %}
+	{% macro page_dispaly(pagination_item) %}FY{{ (pagination_item|string)[-2:] }}{% endmacro %}
+	{{ PAGINATION('fy', thisfy, 'FY', page_dispaly) }}
+
+	<p class="text-center lead"><strong>Listing Campaigns generated revenue in FY{{ thisfy }}</strong> :</p>
+
+
+	<ul class="nav nav-pills nav-fill" id="pills-tab" role="tablist">
+		<li class="nav-item">
+			<a class="nav-link active" id="showall-tab" data-toggle="pill" href="#showall" role="tab" aria-controls="showall" aria-selected="true">
+				<span class="text-dark">All Campaign Code</span>
+			</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" id="Ongoing-tab" data-toggle="pill" href="#Ongoing" role="tab" aria-controls="Ongoing" aria-selected="false">
+				<span class="text-danger">Ongoing Campaign Code</span>
+			</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" id="CFY-tab" data-toggle="pill" href="#CFY" role="tab" aria-controls="CFY" aria-selected="false">
+				<span class="text-primary">FY{{ thisfy }} Campaign Code</span>
+			</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" id="PreviousFY-tab" data-toggle="pill" href="#PreviousFY" role="tab" aria-controls="PreviousFY" aria-selected="false">
+				<span class="text-secondary">Non FY{{ thisfy }} Campaign Code</span>
+			</a>
+		</li>
+	</ul>
+
+	<div class="tab-content" id="pills-tabContent">
+		<div class="tab-pane fade show active" id="showall" role="tabpanel" aria-labelledby="showall-tab">
+			<div class="card-group">
+			{% for campcode in campaigncodes.rows %}
+				<div class="card bg-{% if campcode[0][:4] == '____' %}danger
+					{% elif campcode[0][:2]|int == (thisfy|string)[2:]|int or campcode[0][-2:]|int == (thisfy|string)[2:]|int %}primary
+					{% else %}secondary{% endif %}">
+					<a class="text-light" href="{{ url_for(request.endpoint, campaign_code=campcode[0]|string, fy=thisfy) }}">
+						<div class="card-body">
+							<h6 class="card-title"></h6>
+							<p class="card-text">{{ campcode[0] }}</p>
+						</div>
+					</a>
+					<div class="card-footer"></div>
+				</div>
+				{% if (loop.index)%6 ==0 %}</div><div class="card-group">{% endif %}
+			{% endfor %}
+			</div>
+		</div>
+
+
+		<div class="tab-pane fade" id="Ongoing" role="tabpanel" aria-labelledby="Ongoing-tab">
+			<div class="card-group">
+			{% for campcode in campaigncodes.rows %}
+			{% if campcode[0][:4] == '____' %}
+				<div class="card bg-danger">
+					<a class="text-light" href="{{ url_for(request.endpoint, campaign_code=campcode[0]|string, fy=thisfy) }}">
+						<div class="card-body">
+							<h6 class="card-title"></h6>
+							<p class="card-text">{{ campcode[0] }}</p>
+						</div>
+					</a>
+					<div class="card-footer"></div>
+				</div>
+				{% if (loop.index)%6 ==0 %}</div><div class="card-group">{% endif %}
+			{% endif %}
+			{% endfor %}
+			</div>
+		</div>
+
+		<div class="tab-pane fade" id="CFY" role="tabpanel" aria-labelledby="CFY-tab">
+			<div class="card-group">
+			{% for campcode in campaigncodes.rows %}
+			{% if not campcode[0][:4] == '____' and (campcode[0][:2]|int == (thisfy|string)[2:]|int or campcode[0][-2:]|int == (thisfy|string)[2:]|int) %}
+				<div class="card bg-primary">
+					<a class="text-light" href="{{ url_for(request.endpoint, campaign_code=campcode[0]|string, fy=thisfy) }}">
+						<div class="card-body">
+							<h6 class="card-title"></h6>
+							<p class="card-text">{{ campcode[0] }}</p>
+						</div>
+					</a>
+					<div class="card-footer"></div>
+				</div>
+				{% if (loop.index)%6 ==0 %}</div><div class="card-group">{% endif %}
+			{% endif %}
+			{% endfor %}
+			</div>
+		</div>
+
+		<div class="tab-pane fade" id="PreviousFY" role="tabpanel" aria-labelledby="PreviousFY-tab">
+			<div class="card-group">
+			{% for campcode in campaigncodes.rows %}
+			{% if not campcode[0][:4] == '____' and not (campcode[0][:2]|int == (thisfy|string)[2:]|int or campcode[0][-2:]|int == (thisfy|string)[2:]|int) %}
+				<div class="card bg-secondary">
+					<a class="text-light" href="{{ url_for(request.endpoint, campaign_code=campcode[0]|string, fy=thisfy) }}">
+						<div class="card-body">
+							<h6 class="card-title"></h6>
+							<p class="card-text">{{ campcode[0] }}</p>
+						</div>
+					</a>
+					<div class="card-footer"></div>
+				</div>
+				{% if (loop.index)%6 ==0 %}</div><div class="card-group">{% endif %}
+			{% endif %}
+			{% endfor %}
+			</div>
+		</div>
+
+	</div> <!-- End of tab -->
+{% endif %}
+</div>
+
+
+<script>
+let campaigncode = '{{ thiscampaign }}';
+let stamp = 'Data captured :' + '{{ data.timestamp|dtAU }}';
+let fyMths = {{ fymths }};
+let dataFYTotals = [], src1Totals = [];
+let data, temp, i;
+
+
+{% for fy, fyList in data.rows|groupby('FY') %}
+	temp = {};
+	data = [];
+	{% set fyTotal = fyList|sum(attribute='PAYMENTAMOUNT') %}
+	{% for mth, mthList in fyList|groupby('DATEOFPAYMENT.month') %}
+			temp['{{ mth }}'] = {{ mthList|sum(attribute='PAYMENTAMOUNT') }};
+	{% endfor %}
+	for(i = 0; i<12; i++ ){
+		if (temp[fyMths[i]]){
+			data.push({
+					y:temp[fyMths[i]],
+					key:fyMths[i],
+					fy:{{ fyTotal }},
+					pct: (temp[fyMths[i]]/{{ fyTotal }}) * 100
+			});
+		}else{
+			data.push({
+					y:null,
+					key:fyMths[i],
+					fy:{{ fyTotal }},
+					pct:0
+			});
+		}
+	}
+	dataFYTotals.push({
+			name:'FY{{ fy }}',
+			data: data,
+			fytotal: {{ fyTotal }}
+	});
+{% endfor %}
+
+{% set donors = data.rows|groupby(attribute='SERIALNUMBER')|length  %}
+{% for src1, src1List in data.rows|groupby('SOURCECODE') %}
+	{% set src1Total = src1List|sum(attribute='PAYMENTAMOUNT') %}
+	{% set src1TotalDonors = src1List|groupby(attribute='SERIALNUMBER')|length  %}
+	src1Totals.push({
+			name: '{{ src1 }}',
+			y: {{ src1Total }},
+			z: {{ (src1TotalDonors/donors) * 300 + 50 }},
+			donors: {{ src1TotalDonors }},
+			donorsPct:{{ (src1TotalDonors/donors) * 100 }}
+	});
+{% endfor %}
+
+
+console.log(dataFYTotals);
+</script>

@@ -53,3 +53,36 @@ def revenue_streams():
 	# data = Tq.query(['PRIVENUE_REVENUE_STREAMS__BASE', 'PRIVENUE_REVENUE_STREAMS_UNION'], *params, cached_timeout=timeout)
 	data = Tq.query('PRIVENUE_REVENUE_STREAMS__BASE', *params, cached_timeout=timeout)
 	return dict(title='Revenue Streams', data=data, thisfy=fy, fys=date_of_payments_fy())
+
+
+@templatified('single_campaign')
+def single_campaign():
+	# Default Values
+	timeout = 600
+	fy = TLMA.cfy
+
+	# Update fy if found argument from URL query string called 'fy'
+	arg = request.args.get('fy')
+	if arg and len(arg.strip()) == 4:
+		fy = int(arg)
+		# If the FY in URL is not CFY, then cache it for a longer period of time
+		if fy != TLMA.cfy:
+			timeout = 2000
+
+	# Prepare for SQL parameters
+	d1, d2 = TLMA.fy_range(fy)
+	params = Tq.format_date((d1, d2))
+	campaign_codes = Tq.query('LIST_FY_CAMPAIGNCODES', *params, cached_timeout=timeout)
+
+	# Default Values
+	campaign_code = None
+	data = None
+	timeout = 200
+	# Update campaign_code if found argument from URL query string called 'campaign_code'
+	arg = request.args.get('campaign_code')
+	if arg and len(arg.strip()) <= 50:
+		campaign_code = arg.strip()
+		update = [('CAMPAIGN_CODE', '\'' + campaign_code + '\'')]
+		data = Tq.query('PRIVENUE_SINGLE_CAMPAIGN', cached_timeout=timeout, updates=update)
+
+	return dict(title='Campaign Overview', data=data, thiscampaign=campaign_code, thisfy=fy, fys=date_of_payments_fy(), campaigncodes=campaign_codes)

@@ -44,6 +44,7 @@
 				<div class="dropdown-menu" aria-labelledby="{{ blueprint }}">
 					{{ NavLink(blueprint, 'index', 'Overview') }}
 					{{ NavLink(blueprint, 'revenue_streams', 'Revenue Streams') }}
+					{{ NavLink(blueprint, 'single_campaign', 'Single Campaign Dashboard') }}
 					{{ NavLink(blueprint, 'sourcecode1', 'Source Codes Created (June-June)') }}
 					{{ NavLink(blueprint, 'pending', 'Pending Batches') }}
 				</div>
@@ -73,7 +74,8 @@
 			<li class="nav-item dropdown {{ activeBlueprint(blueprint) }}">
 				<a class="nav-link dropdown-toggle" href="#" id="{{ blueprint }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ blueprint|title }}</a>
 				<div class="dropdown-menu" aria-labelledby="{{ blueprint }}">
-					{{ NavLink(blueprint, 'cure_one', 'Cure One') }}
+					{{ NavLink(blueprint, 'cure_one', 'Cure One Stewardship') }}
+					{{ NavLink(blueprint, 'cure_one_acquisition', 'Cure One Acquisition') }}
 					{{ NavLink(blueprint, 'general_new', 'General New Donor') }}
 					{{ NavLink(blueprint, 'merchandise_new', 'New Merchandise Customer') }}
 				</div>
