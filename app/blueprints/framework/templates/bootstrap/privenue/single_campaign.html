@@ -108,9 +108,10 @@
 
 
 {#	{{ prototype('data_table') }}#}
-{% else %}
+
+{% else %} {# if no campaign code was specified, show the FY list and  #}
 	{% macro page_dispaly(pagination_item) %}FY{{ (pagination_item|string)[-2:] }}{% endmacro %}
-	{{ PAGINATION('fy', thisfy, 'FY', page_dispaly) }}
+	{{ PAGINATION( 'fy', thisfy, 'FY', page_dispaly) }}
 
 	<p class="text-center lead"><strong>Listing Campaigns generated revenue in FY{{ thisfy }}</strong> :</p>
 

@@ -90,11 +90,21 @@
 				</div>
 			</li>
 
+			<!-- Budget -->
+			{% set blueprint = 'budget' %}
+			<li class="nav-item dropdown {{ activeBlueprint(blueprint) }}">
+				<a class="nav-link dropdown-toggle" href="#" id="{{ blueprint }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ blueprint|title }}</a>
+				<div class="dropdown-menu" aria-labelledby="{{ blueprint }}">
+					{{ NavLink(blueprint, 'scoping_fy20', 'FY20 Budget Scoping') }}
+				</div>
+			</li>
+
 			<!-- API -->
 			{% set blueprint = 'api' %}
 			<li class="nav-item {{ activeBlueprint(blueprint) }}">
 				{{ NavLink(blueprint, 'index', 'API', 'nav-link') }}
 			</li>
+
 		</ul>
 
 		{% if current_user.is_authenticated %}
