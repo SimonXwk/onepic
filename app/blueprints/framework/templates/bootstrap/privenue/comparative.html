@@ -1,0 +1,182 @@
+<div class="container-fluid">
+	{% set total = data.rows|sum(attribute='PAYMENTAMOUNT')  %}
+	{% set donors = data.rows|groupby(attribute='SERIALNUMBER')|length  %}
+	{% set trxs = data.rows|map(attribute='TRXID')|list|max  %}
+	{% set pledgeids = data.rows|map(attribute='PLEDGEID')|list|unique %}
+{#	{% set pledges = data.rows|map(attribute='PLEDGEID')|list|unique|list|length - 1 if None in data.rows|map(attribute='PLEDGEID')|list else data.rows|map(attribute='PLEDGEID')|list|unique|list|length %}#}
+	{% set pledges = count_unique(data.rows, 'PLEDGEID')|int %}
+
+
+	<h5>FY{{ thisfy }}</h5>
+	<p class="lead">
+		Total Revenue : {{ total|currency }}
+	</p>
+	<p class="lead">
+		Number of Transactions : {{ trxs|number }}
+	</p>
+	<p class="lead">
+		Number of Unique Donors : {{ donors|number }}
+	</p>
+	<p class="lead">
+		Number of Unique Pledges : {{ pledges|number }}
+	</p>
+
+	<!-- ROW -->
+	<div class="row">
+		<div class="col-md-8">
+			<div class="chart" id="chart1" ></div>
+		</div>
+
+		<div class="col-md-4">
+			<div class="chart" id="chart2" ></div>
+		</div>
+	</div> <!-- END OF ROW -->
+
+	<!-- ROW -->
+	<div class="row">
+		<div class="col-md-8">
+			<div class="chart" id="chart3" ></div>
+		</div>
+
+		<div class="col-md-4">
+			<div class="chart" id="chart4" ></div>
+		</div>
+	</div> <!-- END OF ROW -->
+
+
+
+
+{#	{{ prototype('DATA_TABLE') }}#}
+</div>
+
+
+<script>
+let stamp = 'Data captured :' + '{{ data.timestamp|dtAU }}';
+let stream = {
+	predefine:{
+		Fundraising: {
+			color: '#eb5424',
+			pointPlacement: 0,
+			budgetColor: '#ffcc2f',
+			budget: []
+		},
+		Merchandise: {
+			color: '#832561',
+			pointPlacement: -0.28,
+			budgetColor: '#a696c8',
+			budget: []
+		},
+		Bequest: {
+			color: '#1769ff',
+			pointPlacement: 0.28,
+			budgetColor: '#7acef4',
+			budget: []
+		},
+
+	},
+	monthlyData: [],
+	monthlyDataCumsum: [],
+	streamData:[],
+};
+
+{% if thisfy == 2019 %}
+stream.predefine.Fundraising.budget = [69885.61,105411.72,116839.60,152246.05,226588.11,217862.86,127638.68,174329.95,148603.96,221951.01,379793.29,694835.78];
+stream.predefine.Merchandise.budget = [110794.82,50818.71,38721.17,213347.72,192391.70,117054.18,46035.11,52250.79,64322.06,36748.07,27754.46,32886.21];
+stream.predefine.Bequest.budget = [10000,10000,10000,10000,10000,50000,50000,50000,50000,50000,100000,150000];
+{% elif thisfy == 2018 %}
+stream.predefine.Fundraising.budget = [];
+stream.predefine.Merchandise.budget = [];
+stream.predefine.Bequest.budget = [];
+{% endif %}
+
+
+let temp, data;
+{% for stream, streamList in data.rows|groupby('STREAM')|reverse %}
+data = [];
+temp ={};
+	{% for mth, mthList in streamList|groupby('FYMTH') %}
+	temp[{{ mth }}] = {{ mthList|sum(attribute='PAYMENTAMOUNT') }};
+	{% endfor %}
+	for(let i=0; i<12; i++){
+		if((i+1) in temp){
+			data.push(temp[i+1]);
+		}else{
+			data.push(null);
+		}
+	}
+
+
+
+
+// Add Budget First As the Background
+stream.monthlyData.push({
+	name: '{{ stream }}' + ' Budget',
+	color:  stream.predefine['{{ stream }}'].budgetColor,
+	tooltip: {
+		valuePrefix: '$',
+		valueSuffix: ' AUD'
+	},
+ 	pointPadding: 0.3,
+	pointPlacement: stream.predefine['{{ stream }}'].pointPlacement,
+	data: stream.predefine['{{ stream }}'].budget
+});
+// Add Actual
+stream.monthlyData.push({
+	name: '{{ stream }}',
+	color: stream.predefine['{{ stream }}'].color,
+	tooltip: {
+		valuePrefix: '$',
+		valueSuffix: ' AUD'
+	},
+ 	pointPadding: 0.4,
+	pointPlacement: stream.predefine['{{ stream }}'].pointPlacement,
+	data: data
+});
+
+// Add Budget First As the Background
+stream.monthlyDataCumsum.push({
+	name: '{{ stream }}' + ' Budget',
+	color: stream.predefine['{{ stream }}'].budgetColor,
+	tooltip: {
+		valuePrefix: '$',
+		valueSuffix: ' AUD'
+	},
+ 	pointPadding: 0.3,
+	pointPlacement: stream.predefine['{{ stream }}'].pointPlacement,
+	data: cumsum(stream.predefine['{{ stream }}'].budget)
+});
+// Add Actual
+stream.monthlyDataCumsum.push({
+	name: '{{ stream }}',
+	color: stream.predefine['{{ stream }}'].color,
+	tooltip: {
+		valuePrefix: '$',
+		valueSuffix: ' AUD'
+	},
+ 	pointPadding: 0.4,
+	pointPlacement: stream.predefine['{{ stream }}'].pointPlacement,
+	data: cumsum(data)
+});
+
+
+{% set stramTotal = streamList|sum(attribute='PAYMENTAMOUNT') %}
+{% set stramTrxs = count_unique(streamList, 'TRXID', [0]) %}
+console.log({{ stramTrxs }}, 'total: ', {{ trxs }});
+stream.streamData.push({
+	name: '{{ stream }}',
+	color: stream.predefine['{{ stream }}'].color,
+	y: {{ stramTotal }},
+	z: {{ (stramTotal-50/stramTotal) * 300 + 50 }},
+
+});
+
+{% endfor %}
+
+
+
+
+
+
+
+console.log(stream);
+</script>

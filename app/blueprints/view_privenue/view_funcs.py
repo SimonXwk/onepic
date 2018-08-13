@@ -18,6 +18,16 @@ def homepage():
 	return dict(title='Private Revenue Overview', date_progress=progress*100)
 
 
+@templatified('comparative')
+def comparative():
+	# Prepare for SQL parameters
+	fy = TLMA.cfy - 0
+	d1, d2 = TLMA.fy_range(fy)
+	params = Tq.format_date((d1, d2))
+	data = Tq.query('PRIVENUE__BASE', *params, cached_timeout=30)
+	return dict(title='Comparative View', thisfy=fy, data=data)
+
+
 @templatified('pending')
 def pending():
 	from app.blueprints.api.data_privenue import pending_split, approved_split

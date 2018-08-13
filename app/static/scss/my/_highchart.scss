@@ -1,0 +1,77 @@
+.highcharts-table-caption{
+  color: #666;
+  font-style: italic;
+  font-weight: normal;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.highcharts-data-table{
+  border-collapse: collapse;
+
+  /*
+  Table Head
+  */
+  thead{
+    th {
+      background-color: #f1d18a;
+      color: #1e1548;
+      border: 1px solid #000000;
+      text-align: right;
+      font-weight: bold;
+    }
+  }
+
+  /*
+  Table Body
+  */
+  tbody {
+    background-color: #ffffff;
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    // Sequence Matters : this should be after tr:nth-child(even)
+    tr:hover {
+      background-color: #dbeede;
+    }
+
+    tr{
+
+      // Sequence Matters : this should be after tr:nth-child(even)
+      :hover {
+        background-color: #3dee7b;
+        color: #3024fe;
+      }
+
+      th {
+        text-align: center;
+        border: 1px solid #000000;
+        font-weight: bold;
+      }
+
+      td {
+        text-align: right;
+        border: 1px solid #685c53;
+        font-weight: normal;
+      }
+
+      .number {
+        color: #1e1548;
+      }
+
+      .text {
+        color: #000000;
+      }
+
+    }
+
+
+
+  }
+}
+
+
+
+
+

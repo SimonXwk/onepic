@@ -109,6 +109,7 @@
 
 {#	{{ prototype('data_table') }}#}
 
+
 {% else %} {# if no campaign code was specified, show the FY list and  #}
 	{% macro page_dispaly(pagination_item) %}FY{{ (pagination_item|string)[-2:] }}{% endmacro %}
 	{{ PAGINATION( 'fy', thisfy, 'FY', page_dispaly) }}

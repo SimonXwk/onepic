@@ -1,0 +1,156 @@
+{% extends framework_template %}
+
+{# Addiditonal Libraries #}
+{% block css_optional %}
+{% endblock %}
+
+{% block js_optional %}
+{{ Highchart([], ['variable-pie']) }}
+{% endblock %}
+
+
+{# My Own js and css #}
+{% block css_custom %}
+{% endblock %}
+
+{% block js_custom %}
+{% endblock %}
+
+
+{# Embedded CSS #}
+{% block css_embedded %}
+{% endblock %}
+
+
+{# Embedded Javascript After Libraries & Before Custom Javascript #}
+{% block js_embedded_before %}
+{% endblock %}
+
+
+{# Embedded Javascript At the Very End #}
+{% block js_embedded_after %}
+<script>
+Highcharts.chart('chart1', {
+	chart: {
+		type: 'column'
+	},
+	title: {
+		text: '3 Major Revenue Streams Month on Month Total'
+	},
+	subtitle: {
+		text: stamp
+	},
+	legend: {
+		shadow: false
+	},
+	tooltip: {
+		shared: false
+	},
+	plotOptions: {
+		column: {
+			grouping: false,
+			shadow: false,
+			borderWidth: 0
+		}
+	},
+	yAxis:{
+		title: {
+			text: 'Total Monthly Revenue (AUD)'
+		}
+	},
+	xAxis: {
+		categories: $FY_MONTH_LIST_NAME
+	},
+	credits: {
+		enabled: false
+	},
+	series: stream.monthlyData
+});
+
+
+
+Highcharts.chart('chart3', {
+	chart: {
+		type: 'column'
+	},
+	title: {
+		text: '3 Major Revenue Streams Cumulative Total'
+	},
+	subtitle: {
+		text: stamp
+	},
+	legend: {
+		shadow: false
+	},
+	tooltip: {
+		shared: false
+	},
+	plotOptions: {
+		column: {
+			grouping: false,
+			shadow: false,
+			borderWidth: 0
+		}
+	},
+	yAxis:{
+		title: {
+			text: 'Total Cumulative Revenue (AUD)'
+		}
+	},
+	xAxis: {
+		categories: $FY_MONTH_LIST_NAME
+	},
+	credits: {
+		enabled: false
+	},
+	series: stream.monthlyDataCumsum
+});
+
+
+
+Highcharts.chart('chart4', {
+	chart: {
+		type: 'variablepie'
+	},
+	title: {
+		text: '3 Major Revenue Streams FY Total'
+	},
+	subtitle: {
+			text: stamp
+	},
+	tooltip: {
+		headerFormat: '',
+		pointFormat: '<span style="color:{point.color}">\u25CF</span><b> {point.name}</b><br/>' +
+				'Total Revenue: $<b>{point.y}</b>  (<span style="color:blue">{point.percentage:.1f}%</span>)<br/>' +
+				'No.Donors: <b>{point.donors:,0f}</b>  (<span style="color:blue">{point.donorsPct:.1f}%</span>)<br/>'
+	},
+	plotOptions: {
+		variablepie: {
+			allowPointSelect: true,
+			cursor: 'pointer',
+			innerSize: 50,
+			depth: 35,
+			dataLabels: {
+				enabled: true,
+				distance: 10,
+				color: 'black',
+				format: '{point.name}:<br><span style="font-size:0.6rem; color:{point.color}">${point.y:,f}</span><br><span style="font-size:0.6rem;}">({point.percentage:.1f}%)</span>'
+			},
+			showInLegend: false,
+		}
+	},
+	series: [{
+		minPointSize: 10,
+		innerSize: '20%',
+		zMin: 0,
+		name: '3 Major Revenue Streams',
+		data:  stream.streamData
+	}]
+});
+
+
+
+
+</script>
+{% endblock %}
+
