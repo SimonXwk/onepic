@@ -15,32 +15,32 @@ body {
 
 
 // Navbar Hover effect
+#navbar-global{
+  .nav-link.active{
+    color: #33fe61;
+  }
 
-.nav-link.active{
-  color: #33fe61;
+  .nav-item::after{
+    content:'';
+    display:block;
+    width:0;
+    height:2px;
+    background: #33fe61;
+    transition: 0.2s;
+  }
+
+  .nav-item a:hover {
+    transition-duration: 0.4s;
+  }
+
+  .nav-item:hover::after{
+    width:100%;
+  }
+
+  .nav-item a:hover::after{
+    color: #33fe61;
+  }
 }
-
-.nav-item::after{
-  content:'';
-  display:block;
-  width:0;
-  height:2px;
-  background: #33fe61;
-  transition: 0.2s;
-}
-
-.nav-item a:hover {
-  transition-duration: 0.4s;
-}
-
-.nav-item:hover::after{
-  width:100%;
-}
-
-.nav-item a:hover::after{
-  color: #33fe61;
-}
-
 
 // Custom Navbar Toggler
 .navbar-dark .custom-toggler.navbar-toggler {

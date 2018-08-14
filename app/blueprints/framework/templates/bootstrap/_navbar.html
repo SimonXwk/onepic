@@ -6,7 +6,7 @@
 	<a class="{{ type }} {% if request.endpoint == blueprint+'.'+endpoint %}active{% endif %}" href="{{ url_for(blueprint+'.'+endpoint) }}">{{ text }}</a>
 {% endmacro %}
 {#- -------------------------------- -#}
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="navbar-global">
 	<a class="navbar-brand" href="/logged">
 		ONEPIC
 	</a>
@@ -43,7 +43,7 @@
 				<a class="nav-link dropdown-toggle" href="#" id="{{ blueprint }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ blueprint|title }}</a>
 				<div class="dropdown-menu" aria-labelledby="{{ blueprint }}">
 					{{ NavLink(blueprint, 'index', 'Overview') }}
-					{{ NavLink(blueprint, 'comparative', 'Comparative') }}
+					{{ NavLink(blueprint, 'comparative', 'Comparative View') }}
 
 					{{ NavLink(blueprint, 'revenue_streams', 'Revenue Streams') }}
 					{{ NavLink(blueprint, 'single_campaign', 'Single Campaign Dashboard') }}

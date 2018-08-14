@@ -21,11 +21,14 @@ def homepage():
 @templatified('comparative')
 def comparative():
 	# Prepare for SQL parameters
-	fy = TLMA.cfy - 0
-	d1, d2 = TLMA.fy_range(fy)
+	d1, d2 = TLMA.cfy_start_date, TLMA.cfy_end_date
+	progress = (datetime.date.today() - d1).days / (d2 - d1).days
+
+	# Run Query By including 2 financial years
+	d1 = TLMA.fy_range(TLMA.cfy-1)[0]
 	params = Tq.format_date((d1, d2))
-	data = Tq.query('PRIVENUE__BASE', *params, cached_timeout=30)
-	return dict(title='Comparative View', thisfy=fy, data=data)
+	data = Tq.query('PRIVENUE__BASE', *params, cached_timeout=180)
+	return dict(title='Comparative View', cfy=TLMA.cfy, data=data, progress=progress)
 
 
 @templatified('pending')

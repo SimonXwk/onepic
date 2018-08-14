@@ -1,6 +1,8 @@
 {% extends '_skeleton.html' %}
 
+
 {% block js_embedded_header %}
+
 <script type=text/javascript>
 let $FY_MONTH_LIST_NUMBER = {{ fymths }};
 let $FY_MONTH_LIST_NAME = {{ fymths|map("mthname", abbr=True)|list|safe }};
@@ -19,7 +21,6 @@ function cumsum(v) {
 	}
 	return r;
 }
-
 
 // Using Fetch API to grab JSON data
 function fetchJSON(endpoint, func) {
@@ -103,6 +104,7 @@ function currency(val) {
                   .replace(/(\d{3}\B)/g, "$1,")
                   .split("").reverse().join("");
 }
+
 
 </script>
 {% endblock %}
@@ -308,24 +310,9 @@ function setHighchartColors(colorList) {
 {% endmacro %}
 
 
-
-{% macro count_unique(data, attribute_name, include_none=false, excludes=None) %}
-	{% set list = data|map(attribute=attribute_name)|list %}
-
-	{% if include_none %}
-		{% set unique_number = list|unique|list|length %}
-	{% else %}
-		{% set unique_number = list|unique|list|length - 1 if None in list else list|unique|list|length %}
-	{% endif %}
-
-	{% if excludes %}
-		{% for exc in excludes %}
-			{% if exc in list %}
-				{% set unique_number = unique_number - 1 %}
-			{% endif %}
-		{% endfor %}
-	{% endif %}
-	{{ unique_number }}
+{# Do not Put any Line Break For this Macro, otherwise use filter  | replace('\n', '') #}
+{% macro odbc_label(odbcDataObj) %}
+Data captured : {{ odbcDataObj.timestamp|dtAU }}
+{#	, {{ odbcDataObj.bytes|number }} bytes#}
 {% endmacro %}
-
 

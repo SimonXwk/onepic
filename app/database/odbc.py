@@ -3,15 +3,38 @@ import pyodbc
 import os
 import datetime
 from app.cache import cached
+from app.helper import jsonified
 
 
 class ODBCResult(object):
 	def __init__(self, data, cached_timeout):
-		self.headers, self.rows, self.timestamp = data
+		self.headers, self.types, self.rows, self.bytes, self.timestamp = data
 		self.cached_timeout = cached_timeout
 
 	def __str__(self):
-		return 'data retrieved at {} :\n{}'.format(self.timestamp, self.rows)
+		return f'>> Timestamp : {self.timestamp}' \
+				f'\n>> Rows : {len(self.rows):,}' \
+				f'\n>> Size : {self.bytes:,} bytes' \
+				f'\n>> Columns : {self.headers}' \
+				f'\n>> Types : {self.types!r}' \
+				f'\n>> First Row : {self.rows[0]}'
+
+	@jsonified
+	def to_json(self, orient='records'):
+		if orient == 'records':
+			results = []
+			for row in self.rows:
+				results.append(dict(zip(self.headers, row)))
+			return results
+
+		elif orient == 'columns':
+			results = {}
+			for col in self.headers:
+				results[col] = []
+			for row in self.rows:
+				for i in range(len(self.headers)):
+					results[self.headers[i]].append(row[i])
+			return results
 
 
 class ThankqODBC(object):
@@ -59,9 +82,11 @@ class ThankqODBC(object):
 				# Row objects are similar to tuples, but they also allow access to columns by name: row[1]/row.colname
 				rows = cursor.execute(sql, *params).fetchall()  # A List
 				headers = [column[0] for column in cursor.description]
+				types = [column[1] for column in cursor.description]
+				byte_size = sum([column[3] for column in cursor.description])
 				# stamp = cursor.execute('SELECT CURRENT_TIMESTAMP').fetchone()[0]  # A Tuple
 				timestamp = datetime.datetime.now()
-				return headers, rows, timestamp  # returning a comma separated set of elements creates a tuple
+				return headers, types, rows, byte_size, timestamp  # returning a comma separated set of elements creates a tuple
 
 		return ODBCResult(run(cls.connection_string, script, *parameters), cached_timeout)
 

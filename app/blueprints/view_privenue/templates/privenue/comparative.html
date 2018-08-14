@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block js_optional %}
-{{ Highchart([], ['variable-pie']) }}
+{{ Highchart([], ['variable-pie'], (true,false,false)) }}
 {% endblock %}
 
 
@@ -30,123 +30,170 @@
 {# Embedded Javascript At the Very End #}
 {% block js_embedded_after %}
 <script>
-Highcharts.chart('chart1', {
+function drawOverlapingColumnChart(obj){
+	Highcharts.chart(obj.renderTo, {
 	chart: {
-		type: 'column'
+	type: 'column'
 	},
 	title: {
-		text: '3 Major Revenue Streams Month on Month Total'
+	text: obj.title
 	},
 	subtitle: {
-		text: stamp
+	text: stamp
 	},
 	legend: {
-		shadow: false
+	shadow: false
 	},
 	tooltip: {
-		shared: false
+	shared: false
 	},
 	plotOptions: {
 		column: {
 			grouping: false,
 			shadow: false,
-			borderWidth: 0
+			borderWidth: 0,
+			stacking: obj.stacking
 		}
 	},
 	yAxis:{
-		title: {
-			text: 'Total Monthly Revenue (AUD)'
-		}
+	title: {
+	text: obj.yAxisTitle
+	}
 	},
 	xAxis: {
-		categories: $FY_MONTH_LIST_NAME
+	categories: obj.categories
 	},
 	credits: {
-		enabled: false
+	enabled: false
 	},
-	series: stream.monthlyData
+	series: obj.data
+	});
+}
+
+
+
+let stackData = JSON.parse(JSON.stringify( stream.monthlyData ));
+stackData.forEach((obj) => {
+	if (obj.stack === 'Budget') {
+		obj['pointPadding'] = 0;
+	} else {
+		obj['pointPadding'] = 0.2;
+	}
+	delete obj['pointPlacement'];
+});
+
+drawOverlapingColumnChart({
+	renderTo: 'chart0',
+	title: '3 Major Revenue Streams Month on Month Budget vs Actual Stacking',
+	yAxisTitle: 'Total Monthly Revenue (AUD)',
+	categories: $FY_MONTH_LIST_NAME,
+	stacking: 'normal',
+	data: stackData
+});
+
+drawOverlapingColumnChart({
+	renderTo: 'chart1',
+	title: '3 Major Revenue Streams Month on Month Budget vs Actual Spread',
+	yAxisTitle: 'Total Monthly Revenue (AUD)',
+	categories: $FY_MONTH_LIST_NAME,
+	stacking: null,
+	data: stream.monthlyData
+});
+
+drawOverlapingColumnChart({
+	renderTo:'chart3',
+	title:'3 Major Revenue Streams Cumulative Budget vs Actual',
+	yAxisTitle: 'Total Cumulative Revenue (AUD)',
+	categories: $FY_MONTH_LIST_NAME,
+	stacking: null,
+	data: stream.monthlyDataCumsum
+});
+
+drawOverlapingColumnChart({
+	renderTo: 'chart2',
+	title: '3 Major Revenue Streams Month on Month Actual FULL LFY vs CFY',
+	yAxisTitle: 'Total Monthly Revenue (AUD)',
+	categories: $FY_MONTH_LIST_NAME,
+	stacking: null,
+	data: stream.monthlyDataLFY
+});
+
+
+drawOverlapingColumnChart({
+	renderTo: 'chart5',
+	title: '3 Major Revenue Streams Cumulative Actual FULL LFY vs CFY',
+	yAxisTitle: 'Total Cumulative Revenue (AUD)',
+	categories: $FY_MONTH_LIST_NAME,
+	stacking: null,
+	data: stream.monthlyDataCumsumLFY
 });
 
 
 
-Highcharts.chart('chart3', {
+
+
+
+function drawVariablePie(obj){
+	Highcharts.chart(obj.renderTo, {
 	chart: {
-		type: 'column'
+	type: 'variablepie'
 	},
 	title: {
-		text: '3 Major Revenue Streams Cumulative Total'
+	text: obj.title
 	},
 	subtitle: {
-		text: stamp
-	},
-	legend: {
-		shadow: false
+	text: stamp
 	},
 	tooltip: {
-		shared: false
+	headerFormat: '',
+	pointFormat: '<span style="color:{point.color}">\u25CF</span><b> {point.name}</b><br/>' +
+		'Total Revenue: $<b>{point.y}</b>	(<span style="color:blue">{point.percentage:.1f}%</span>)<br/>' +
+		'Number of Related Transactions: <b>{point.z:,0f}</b><br/>'
 	},
 	plotOptions: {
-		column: {
-			grouping: false,
-			shadow: false,
-			borderWidth: 0
-		}
+	variablepie: {
+	allowPointSelect: true,
+	cursor: 'pointer',
+	innerSize: 50,
+	depth: 35,
+	dataLabels: {
+		enabled: true,
+		distance: 10,
+		color: 'black',
+		format: '{point.name}:<br><span style="font-size:0.6rem; color:{point.color}">${point.y:,f}</span><br><span style="font-size:0.6rem;}">({point.percentage:.1f}%)</span>'
 	},
-	yAxis:{
-		title: {
-			text: 'Total Cumulative Revenue (AUD)'
-		}
-	},
-	xAxis: {
-		categories: $FY_MONTH_LIST_NAME
-	},
-	credits: {
-		enabled: false
-	},
-	series: stream.monthlyDataCumsum
-});
-
-
-
-Highcharts.chart('chart4', {
-	chart: {
-		type: 'variablepie'
-	},
-	title: {
-		text: '3 Major Revenue Streams FY Total'
-	},
-	subtitle: {
-			text: stamp
-	},
-	tooltip: {
-		headerFormat: '',
-		pointFormat: '<span style="color:{point.color}">\u25CF</span><b> {point.name}</b><br/>' +
-				'Total Revenue: $<b>{point.y}</b>  (<span style="color:blue">{point.percentage:.1f}%</span>)<br/>' +
-				'No.Donors: <b>{point.donors:,0f}</b>  (<span style="color:blue">{point.donorsPct:.1f}%</span>)<br/>'
-	},
-	plotOptions: {
-		variablepie: {
-			allowPointSelect: true,
-			cursor: 'pointer',
-			innerSize: 50,
-			depth: 35,
-			dataLabels: {
-				enabled: true,
-				distance: 10,
-				color: 'black',
-				format: '{point.name}:<br><span style="font-size:0.6rem; color:{point.color}">${point.y:,f}</span><br><span style="font-size:0.6rem;}">({point.percentage:.1f}%)</span>'
-			},
-			showInLegend: false,
-		}
+	showInLegend: false,
+	}
 	},
 	series: [{
-		minPointSize: 10,
-		innerSize: '20%',
-		zMin: 0,
-		name: '3 Major Revenue Streams',
-		data:  stream.streamData
+	minPointSize: 10,
+	innerSize: '20%',
+	zMin: 0,
+	name: obj.seriesName,
+	data: obj.data
 	}]
+	});
+}
+
+drawVariablePie({
+	renderTo: 'chart4',
+	title: '3 Major Revenue Streams CFY Total (Area: Total Radius: No.Transactions)',
+	seriesName: '3 Major Revenue Streams',
+	data: stream.streamDataCFY
 });
+
+drawVariablePie({
+	renderTo: 'chart6',
+	title: '3 Major Revenue Streams FULL LFY Total (Area: Total Radius: No.Transactions)',
+	seriesName: '3 Major Revenue Streams',
+	data: stream.streamDataLFY
+});
+
+
+
+
+
+
 
 
 

@@ -1,34 +1,85 @@
 <div class="container-fluid">
-	{% set total = data.rows|sum(attribute='PAYMENTAMOUNT')  %}
-	{% set donors = data.rows|groupby(attribute='SERIALNUMBER')|length  %}
-	{% set trxs = data.rows|map(attribute='TRXID')|list|max  %}
-	{% set pledgeids = data.rows|map(attribute='PLEDGEID')|list|unique %}
-{#	{% set pledges = data.rows|map(attribute='PLEDGEID')|list|unique|list|length - 1 if None in data.rows|map(attribute='PLEDGEID')|list else data.rows|map(attribute='PLEDGEID')|list|unique|list|length %}#}
-	{% set pledges = count_unique(data.rows, 'PLEDGEID')|int %}
+
+	{% set totalCFY =  data.rows|selectattr('FY','equalto',cfy)|sum(attribute='PAYMENTAMOUNT')  %}
+	{% set donorsCFY =  data.rows|selectattr('FY','equalto',cfy)|groupby(attribute='SERIALNUMBER')|length  %}
+	{% set trxsCFY =  data.rows|selectattr('FY','equalto',cfy)|map(attribute='TRXID')|unique|reject('equalto', 0)|list|length  %}
+	{% set pledgesCFY =  data.rows|selectattr('FY','equalto',cfy)|map(attribute='PLEDGEID')|unique|reject('none')|list|length %}
+	{% set pledgeTotalCFY =  data.rows|selectattr('FY','equalto',cfy)|rejectattr('PLEDGEID','none')|sum(attribute='PAYMENTAMOUNT') %}
+
+	{% set totalLFY =  data.rows|selectattr('FY','equalto',cfy-1) |sum(attribute='PAYMENTAMOUNT')  %}
+	{% set donorsLFY =  data.rows|selectattr('FY','equalto',cfy-1) |groupby(attribute='SERIALNUMBER')|length  %}
+	{% set trxsLFY =  data.rows|selectattr('FY','equalto',cfy-1) |map(attribute='TRXID')|unique|reject('equalto', 0)|list|length  %}
+	{% set pledgesLFY =  data.rows|selectattr('FY','equalto',cfy-1) |map(attribute='PLEDGEID')|unique|reject('none')|list|length %}
+	{% set pledgeTotalLFY =  data.rows|selectattr('FY','equalto',cfy-1)|rejectattr('PLEDGEID','none')|sum(attribute='PAYMENTAMOUNT') %}
 
 
-	<h5>FY{{ thisfy }}</h5>
-	<p class="lead">
-		Total Revenue : {{ total|currency }}
-	</p>
-	<p class="lead">
-		Number of Transactions : {{ trxs|number }}
-	</p>
-	<p class="lead">
-		Number of Unique Donors : {{ donors|number }}
-	</p>
-	<p class="lead">
-		Number of Unique Pledges : {{ pledges|number }}
-	</p>
+	{% set totalLFYLtd =  data.rows|selectattr('FY','equalto',cfy-1)|selectattr('ISLTD','equalto',-1)|sum(attribute='PAYMENTAMOUNT')  %}
+	{% set donorsLFYLtd =  data.rows|selectattr('FY','equalto',cfy-1)|selectattr('ISLTD','equalto',-1)|groupby(attribute='SERIALNUMBER')|length  %}
+	{% set trxsLFYLtd =  data.rows|selectattr('FY','equalto',cfy-1)|selectattr('ISLTD','equalto',-1)|map(attribute='TRXID')|unique|reject('equalto', 0)|list|length  %}
+	{% set pledgesLFYLtd =  data.rows|selectattr('FY','equalto',cfy-1)|selectattr('ISLTD','equalto',-1)|map(attribute='PLEDGEID')|unique|reject('none')|list|length %}
+	{% set pledgeTotalLFYLtd =  data.rows|selectattr('FY','equalto',cfy-1)|selectattr('ISLTD','equalto',-1)|rejectattr('PLEDGEID','none')|sum(attribute='PAYMENTAMOUNT') %}
+
+	{% macro component_compare_tr(text, v1, v2, v3, type='value') %}
+		<tr>
+			<th scope="row">{{ text }}</th>
+			<td><span class="text-primary"><strong>{% if type =='currency' %}{{ v1|round(2)|currency }}{% elif type =='number' %}{{ v1|round(2)|number }}{% endif %}</strong></span></td>
+			<td><span class="text-dark">{% if type =='currency' %}{{ v2|round(2)|currency }}{% elif type =='number' %}{{ v2|round(2)|number }}{% endif %}</span></td>
+			<td><span class="badge badge-{{ compare_color(v1, v2) }}">{{ v1|pct(v2) }}</span></td>
+			<td><span class="text-secondary ">{% if type =='currency' %}{{ v3|round(2)|currency }}{% elif type =='number' %}{{ v3|round(2)|number }}{% endif %}</span></td>
+			<td><span class="badge badge-{{ compare_color(v1, v3) }}">{{ v1|pct(v3) }}</span></td>
+		</tr>
+	{% endmacro %}
+
+	<h4>Currently in <span class="text-primary">FY{{ cfy }}</span>
+		<small>
+			, <span class="text-primary">{{ progress|round(4) * 100 }}%</span> of the year has passed
+			<small>, <span class="text-secondary">{{ data.bytes|number }} bytes data captured : {{ data.timestamp|dtAU }}, cached for {{ data.cached_timeout|number }} seconds</span></small>
+		</small>
+	</h4>
 
 	<!-- ROW -->
 	<div class="row">
-		<div class="col-md-8">
-			<div class="chart" id="chart1" ></div>
+		<div class="col-md-6">
+			<div class="table-responsive">
+				<table class="table table-sm table-hover">
+					<thead class="thead-light">
+						<tr>
+							<th scope="col">Calculation</th>
+							<th scope="col">FY{{ cfy }} <span class="text-primary">FULL</span></th>
+							<th scope="col">FY{{ cfy-1 }} <span class="text-primary">LTD</span></th>
+							<th scope="col">of <span class="text-primary">LTD</span> FY{{ cfy-1 }}</th>
+							<th scope="col">FY{{ cfy-1 }} <span class="text-danger">FULL</span></th>
+							<th scope="col">of <span class="text-danger">FULL</span> FY{{ cfy-1 }}</th>
+						</tr>
+					</thead>
+					<tbody>
+						{{ component_compare_tr('Total Revenue', totalCFY, totalLFYLtd, totalLFY, 'currency') }}
+						{{ component_compare_tr('No.Transactions', trxsCFY, trxsLFYLtd, trxsLFY, 'number') }}
+						{{ component_compare_tr('No.Active Contacts', donorsCFY, donorsLFYLtd, donorsLFY, 'number') }}
+						{{ component_compare_tr('Value Per Contact', (totalCFY/donorsCFY), (totalLFYLtd/donorsLFYLtd), (totalLFY/donorsLFY), 'currency') }}
+						{{ component_compare_tr('Transaction Per Contact', (trxsCFY/donorsCFY), (trxsLFYLtd/donorsLFYLtd), (trxsLFY/donorsLFY), 'number') }}
+						{{ component_compare_tr('Value Per Transaction', (totalCFY/trxsCFY), (totalLFYLtd/trxsLFYLtd), (totalLFY/trxsLFY), 'currency') }}
+						{{ component_compare_tr('No.Pledges Involved', pledgesCFY, pledgesLFYLtd, pledgesLFY, 'number') }}
+						{{ component_compare_tr('Total Pledges Revenue', pledgeTotalCFY, pledgeTotalLFYLtd, pledgeTotalLFY, 'currency') }}
+						{{ component_compare_tr('Value Per Pledge', (pledgeTotalCFY/pledgesCFY), (pledgeTotalLFYLtd/pledgesLFYLtd), (pledgeTotalLFY/pledgesLFY), 'currency') }}
+					</tbody>
+				</table>
+			</div>
 		</div>
 
-		<div class="col-md-4">
-			<div class="chart" id="chart2" ></div>
+		<div class="col-md-6">
+			<div class="chart" id="chart0" ></div>
+		</div>
+
+	</div> <!-- END OF ROW -->
+
+
+
+
+	<!-- ROW -->
+	<div class="row">
+		<div class="col-md-12">
+			<div class="chart" id="chart1" ></div>
 		</div>
 	</div> <!-- END OF ROW -->
 
@@ -43,6 +94,26 @@
 		</div>
 	</div> <!-- END OF ROW -->
 
+	<!-- ROW -->
+	<div class="row">
+		<div class="col-md-12">
+			<div class="chart" id="chart2" ></div>
+		</div>
+	</div> <!-- END OF ROW -->
+
+	<!-- ROW -->
+	<div class="row">
+		<div class="col-md-8">
+			<div class="chart" id="chart5" ></div>
+		</div>
+
+		<div class="col-md-4">
+			<div class="chart" id="chart6" ></div>
+		</div>
+	</div> <!-- END OF ROW -->
+
+
+
 
 
 
@@ -51,39 +122,46 @@
 
 
 <script>
-let stamp = 'Data captured :' + '{{ data.timestamp|dtAU }}';
+let stamp =  '{{ odbc_label(data)|replace('\n', '') }}';
 let stream = {
 	predefine:{
 		Fundraising: {
 			color: '#eb5424',
 			pointPlacement: 0,
 			budgetColor: '#ffcc2f',
+			pfy1Color:'#F7C4CC',
 			budget: []
 		},
 		Merchandise: {
 			color: '#832561',
 			pointPlacement: -0.28,
 			budgetColor: '#a696c8',
+			pfy1Color:'#C5C0F6',
 			budget: []
 		},
 		Bequest: {
 			color: '#1769ff',
 			pointPlacement: 0.28,
 			budgetColor: '#7acef4',
+			pfy1Color:'#c1f1fc',
 			budget: []
 		},
 
 	},
 	monthlyData: [],
 	monthlyDataCumsum: [],
-	streamData:[],
+
+	monthlyDataLFY: [],
+	monthlyDataCumsumLFY: [],
+	streamDataCFY:[],
+	streamDataLFY:[]
 };
 
-{% if thisfy == 2019 %}
+{% if cfy == 2019 %}
 stream.predefine.Fundraising.budget = [69885.61,105411.72,116839.60,152246.05,226588.11,217862.86,127638.68,174329.95,148603.96,221951.01,379793.29,694835.78];
 stream.predefine.Merchandise.budget = [110794.82,50818.71,38721.17,213347.72,192391.70,117054.18,46035.11,52250.79,64322.06,36748.07,27754.46,32886.21];
 stream.predefine.Bequest.budget = [10000,10000,10000,10000,10000,50000,50000,50000,50000,50000,100000,150000];
-{% elif thisfy == 2018 %}
+{% elif cfy == 2018 %}
 stream.predefine.Fundraising.budget = [];
 stream.predefine.Merchandise.budget = [];
 stream.predefine.Bequest.budget = [];
@@ -91,9 +169,12 @@ stream.predefine.Bequest.budget = [];
 
 
 let temp, data;
-{% for stream, streamList in data.rows|groupby('STREAM')|reverse %}
+let actualCFY = {} ;
+let actualLFY = {} ;
+{% for stream, streamList in  data.rows|selectattr('FY','equalto',cfy)|groupby('STREAM')|reverse %}
 data = [];
 temp ={};
+// Calculate Monthly Total then put in month array
 	{% for mth, mthList in streamList|groupby('FYMTH') %}
 	temp[{{ mth }}] = {{ mthList|sum(attribute='PAYMENTAMOUNT') }};
 	{% endfor %}
@@ -104,13 +185,11 @@ temp ={};
 			data.push(null);
 		}
 	}
-
-
-
-
+actualCFY['{{ stream }}'] = data;
 // Add Budget First As the Background
 stream.monthlyData.push({
 	name: '{{ stream }}' + ' Budget',
+	stack: 'Budget',
 	color:  stream.predefine['{{ stream }}'].budgetColor,
 	tooltip: {
 		valuePrefix: '$',
@@ -123,6 +202,7 @@ stream.monthlyData.push({
 // Add Actual
 stream.monthlyData.push({
 	name: '{{ stream }}',
+	stack: 'Actual',
 	color: stream.predefine['{{ stream }}'].color,
 	tooltip: {
 		valuePrefix: '$',
@@ -136,6 +216,7 @@ stream.monthlyData.push({
 // Add Budget First As the Background
 stream.monthlyDataCumsum.push({
 	name: '{{ stream }}' + ' Budget',
+	stack: 'Budget',
 	color: stream.predefine['{{ stream }}'].budgetColor,
 	tooltip: {
 		valuePrefix: '$',
@@ -148,6 +229,7 @@ stream.monthlyDataCumsum.push({
 // Add Actual
 stream.monthlyDataCumsum.push({
 	name: '{{ stream }}',
+	stack: 'Actual',
 	color: stream.predefine['{{ stream }}'].color,
 	tooltip: {
 		valuePrefix: '$',
@@ -160,14 +242,27 @@ stream.monthlyDataCumsum.push({
 
 
 {% set stramTotal = streamList|sum(attribute='PAYMENTAMOUNT') %}
-{% set stramTrxs = count_unique(streamList, 'TRXID', [0]) %}
-console.log({{ stramTrxs }}, 'total: ', {{ trxs }});
-stream.streamData.push({
+{% set stramTrxs = streamList|map(attribute='TRXID')|unique|reject('equalto', 0)|list|length %}
+stream.streamDataCFY.push({
 	name: '{{ stream }}',
 	color: stream.predefine['{{ stream }}'].color,
 	y: {{ stramTotal }},
-	z: {{ (stramTotal-50/stramTotal) * 300 + 50 }},
+	z: {{ stramTrxs }},
 
+});
+
+
+<!-- Build Scatter-->
+temp=[];
+data = [];
+	{% for date, dateList in streamList|rejectattr('TRXID','eq', 0)|groupby('DATEOFPAYMENT') %}
+	data.push([ '{{ date|tojson|safe }}', {{ dateList|sum(attribute='PAYMENTAMOUNT')|float }} ]);
+	{% endfor %}
+// Add LFY First As the Background
+temp.push({
+	name: '{{ stream }}',
+	color: stream.predefine['{{ stream }}'].color,
+	data: data
 });
 
 {% endfor %}
@@ -178,5 +273,97 @@ stream.streamData.push({
 
 
 
+
+{# ----------------------------------------- LFY ---------------------------------------------------- #}
+{% for stream, streamList in  data.rows|selectattr('FY','equalto',cfy-1)|groupby('STREAM')|reverse %}
+data = [];
+temp ={};
+	{% for mth, mthList in streamList|groupby('FYMTH') %}
+	temp[{{ mth }}] = {{ mthList|sum(attribute='PAYMENTAMOUNT') }};
+	{% endfor %}
+	for(let i=0; i<12; i++){
+		if((i+1) in temp){
+			data.push(temp[i+1]);
+		}else{
+			data.push(null);
+		}
+	}
+actualLFY['{{ stream }}'] = data;
+// Add LFY First As the Background
+stream.monthlyDataLFY.push({
+	name: '{{ stream }}' + ' FY' + '{{ (cfy-1) }}',
+	stack: ' FY' + '{{ (cfy-1) }}',
+	color:  stream.predefine['{{ stream }}'].pfy1Color,
+	tooltip: {
+		valuePrefix: '$',
+		valueSuffix: ' AUD'
+	},
+ 	pointPadding: 0.3,
+	pointPlacement: stream.predefine['{{ stream }}'].pointPlacement,
+	data: data
+});
+// Add Actual
+stream.monthlyDataLFY.push({
+	name: '{{ stream }}' + ' FY'+ '{{ (cfy) }}',
+	stack: ' FY' + '{{ (cfy) }}',
+	color: stream.predefine['{{ stream }}'].color,
+	tooltip: {
+		valuePrefix: '$',
+		valueSuffix: ' AUD'
+	},
+ 	pointPadding: 0.4,
+	pointPlacement:stream.predefine['{{ stream }}'].pointPlacement,
+	data:  actualCFY['{{ stream }}']
+});
+
+// Add LFY First As the Background
+stream.monthlyDataCumsumLFY.push({
+	name: '{{ stream }}' + ' FY' + '{{ (cfy-1) }}',
+	stack: ' FY' + '{{ (cfy-1) }}',
+	color: stream.predefine['{{ stream }}'].pfy1Color,
+	tooltip: {
+		valuePrefix: '$',
+		valueSuffix: ' AUD'
+	},
+ 	pointPadding: 0.3,
+	pointPlacement: stream.predefine['{{ stream }}'].pointPlacement,
+	data: cumsum(data)
+});
+// Add Actual
+stream.monthlyDataCumsumLFY.push({
+	name: '{{ stream }}' + ' FY'+ '{{ (cfy) }}',
+	stack: ' FY' + '{{ (cfy) }}',
+	color: stream.predefine['{{ stream }}'].color,
+	tooltip: {
+		valuePrefix: '$',
+		valueSuffix: ' AUD'
+	},
+ 	pointPadding: 0.4,
+	pointPlacement: stream.predefine['{{ stream }}'].pointPlacement,
+	data: cumsum(actualCFY['{{ stream }}'])
+});
+
+
+
+
+<!--Build Pie Chart-->
+{% set stramTotal = streamList|sum(attribute='PAYMENTAMOUNT') %}
+{% set stramTrxs = streamList|map(attribute='TRXID')|unique|reject('equalto', 0)|list|length %}
+stream.streamDataLFY.push({
+	name: '{{ stream }}',
+	color: stream.predefine['{{ stream }}'].pfy1Color,
+	y: {{ stramTotal }},
+	z: {{ stramTrxs }},
+
+});
+
+
+
+{% endfor %}
+
+
+
+{#let json = {{ data.to_json(orient='columns')|safe }}#}
+{#console.log(json);#}
 console.log(stream);
 </script>

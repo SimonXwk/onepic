@@ -1,7 +1,10 @@
 from werkzeug.utils import import_string, cached_property
 from flask import Blueprint, request, render_template, jsonify
-from functools import wraps
+from functools import wraps, singledispatch
 from flask_login import login_required
+from datetime import datetime
+from decimal import Decimal
+import json
 
 
 class LazyView(object):
@@ -43,6 +46,15 @@ class LazyLoader(object):
 		else:
 			# Register Filter Function on Flask instance
 			self.flask_proxy.add_template_filter(view, name=name)
+
+	def test(self, import_name, name=None):
+		view = LazyView(self.full_import_name(import_name))
+		if isinstance(self.flask_proxy, Blueprint):
+			# Register Filter Function on Blueprint instance
+			self.flask_proxy.add_app_template_test(view, name=name)
+		else:
+			# Register Filter Function on Flask instance
+			self.flask_proxy.add_template_test(view, name=name)
 
 
 def create_blueprint(blueprint_name, import_name, prefixed=True, **options) -> Blueprint:
@@ -90,13 +102,36 @@ def templatified(template=None, absolute=False, extension='.html', require_login
 	return decorator
 
 
+@singledispatch
+def convert(obj):
+	raise TypeError(f'can not convert {type(obj)}')
+
+
+@convert.register(datetime)
+def _(obj):
+	return obj.strftime('%d %B %Y %H:%M:%S')
+
+
+@convert.register(Decimal)
+def _(obj):
+	return float(obj)
+
+
+class ExtendJSONEncoder(json.JSONEncoder):
+	def default(self, obj):
+		try:
+			return convert(obj)
+		except TypeError:
+			return super(ExtendJSONEncoder, self).default(obj)
+
+
 def jsonified(f):
 	@wraps(f)
 	def decorated_function(*args, **kwargs):
 		res = f(*args, **kwargs)
 		if res is None:
 			res = {}
-		return jsonify(res)
+		return json.dumps(res, cls=ExtendJSONEncoder)
 	return decorated_function
 
 
