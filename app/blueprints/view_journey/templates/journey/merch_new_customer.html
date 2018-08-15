@@ -5,6 +5,7 @@
 {% endblock %}
 
 {% block js_optional %}
+	{{ import('datatables') }}
 {% endblock %}
 {# ------------------------------------------------------------------- #}
 
@@ -31,6 +32,9 @@ $(function () {
   $('[data-toggle="tooltip"]').tooltip({
 		html:true
 	});
+});
+$(document).ready( function () {
+	$(tblSelector).DataTable();
 });
 </script>
 {% endblock %}

@@ -87,7 +87,7 @@
 				</th>
 				<th scope="col">STATUS</th>
 				<th scope="col">START DATE</th>
-				<th scope="col">CREATEDBY</th>
+				<th scope="col">END DATE</th>
 			</tr>
 		</thead>
 		<tbody>{% for row in data.rows %}
@@ -118,7 +118,7 @@
 					{% if row.GOODSTAXAPPLICABLE==-1 %}<span class="badge badge-pill badge-info">GST</span>{% endif %}
 				</td>
 				<td>{{row.SOURCESTARTDATE|dAU}}</td>
-				<td>{{row.CREATEDBY}}</td>
+				<td>{{row.SOURCEENDDATE|dAU}}</td>
 			</tr>
 		{% endfor %}
 		</tbody>
@@ -126,3 +126,8 @@
 </div>
 {% endif %}
 </div>
+
+
+<script>
+let tblSelector = '#' + '{{ table_name }}';
+</script>

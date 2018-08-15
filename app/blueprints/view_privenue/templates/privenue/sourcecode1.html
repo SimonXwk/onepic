@@ -5,6 +5,7 @@
 {% endblock %}
 
 {% block js_optional %}
+	{{ import('datatables') }}
 {% endblock %}
 
 
@@ -31,6 +32,10 @@ $(function () {
 	$('.popover-dismiss').popover({
   	trigger: 'focus'
 	})
+});
+
+$(document).ready( function () {
+	$(tblSelector).DataTable();
 });
 </script>
 {% endblock %}

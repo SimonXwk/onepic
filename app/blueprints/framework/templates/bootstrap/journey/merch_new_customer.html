@@ -1,5 +1,5 @@
-<div<div class="container-fluid">
-
+<div class="container-fluid">
+	{% set table_name = 'merchandise-new-customer'  %}
      <div class="card text-center">
           <div class="card-body">
                <h5 class="card-title text-primary"><strong>FY{{ cfy }} [ON BOARDING] JOURNEY</strong> FOR MERCHANDISE NEW CUSTOMER (Priority 2.1)</h5>
@@ -22,7 +22,7 @@
      </div>
      </div>
      <div class="table-responsive-lg">
-          <table class="table table-hover table-sm" id="merchandise-new-customer">
+          <table class="table table-hover table-sm" id="{{ table_name }}">
                <caption><strong>Data Captured : </strong>{{ data.timestamp|dtAU }}, result will be cached for {{ '{:,}'.format(data.cached_timeout) }} seconds</caption>
                <thead>
                     <tr class="table-bordered table-dark">
@@ -170,3 +170,7 @@
           </table>
      </div>
 </div>
+
+<script>
+let tblSelector = '#' + '{{ table_name }}';
+</script>

@@ -179,6 +179,12 @@ function currency(val) {
 	{% elif vendor == 'vue' %}
 <script src="{{ url_for('vendor', filename='vue.min.js') }}"></script>
 <script>Vue.options.delimiters = ['<<', '>>'];</script>
+
+{# -------------------- vue.js -------------------- #}
+	{% elif vendor == 'datatables' %}
+<script src="{{ url_for('vendor', filename='jquery.dataTables.min.js') }}"></script>
+<link rel="stylesheet" type="text/css" href="{{ url_for('vendor', filename='jquery.dataTables.min.css') }}">
+
 	{% else %}
 		{# Do Nothing	#}
 	{% endif %}
