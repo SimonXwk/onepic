@@ -22,6 +22,11 @@ function cumsum(v) {
 	return r;
 }
 
+// Sort An Array By its Object's Attribute and return the Array
+function sortByAttribute(arr, attributeName){
+	return arr.sort((a, b) => {return  (a[attributeName] < b[attributeName]) ? -1 : ((a[attributeName] > b[attributeName]) ? 1 : 0)});
+}
+
 // Using Fetch API to grab JSON data
 function fetchJSON(endpoint, func) {
 	function status(response) {
@@ -307,12 +312,5 @@ function setHighchartColors(colorList) {
 	});
 }
 </script>
-{% endmacro %}
-
-
-{# Do not Put any Line Break For this Macro, otherwise use filter  | replace('\n', '') #}
-{% macro odbc_label(odbcDataObj) %}
-Data captured : {{ odbcDataObj.timestamp|dtAU }}
-{#	, {{ odbcDataObj.bytes|number }} bytes#}
 {% endmacro %}
 

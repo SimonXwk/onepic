@@ -29,6 +29,7 @@ fetchJSON(endpoint('/api/cash/fys'), function(json){
   let chart = valueChart1;
   chart.addSeries({
     name: 'Full FY',
+    color: '#ad182d',
     data: json.total
   });
   chart.update({
@@ -50,7 +51,8 @@ fetchJSON(endpoint('/api/cash/fys'), function(json){
 fetchJSON(endpoint('/api/cash/fysltd'), function(json){
   let chart = valueChart1;
   chart.addSeries({
-    name: 'TLD',
+    name: 'LTD',
+    color: '#456acf',
     data: json.total
   });
   chart.update({

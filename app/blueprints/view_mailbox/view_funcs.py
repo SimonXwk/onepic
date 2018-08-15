@@ -20,7 +20,7 @@ def excel_list():
 	return dict(title='Mail Excels', folders=folders)
 
 
-@templatified('today', require_login=True)
+@templatified('today')
 def today():
 	return dict(title='Mailbox-Daily')
 

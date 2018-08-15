@@ -24,6 +24,16 @@
 
 {# Embedded Javascript After Libraries & Before Custom Javascript #}
 {% block js_embedded_before %}
+<script>
+$(function () {
+  $('[data-toggle="popover"]').popover({
+		html:true
+	});
+	$('.popover-dismiss').popover({
+  	trigger: 'focus'
+	})
+});
+</script>
 {% endblock %}
 
 
@@ -71,46 +81,68 @@ function drawOverlapingColumnChart(obj){
 }
 
 
-
-let stackData = JSON.parse(JSON.stringify( stream.monthlyData ));
-stackData.forEach((obj) => {
-	if (obj.stack === 'Budget') {
-		obj['pointPadding'] = 0;
-	} else {
-		obj['pointPadding'] = 0.2;
-	}
-	delete obj['pointPlacement'];
-});
+let resetColumnPlacement = (arr, backgroundStackName) => {
+	let dupArr = JSON.parse(JSON.stringify(arr));
+	dupArr.forEach((obj) => {
+		if (obj.stack === backgroundStackName) {
+			obj['pointPadding'] = 0;
+		} else {
+			obj['pointPadding'] = 0.2;
+		}
+		delete obj['pointPlacement'];
+	});
+	return dupArr
+};
 
 drawOverlapingColumnChart({
 	renderTo: 'chart0',
+	title: 'Month on Month LTD',
+	yAxisTitle: 'Total Monthly Revenue (AUD)',
+	categories: $FY_MONTH_LIST_NAME,
+	stacking: null,
+	data: stream.monthlyDataTLMA
+});
+
+
+drawOverlapingColumnChart({
+	renderTo: 'chart1',
 	title: '3 Major Revenue Streams Month on Month Budget vs Actual Stacking',
 	yAxisTitle: 'Total Monthly Revenue (AUD)',
 	categories: $FY_MONTH_LIST_NAME,
 	stacking: 'normal',
-	data: stackData
-});
-
-drawOverlapingColumnChart({
-	renderTo: 'chart1',
-	title: '3 Major Revenue Streams Month on Month Budget vs Actual Spread',
-	yAxisTitle: 'Total Monthly Revenue (AUD)',
-	categories: $FY_MONTH_LIST_NAME,
-	stacking: null,
-	data: stream.monthlyData
-});
-
-drawOverlapingColumnChart({
-	renderTo:'chart3',
-	title:'3 Major Revenue Streams Cumulative Budget vs Actual',
-	yAxisTitle: 'Total Cumulative Revenue (AUD)',
-	categories: $FY_MONTH_LIST_NAME,
-	stacking: null,
-	data: stream.monthlyDataCumsum
+	data: resetColumnPlacement(stream.monthlyDataCFY, 'Budget')
 });
 
 drawOverlapingColumnChart({
 	renderTo: 'chart2',
+	title: '3 Major Revenue Streams Cumulative Budget vs Actual Stacking',
+	yAxisTitle: 'Total Cumulative Revenue (AUD)',
+	categories: $FY_MONTH_LIST_NAME,
+	stacking: 'normal',
+	data: resetColumnPlacement(stream.monthlyDataCumsumCFY, 'Budget')
+});
+
+
+drawOverlapingColumnChart({
+	renderTo: 'chart3',
+	title: '3 Major Revenue Streams Month on Month Budget vs Actual Spread',
+	yAxisTitle: 'Total Monthly Revenue (AUD)',
+	categories: $FY_MONTH_LIST_NAME,
+	stacking: null,
+	data: sortByAttribute(stream.monthlyDataCFY, 'entered')
+});
+
+drawOverlapingColumnChart({
+	renderTo:'chart4',
+	title:'3 Major Revenue Streams Cumulative Budget vs Actual',
+	yAxisTitle: 'Total Cumulative Revenue (AUD)',
+	categories: $FY_MONTH_LIST_NAME,
+	stacking: null,
+	data: sortByAttribute(stream.monthlyDataCumsumCFY, 'entered')
+});
+
+drawOverlapingColumnChart({
+	renderTo: 'chart6',
 	title: '3 Major Revenue Streams Month on Month Actual FULL LFY vs CFY',
 	yAxisTitle: 'Total Monthly Revenue (AUD)',
 	categories: $FY_MONTH_LIST_NAME,
@@ -120,15 +152,13 @@ drawOverlapingColumnChart({
 
 
 drawOverlapingColumnChart({
-	renderTo: 'chart5',
+	renderTo: 'chart7',
 	title: '3 Major Revenue Streams Cumulative Actual FULL LFY vs CFY',
 	yAxisTitle: 'Total Cumulative Revenue (AUD)',
 	categories: $FY_MONTH_LIST_NAME,
 	stacking: null,
 	data: stream.monthlyDataCumsumLFY
 });
-
-
 
 
 
@@ -176,24 +206,18 @@ function drawVariablePie(obj){
 }
 
 drawVariablePie({
-	renderTo: 'chart4',
-	title: '3 Major Revenue Streams CFY Total (Area: Total Radius: No.Transactions)',
+	renderTo: 'chart5',
+	title: '3 Major Revenue Streams CFY Total Nightingale Chart (Area: Total, Radius: No.Transactions)',
 	seriesName: '3 Major Revenue Streams',
 	data: stream.streamDataCFY
 });
 
 drawVariablePie({
-	renderTo: 'chart6',
-	title: '3 Major Revenue Streams FULL LFY Total (Area: Total Radius: No.Transactions)',
+	renderTo: 'chart8',
+	title: '3 Major Revenue Streams FULL LFY Total Nightingale Chart (Area: Total, Radius: No.Transactions)',
 	seriesName: '3 Major Revenue Streams',
 	data: stream.streamDataLFY
 });
-
-
-
-
-
-
 
 
 

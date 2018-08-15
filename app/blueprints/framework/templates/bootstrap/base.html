@@ -43,13 +43,11 @@
 
 {# *********************** Bootstrap Component: PAGINATION ************************************** #}
 {% macro compare_color(v1, v2) %}
-		{% if  v2|int == 0 %}{% set res = 0 %}{% else %}{% set res = (v1/v2)|float %}{% endif %}
+		{% if not v2 is number %}{% set res = 0 %}{% elif  v2|int == 0 %}{% set res = 0 %}{% else %}{% set res = v1|div(v2) %}{% endif %}
 		{% if res == 0 %}secondary
-		{% elif res >= 0 and res < 0.5 %}danger
-		{% elif res >= 0.5 and res < 0.9 %}warning
-		{% elif res >= 0.9 and res < 0.99 %}info
-		{% elif res >= 0.98 and res < 1.01 %}primary
-		{% elif res >= 1.01  %}success
+		{% elif res > 0 and res < 0.97 %}warning
+		{% elif res >= 0.97 and res <= 1.03 %}success
+		{% elif res > 1.03  %}primary
 		{% endif %}
 {% endmacro %}
 

@@ -2,7 +2,7 @@
 
 	<div class="progress">
 		<div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="{{ date_progress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ date_progress }}%">
-			{{ date_progress |f(1) }}% of FY completed
+			{{ date_progress |round(2) }}% of FY completed
 		</div>
 	</div>
 
