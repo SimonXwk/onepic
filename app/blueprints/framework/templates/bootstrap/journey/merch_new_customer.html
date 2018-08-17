@@ -1,26 +1,121 @@
 <div class="container-fluid">
-	{% set table_name = 'merchandise-new-customer'  %}
-     <div class="card text-center">
-          <div class="card-body">
-               <h5 class="card-title text-primary"><strong>FY{{ cfy }} [ON BOARDING] JOURNEY</strong> FOR MERCHANDISE NEW CUSTOMER (Priority 2.1)</h5>
-               <p class="card-text">
-                    All New Donor in FY{{ cfy }}, Excluding Pure Non-Merchandise Donors :
-                    <span class="card-title text-primary"><strong>{% if data.rows %}{{ '{:,}'.format(data.rows|length) }}{% else %}No{% endif %}</strong></span> Contacts Found
-               </p>
-          </div>
 
-          <div class="card-footer text-muted">
-               <span class="badge badge-pill badge-success">PM: Pure Merch Customer</span>
-     <span class="badge badge-pill badge-dark">ORG: Organization</span>
-               <span class="badge badge-pill badge-danger">ESTATE</span>
-               <span class="badge badge-pill badge-danger">DECD: Deceased</span>
-               <span class="badge badge-pill badge-warning">!MAIL: Do not mail</span>
-               <span class="badge badge-pill badge-warning">!CALL: DO not call</span>
-               <span class="badge badge-pill badge-info">HOUSEHOLD ROLE</span>
-               <span class="badge badge-pill badge-dark">PMP: Pure Merch Pledger</span>
-               <span class="badge badge-pill badge-dark">PMD: Pure Merch Donor</span>
-     </div>
-     </div>
+	<div class="row">
+		<div class="col-md-12">
+			 <h5 class="card-title text-primary"><strong>FY{{ cfy }} ON BOARDING JOURNEY</strong> for Merchandise New Customer (Priority 2.1)</h5>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-xl-6">
+
+					 <div class="container">
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="main-timeline12">
+
+                        <div class="col-md-2 col-sm-4 timeline">
+													<span class="timeline-icon"><span class="timeline-icon">&#10024</span>
+													</span>
+													<div class="border"></div>
+													<div class="timeline-content">
+														<h4 class="title">Step1</h4>
+														<p class="description">On Board whoever on this list</p>
+													</div>
+                        </div>
+
+                        <div class="col-md-2 col-sm-4 timeline">
+													<div class="timeline-content">
+														<h4 class="title">Step2</h4>
+														<p class="description">Cancel On Boarding when applicable</p>
+													</div>
+													<div class="border"></div>
+													<span class="timeline-icon"><span class="timeline-icon">&#9940</span></span>
+                        </div>
+
+                        <div class="col-md-2 col-sm-4 timeline">
+													<span class="timeline-icon"><span class="timeline-icon">&#10160</span></span>
+													<div class="border"></div>
+													<div class="timeline-content">
+														<h4 class="title">Step3</h4>
+														<p class="description">Check delivery Status for some</p>
+													</div>
+                        </div>
+
+                        <div class="col-md-2 col-sm-4 timeline">
+													<div class="timeline-content">
+														<h4 class="title">Step4</h4>
+														<p class="description">Change On Board Order if necessary</p>
+													</div>
+													<div class="border"></div>
+													<span class="timeline-icon"><span class="timeline-icon">&#9972</span></span>
+                        </div>
+
+                        <div class="col-md-2 col-sm-4 timeline">
+													<span class="timeline-icon"><span class="timeline-icon">&#9742</span></span>
+													<div class="border"></div>
+													<div class="timeline-content">
+														<h4 class="title">Step5</h4>
+														<p class="description">Thank You Call</p>
+													</div>
+                        </div>
+
+												<div class="col-md-2 col-sm-4 timeline">
+													<div class="timeline-content">
+														<h4 class="title">Step6</h4>
+														<p class="description">Bulk sending welcome pack</p>
+													</div>
+													<div class="border"></div>
+													<span class="timeline-icon">&#9993</span>
+												</div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+		</div>
+
+		<div class="col-md-6 col-xl-3">
+			<div class="card border-primary mb-3 shadow-type7">
+				<h5 class="card-header">Listing <strong>{{ '{:,}'.format(data.rows|length) }}</strong> customers found</h5>
+				<div class="card-body">
+					<h6 class="card-title"><span class="text-info">Searching Time Frame</span></h6>
+					<p>{{ dates[0]|dAU }} &#8621 {{ dates[1]|dAU }}</p>
+					<h6 class="card-title"><span class="text-info">Searching Criteria 1</span></h6>
+					<p class="card-text">Contact that financially engaged with us for the first time within the &#8273Searching Time Frame&#8273
+					</p>
+					<h6 class="card-title"><span class="text-info">Searching Criteria 2</span></h6>
+					<p class="card-text">More than zero of the total contribution was through merchandise platform on their first date of financial engagement
+					</p>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-md-6 col-xl-3">
+			<div class="card border-info mb-3 shadow-type4">
+				<div class="card-body">
+					<h5 class="card-title">Tag Legends</h5>
+					<span class="badge badge-pill badge-success">PM: Pure Merch Customer</span>
+					<span class="badge badge-pill badge-dark">ORG: Organization</span>
+					<span class="badge badge-pill badge-danger">ESTATE</span>
+					<span class="badge badge-pill badge-danger">DECD: Deceased</span>
+					<span class="badge badge-pill badge-warning">!MAIL: Do not mail</span>
+					<span class="badge badge-pill badge-warning">!CALL: DO not call</span>
+					<span class="badge badge-pill badge-info">HOUSEHOLD ROLE</span>
+					<span class="badge badge-pill badge-dark">PMP: Pure Merch Pledger</span>
+					<span class="badge badge-pill badge-dark">PMD: Pure Merch Donor</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<hr>
+
+	{% set table_name = 'merchandise-new-customer'  %}
      <div class="table-responsive-lg">
           <table class="table table-hover table-sm" id="{{ table_name }}">
                <caption><strong>Data Captured : </strong>{{ data.timestamp|dtAU }}, result will be cached for {{ '{:,}'.format(data.cached_timeout) }} seconds</caption>
@@ -29,7 +124,7 @@
                          <th scope="col">THANKQID</th>
                          <th scope="col">FIRST DATE</th>
                          <th scope="col">FIRST ORDER</th>
-                         <th scope="col">TOTAL MERCH</th>
+                         <th scope="col">FIRST DATE TOTAL MERCH</th>
                          <th scope="col">STATUS</th>
                          <th scope="col">ONBOARD</th>
                          <th scope="col">DELIVERED</th>
@@ -64,7 +159,7 @@
                               {% endif %}
                          </td>
                          <td><!--MERCHANDISE TOTAL-->
-                              {% if row.TOTAL == row.MERCHANDISE_TOTAL %}
+                              {% if row.FIRSTDATETOTAL == row.MERCHANDISE_TOTAL %}
                               <span class="text-info" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
                                                             title='
                                                             Pure Merchandise Customer<hr>
@@ -78,7 +173,7 @@
                               {% else %}
                                    <span data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
                                                   title='
-                                                            Non Merchandise Total {{ (row.TOTAL - row.MERCHANDISE_TOTAL)|currency }}
+                                                            Non Merchandise Total {{ (row.FIRSTDATETOTAL - row.MERCHANDISE_TOTAL)|currency }}
                                                             '
                                         >
                                         {{ row.MERCHANDISE_TOTAL|currency }}
@@ -86,7 +181,7 @@
                               {% endif %}
                          </td>
                          <td><!--STATUS-->
-                                   {% if row.TOTAL == row.MERCHANDISE_TOTAL %}<span class="badge badge-pill badge-success">PM</span>{% endif %}
+                                   {% if row.FIRSTDATETOTAL == row.MERCHANDISE_TOTAL %}<span class="badge badge-pill badge-success">PM</span>{% endif %}
                                    {% if row.CONTACTTYPE|trim|upper == 'ORGANISATION' %}<span class="badge badge-pill badge-dark">ORG</span>{% endif %}
                                    {% if row.PRIMARYCATEGORY|trim|upper == 'ESTATE' %}<span class="badge badge-pill badge-danger">ESTATE</span>{% endif %}
                                    {% if row.DONOTMAILREASON|trim|upper == 'DECEASED' %}<span class="badge badge-pill badge-danger">DECD</span>{% endif %}

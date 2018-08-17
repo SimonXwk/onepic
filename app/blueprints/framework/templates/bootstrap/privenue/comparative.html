@@ -23,19 +23,8 @@
 			<th scope="row">{{ text }}</th>
 			<td><span
 				{% if text == 'Total Revenue' %}
-				{% set totalBudget = (budget['FY'][cfy]['TLMA'])|sum %}
 				{% set thisBudget = (budget['FY'][cfy]['TLMA'][:(now.month|fymth)])|sum %}
-
 				class="bg-{{ compare_color(v1, thisBudget) }} text-dark"
-				tabindex="0" data-toggle="popover" data-placement="right" data-trigger="focus"
-				title ='Total Revenue of the Financial Year'
-					data-content='
-						<p>FY{{ cfy }} Budget : <span class="badge badge-primary">{{ totalBudget|currency }}</span></p>
-						<p>Budget up to {{ now.month|mthname }}: <span class="badge badge-info">{{ thisBudget|currency }}</span></p>
-						Difference:
-							<span class="badge badge-{{ compare_color(v1, thisBudget) }}"> {{ (v1|float -thisBudget)|currency }}</span>
-							<span class="badge badge-{{ compare_color(v1, thisBudget) }}"> {{ (v1|float -thisBudget)|pct(thisBudget) }}</span>
-						'
 			 	{% else %}class="text-dark"
 				{% endif %}
 			><strong>{% if type =='currency' %}{{ v1|currency }}{% elif type =='number' %}{{ v1|round(2)|number }}{% endif %}</strong></span></td>
@@ -87,18 +76,6 @@
 			<div class="chart" id="chart0" ></div>
 		</div>
 
-	</div> <!-- END OF ROW -->
-
-
-	<!-- ROW -->
-	<div class="row">
-		<div class="col-md-6">
-			<div class="chart" id="chart1" ></div>
-		</div>
-
-		<div class="col-md-6">
-			<div class="chart" id="chart2" ></div>
-		</div>
 	</div> <!-- END OF ROW -->
 
 
@@ -179,6 +156,20 @@
 
 	</div> <!-- END OF ROW -->
 
+
+	<!-- ROW -->
+	<div class="row">
+		<div class="col-md-6">
+			<div class="chart" id="chart1" ></div>
+		</div>
+
+		<div class="col-md-6">
+			<div class="chart" id="chart2" ></div>
+		</div>
+	</div> <!-- END OF ROW -->
+
+
+
 	<!-- ROW -->
 	<div class="row">
 		<div class="col-md-12">
@@ -221,7 +212,10 @@
 </div>
 
 
+
+
 <script>
+let json = JSON.parse({{ data.to_json(orient='records')|tojson|safe }});
 let stamp =  'Data captured :' + '{{ data.timestamp|dtAU }}';
 let budget={}, cfy=0;
 budget = {{ budget|tojson|safe }};
@@ -483,7 +477,6 @@ stream.monthlyDataTLMA.push({
 });
 
 
-{#let json = {{ data.to_json(orient='columns')|safe }}#}
 {#console.log(json);#}
-console.log(stream);
+{#console.log(stream);#}
 </script>

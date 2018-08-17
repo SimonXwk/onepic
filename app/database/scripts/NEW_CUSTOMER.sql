@@ -24,6 +24,7 @@ cte_payments as (
     (B2.REVERSED IS NULL OR NOT (B2.REVERSED=1 OR B2.REVERSED=-1)) -- Full reversal and re-entry should be excluded all time
     AND (B4.STAGE ='Batch Approved')
     AND (C1.CONTACTTYPE NOT LIKE 'ADDRESS')
+--     AND B2.DATEOFPAYMENT between '20170701' and '20180630'
 )
 -- --------------------------------------------------------------
 ,cte_first_date as (

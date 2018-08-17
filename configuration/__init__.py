@@ -18,9 +18,9 @@ class CustomConfig(ExtensionConfig):
 	"""
 	""" Bootstrap Configuration
 	"""
-	BOOTSTRAP_SERVE_LOCAL = False
+	BOOTSTRAP_SERVE_LOCAL = True
 
-	BOOTSTRAP_USE_PACKAGE_JSON_VERSION = False
+	BOOTSTRAP_USE_PACKAGE_JSON_VERSION = True
 	BOOTSTRAP_VERSION = '4.1.3'
 	BOOTSTRAP_JQUERY_VERSION = '3.3.1'
 	BOOTSTRAP_POPPER_VERSION = '1.14.1'
@@ -32,7 +32,7 @@ class CustomConfig(ExtensionConfig):
 	""" HighChart Configuration
 	"""
 	HIGHCHART_SERVE_LOCAL = False
-	HIGHCHART_LOCAL_JS_PATH = 'vendor/hc/{}.js'
+	HIGHCHART_LOCAL_JS_PATH = 'vendor/highcharts/{}.js'
 
 	HIGHCHART_USE_PACKAGE_JSON_VERSION = True
 	HIGHCHART_VERSION = '6.1.1'

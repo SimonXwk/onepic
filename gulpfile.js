@@ -9,7 +9,8 @@ const autoprefixer    = require('gulp-autoprefixer');
 const config = {
     baseDir: '.',
     vendorDir: 'app/static/vendor',
-    vendorHighChartDir: 'app/static/vendor/hc',
+    vendorHighChartDir: 'app/static/vendor/highcharts',
+    vendorLodashDir: 'app/static/vendor/lodash',
     cssDir: 'app/static/css',
     sassPattern: 'app/**/*.scss',
     htmlPattern: 'app/**/*.html',
@@ -31,6 +32,8 @@ gulp.task('vendor-highchart', function() {
     .pipe(gulp.dest(config.vendorHighChartDir))
 });
 
+
+
 // Move the Framework libraries(css and javascripts) into app/static/vendor folder :
 gulp.task('vendor-general', function() {
   return gulp.src([
@@ -43,10 +46,12 @@ gulp.task('vendor-general', function() {
       'node_modules/echarts/dist/echarts-en.min.js',
       'node_modules/sketch-js/js/sketch.min.js',
       'node_modules/chart.js/dist/Chart.bundle.min.js',
+      'node_modules/d3/dist/d3.min.js',
+      'node_modules/lodash/lodash.min.js',
+      'node_modules/crossfilter/crossfilter.min.js',
       'node_modules/vue/dist/vue.min.js',
       'node_modules/datatables.net/js/jquery.dataTables.min.js',
       'node_modules/datatables.net-dt/css/jquery.dataTables.min.css',
-      'node_modules/font-awesome/css/font-awesome.min.css',
     ])
     .pipe(plumber())
     .pipe(gulp.dest(config.vendorDir))

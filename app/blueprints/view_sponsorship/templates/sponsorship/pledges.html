@@ -34,7 +34,11 @@ $(function () {
 	})
 });
 $(document).ready( function () {
-	$(tblSelector).DataTable();
+	$(tblSelector).DataTable(
+		{
+			stateSave: true
+		}
+	);
 });
 </script>
 {% endblock %}

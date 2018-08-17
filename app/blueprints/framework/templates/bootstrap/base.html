@@ -6,7 +6,7 @@
 
 {% block js_framework %}
 {% for js in framework_js %}<script src="{{ js }}"></script>{% endfor %}
-{#<script src="{{ url_for('static',filename= 'js/main.js') }}"></script>#}
+<script src="{{ url_for('static',filename= 'js/main.js') }}"></script>
 {% endblock %}
 
 {# Clear out css except for framework ones #}

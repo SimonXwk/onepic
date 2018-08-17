@@ -171,14 +171,28 @@ function currency(val) {
 			{% endif %}
 		{% endif %}
 
-{# -------------------- sketch.js -------------------- #}
-	{% elif vendor == 'sketch' %}
-<script src="{{ url_for('vendor', filename='sketch.min.js') }}"></script>
+{# -------------------- lodash.js -------------------- #}
+	{% elif vendor == 'lodash' %}
+<script src="{{ url_for('vendor', filename='lodash.min.js') }}"></script>
+
+{# -------------------- lodash.js -------------------- #}
+	{% elif vendor == 'd3' %}
+<script src="{{ url_for('vendor', filename='d3.min.js') }}"></script>
+
 
 {# -------------------- vue.js -------------------- #}
 	{% elif vendor == 'vue' %}
 <script src="{{ url_for('vendor', filename='vue.min.js') }}"></script>
 <script>Vue.options.delimiters = ['<<', '>>'];</script>
+
+{# -------------------- crossfilter.js -------------------- #}
+	{% elif vendor == 'crossfilter' %}
+<script src="{{ url_for('vendor', filename='crossfilter.min.js') }}"></script>
+
+{# -------------------- sketch.js -------------------- #}
+	{% elif vendor == 'sketch' %}
+<script src="{{ url_for('vendor', filename='sketch.min.js') }}"></script>
+
 
 {# -------------------- vue.js -------------------- #}
 	{% elif vendor == 'datatables' %}
