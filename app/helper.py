@@ -4,6 +4,7 @@ from functools import wraps, singledispatch
 from flask_login import login_required
 from datetime import datetime
 from decimal import Decimal
+import time
 import json
 
 
@@ -109,7 +110,7 @@ def convert(obj):
 
 @convert.register(datetime)
 def _(obj):
-	return obj.strftime('%d %B %Y %H:%M:%S')
+	return obj.strftime('%Y-%m-%dT%H:%M:%S')
 
 
 @convert.register(Decimal)
@@ -132,6 +133,17 @@ def jsonified(f):
 		if res is None:
 			res = {}
 		return json.dumps(res, cls=ExtendJSONEncoder)
+	return decorated_function
+
+
+def timeit(f):
+	@wraps(f)
+	def decorated_function(*args, **kwargs):
+		ts = time.time()
+		res = f(*args, **kwargs)
+		te = time.time()
+		print(f':::execution time of [{f.__name__}] : {((te - ts) * 1000):,.2f} ms')
+		return res
 	return decorated_function
 
 

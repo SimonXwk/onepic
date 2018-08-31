@@ -16,10 +16,7 @@ from
   cte_pledge_actual t1
   left join cte_pledge t2 ON (t1.PLEDGEID=t2.PLEDGEID)
 where
-  DATEOFPAYMENT between
-    DATEFROMPARTS(/*<START_YEAR>*/@FY-1/*</START_YEAR>*/,/*<START_MTH>*/7/*</START_MTH>*/,/*<START_DAY>*/1/*</START_DAY>*/)
-    and
-    DATEFROMPARTS(/*<END_YEAR>*/@FY/*</END_YEAR>*/,/*<END_MTH>*/6/*</END_MTH>*/,/*<END_DAY>*/30/*</END_DAY>*/)
+  DATEOFPAYMENT between /*<DOP_START>*/'20180701'/*</DOP_START>*/ and /*<DOP_END>*/'20190630'/*</DOP_END>*/
 order by
   DATEOFPAYMENT desc
 

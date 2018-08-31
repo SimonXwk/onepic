@@ -1,31 +1,58 @@
 <div class="container">
-
-
-	<div class="input-group mb-3">
-		<input type="text" class="form-control" id="ssi-search-text" placeholder="rex order number (eg 18-00003789)" aria-label="Rex Order Number" aria-describedby="ssi-search">
-		<div class="input-group-prepend">
-			<button class="btn btn-outline-info" type="button" id="ssi-search" onclick="searchOrder()">Search Order</button>
-		</div>
-	</div>
-
-	<div id="track-info">
-		<div class="card text-center" id="ssi-order-detail" >
-			<div class="card-header">
-				<span v-if="state === 'wait'"><< headerBefore >> ... &#9749</span>
+	<div id="ssi">
+{#		<< stage1.status >> | << stage2.status >> | << stage3.status >> | << showBanner >>#}
+		<div class="row"><!-- ROW -->
+			<div class="col-12">
+				<div class="input-group mb-3">
+					<input type="text" class="form-control"
+								 placeholder="type in rex order number"
+								 aria-label="Rex Order Number"
+								 aria-describedby="ssi-search"
+								 id="ssi-search-text"
+								 v-model.trim="order.number" @input="validateOrderNumberOnInput()" >
+					<div class="input-group-prepend ">
+						<button class="btn btn-outline-danger shadow-type1" type="button" id="ssi-search-clear" @click="clearOrderNumber()">Clear</button>
+					</div>
+				</div>
 			</div>
-			<div class="card-body">
-				<h5 class="card-title">
-					<span v-if="state === 'wait'"><< bodyBefore >></span>
-				</h5>
-				<p class="card-text"></p>
-				<p class="card-text"></p>
-			</div>
-			<div class="card-footer text-muted"></div>
 		</div>
 
+		<div class="row"><!-- ROW -->
+			<div class="col-12">
+				<ssi-banner ></ssi-banner>
+			</div>
+		</div>
 
 
+		<div class="row"><!-- ROW -->
+
+			<div class="col-md-5">
+
+				<div class="row"><!-- ROW -->
+					<div class="col-md-12">
+						<div id="ssi-order-header">
+							<ssi-order-header></ssi-order-header>
+						</div>
+					</div>
+				</div> <!-- END OF ROW -->
+
+				<div class="row"><!-- ROW -->
+					<div class="col-md-12">
+						<div id="ssi-order-detail">
+							<ssi-order-detail></ssi-order-detail>
+						</div>
+					</div>
+				</div> <!-- END OF ROW -->
+
+			</div>
+
+
+			<div class="col-md-7">
+				<div id="ssi-order-tracking">
+					<ssi-order-track></ssi-order-track>
+				</div>
+			</div>
+		</div> <!-- END OF ROW -->
 
 	</div>
-
 </div>

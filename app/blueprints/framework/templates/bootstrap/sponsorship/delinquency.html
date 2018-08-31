@@ -1,1 +1,53 @@
-delinquency
+<div class="container-fluid">
+	<div class="alert alert-warning" role="alert">
+  Active Pledges that have due date before {{ now|dAU }} : <strong>	{{ data.rows|length|number }}</strong> found
+	</div>
+
+	<div class="table-responsive-lg">
+		<table class="table table-sm table-hover" id="delinquency">
+			<caption>
+				<strong>Data Captured : </strong>{{ data.timestamp|dtAU }}, result will be cached for {{ '{:,}'.format(data.cached_timeout) }} seconds
+			</caption><!-- End of Table Caption -->
+
+			<thead>
+				<tr class="table-dark">
+					{% for header in data.headers %}
+					<th scope="col">{{ header }}</th>
+					{% endfor %}
+				</tr>
+			</thead><!-- End of Table Head -->
+
+			<tbody>
+				{% for row in data.rows %}
+				<tr>
+					{% for col in row %}
+					{% if loop.index == 1 %}
+					<th scope="row">
+						{{ col }}
+					</th>
+					{% else %}
+					<td>
+						<span>{{ col }}</span>
+					</td>
+					{% endif %}
+					{% endfor %}
+				</tr>
+				{% endfor %}
+			</tbody><!-- End of Table Body -->
+{#			<tfoot>#}
+{#				<tr>#}
+{#					{% for header in data.headers %}#}
+{#					<th scope="col">{{ header }}</th>#}
+{#					{% endfor %}#}
+{#				</tr>#}
+{#			</tfoot>#}
+		</table><!-- End of Table -->
+	</div><!-- End of Table Responsive -->
+
+
+</div>
+
+
+<script>
+let tblSelector = '#delinquency';
+</script>

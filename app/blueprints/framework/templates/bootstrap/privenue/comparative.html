@@ -59,11 +59,11 @@
 					</thead>
 					<tbody>
 						{{ component_compare_tr('Total Revenue', totalCFY, totalLFYLtd, totalLFY, 'currency') }}
-						{{ component_compare_tr('No.Transactions', trxsCFY, trxsLFYLtd, trxsLFY, 'number') }}
 						{{ component_compare_tr('No.Active Contacts', donorsCFY, donorsLFYLtd, donorsLFY, 'number') }}
+						{{ component_compare_tr('No.Transactions', trxsCFY, trxsLFYLtd, trxsLFY, 'number') }}
 						{{ component_compare_tr('Value Per Contact', (totalCFY|div(donorsCFY)), (totalLFYLtd|div(donorsLFYLtd)), (totalLFY|div(donorsLFY)), 'currency') }}
-						{{ component_compare_tr('Transaction Per Contact', (trxsCFY|div(donorsCFY)), (trxsLFYLtd|div(donorsLFYLtd)), (trxsLFY|div(donorsLFY)), 'number') }}
 						{{ component_compare_tr('Value Per Transaction', (totalCFY|div(trxsCFY)), (totalLFYLtd|div(trxsLFYLtd)), (totalLFY|div(trxsLFY)), 'currency') }}
+						{{ component_compare_tr('Transaction Per Contact', (trxsCFY|div(donorsCFY)), (trxsLFYLtd|div(donorsLFYLtd)), (trxsLFY|div(donorsLFY)), 'number') }}
 						{{ component_compare_tr('No.Pledges Involved', pledgesCFY, pledgesLFYLtd, pledgesLFY, 'number') }}
 						{{ component_compare_tr('Total Pledge Revenue', pledgeTotalCFY, pledgeTotalLFYLtd, pledgeTotalLFY, 'currency') }}
 						{{ component_compare_tr('Value Per Pledge', (pledgeTotalCFY|div(pledgesCFY)), (pledgeTotalLFYLtd|div(pledgesLFYLtd)), (pledgeTotalLFY|div(pledgesLFY)), 'currency') }}

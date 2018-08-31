@@ -32,28 +32,30 @@ function fetchJSON(endpoint, func) {
 	function status(response) {
 		console.log(response);
 		if (response.status >= 200 && response.status < 300) {
+			console.log('Response Status Success, Promise.resolve response now ... ');
 			return Promise.resolve(response)
 		} else {
+			console.log('Response Status Failed, Promise.reject response now ...');
 			return Promise.reject(new Error(response.statusText))
 		}
 	}
 	function json(response) {
 		return response.json()
 	}
+
 	console.log('Fetching Endpoint: ', endpoint);
 	fetch(endpoint)
 		.then(status)
 		.then(json)
 		.then(function (data) {
-			console.log('Response To JSON: ', data);
+			console.log(data);
 			// ---------------------------------------------------------------------------------
 			// Call Processing Function
 			func(data);
-
+			// ---------------------------------------------------------------------------------
 		}).catch(function(error) {
     	console.log('Request failed', error);
   	});
-
 }
 
 
@@ -193,11 +195,34 @@ function currency(val) {
 	{% elif vendor == 'sketch' %}
 <script src="{{ url_for('vendor', filename='sketch.min.js') }}"></script>
 
+{# -------------------- sketch.js -------------------- #}
+	{% elif vendor == 'moment' %}
+<script src="{{ url_for('vendor', filename='moment.min.js') }}"></script>
 
-{# -------------------- vue.js -------------------- #}
+
+{# -------------------- datatable -------------------- #}
 	{% elif vendor == 'datatables' %}
 <script src="{{ url_for('vendor', filename='jquery.dataTables.min.js') }}"></script>
-<link rel="stylesheet" type="text/css" href="{{ url_for('vendor', filename='jquery.dataTables.min.css') }}">
+<script src="{{ url_for('vendor', filename='dataTables.bootstrap4.min.js') }}"></script>
+
+<script src="https://cdn.datatables.net/plug-ins/1.10.19/sorting/datetime-moment.js"></script>
+
+<link rel="stylesheet" type="text/css" href="{{ url_for('vendor', filename='dataTables.bootstrap4.min.css') }}">
+
+{#		{% if vendor_optionals %}#}
+{#			{% if vendor_optionals[0] == 'bs4' %}#}
+{#			<script src="{{ url_for('vendor', filename='jquery.dataTables.min.js') }}"></script>#}
+{#			<script src="{{ url_for('vendor', filename='dataTables.bootstrap4.min.js') }}"></script>#}
+{#			<link rel="stylesheet" type="text/css" href="{{ url_for('vendor', filename='dataTables.bootstrap4.min.css') }}">#}
+{##}
+{#			{% endif %}#}
+{#		{% else %}#}
+{#		<script src="{{ url_for('vendor', filename='jquery.dataTables.min.js') }}"></script>#}
+{#		<link rel="stylesheet" type="text/css" href="{{ url_for('vendor', filename='jquery.dataTables.min.css') }}">#}
+{#		{% endif %}#}
+
+
+
 
 	{% else %}
 		{# Do Nothing	#}

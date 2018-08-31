@@ -31,5 +31,5 @@ def merchandise_new():
 	d1, d2 = TLMA.fy_range(TLMA.cfy)
 	# params = (Tq.format_date(d1), Tq.format_date(d2))
 	updates = [('START_DATE', '\'' + Tq.format_date(d1) + '\''), ('END_DATE', '\'' + Tq.format_date(d2) + '\'')]
-	data = Tq.query('JOURNEY_NEW_MERCHANDISE_CUSTOMER', cached_timeout=20, updates=updates)
+	data = Tq.query('JOURNEY_NEW_MERCHANDISE_CUSTOMER', cached_timeout=30, updates=updates)
 	return dict(title='Merchandise New Customer Journey', data=data, dates=(d1, d2))

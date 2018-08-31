@@ -29,7 +29,7 @@ cte_payments as (
     (B2.REVERSED IS NULL OR NOT (B2.REVERSED=1 OR B2.REVERSED=-1)) -- Full reversal and re-entry should be excluded all time
     AND (B4.STAGE ='Batch Approved')
     AND (C1.CONTACTTYPE NOT LIKE 'ADDRESS')
-    AND B2.DATEOFPAYMENT BETWEEN /*<START_DATE>*/'2017/07/01'/*</START_DATE>*/ AND /*<END_DATE>*/'2018/06/30'/*</END_DATE>*/
+    AND B2.DATEOFPAYMENT BETWEEN /*<START_DATE>*/'2018/07/01'/*</START_DATE>*/ AND /*<END_DATE>*/'2019/06/30'/*</END_DATE>*/
 )
 -- --------------------------------------------------------------
 ,cte_first_date as (
@@ -41,12 +41,11 @@ cte_payments as (
   -- --------------------------------------------------------------
 ,cte_rex_orders as (
   SELECT SERIALNUMBER, DATEOFPAYMENT,
-    CASE WHEN NOT MANUALRECEIPTNO LIKE '%[0-9][0-9]-[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]%'
+    CASE WHEN  MANUALRECEIPTNO LIKE '%[0-9][0-9]-[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]%'
     THEN
-      SUBSTRING(NOTES
-        ,PATINDEX('%REX Order Number: [0-9][0-9]-[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]%', NOTES) + LEN('REX Order Number:') + 1
-        ,11)
-    ELSE LTRIM(RTRIM(ISNULL(MANUALRECEIPTNO, '')))
+      SUBSTRING(MANUALRECEIPTNO,PATINDEX('%[0-9][0-9]-[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]%', MANUALRECEIPTNO),11)
+    ELSE
+      SUBSTRING(NOTES,PATINDEX('%REX Order Number: [0-9][0-9]-[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]%', NOTES) + LEN('REX Order Number:') + 1,11)
     END AS [ORDERID]
   FROM TBL_BATCHITEM
   WHERE
@@ -83,19 +82,22 @@ select
   ,[EFFECTIVEFROM]=MIN(t4.EFFECTIVEFROM)
   ,[EFFECTIVETO]=MIN(t4.EFFECTIVETO)
   ,[PARAMETERNOTE]=MIN(t4.PARAMETERNOTE)
-  ,[FIRST_ORDER_SOURCE] = IIF(MIN(t3.MANUALRECEIPTNO)=MIN(t2.ORDERID),'Alternative Receipt Number','Notes' )
-  ,CASE WHEN MIN(t4.PARAMETERNAME) IS NULL
+  ,[FIRST_ORDER_SOURCE] = IIF(MIN(t3.MANUALRECEIPTNO) LIKE '%[0-9][0-9]-[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]%','Alternative Receipt Number','Notes' )
+  ,CASE WHEN MIN(t4.PARAMETERNAME) IS NULL OR RTRIM(MIN(t4.PARAMETERNAME)) = ''
   THEN 0
   ELSE
-    -1
-  END
+    CASE WHEN MIN(t4.PARAMETERVALUE) = MIN(t2.ORDERID) AND CAST(MIN(t4.EFFECTIVEFROM) AS DATE) = CAST(MIN(t4.EFFECTIVEFROM) AS DATE)
+    THEN -1
+    ELSE -2
+    END
+  END AS [BOARDED]
 from
   cte_first_date t1
   left join cte_rex_orders t2 on (t1.FIRSTDATE = t2.DATEOFPAYMENT and t1.SERIALNUMBER = t2.SERIALNUMBER)
   left join cte_payments t3 on (t1.FIRSTDATE = t3.DATEOFPAYMENT and t1.SERIALNUMBER = t3.SERIALNUMBER)
   left join cte_onboard_last t4 on (t1.SERIALNUMBER = t4.SERIALNUMBER)
 where
-  t1.FIRSTDATE between /*<START_DATE>*/'2017/07/01'/*</START_DATE>*/ and /*<END_DATE>*/'2018/06/30'/*</END_DATE>*/
+  t1.FIRSTDATE between /*<START_DATE>*/'2018/07/01'/*</START_DATE>*/ and /*<END_DATE>*/'2019/06/30'/*</END_DATE>*/
 group by
   t1.SERIALNUMBER,t1.FIRSTDATE
   ,t3.CONTACTTYPE, t3.PRIMARYCATEGORY, t3.DONOTMAIL, t3.DONOTMAILREASON, t3.DONOTCALL, t3.SORTKEYREF1, t3.SORTKEYREFREL1 ,t3.SORTKEYREFREL2

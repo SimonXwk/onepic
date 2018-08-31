@@ -6,6 +6,8 @@
 
 {% block js_optional %}
 	{{ import('datatables') }}
+	{{ import('moment') }}
+
 {% endblock %}
 {# ------------------------------------------------------------------- #}
 
@@ -74,29 +76,12 @@ $(function () {
 		html:true
 	});
 });
+
 $(document).ready( function () {
+	{#$.fn.dataTable.moment( 'D, MMMM, YYYY' );#}
 	$(tblSelector).DataTable({
-        initComplete: function () {
-            this.api().columns().every( function () {
-                var column = this;
-                var select = $('<select><option value=""></option></select>')
-                    .appendTo( $(column.footer()).empty() )
-                    .on( 'change', function () {
-                        var val = $.fn.dataTable.util.escapeRegex(
-                            $(this).val()
-                        );
-
-                        column
-                            .search( val ? '^'+val+'$' : '', true, false )
-                            .draw();
-                    } );
-
-                column.data().unique().sort().each( function ( d, j ) {
-                    select.append( '<option value="'+d+'">'+d+'</option>' )
-                } );
-            } );
-        }
-    });
+			"lengthMenu": [[7, 10, 15, 20, 25, 50, 100, -1], [ 7, 10, 15, 20, 25, 50, 100, "All"]],
+  })
 });
 </script>
 {% endblock %}

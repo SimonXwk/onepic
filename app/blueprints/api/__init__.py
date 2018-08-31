@@ -10,6 +10,9 @@ ld.url('data_mail.today', ['/mailbox/today', '/mailbox/today/<int:year_offset>']
 ld.url('data_mail.date', ['/mailbox/ymd', '/mailbox/ymd/<string:str_date>'])
 ld.url('data_mail.year_month', ['/mailbox/ym/<string:str_yearmonth>'])
 
+ld.url('data_thankq.payments', ['/tq/payments'])
+
+
 ld.url('data_privenue.fy_total_all', ['/cash/fys'])
 ld.url('data_privenue.fy_total_all_ltd', ['/cash/fysltd'])
 ld.url('data_privenue.cfy_platform_type_revenue', ['/cash/cfy/stream'])

@@ -1,17 +1,21 @@
+import http.client
+import json
+import urllib.error
+import urllib.parse
+import urllib.request
+from functools import wraps
+
+import requests
 from flask import current_app
+
 from app.api import ApiResult, ApiException
 from app.cache import cached
-import json
-import urllib.request, urllib.parse, urllib.error
-import http.client
-import requests
-from functools import wraps
 
 
 class StarShipItAPI(object):
 	# Configurations
-	star_ship_it_api_host = 'api.starshipit.com'
-	star_ship_it_api_url = 'https://api.starshipit.com'
+	__star_ship_it_api_host = 'api.starshipit.com'
+	__star_ship_it_api_url = 'https://api.starshipit.com'
 	api_key = current_app.config['STARSHIPIT_API_KEY']
 	subscription_development_key_primary = current_app.config['STARSHIPIT_OCP_APIM_SUBSCRIPTION_DEVELOPMENT_PRIMARY_KEY']
 	subscription_development_key_secondary = current_app.config['STARSHIPIT_OCP_APIM_SUBSCRIPTION_DEVELOPMENT_SECONDARY_KEY']
@@ -36,14 +40,14 @@ class StarShipItAPI(object):
 
 	# Using Requests Library
 	@classmethod
-	@cached(300)
+	@cached(900)
 	def use_request(cls, method, endpoint, params, decode):
-		if cls.star_ship_it_api_url[-1] != '/' and endpoint[0] != '/':
-			url = '/'.join((cls.star_ship_it_api_url, endpoint))
-		elif cls.star_ship_it_api_url[-1] == '/' and endpoint[0] == '/':
-			url = cls.star_ship_it_api_url + endpoint[1:]
+		if cls.__star_ship_it_api_url[-1] != '/' and endpoint[0] != '/':
+			url = '/'.join((cls.__star_ship_it_api_url, endpoint))
+		elif cls.__star_ship_it_api_url[-1] == '/' and endpoint[0] == '/':
+			url = cls.__star_ship_it_api_url + endpoint[1:]
 		else:
-			url = cls.star_ship_it_api_url + endpoint
+			url = cls.__star_ship_it_api_url + endpoint
 
 		if method.upper() == 'GET':
 			r = requests.get(url,  params=params, headers=cls.headers)
@@ -54,12 +58,12 @@ class StarShipItAPI(object):
 
 	# Using Standard Libraries
 	@classmethod
-	@cached(300)
+	@cached(900)
 	def use_urllib(cls, method, endpoint, params, decode):
 		if params:
 			endpoint = endpoint + '?' + urllib.parse.urlencode(params)
 
-		conn = http.client.HTTPConnection(cls.star_ship_it_api_host)
+		conn = http.client.HTTPConnection(cls.__star_ship_it_api_host)
 		conn.request(method, endpoint, "{body}", cls.headers)
 		response = conn.getresponse()
 		data = response.read()  # Read data as bytes
