@@ -19,8 +19,7 @@ class ODBCResult(object):
 				f'\n>> Types : {self.types!r}' \
 				f'\n>> First Row : {self.rows[0]}'
 
-	@jsonified
-	def to_json(self, orient='records'):
+	def to_shape(self, orient='records'):
 		if orient == 'records':
 			results = []
 			for row in self.rows:
@@ -29,12 +28,18 @@ class ODBCResult(object):
 
 		elif orient == 'columns':
 			results = {}
+			# Each Column is a dictionary key
 			for col in self.headers:
 				results[col] = []
+			# Filling data for each key as a list
 			for row in self.rows:
-				for i in range(len(self.headers)):
-					results[self.headers[i]].append(row[i])
+				for col in range(len(self.headers)):
+					results[self.headers[col]].append(row[col])
 			return results
+
+	@jsonified
+	def to_json(self, orient='records'):
+		return self.to_shape(orient=orient)
 
 
 class ThankqODBC(object):
@@ -76,13 +81,13 @@ class ThankqODBC(object):
 		if updates:
 			script = cls.__change_parameter(script, updates)
 
-		@timeit
 		@cached(cached_timeout)
 		def run(conn_str, sql, *params):
 			with pyodbc.connect(conn_str) as conn:
 				cursor = conn.cursor()  # Create a cursor from the connection
 				# If there are no rows: fetchall() and fetchmany() will both return empty list of row objects.
 				# Row objects are similar to tuples, but they also allow access to columns by name: row[1]/row.colname
+
 				rows = cursor.execute(sql, *params).fetchall()  # A List
 				headers = [column[0] for column in cursor.description]
 				types = [column[1] for column in cursor.description]
@@ -101,7 +106,7 @@ class ThankqODBC(object):
 			if len(item) == 3:
 				wrapper_left = wrapper_right = item[2]
 			elif len(item) == 4:
-				wrapper_left, wrapper_right = item[2], item[4]
+				wrapper_left, wrapper_right = item[2], item[3]
 			else:
 				wrapper_left = wrapper_right = ''
 
@@ -114,4 +119,5 @@ class ThankqODBC(object):
 			new_value = f'{opening_tag}{wrapper_left}{value}{wrapper_right}{closing_tag}'
 
 			script = script.replace(old_value, new_value)
+		print(f'> {len(update_list)} parameter replaced')
 		return script

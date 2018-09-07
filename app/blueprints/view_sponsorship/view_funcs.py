@@ -1,6 +1,8 @@
-from app.helper import templatified
+from flask import request
+from app.helper import templatified, request_arg
 from app.database.odbc import ThankqODBC as Tq
 from app.database.tlma import TLMA
+import app.tests as tests
 import datetime
 
 
@@ -12,6 +14,14 @@ def pledge_created_fys():
 def pledge_dop_fys():
 	data = Tq.query('LIST_FY_DATEOFPAYMENT_SPONSORSHIP', cached_timeout=600)
 	return data.rows
+
+
+@templatified()
+def overview():
+	fy = int(request_arg('fy', TLMA.cfy, tests.is_year))
+	updates = [('FY', fy)]
+	data = Tq.query(('PLEDGE__BASE', 'PLEDGE_OVERVIEW'),  cached_timeout=30, updates=updates)
+	return dict(title='Sponsorship Overview', data=data, thisfy=fy)
 
 
 @templatified()
@@ -36,5 +46,6 @@ def pledge_income_fy(fy=TLMA.cfy):
 
 @templatified()
 def delinquency():
-	data = Tq.query(('PLEDGE__BASE', 'PLEDGE_DELINQUENCY'),  cached_timeout=10)
-	return dict(title='Delinquency Check', data=data)
+	data = Tq.query(('PLEDGE__BASE', 'PLEDGE_DELINQUENCY'),  cached_timeout=10 )
+	warning_days = 90
+	return dict(title='Delinquency Check', data=data, warning_days=warning_days)

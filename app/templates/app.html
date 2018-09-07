@@ -27,15 +27,19 @@ function sortByAttribute(arr, attributeName){
 	return arr.sort((a, b) => {return  (a[attributeName] < b[attributeName]) ? -1 : ((a[attributeName] > b[attributeName]) ? 1 : 0)});
 }
 
+
+
+
+
 // Using Fetch API to grab JSON data
 function fetchJSON(endpoint, func) {
 	function status(response) {
-		console.log(response);
+		//console.log('✓ Response received', response);
 		if (response.status >= 200 && response.status < 300) {
-			console.log('Response Status Success, Promise.resolve response now ... ');
+			console.log('✓ Response status success (' + response.status + '), Promise.resolve response ... ');
 			return Promise.resolve(response)
 		} else {
-			console.log('Response Status Failed, Promise.reject response now ...');
+			console.log('✘ Response Status Failed, Promise.reject response now ...');
 			return Promise.reject(new Error(response.statusText))
 		}
 	}
@@ -43,18 +47,20 @@ function fetchJSON(endpoint, func) {
 		return response.json()
 	}
 
-	console.log('Fetching Endpoint: ', endpoint);
+	console.log('➠ Fetching Endpoint: ', endpoint);
 	fetch(endpoint)
 		.then(status)
 		.then(json)
 		.then(function (data) {
-			console.log(data);
+			console.log('✓ JSON data converted');
+			// console.log(data);
 			// ---------------------------------------------------------------------------------
 			// Call Processing Function
 			func(data);
 			// ---------------------------------------------------------------------------------
+			console.log('✓ JSON data processed for endpoint: ' + endpoint);
 		}).catch(function(error) {
-    	console.log('Request failed', error);
+    	console.log('✘ Request failed', error);
   	});
 }
 
@@ -98,6 +104,16 @@ function showTableAll(tableID){
   for (i = 0; i < trs.length; i++) {
 		trs[i].style.display = "";
   }
+}
+
+// Table Show All
+function applyDataTable(id) {
+	$(document).ready( function () {
+		$('#' + id).DataTable({
+				stateSave: true,
+				"lengthMenu": [[-1, 7, 10, 15, 20, 25, 50, 100 ], [ "All", 7, 10, 15, 20, 25, 50, 100 ]],
+		});
+	});
 }
 
 
@@ -158,7 +174,7 @@ function currency(val) {
 {% macro import(vendor, vendor_optionals=[]) %}
 {# -------------------- echart.js -------------------- #}
 	{% if vendor == 'echart' %}
-<script src="{{ url_for('vendor', filename='echarts-en.min.js') }}"></script>
+	<script src="{{ url_for('vendor', filename='echarts-en.min.js') }}"></script>
 
 {# -------------------- chart.js -------------------- #}
 	{% elif vendor == 'chart.js' %}
@@ -175,52 +191,42 @@ function currency(val) {
 
 {# -------------------- lodash.js -------------------- #}
 	{% elif vendor == 'lodash' %}
-<script src="{{ url_for('vendor', filename='lodash.min.js') }}"></script>
+	<script src="{{ url_for('vendor', filename='lodash.min.js') }}"></script>
 
 {# -------------------- lodash.js -------------------- #}
 	{% elif vendor == 'd3' %}
-<script src="{{ url_for('vendor', filename='d3.min.js') }}"></script>
+	<script src="{{ url_for('vendor', filename='d3.min.js') }}"></script>
 
 
 {# -------------------- vue.js -------------------- #}
 	{% elif vendor == 'vue' %}
-<script src="{{ url_for('vendor', filename='vue.min.js') }}"></script>
-<script>Vue.options.delimiters = ['<<', '>>'];</script>
+	<script src="{{ url_for('vendor', filename='vue.min.js') }}"></script>
+	<script>Vue.options.delimiters = ['<<', '>>'];</script>
 
 {# -------------------- crossfilter.js -------------------- #}
 	{% elif vendor == 'crossfilter' %}
-<script src="{{ url_for('vendor', filename='crossfilter.min.js') }}"></script>
+	<script src="{{ url_for('vendor', filename='crossfilter.min.js') }}"></script>
 
 {# -------------------- sketch.js -------------------- #}
 	{% elif vendor == 'sketch' %}
-<script src="{{ url_for('vendor', filename='sketch.min.js') }}"></script>
+	<script src="{{ url_for('vendor', filename='sketch.min.js') }}"></script>
 
 {# -------------------- sketch.js -------------------- #}
 	{% elif vendor == 'moment' %}
-<script src="{{ url_for('vendor', filename='moment.min.js') }}"></script>
+	<script src="{{ url_for('vendor', filename='moment.min.js') }}"></script>
 
 
 {# -------------------- datatable -------------------- #}
 	{% elif vendor == 'datatables' %}
-<script src="{{ url_for('vendor', filename='jquery.dataTables.min.js') }}"></script>
-<script src="{{ url_for('vendor', filename='dataTables.bootstrap4.min.js') }}"></script>
-
-<script src="https://cdn.datatables.net/plug-ins/1.10.19/sorting/datetime-moment.js"></script>
-
-<link rel="stylesheet" type="text/css" href="{{ url_for('vendor', filename='dataTables.bootstrap4.min.css') }}">
-
-{#		{% if vendor_optionals %}#}
-{#			{% if vendor_optionals[0] == 'bs4' %}#}
-{#			<script src="{{ url_for('vendor', filename='jquery.dataTables.min.js') }}"></script>#}
-{#			<script src="{{ url_for('vendor', filename='dataTables.bootstrap4.min.js') }}"></script>#}
-{#			<link rel="stylesheet" type="text/css" href="{{ url_for('vendor', filename='dataTables.bootstrap4.min.css') }}">#}
-{##}
-{#			{% endif %}#}
-{#		{% else %}#}
-{#		<script src="{{ url_for('vendor', filename='jquery.dataTables.min.js') }}"></script>#}
-{#		<link rel="stylesheet" type="text/css" href="{{ url_for('vendor', filename='jquery.dataTables.min.css') }}">#}
-{#		{% endif %}#}
-
+	<script src="{{ url_for('vendor', filename='jquery.dataTables.min.js') }}"></script>
+		{% if vendor_optionals %}
+			{% if vendor_optionals[0] == 'bs4' %}
+			<script src="{{ url_for('vendor', filename='dataTables.bootstrap4.min.js') }}"></script>
+			<link rel="stylesheet" type="text/css" href="{{ url_for('vendor', filename='dataTables.bootstrap4.min.css') }}">
+			{% endif %}
+		{% else %}
+			<link rel="stylesheet" type="text/css" href="{{ url_for('vendor', filename='jquery.dataTables.min.css') }}">
+		{% endif %}
 
 
 
@@ -279,7 +285,7 @@ function currency(val) {
 
 {# Set High Chart Global Defaults #}
 <script type="text/javascript">
-console.log('Highchart ready to serve: ', "{{ bases|safe }}{{ modules|safe }}");
+console.log('✓ Highchart ready to serve: ', "{{ bases|safe }}{{ modules|safe }}");
 Highcharts.setOptions({
 	lang: {
 		decimalPoint: '.',

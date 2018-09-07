@@ -56,3 +56,8 @@ def rfm_result(filename):
 @templatified('track_order')
 def track_order():
 	return dict(title='Track Rex Order')
+
+
+@templatified('merch_new_customer_courtesy_call')
+def merchandise_new_courtesy_call():
+	return dict(title='CSD Courtesy Call Todo List')

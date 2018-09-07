@@ -1,0 +1,148 @@
+{% extends framework_template %}
+
+{# Addiditonal Libraries #}
+{% block css_optional %}
+{% endblock %}
+
+{% block js_optional %}
+{{ import('vue') }}
+{% endblock %}
+{# ------------------------------------------------------------------- #}
+
+
+{# My Own js and css #}
+{% block css_custom %}
+{% endblock %}
+
+{% block js_custom %}
+{% endblock %}
+{# ------------------------------------------------------------------- #}
+
+
+{# Embedded CSS #}
+{% block css_embedded %}
+<style type="text/css">
+</style>
+{% endblock %}
+{# ------------------------------------------------------------------- #}
+
+
+{# Embedded Javascript After Libraries & Before Custom Javascript #}
+{% block js_embedded_before %}
+{% endblock %}
+{# ------------------------------------------------------------------- #}
+
+
+{# Embedded Javascript At the Very End #}
+{% block js_embedded_after %}
+<script>
+const vueBus =new Vue();
+
+let vueTable = Vue.component('typeCard', {
+	props: ['raw'],
+	data: function() {
+		return {
+			headers: ['SN','FIRST DATE','FIRST ORDER','DELIVERY STATUS'],
+			orders: {},
+			stage1: {
+				endpoint: '/api/ssi/orders/search/',
+				status: 'wait',
+	  	},
+			stage2: {
+				endpoint: '/api/ssi/order/',
+				status: 'wait',
+
+	  	},
+			stage3: {
+				endpoint: '/api/ssi/track/',
+				status: 'wait',
+	  	},
+		}
+	},
+	template: `
+	<div class="table-responsive-lg">
+	<div class="alert alert-primary" role="alert"> << orders >> </div>
+	<table class="table table-hover table-sm" id="vue-table">
+		<caption>Data Refreshed : << formatDateTime(raw.timestamp) >>  </caption>
+		<thead>
+			<tr class="table-bordered table-info">
+				 <th scope="col" v-for="header in headers"><< header >></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr v-for="row in raw.rows" v-if="!excludeRow(row)">
+				<th scope="row"><< row.SERIALNUMBER >></th>
+				<td><< formatDate(row.FIRSTDATE) >></td>
+				<td><< row.FIRSTORDER >></td>
+				<td><< fetchStatus(row.FIRSTORDER) >></td>
+			</tr>
+		</tbody>
+	</table>
+ 	</div>
+
+
+	`,
+	methods:{
+		excludeRow: function (row) {
+			let ck1 = row.CONTACTTYPE.toUpperCase() === 'ORGANISATION' || row.PRIMARYCATEGORY.toUpperCase() === 'ESTATE';
+			return ck1
+		},
+		formatDate: function (rawDate){
+			let d = new Date(rawDate);
+			return d.toLocaleDateString("en-AU", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+		},
+		formatDateTime: function (rawDate){
+			let d = new Date(rawDate);
+			return d.toLocaleDateString("en-AU", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' });
+		},
+		fetchStatus: function(orderID){
+			console.log(this.orders);
+			if(!(orderID in this.orders)){
+				this.orders[orderID] = {
+					orders: [],
+					details: [],
+					track:[],
+				};
+			}
+			fetchJSON(endpoint(this.stage1.endpoint + orderID), this.processStage1);
+
+		},
+		processStage1: function(json){
+			let orders = json.orders;
+
+			if (orders.length > 0 ){
+				{#this.orders[orderID].orders = orders;#}
+			} else {
+				return 'No Value'
+			}
+		}
+	}
+});
+
+let rootVue = new Vue({
+	el: '#todo-merchandise-new-customer',
+	data: {
+		raw: {
+			rows: null,
+			ready: false,
+			timestamp: undefined,
+		},
+
+	},
+	methods:{
+
+	},
+	components:{
+		'vue-table': vueTable,
+
+	}
+});
+
+fetchJSON(endpoint('/api/merch/new_customers'), function(json){
+	rootVue.raw.rows = json;
+	rootVue.raw.ready = true;
+	rootVue.raw.timestamp = new Date();
+});
+</script>
+{% endblock %}
+{# ------------------------------------------------------------------- #}

@@ -49,6 +49,14 @@ def format_date_au(value, fmt='%d %B %Y'):
 	return value.strftime(fmt) if value else None
 
 
+def format_date_sort(value, fmt='%Y-%m-%d'):
+	return value.strftime(fmt) if value else None
+
+
+def format_datetime_sort(value, fmt='%Y-%m-%d %H:%M:%S'):
+	return value.strftime(fmt) if value else None
+
+
 def filter_to_date(value, fmt=''):
 	return datetime.datetime.strptime(value, fmt)
 

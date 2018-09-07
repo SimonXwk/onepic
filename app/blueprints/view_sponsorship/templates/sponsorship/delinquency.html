@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block js_optional %}
-		{{ import('datatables', ['bs4']) }}
+{{ import('datatables', ['bs4']) }}
 {% endblock %}
 
 
@@ -15,31 +15,7 @@
 
 {% block js_custom %}
 <script>
-$(document).ready( function () {
-	{#$(tblSelector + ' thead tr').clone(true).appendTo( tblSelector + ' thead' );#}
-	{##}
-	{#$(tblSelector + ' thead tr:eq(1) th').each( function (i) {#}
-	{#	let title = $(this).text();#}
-	{#	$(this).html( '<input type="text" placeholder="" />' );#}
-	{##}
-	{#	$( 'input', this ).on( 'keyup change', function () {#}
-	{#		if ( table.column(i).search() !== this.value ) {#}
-	{#			table#}
-	{#				.column(i)#}
-	{#				.search( this.value )#}
-	{#				.draw();#}
-	{#		}#}
-	{#	});#}
-	{#});#}
-
-	$(tblSelector).DataTable(
-		{
-			"lengthMenu": [[7, 10, 15, 20, -1], [ 7, 10, 15, 20, "All"]],
-			{#stateSave: true#}
-		}
-	);
-
-});
+applyDataTable('delinquency');
 </script>
 {% endblock %}
 

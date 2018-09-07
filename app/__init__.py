@@ -60,22 +60,24 @@ def create_app(test_config=None):
 	loader.url('hidden_portal', ['/tt'])
 
 	# LazyLoad Jinja filter functions
-	loader.filter('jinja_filters.format_currency', name='currency')
-	loader.filter('jinja_filters.format_number', name='number')
-	loader.filter('jinja_filters.division', name='div')
-	loader.filter('jinja_filters.percentage', name='pct')
-	loader.filter('jinja_filters.format_datetime_au', name='dtAU')
-	loader.filter('jinja_filters.format_date_au', name='dAU')
-	loader.filter('jinja_filters.filter_month_name', name='mthname')
-	loader.filter('jinja_filters.filter_add_working_days', name='addworkingdays')
-	loader.filter('jinja_filters.filter_to_date', name='strpdt')
-	loader.filter('jinja_filters.filter_financial_year', name='FY')
-	loader.filter('jinja_filters.financial_year_month', name='fymth')
+	loader.filter('filters.format_currency', name='currency')
+	loader.filter('filters.format_number', name='number')
+	loader.filter('filters.division', name='div')
+	loader.filter('filters.percentage', name='pct')
+	loader.filter('filters.format_datetime_au', name='dtAU')
+	loader.filter('filters.format_date_au', name='dAU')
+	loader.filter('filters.format_date_sort', name='dSort')
+	loader.filter('filters.format_datetime_sort', name='dtSort')
+	loader.filter('filters.filter_month_name', name='mthname')
+	loader.filter('filters.filter_add_working_days', name='addworkingdays')
+	loader.filter('filters.filter_to_date', name='strpdt')
+	loader.filter('filters.filter_financial_year', name='FY')
+	loader.filter('filters.financial_year_month', name='fymth')
 
-	loader.filter('jinja_filters.filter_datetime_offset', name='dtOffset')
+	loader.filter('filters.filter_datetime_offset', name='dtOffset')
 
-	loader.filter('jinja_filters.filter_filename', name='fname')
-	loader.filter('jinja_filters.filter_mail_excel_month', name='mailmonth')
+	loader.filter('filters.filter_filename', name='fname')
+	loader.filter('filters.filter_mail_excel_month', name='mailmonth')
 
 	# Close the session after each request or application context shutdown
 	@app.teardown_appcontext

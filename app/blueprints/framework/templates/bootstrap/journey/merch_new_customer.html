@@ -119,23 +119,22 @@
 	    <table class="table table-hover table-sm" id="{{ table_name }}">
 		   <caption><strong>Data Captured : </strong>{{ data.timestamp|dtAU }}, result will be cached for {{ '{:,}'.format(data.cached_timeout) }} seconds</caption>
 		   <thead>
-			  <tr class="table-bordered table-dark">
+			  <tr class="table-bordered table-primary">
 				 <th scope="col">SN</th>
 				 <th scope="col">1ST DATE</th>
 				 <th scope="col">1ST ORDER</th>
 				 <th scope="col">1ST DATE MERCH TOTAL</th>
 				 <th scope="col">TAGS</th>
-				 <th scope="col">ONBOARD</th>
+				 <th scope="col">MERCH ONBOARDING</th>
 				 <th scope="col">DELIVERED</th>
-				 <th scope="col">THANK YOU</th>
-				 <th scope="col">WELCOME PACK</th>
+				 <th scope="col">COURTESY CALL</th>
 			  </tr>
 		   </thead>
 		   <tbody>
 			  {% for row in data.rows %}
 			  <tr {% if not row[2] %}class=""{% endif %}>
 				 <th scope="row">{{ row.SERIALNUMBER }}</th>
-				 <td>{{ row.FIRSTDATE|dAU }}</td>
+				 <td>{{ row.FIRSTDATE|dSort }}</td>
 				 <td><!--First Order ID-->
 					{% if row.FIRSTORDER %}
 					     {% if row.FIRSTORDERS|int > 1 %}
@@ -161,29 +160,29 @@
 
 					<span class="text-info" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
 										title='
-										{% if row.FIRSTDATETOTAL == row.MERCHANDISE_TOTAL %}
+										{% if row.FIRSTDATETOTAL == row.FIRSTDATE_MERCHANDISE_TOTAL %}
 										<div class="alert alert-info" role="alert">Pure Merchandise Customer</div>
 										{% else %}
 										<div class="alert alert-warning" role="alert">Mixed Type Merchandise Customer</div>
 										{% endif %}
 										<div class="alert alert-info" role="alert"><small>Merchandise Breakdown</small></div>
-									 	{% if row.MERCHANDISE_PURCHASE != 0  %}Purchase&Postage: <span class="border border-light">{{ row.MERCHANDISE_PURCHASE|currency }}</span><br>{% endif %}
-										{% if row.MERCHANDISE_PLEDGE !=0  %}Pledge:  <span class="border border-light">{{ row.MERCHANDISE_PLEDGE|currency }}</span><br>{% endif %}
-										{% if row.MERCHANDISE_DONATION !=0  %}Donation:  <span class="border border-light">{{ row.MERCHANDISE_DONATION|currency }}</span><br>{% endif %}
-										{% if row.MERCHANDISE_GOL !=0  %}Gift of Love:  <span class="border border-light">{{ row.MERCHANDISE_GOL|currency }}</span><br>{% endif %}
-										{% if (row.MERCHANDISE_TOTAL -  row.MERCHANDISE_PURCHASE - row.MERCHANDISE_PLEDGE - row.MERCHANDISE_DONATION - row.MERCHANDISE_GOL) !=0  %}Other: <span class="border border-light">{{ (row.MERCHANDISE_TOTAL -  row.MERCHANDISE_PURCHASE - row.MERCHANDISE_PLEDGE - row.MERCHANDISE_DONATION - row.MERCHANDISE_GOL)|currency }}</span><br>{% endif %}
+									 	{% if row.FIRSTDATE_MERCHANDISE_PURCHASE != 0  %}Purchase&Postage: <span class="border border-light">{{ row.FIRSTDATE_MERCHANDISE_PURCHASE|currency }}</span><br>{% endif %}
+										{% if row.FIRSTDATE_MERCHANDISE_PLEDGE !=0  %}Pledge:  <span class="border border-light">{{ row.FIRSTDATE_MERCHANDISE_PLEDGE|currency }}</span><br>{% endif %}
+										{% if row.FIRSTDATE_MERCHANDISE_DONATION !=0  %}Donation:  <span class="border border-light">{{ row.FIRSTDATE_MERCHANDISE_DONATION|currency }}</span><br>{% endif %}
+										{% if row.FIRSTDATE_MERCHANDISE_GOL !=0  %}Gift of Love:  <span class="border border-light">{{ row.FIRSTDATE_MERCHANDISE_GOL|currency }}</span><br>{% endif %}
+										{% if (row.FIRSTDATE_MERCHANDISE_TOTAL -  row.FIRSTDATE_MERCHANDISE_PURCHASE - row.FIRSTDATE_MERCHANDISE_PLEDGE - row.FIRSTDATE_MERCHANDISE_DONATION - row.FIRSTDATE_MERCHANDISE_GOL) !=0  %}Other: <span class="border border-light">{{ (row.FIRSTDATE_MERCHANDISE_TOTAL -  row.FIRSTDATE_MERCHANDISE_PURCHASE - row.FIRSTDATE_MERCHANDISE_PLEDGE - row.FIRSTDATE_MERCHANDISE_DONATION - row.FIRSTDATE_MERCHANDISE_GOL)|currency }}</span><br>{% endif %}
 										<br>
 										<div class="alert alert-warning" role="alert"><small>Non-Merchandise Total</small></div>
-											{% if (row.FIRSTDATETOTAL - row.MERCHANDISE_TOTAL) ==0  %}None
-											{% else %}<span class="border border-light">{{ (row.FIRSTDATETOTAL - row.MERCHANDISE_TOTAL) }}</span>{% endif %}
+											{% if (row.FIRSTDATETOTAL - row.FIRSTDATE_MERCHANDISE_TOTAL) ==0  %}None
+											{% else %}<span class="border border-light">{{ (row.FIRSTDATETOTAL - row.FIRSTDATE_MERCHANDISE_TOTAL) }}</span>{% endif %}
 
 										'
-					><strong>{{ row.MERCHANDISE_TOTAL|currency }}</strong>
+					><strong>{{ row.FIRSTDATE_MERCHANDISE_TOTAL|currency }}</strong>
 					</span>
 
 				 </td>
 				 <td><!--STATUS-->
-					     {% if row.FIRSTDATETOTAL == row.MERCHANDISE_TOTAL %}<span class="badge badge-pill badge-success">PM</span>{% endif %}
+					     {% if row.FIRSTDATETOTAL == row.FIRSTDATE_MERCHANDISE_TOTAL %}<span class="badge badge-pill badge-success">PM</span>{% endif %}
 					     {% if row.CONTACTTYPE|trim|upper == 'ORGANISATION' %}<span class="badge badge-pill badge-dark">ORG</span>{% endif %}
 					     {% if row.PRIMARYCATEGORY|trim|upper == 'ESTATE' %}<span class="badge badge-pill badge-danger">ESTATE</span>{% endif %}
 					     {% if row.DONOTMAILREASON|trim|upper == 'DECEASED' %}<span class="badge badge-pill badge-danger">DECD</span>{% endif %}
@@ -200,8 +199,8 @@
 							   {{ row.SORTKEYREFREL2 }}
 						    </span>
 					     {% endif %}
-					     {% if row.MERCHANDISE_TOTAL==row.MERCHANDISE_PLEDGE %}<span class="badge badge-pill badge-dark">PMP</span>{% endif %}
-					     {% if row.MERCHANDISE_PURCHASE==0 %}<span class="badge badge-pill badge-dark">PMD</span>{% endif %}
+					     {% if row.FIRSTDATE_MERCHANDISE_TOTAL==row.FIRSTDATE_MERCHANDISE_PLEDGE %}<span class="badge badge-pill badge-dark">PMP</span>{% endif %}
+					     {% if row.FIRSTDATE_MERCHANDISE_PURCHASE==0 %}<span class="badge badge-pill badge-dark">PMD</span>{% endif %}
 				 </td>
 				 <td><!--ON BOARDING STATUS-->
 					{% if row.PARAMETERNAME %}
@@ -221,8 +220,8 @@
 					{% endif %}
 				 </td>
 				 <td><!--AUS POST-->
-					{% if row.MERCHANDISE_TOTAL==row.MERCHANDISE_PLEDGE %}<span class="text-muted"><s>[Skipped]</s></span>
-					{% elif row.MERCHANDISE_PURCHASE==0 %}<span class="text-muted"><s>[Skipped]</s></span>
+					{% if row.FIRSTDATE_MERCHANDISE_TOTAL==row.FIRSTDATE_MERCHANDISE_PLEDGE %}<span class="text-muted"><s>[Skipped]</s></span>
+					{% elif row.FIRSTDATE_MERCHANDISE_PURCHASE==0 %}<span class="text-muted"><s>[Skipped]</s></span>
 					{% elif row.CONTACTTYPE|trim|upper == 'ORGANISATION' %}<span class="text-muted"><s>[Skipped]</s></span>
 					{% elif row.PRIMARYCATEGORY|trim|upper == 'ESTATE' %}<span class="text-muted"><s>[Skipped]</s></span>
 					{% elif row.DONOTMAILREASON|trim|upper == 'DECEASED' %}<span class="text-muted"><s>[Skipped]</s></span>
@@ -245,15 +244,7 @@
 						    <s>No Valid Boarding Profile</s></span>
 					{% endif %}
 				 </td>
-				 <td><!--ACTION2-->
-					{% if valid_profile %}
-					     X
-					     / <span class="text-info">Check PickingSlip</span>
-					{% else %}
-					     <span class="text-muted">
-						    <s>No Valid Boarding Profile</s></span>
-					{% endif %}
-				 </td>
+
 			  </tr>
 			  {% endfor %}
 		   </tbody>
@@ -262,5 +253,5 @@
 </div>
 
 <script>
-let tblSelector = '#' + '{{ table_name }}';
+let tblSelector = '{{ table_name }}';
 </script>

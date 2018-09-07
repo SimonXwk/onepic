@@ -1,53 +1,102 @@
 <div class="container-fluid">
-	<div class="alert alert-warning" role="alert">
-  Active Pledges that have due date before {{ now|dAU }} : <strong>	{{ data.rows|length|number }}</strong> found
+
+	<div class="row"><!-- ROW -->
+		<div class="col-12"></div>
 	</div>
 
-	<div class="table-responsive-lg">
-		<table class="table table-sm table-hover" id="delinquency">
-			<caption>
-				<strong>Data Captured : </strong>{{ data.timestamp|dtAU }}, result will be cached for {{ '{:,}'.format(data.cached_timeout) }} seconds
-			</caption><!-- End of Table Caption -->
-
-			<thead>
-				<tr class="table-dark">
-					{% for header in data.headers %}
-					<th scope="col">{{ header }}</th>
-					{% endfor %}
-				</tr>
-			</thead><!-- End of Table Head -->
-
-			<tbody>
-				{% for row in data.rows %}
-				<tr>
-					{% for col in row %}
-					{% if loop.index == 1 %}
-					<th scope="row">
-						{{ col }}
-					</th>
+	{% set warnings =  data.rows|selectattr('FIRSTOVERDUE_LAPSED_DAYS','greaterthan',warning_days)|groupby(attribute='PLEDGEID')|length  %}
+	<div class="row"><!-- ROW -->
+		<div class="col-12">
+			<div class="card shadow-type6">
+				<div class="card-body">
+					{% if data.rows|length == 1 %}
+					<h3 class="card-title">One Active Pledge</h3>
+					<p class="card-text">that has due date before <span class="text-info">{{ now|dAU }}</span>,
+						and pledges that have lapsed for more than <span class="text-danger">{{ warning_days|number }}</span> days will be red-out :
+						<span class="text-danger">found {{  warnings|number }}</span>
+					</p>
 					{% else %}
-					<td>
-						<span>{{ col }}</span>
-					</td>
+					<h3 class="card-title text-danger"> &#10148 {{ data.rows|length|number }} <span class="text-success">Active Pledges</span></h3>
+					<p class="card-text text-secondary">that have due date before <span class="text-info">{{ now|dAU }}</span>,
+						and pledges that have lapsed for more than <span class="text-danger">{{ warning_days|number }}</span> days will be red-out :
+						{% if warnings != 0 %}<span class="text-danger">found {{  warnings|number }}</span>{% else %}<span class="text-success">None &#10003</span>{% endif %}
+					</p>
 					{% endif %}
-					{% endfor %}
-				</tr>
-				{% endfor %}
-			</tbody><!-- End of Table Body -->
-{#			<tfoot>#}
-{#				<tr>#}
-{#					{% for header in data.headers %}#}
-{#					<th scope="col">{{ header }}</th>#}
-{#					{% endfor %}#}
-{#				</tr>#}
-{#			</tfoot>#}
-		</table><!-- End of Table -->
-	</div><!-- End of Table Responsive -->
+					<hr/>
+					<div class="table-responsive-lg">
+						<table class="table table-sm table-hover table-bordered shadow-type1" id="delinquency">
+							<caption>
+								<strong>Data Captured : </strong>{{ data.timestamp|dtAU }}, result will be cached for {{ '{:,}'.format(data.cached_timeout) }} seconds
+							</caption><!-- End of Table Caption -->
 
+							<thead>
+								<tr class="bg-secondary text-light">
+									<th scope="col">PLEDGE ID</th>
+									<th scope="col">PLEDGE CREATED</th>
+									<th scope="col">CONTACT</th>
+									<th scope="col">PAYMENT INFO</th>
+									<th scope="col">CC EXPIRY</th>
+									<th scope="col">1ST OVERDUE</th>
+									<th scope="col">1ST OVERDUE (DAYS)</th>
+									<th scope="col">OVERDUES</th>
+									<th scope="col">SOURCECODE</th>
+									<th scope="col">SPONSORSHIP</th>
+								</tr>
+							</thead><!-- End of Table Head -->
+
+							<tbody>
+								{% for row in data.rows %}
+								<tr class="{% if row.FIRSTOVERDUE_LAPSED_DAYS > warning_days %}table-danger{% endif %}">
+									<td scope="row" class="text-dark">{{ row.PLEDGEID }}</td>
+									<td>{{ row.CREATED|dtSort }}&#10;<small class="text-secondary">{{ row.CREATEDBY }}</small></td>
+									<td>{{ row.FULLNAME }} <small class="text-secondary">({{ row.SERIALNUMBER }})</small></td>
+
+									<td>
+										<span class="badge badge-dark text-{% if row.PAYMENTTYPE|trim|upper == 'CREDIT CARD' %}warning{% else %}light{% endif %}">{{ row.PAYMENTTYPE }}</span>
+										<span class="badge badge-secondary">{{ row.PAYMENTFREQUENCY }}</span>
+										<span class="badge badge-secondary">{{ row.PLAN }}</span>
+										<span class="badge badge-info">{{ row.INSTALMENTVALUE|currency }}</span>
+										<span class="badge badge-success">Start {{ row.STARTDATE|dAU }}</span>
+										{% if row.SPONSORSHIP1 == 'CURE ONE' %}<span class="badge badge-warning">End {{ row.ENDDATE|dAU }}</span>{% endif %}
+									</td>
+
+									<td>{{ row.CREDITCARDEXPIRY }}</td>
+									<td>{{ row.FIRSTOVERDUE|dSort }}</td>
+
+									<td>
+										{% if row.FIRSTOVERDUE_LAPSED_DAYS > 31 %}
+										<span class="text-danger"><strong>{{ row.FIRSTOVERDUE_LAPSED_DAYS|number }}</strong></span>
+										{% else %}
+										<span class="text-dark">{{ row.FIRSTOVERDUE_LAPSED_DAYS|number }}</span>
+										{% endif %}
+									</td>
+
+									<td>
+										{% if row.DUES > 31 %}
+										<span class="text-danger"><strong>{{ row.DUES|number }}</strong></span>
+										{% else %}
+										<span class="text-dark">{{ row.DUES|number }}</span>
+										{% endif %}
+									</td>
+
+									<td>{{ row.FIRST_SOURCECODE1 }}&#10;<small class="text-secondary">({% if row.SOURCECODES ==1 %}unique{% else %}{{ row.SOURCECODES }} codes{% endif %})</small></td>
+									<td>{{ row.SPONSORSHIP2 }}</td>
+								</tr>
+								{% endfor %}
+							</tbody><!-- End of Table Body -->
+				{#			<tfoot>#}
+				{#				<tr>#}
+				{#					{% for header in data.headers %}#}
+				{#					<th scope="col">{{ header }}</th>#}
+				{#					{% endfor %}#}
+				{#				</tr>#}
+				{#			</tfoot>#}
+						</table><!-- End of Table -->
+					</div><!-- End of Table Responsive -->
+
+				</div><!-- End of Card Body -->
+			</div><!-- End of Card -->
+		</div><!-- End of Column -->
+	</div><!-- END OF ROW -->
 
 </div>
-
-
-<script>
-let tblSelector = '#delinquency';
-</script>

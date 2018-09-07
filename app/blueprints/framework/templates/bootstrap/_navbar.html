@@ -1,12 +1,29 @@
-{% macro activeBlueprint(blueprint) %}
-	{% if request.blueprint == blueprint %}active{% endif %}
+{% macro blueprintNavItem(blueprint, maxlevel, links) %}
+<li class="nav-item {% if maxlevel > 1 %}dropdown{% endif %} {% if request.blueprint == blueprint %}active{% endif %}">
+{% if maxlevel > 1 %}
+	<a class="nav-link dropdown-toggle" href="#" id="{{ blueprint }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ blueprint|title }}</a>
+	<div class="dropdown-menu" aria-labelledby="{{ blueprint }}">
+	{% for endpoint, text in links %}
+
+		{% if endpoint %}
+		<a class="dropdown-item {% if request.endpoint == blueprint+'.'+endpoint %}active{% endif %}" href="{{ url_for(blueprint+'.'+endpoint) }}">{{ text }}</a>
+		{% else %}
+		<div class="dropdown-divider"></div>
+		{% endif %}
+	{% endfor %}
+	</div>
+{% elif maxlevel == 1 %}
+	{% for endpoint, text in links %}
+	<a class="nav-link {% if request.endpoint == blueprint+'.'+endpoint %}active{% endif %}" href="{{ url_for(blueprint+'.'+endpoint) }}">{{ text }}</a>
+	{% endfor %}
+{% else %}
+{% endif %}
+</li>
 {% endmacro %}
 
-{% macro NavLink(blueprint, endpoint, text, type='dropdown-item') %}
-	<a class="{{ type }} {% if request.endpoint == blueprint+'.'+endpoint %}active{% endif %}" href="{{ url_for(blueprint+'.'+endpoint) }}">{{ text }}</a>
-{% endmacro %}
+
 {#- -------------------------------- -#}
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="navbar-global">
+<nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark " id="navbar-global">
 	<a class="navbar-brand" href="/logged">
 		ONEPIC
 	</a>
@@ -17,95 +34,71 @@
 	<div class="collapse navbar-collapse" id="onepic_nav_global">
 		<ul class="navbar-nav mr-auto">
 			<!-- Dictionary -->
-			{% set blueprint = 'dictionary' %}
-			<li class="nav-item dropdown {{ activeBlueprint(blueprint) }}">
-				<a class="nav-link dropdown-toggle" href="#" id="{{ blueprint }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ blueprint|title }}</a>
-				<div class="dropdown-menu" aria-labelledby="{{ blueprint }}">
-					{{ NavLink(blueprint, 'index', 'General') }}
-					{{ NavLink(blueprint, 'donor_type', 'On Donor Type') }}
-					{{ NavLink(blueprint, 'marketing_cycle', 'On Marketing Cycle') }}
-				</div>
-			</li>
+			{{ blueprintNavItem('dictionary', 2,
+				 [('index', 'General')
+				,('donor_type', 'On Donor Type')
+				,('marketing_cycle', 'On Marketing Cycle')
+			]) }}
+
 			<!-- MailBox -->
-			{% set blueprint = 'mailbox' %}
-			<li class="nav-item dropdown {{ activeBlueprint(blueprint) }}">
-				<a class="nav-link dropdown-toggle" href="#" id="{{ blueprint }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ blueprint|title }}</a>
-				<div class="dropdown-menu" aria-labelledby="{{ blueprint }}">
-					{{ NavLink(blueprint, 'index', 'Today') }}
-					{{ NavLink(blueprint, 'daily', 'Daily') }}
-					{{ NavLink(blueprint, 'monthly', 'Monthly') }}
-					{{ NavLink(blueprint, 'excel_list', 'Excel List') }}
-				</div>
-			</li>
+			{{ blueprintNavItem('mailbox', 2,
+				[('index', 'Today')
+				,('daily', 'Daily')
+				,('monthly', 'Monthly')
+				,('excel_list', 'Excel List')
+			]) }}
+
 			<!-- Private Revenue -->
-			{% set blueprint = 'privenue' %}
-			<li class="nav-item dropdown {{ activeBlueprint(blueprint) }}">
-				<a class="nav-link dropdown-toggle" href="#" id="{{ blueprint }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ blueprint|title }}</a>
-				<div class="dropdown-menu" aria-labelledby="{{ blueprint }}">
-					{{ NavLink(blueprint, 'index', 'Overview') }}
-					{{ NavLink(blueprint, 'comparative', 'Comparative View') }}
+			{{ blueprintNavItem('privenue', 2,
+				[('index', 'Overview')
+				,('comparative', 'Comparative View')
+				,('revenue_streams', 'Revenue Streams')
+				,('single_campaign', 'Single Campaign Dashboard')
+				,('sourcecode1', 'Source Codes Created (June-June)')
+				,('pending', 'Pending Batches')
+			]) }}
 
-					{{ NavLink(blueprint, 'revenue_streams', 'Revenue Streams') }}
-					{{ NavLink(blueprint, 'single_campaign', 'Single Campaign Dashboard') }}
-					{{ NavLink(blueprint, 'sourcecode1', 'Source Codes Created (June-June)') }}
-					{{ NavLink(blueprint, 'pending', 'Pending Batches') }}
-				</div>
-			</li>
 			<!-- Donor Statistics -->
-			{% set blueprint = 'stats' %}
-			<li class="nav-item dropdown {{ activeBlueprint(blueprint) }}">
-				<a class="nav-link dropdown-toggle" href="#" id="{{ blueprint }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ blueprint|title }}</a>
-				<div class="dropdown-menu" aria-labelledby="{{ blueprint }}">
-					{{ NavLink(blueprint, 'fishing_pool', 'Fishing Pool') }}
-					{{ NavLink(blueprint, 'segments', 'Segments') }}
+			{{ blueprintNavItem('stats', 2,
+				[('fishing_pool', 'Fishing Pool')
 
-				</div>
-			</li>
-			<!-- Donor Statistics -->
-			{% set blueprint = 'sponsorship' %}
-			<li class="nav-item dropdown {{ activeBlueprint(blueprint) }}">
-				<a class="nav-link dropdown-toggle" href="#" id="{{ blueprint }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ blueprint|title }}</a>
-				<div class="dropdown-menu" aria-labelledby="{{ blueprint }}">
-					{{ NavLink(blueprint, 'pledges', 'Pledges Created') }}
-					{{ NavLink(blueprint, 'pledge_income_fy', 'Pledge Income: Single FY') }}
-					{{ NavLink(blueprint, 'delinquency', 'Delinquency to be') }}
-				</div>
-			</li>
+				,('segments', 'Segments')
+			]) }}
+		{# ,('donor_types', 'Donor Types') #}
+
+			<!-- Sponsorship -->
+			{{ blueprintNavItem('sponsorship', 2,
+				[('overview', 'Overview')
+				,('pledge_income_fy', 'Revenue by Financial Year')
+				,('pledges', 'Created by Financial Year')
+				,('delinquency', 'Delinquency Warning')
+			]) }}
+
 			<!-- Journey -->
-			{% set blueprint = 'journey' %}
-			<li class="nav-item dropdown {{ activeBlueprint(blueprint) }}">
-				<a class="nav-link dropdown-toggle" href="#" id="{{ blueprint }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ blueprint|title }}</a>
-				<div class="dropdown-menu" aria-labelledby="{{ blueprint }}">
-					{{ NavLink(blueprint, 'cure_one', 'Cure One Stewardship') }}
-					{{ NavLink(blueprint, 'cure_one_acquisition', 'Cure One Acquisition') }}
-					{{ NavLink(blueprint, 'general_new', 'General New Donor') }}
-					{{ NavLink(blueprint, 'merchandise_new', 'New Merchandise Customer') }}
-				</div>
-			</li>
+			{{ blueprintNavItem('journey', 2,
+				[('cure_one', 'Cure One Stewardship')
+				,('cure_one_acquisition', 'Cure One Acquisition')
+				,('general_new', 'General New Donor Journey')
+				,('merchandise_new', 'New Merchandise Customer')
+			]) }}
+
 			<!-- Private Revenue -->
-			{% set blueprint = 'merchandise' %}
-			<li class="nav-item dropdown {{ activeBlueprint(blueprint) }}">
-				<a class="nav-link dropdown-toggle" href="#" id="{{ blueprint }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ blueprint|title }}</a>
-				<div class="dropdown-menu" aria-labelledby="{{ blueprint }}">
-					{{ NavLink(blueprint, 'track_order', 'Track Rex Order') }}
-					{{ NavLink(blueprint, 'upload', 'RFM') }}
-				</div>
-			</li>
+			{{ blueprintNavItem('merchandise', 2,
+				[('track_order', 'Track REX Order')
+				,('upload', 'REX RFM')
+				,(none, none)
+				,('merchandise_new_courtesy_call', 'Todo : New Merch Customer Courtesy Call')
+			]) }}
 
 			<!-- Budget -->
-			{% set blueprint = 'budget' %}
-			<li class="nav-item dropdown {{ activeBlueprint(blueprint) }}">
-				<a class="nav-link dropdown-toggle" href="#" id="{{ blueprint }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ blueprint|title }}</a>
-				<div class="dropdown-menu" aria-labelledby="{{ blueprint }}">
-					{{ NavLink(blueprint, 'scoping_fy20', 'FY20 Budget Scoping') }}
-				</div>
-			</li>
+			{{ blueprintNavItem('budget', 2,
+				[('scoping_fy20', 'FY20 Budget Scoping')
+			]) }}
 
 			<!-- API -->
-			{% set blueprint = 'api' %}
-			<li class="nav-item {{ activeBlueprint(blueprint) }}">
-				{{ NavLink(blueprint, 'index', 'API', 'nav-link') }}
-			</li>
+			{{ blueprintNavItem('api', 1,
+				[('index', 'API')
+			]) }}
 
 		</ul>
 

@@ -1,0 +1,128 @@
+<div class="container-fluid">
+
+	<div class="row"><!-- ROW -->
+		<div class="col-12">
+			<p>
+				<small class="text-secondary">Data Captured : {{ data.timestamp|dtAU }}, result will be cached for {{ '{:,}'.format(data.cached_timeout) }} seconds</small>
+			</p>
+
+
+			<p class="lead text-primary">
+				<strong>FY{{ thisfy }} : {{ data.rows|length|number }} Pledges Involved </strong>
+			</p>
+
+		</div>
+	</div>
+
+	<div class="row"><!-- ROW -->
+		<div class="col-lg-6 col-md-12">
+
+			<div class="table-responsive-lg">
+				<table class="table table-sm table-hover table-bordered shadow-type1">
+					<thead>
+						<tr class="bg-secondary text-light">
+							<th scope="col">TYPE 1</th>
+							<th scope="col">CREATED</th><th scope="col">NEW</th><th scope="col">ACTIVE</th>
+							<th scope="col">ONHOLD</th><th scope="col">CANCEL</th><th scope="col">FINISH</th>
+						</tr>
+					</thead><!-- End of Table Head -->
+					<tbody>
+						{% for type, typeList in data.rows|groupby('SPONSORSHIP1') %}
+						{% set calc1 = typeList|selectattr('CREATED_FY','equalto',thisfy)|list|length %}
+						{% set calc2 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('START_FY','equalto',thisfy)|list|length %}
+						{% set calc3 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Active')|list|length %}
+						{% set calc4 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','On Hold')|selectattr('ONHOLD_FY','equalto',thisfy)|list|length %}
+						{% set calc5 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Written Down')|selectattr('WRITTENDOWN_FY','equalto',thisfy)|list|length %}
+						{% set calc6 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Closed')|selectattr('CLOSED_FY','equalto',thisfy)|list|length %}
+						<tr>
+							<th scope="row" style="color:{{ typeList[0].SPONSORSHIP1_COLOR }}">{{ type }}</th>
+							<td>{{ calc1|number or '' }}</td>
+							<td>{{ calc2|number or '' }}</td>
+							<td>{{ calc3|number or '' }}</td>
+							<td>{{ calc4|number or '' }}</td>
+							<td>{{ calc5|number or '' }}</td>
+							<td>{{ calc6|number or '' }}</td>
+						</tr>
+						{% endfor %}
+					</tbody><!-- End of Table Body -->
+					<tfoot>
+						<tr class="bg-light text-dark font-weight-bold">
+							<th>Total</th>
+							<td>{{ data.rows|selectattr('CREATED_FY','equalto',thisfy)|list|length|number }}</td>
+							<td>{{ data.rows|selectattr('CREATED_FY','<=',thisfy)|selectattr('START_FY','equalto',thisfy)|list|length|number }}</td>
+							<td>{{ data.rows|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Active')|list|length|number }}</td>
+							<td>{{ data.rows|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','On Hold')|selectattr('ONHOLD_FY','equalto',thisfy)|list|length|number }}</td>
+							<td>{{ data.rows|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Written Down')|selectattr('WRITTENDOWN_FY','equalto',thisfy)|list|length|number }}</td>
+							<td>{{ data.rows|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Closed')|selectattr('CLOSED_FY','equalto',thisfy)|list|length|number }}</td>
+						</tr>
+					</tfoot>
+				</table><!-- End of Table -->
+			</div><!-- End of Table Responsive -->
+
+			<div class="table-responsive-lg">
+				<table class="table table-sm table-hover table-bordered shadow-type1">
+					<thead>
+						<tr class="bg-secondary text-light">
+							<th scope="col">TYPE 2</th>
+							<th scope="col">CREATED</th><th scope="col">NEW</th><th scope="col">ACTIVE</th>
+							<th scope="col">ONHOLD</th><th scope="col">CANCEL</th><th scope="col">FINISH</th>
+						</tr>
+					</thead><!-- End of Table Head -->
+					<tbody>
+						{% for type, typeList in data.rows|groupby('SPONSORSHIP2') %}
+						{% set calc1 = typeList|selectattr('CREATED_FY','equalto',thisfy)|list|length %}
+						{% set calc2 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('START_FY','equalto',thisfy)|list|length %}
+						{% set calc3 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Active')|list|length %}
+						{% set calc4 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','On Hold')|selectattr('ONHOLD_FY','equalto',thisfy)|list|length %}
+						{% set calc5 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Written Down')|selectattr('WRITTENDOWN_FY','equalto',thisfy)|list|length %}
+						{% set calc6 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Closed')|selectattr('CLOSED_FY','equalto',thisfy)|list|length %}
+							<tr>
+							<th scope="row" style="color:{{ typeList[0].SPONSORSHIP1_COLOR }}">{{ type }}</th>
+							<td>{{ calc1|number or '' }}</td>
+							<td>{{ calc2|number or '' }}</td>
+							<td>{{ calc3|number or '' }}</td>
+							<td>{{ calc4|number or '' }}</td>
+							<td>{{ calc5|number or '' }}</td>
+							<td>{{ calc6|number or '' }}</td>
+						</tr>
+						{% endfor %}
+					</tbody><!-- End of Table Body -->
+					<tfoot>
+						<tr class="bg-light text-dark font-weight-bold">
+							<th>Total</th>
+							<td>{{ data.rows|selectattr('CREATED_FY','equalto',thisfy)|list|length|number }}</td>
+							<td>{{ data.rows|selectattr('CREATED_FY','<=',thisfy)|selectattr('START_FY','equalto',thisfy)|list|length|number }}</td>
+							<td>{{ data.rows|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Active')|list|length|number }}</td>
+							<td>{{ data.rows|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','On Hold')|selectattr('ONHOLD_FY','equalto',thisfy)|list|length|number }}</td>
+							<td>{{ data.rows|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Written Down')|selectattr('WRITTENDOWN_FY','equalto',thisfy)|list|length|number }}</td>
+							<td>{{ data.rows|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Closed')|selectattr('CLOSED_FY','equalto',thisfy)|list|length|number }}</td>
+						</tr>
+					</tfoot>
+				</table><!-- End of Table -->
+			</div><!-- End of Table Responsive -->
+
+		</div><!-- End of COLUMN -->
+
+		<div class="col-xl-6 col-md-12">
+			<div class="row"><!-- ROW -->
+				<div class="col-12">
+					<div class="chart " id="chart1" >{{ prototype('loading2') }}</div>
+				</div>
+			</div><!-- END OF ROW -->
+			<div class="row"><!-- ROW -->
+				<div class="col-12">
+					<div class="chart " id="chart2" >{{ prototype('loading2') }}</div>
+				</div>
+			</div><!-- END OF ROW -->
+		</div><!-- End of COLUMN -->
+
+	</div><!-- END OF ROW -->
+
+</div>
+
+
+<script>
+let data = JSON.parse({{ data.to_json()|tojson }});
+let thisFY = {{ thisfy }};
+
+</script>

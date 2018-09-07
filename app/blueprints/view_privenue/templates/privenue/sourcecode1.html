@@ -35,7 +35,10 @@ $(function () {
 });
 
 $(document).ready( function () {
-	{#$(tblSelector).DataTable();#}
+	{#$(tblSelector).DataTable({#}
+	{#	"lengthMenu": [[-1, 7, 10, 15, 20, 25, 50, 100 ], [ "All", 7, 10, 15, 20, 25, 50, 100 ]],#}
+	{#});#}
+
 });
 </script>
 {% endblock %}

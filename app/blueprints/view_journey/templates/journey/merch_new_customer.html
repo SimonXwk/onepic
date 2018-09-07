@@ -5,9 +5,7 @@
 {% endblock %}
 
 {% block js_optional %}
-	{{ import('datatables') }}
-	{{ import('moment') }}
-
+{{ import('datatables', ['bs4']) }}
 {% endblock %}
 {# ------------------------------------------------------------------- #}
 
@@ -76,13 +74,7 @@ $(function () {
 		html:true
 	});
 });
-
-$(document).ready( function () {
-	{#$.fn.dataTable.moment( 'D, MMMM, YYYY' );#}
-	$(tblSelector).DataTable({
-			"lengthMenu": [[7, 10, 15, 20, 25, 50, 100, -1], [ 7, 10, 15, 20, 25, 50, 100, "All"]],
-  })
-});
+applyDataTable(tblSelector);
 </script>
 {% endblock %}
 {# ------------------------------------------------------------------- #}

@@ -1,38 +1,38 @@
-console.log(cfy, budget,json);
+// console.log(cfy, budget,json);
 
 // Create the crossfilter represents the multi-dimensional data set
-const cs = crossfilter(json);
-console.log('crossfilter size(no.rows): ',cs.size());
+// const cs = crossfilter(json);
+// console.log('crossfilter size(no.rows): ',cs.size());
 // Constructs a new dimension using the specified value accessor function.
-const dimFY = cs.dimension(d=>d['FY'])
-	,dimFYMTH = cs.dimension(d=>d['FYMTH'])
-	,dimLTD = cs.dimension(d=>d['ISLTD'])
-	,dimTRX = cs.dimension(d=>d['ISTRX'])
-	,dimSTREAM = cs.dimension(d=>d['STREAM'])
-	,dimCAMPAIGN = cs.dimension(d=>d['CAMPAIGNCODE'])
-	,dimPLEDGETYPE = cs.dimension(d=>d['PLEDGETYPE'])
-;
-const mesTrxCount = dimTRX.group().reduceCount()
-;
+// const dimFY = cs.dimension(d=>d['FY'])
+// 	,dimFYMTH = cs.dimension(d=>d['FYMTH'])
+// 	,dimLTD = cs.dimension(d=>d['ISLTD'])
+// 	,dimTRX = cs.dimension(d=>d['ISTRX'])
+// 	,dimSTREAM = cs.dimension(d=>d['STREAM'])
+// 	,dimCAMPAIGN = cs.dimension(d=>d['CAMPAIGNCODE'])
+// 	,dimPLEDGETYPE = cs.dimension(d=>d['PLEDGETYPE'])
+// ;
+// const mesTrxCount = dimTRX.group().reduceCount()
+// ;
 
-console.log(Date.parse(json[0]['DATEOFPAYMENT']));
-
-console.log(json.filter(row => row['FY'] === cfy).sum("PAYMENTAMOUNT").toFixed(2));
-console.log(json.filter(row => row['FY'] === (cfy -1) ).sum("PAYMENTAMOUNT").toFixed(2));
-
-
-dimFY.filter(cfy);
-// dimFYMTH.filter(2);
-dimSTREAM.filter('Fundraising');
-
-console.log('CFY TOTAL:', cs.groupAll().reduceSum(fact => fact['PAYMENTAMOUNT']).value().toFixed(2));
-console.log('CFY PAYMENTS:', cs.groupAll().reduceCount().value());
-
-
+// console.log(Date.parse(json[0]['DATEOFPAYMENT']));
+//
+// console.log(json.filter(row => row['FY'] === cfy).sum("PAYMENTAMOUNT").toFixed(2));
+// console.log(json.filter(row => row['FY'] === (cfy -1) ).sum("PAYMENTAMOUNT").toFixed(2));
+//
+//
+// dimFY.filter(cfy);
+// // dimFYMTH.filter(2);
+// dimSTREAM.filter('Fundraising');
+//
+// console.log('CFY TOTAL:', cs.groupAll().reduceSum(fact => fact['PAYMENTAMOUNT']).value().toFixed(2));
+// console.log('CFY PAYMENTS:', cs.groupAll().reduceCount().value());
 
 
 
-console.log(stream.monthlyDataTLMA);
+
+
+// console.log(stream.monthlyDataTLMA);
 
 let dataTLMA = [];
 //ADD Budget
@@ -64,7 +64,7 @@ dataTLMA.push({
 
 
 
-console.log(dataTLMA);
+// console.log(dataTLMA);
 
 const  drawOverlappingColumnChart = obj => {
 	Highcharts.chart(obj.renderTo, {

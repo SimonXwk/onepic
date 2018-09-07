@@ -30,11 +30,11 @@ def cached(cached_timeout=2*60):
 			cache_key = compute_cache_key(f, args, kwargs)
 			result = cache.get(cache_key)
 			if result is not None:
-				print('*** {{cache}} * <{} seconds, {}> retrieved for [{}]'.format(cached_timeout, cache_key, calc_key))
+				print(f'~~~ [cache] | <{cached_timeout} seconds, {cache_key}> retrieved for [{calc_key}]')
 				return result
 			result = f(*args, **kwargs)
 			cache.set(cache_key, result, timeout=cached_timeout)
-			print('*** {{cache}} * <{} seconds, {}> created for [{}]'.format(cached_timeout, cache_key, calc_key))
+			print(f'~~~ [cache] | <{cached_timeout} seconds, {cache_key}> created for [{calc_key}]')
 			return result
 		return decorated_function
 	return decorator

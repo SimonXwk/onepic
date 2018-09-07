@@ -4,12 +4,13 @@ from werkzeug.exceptions import HTTPException
 
 # API Result Wrapper
 class ApiResult(object):
-	def __init__(self, value, status=200):
+	def __init__(self, value, status=200, dump=True):
 		self.value = value
 		self.status = status
+		self.dump = dump
 
 	def to_response(self):
-		return Response(json.dumps(self.value), status=self.status, mimetype='application/json')
+		return Response(json.dumps(self.value) if self.dump else self.value, status=self.status, mimetype='application/json')
 
 
 # API Errors

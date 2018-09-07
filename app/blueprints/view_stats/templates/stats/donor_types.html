@@ -1,0 +1,227 @@
+{% extends framework_template %}
+
+{# Addiditonal Libraries #}
+{% block css_optional %}
+{% endblock %}
+
+{% block js_optional %}
+{{ Highchart([], ['variable-pie'], (true,false,false)) }}
+{{ import('crossfilter') }}
+{{ import('vue') }}
+{% endblock %}
+
+
+{# My Own js and css #}
+{% block css_custom %}
+<style type="text/css">
+
+</style>
+{% endblock %}
+
+{% block js_custom %}
+{% endblock %}
+
+
+{# Embedded CSS #}
+{% block css_embedded %}
+{% endblock %}
+
+
+{# Embedded Javascript After Libraries & Before Custom Javascript #}
+{% block js_embedded_before %}
+{% endblock %}
+
+
+{# Embedded Javascript At the Very End #}
+{% block js_embedded_after %}
+<script>
+
+let typeCard = Vue.component('typeCard', {
+	props: ['type'],
+	template: `
+	<div class="card">
+		<div class="card-header bg-success text-light">
+			<< this.$parent.types[<< type >>].name >>
+			<label class="switch">
+				<input type="checkbox" class="switch-input"  v-on:input="toggleType1(<< type >>)">
+				<span class="switch-slider"></span>
+			</label>
+		</div>
+		<div class="card-body">
+			<< this.$parent.types['NEW'].filterOn >>
+			<p class="card-text">Number of Contacts: << >> </p>
+			<p class="card-text">Total Revenue: << this.$parent.types[<< type >>].total >> </p>
+		</div>
+		<div class="card-footer">
+			<small class="text-muted">Donors that have their first financial transaction in reporting period</small>
+		</div>
+	</div>
+	`,
+});
+
+let rootVue = new Vue({
+	el: '#DonorType',
+	data: {
+		crossFilter: {
+			ready: false,
+			cs: null,
+			dims: {},
+		},
+		types: {
+			NEW: {
+				name: 'New',
+				filterValue: 'NEW',
+				filterOn: true,
+				total: 0,
+			},
+			CON: {
+				name: 'Continuing',
+				filterValue: 'CON',
+				filterOn: true,
+				total: null,
+			},
+			REC: {
+				name: 'Reactivated',
+				filterValue: 'REC',
+				filterOn: true,
+				total: null,
+			}
+		}
+	},
+	computed:{
+		crossFilterSize: function(){
+			return this.crossFilter.cs === null ? 0 : this.crossFilter.cs.size()
+		},
+		totalRevenue: function(){
+			return  this.crossFilter.cs.groupAll().reduceSum( fact => fact["PAYMENTAMOUNT"]).value().toFixed(2)
+		}
+	},
+	methods:{
+		createCrossFilter: function (raw) {
+			this.crossFilter.cs =  crossfilter(raw);
+
+			this.crossFilter.dims.TYPE1 = this.crossFilter.cs.dimension(f=>f['DONTYPE1']);
+			this.crossFilter.dims.FYMTH = this.crossFilter.cs.dimension(f=>f['FYMTH']);
+			this.crossFilter.dims.LTD = this.crossFilter.cs.dimension(f=>f['ISLTD']);
+			this.crossFilter.dims.TRX = this.crossFilter.cs.dimension(f=>f['ISTRX']);
+			this.crossFilter.dims.STREAM = this.crossFilter.cs.dimension(f=>f['STREAM']);
+			this.crossFilter.dims.CAMPAIGN = this.crossFilter.cs.dimension(f=>f['CAMPAIGNCODE']);
+
+			this.crossFilter.ready = true;
+		},
+		filterType: function(){
+			this.crossFilter.dims.TYPE1.filterFunction(function(d){
+				return (this.types.NEW.filterOn ? d === this.types.NEW.filterValue : d !== this.types.NEW.filterValue)
+						&&  (this.types.CON.filterOn ? d === this.types.CON.filterValue : d !== this.types.CON.filterValue)
+						&&  (this.types.REC.filterOn ? d === this.types.REC.filterValue : d !== this.types.REC.filterValue)
+			});
+		}
+
+	},
+	components:{
+	// Component : Counter
+		'counter':{
+			template: `
+			<div v-if="this.$parent.crossFilter.ready">
+				<div class="alert alert-light" role="alert" >
+					<< this.$parent.crossFilterSize >> Lines of data found,
+					total Reveue : << this.$parent.totalRevenue >>
+				</div>
+
+
+			</div>
+			`
+
+		},
+		'type_card':{
+			template:`
+				<div class="card-deck" v-if="this.$parent.crossFilter.ready">
+
+					<div class="card">
+						<div class="card-header bg-success text-light">
+							<< this.$parent.types['NEW'].name >>
+							<label class="switch">
+								<input type="checkbox" class="switch-input"  v-on:input="toggleType1('NEW')">
+								<span class="switch-slider"></span>
+							</label>
+						</div>
+						<div class="card-body">
+							<< this.$parent.types['NEW'].filterOn >>
+							<p class="card-text">Number of Contacts: << >> </p>
+							<p class="card-text">Total Revenue: << this.$parent.types['NEW'].total >> </p>
+						</div>
+						<div class="card-footer">
+							<small class="text-muted">Donors that have their first financial transaction in reporting period</small>
+						</div>
+					</div>
+
+					<div class="card">
+						<div class="card-header bg-warning text-light">
+							<< this.$parent.types.CON.name >>
+							<label class="switch">
+								<input type="checkbox" class="switch-input"  v-on:input="toggleType1('CON')">
+								<span class="switch-slider"></span>
+							</label>
+						</div>
+						<div class="card-body">
+							<< this.$parent.types.CON.filterOn >>
+							<p class="card-text">Number of Contacts: << >> </p>
+							<p class="card-text">Total Revenue: << >> </p>
+						</div>
+						<div class="card-footer">
+							<small class="text-muted">Donors that have their first financial transaction in reporting period</small>
+						</div>
+					</div>
+
+					<div class="card">
+						<div class="card-header bg-info text-light">
+							<< this.$parent.types.REC.name >>
+							<label class="switch">
+								<input type="checkbox" class="switch-input"  v-on:input="toggleType1('REC')">
+								<span class="switch-slider"></span>
+							</label>
+						</div>
+						<div class="card-body">
+							<< this.$parent.types.REC.filterOn >>
+							<p class="card-text">Number of Contacts: << >> </p>
+							<p class="card-text">Total Revenue: << >> </p>
+						</div>
+						<div class="card-footer">
+							<small class="text-muted">Donors that have their first financial transaction in reporting period</small>
+						</div>
+					</div>
+
+
+				</div>
+			`,
+			methods:{
+				toggleType1: function(type){
+					console.log('toggled ', type, this);
+					this.$parent.types[type].filterOn = !this.$parent.types[type].filterOn;
+					this.$parent.crossFilter.dims.TYPE1.filter(type);
+
+					let total = this.$parent.crossFilter.cs.groupAll().reduceSum( fact => fact["PAYMENTAMOUNT"]).value().toFixed(2);
+					console.log(total);
+
+				}
+	  	}
+		}
+	}
+
+
+});
+
+
+
+fetchJSON(endpoint('/api/tq/payments'), function(json){
+	{#let data = JSON.parse(json);#}
+	rootVue.createCrossFilter(json);
+});
+
+
+
+
+
+</script>
+{% endblock %}
+

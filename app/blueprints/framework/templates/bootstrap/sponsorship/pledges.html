@@ -21,7 +21,7 @@
 		<!-- Pledge Status -->
 		<p>
 		{% set search_col = 5 %}
-		{% for group in data.rows|groupby('STATUS')%}
+		{% for group in data.rows|groupby('PLEDGESTATUS')%}
 		{% if group.grouper|string|upper == 'ACTIVE' %}
 		<button type="button" class="btn btn-success" onclick="{{ filterTable(search_col, 'ACTIVE') }}">
 			{{  group.grouper|upper }} <span class="badge-pill badge-light">{{ group.list|length }}</span>
@@ -187,7 +187,7 @@
 			{% with  %}
 			{% for row in data.rows %}
 			{% set err_tring = ':BLANK' %}
-{#				{% if row.DESCRIPTION == err_tring or row.RECRUITCAMPAIGN == err_tring  or row.STATUS == err_tring or row.PLAN == err_tring or row.TYPE == err_tring or row.PAYMENTFREQUENCY == err_tring or row.PAYMENTTYPE == err_tring %}#}
+{#				{% if row.DESCRIPTION == err_tring or row.RECRUITCAMPAIGN == err_tring  or row.PLEDGESTATUS == err_tring or row.PLEDGEPLAN == err_tring or row.PLEDGETYPE == err_tring or row.PAYMENTFREQUENCY == err_tring or row.PAYMENTTYPE == err_tring %}#}
 {#					{% set row_type = 'table-danger' %}#}
 {#				{% elif row.SOURCECODES|int != 1 or row.RECRUITMETHOD == err_tring %}#}
 {#					{% set row_type = 'table-warning' %}#}
@@ -202,12 +202,16 @@
 						<th scope="row">
 							{{ col }}
 						</th>
+					{% elif loop.index == 2 %}
+						<td>{{ col|dtSort }}</td>
+					{% elif loop.index in (3,4) %}
+						<td>{{ col|dSort }}</td>
 					{% else %}
 						<td>
 							{% if col == ':BLANK'  %}
 							<span class="badge badge-danger">{{ col }}</span>
 							{% else %}
-								{% if data.headers[loop.index - 1]|upper == 'STATUS' %}
+								{% if data.headers[loop.index - 1]|upper == 'PLEDGESTATUS' %}
 									{% if row.FIRST_DUE and row.FIRST_DUE < now %}
 										<span class="badge badge-warning"
 													data-toggle="popover" tabindex="0" data-trigger="focus"
@@ -247,5 +251,5 @@
 
 
 <script>
-let tblSelector = '#' + '{{ table_name }}';
+let tblSelector =  '{{ table_name }}';
 </script>

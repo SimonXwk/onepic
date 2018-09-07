@@ -1,5 +1,5 @@
 from werkzeug.utils import import_string, cached_property
-from flask import Blueprint, request, render_template, jsonify
+from flask import Blueprint, request, render_template
 from functools import wraps, singledispatch
 from flask_login import login_required
 from datetime import datetime
@@ -110,7 +110,7 @@ def convert(obj):
 
 @convert.register(datetime)
 def _(obj):
-	return obj.strftime('%Y-%m-%dT%H:%M:%S')
+	return obj.strftime('%Y-%m-%dT%H:%M:%SZ')
 
 
 @convert.register(Decimal)
@@ -142,9 +142,16 @@ def timeit(f):
 		ts = time.time()
 		res = f(*args, **kwargs)
 		te = time.time()
-		print(f':::execution time of [{f.__name__}] : {((te - ts) * 1000):,.2f} ms')
+		print(f'::: execution time of [{f.__name__}] : {((te - ts) * 1000):,.2f} ms')
 		return res
 	return decorated_function
+
+
+def request_arg(arg_name, default, check_func, strip=True):
+	arg = request.args.get(arg_name)
+	if arg is not None and check_func(arg):
+		return arg if strip else arg.strip()
+	return default
 
 
 def to_data_frame(header=None):

@@ -144,7 +144,7 @@ let ssi = new Vue({
 				<transition name="bounce">
 					<div v-if="this.$parent.$data.showBanner ">
 						<div class="alert alert-success shadow-type8" role="alert" v-if="this.$parent.validateOrderNumberOnInput() ">&#10004 <span class="text-danger"><strong><< this.$parent.$data.order.number >></strong></span> is a legitimate input</div>
-						<div class="alert alert-secondary shadow-type6" role="alert" v-else-if="this.$parent.$data.order.number === '' || this.$parent.$data.order.number === null "><span class="text-muted">waiting for a rex order id as input ... ( eg  18-00004073 )</span></div>
+						<div class="alert alert-secondary shadow-type1" role="alert" v-else-if="this.$parent.$data.order.number === '' || this.$parent.$data.order.number === null "><span class="text-muted">waiting for a rex order id as input ... ( eg  18-00004073 )</span></div>
 						<div class="alert alert-info shadow-type1" role="alert" v-else>&#10148 Reading Input : <span class="text-primary"><strong><< this.$parent.$data.order.number >></strong></span></div>
 					</div>
 				</transition>
@@ -216,8 +216,7 @@ let ssi = new Vue({
 					<div v-else-if=" this.$parent.$data.stage2.status === 'success' ">
 						<div v-for="orderDetail in this.$parent.$data.stage2.orderDetails">
 							<h3 ><span class="text-danger">&#9972</span> <span class="text-primary">Destination</span>
-								<small><span class="badge badge-light"><< orderDetail.order_id >></span></small>
-								<small><span class="badge badge-light"><< orderDetail.order_number >></span></small>
+								<small><span class="badge badge-light text-muted"><< orderDetail.order_id >></span></small>
 							</h3>
 
 							<p class="text-info" v-if="orderDetail.reference"> Rex Reference : <span class="badge badge-info"><< orderDetail.reference >></span> </p>
@@ -371,7 +370,7 @@ let ssi = new Vue({
 									</tr>
 									<tr>
 										<th scope="row">&#10024 Tracking Status</th>
-										<td v-if="result.tracking_status==='Delivered'"><span class="text-success"><strong>&#9989 << result.tracking_status >></strong></span></td>
+										<td v-if="result.tracking_status.trim().slice(0,9)==='Delivered' "><span class="text-success"><strong>&#9989 << result.tracking_status >></strong></span></td>
 										<td v-else-if="result.tracking_status==='Exception'"><span class="text-danger"><strong>&#10071 << result.tracking_status >></strong></span></td>
 										<td v-else><span class="text-dark"><strong>&#10068 << result.tracking_status >></strong></span></td>
 									</tr>
@@ -427,7 +426,7 @@ let ssi = new Vue({
 						}
 					},
 					eventStatusClass: function(event, prefix=''){
-						if (event.status === 'Delivered' ){
+						if (event.status === 'Delivered' || event.status === 'Delivered with signature' ){
 							return prefix === '' ? 'success' : prefix + '-success'
 						}else if(event.status === 'Exception') {
 							return prefix === '' ? 'danger' : prefix + '-danger'

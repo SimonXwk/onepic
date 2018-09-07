@@ -10,7 +10,7 @@ ld.url('data_mail.today', ['/mailbox/today', '/mailbox/today/<int:year_offset>']
 ld.url('data_mail.date', ['/mailbox/ymd', '/mailbox/ymd/<string:str_date>'])
 ld.url('data_mail.year_month', ['/mailbox/ym/<string:str_yearmonth>'])
 
-ld.url('data_thankq.payments', ['/tq/payments'])
+ld.url('data_thankq_general.payments', ['/tq/payments'])
 
 
 ld.url('data_privenue.fy_total_all', ['/cash/fys'])
@@ -18,9 +18,8 @@ ld.url('data_privenue.fy_total_all_ltd', ['/cash/fysltd'])
 ld.url('data_privenue.cfy_platform_type_revenue', ['/cash/cfy/stream'])
 
 # Merchandise related APIs
-ld.url('data_merch.new_fy', ['/merch/new/fy/<string:fy>'])
-ld.url('data_merch.new_cfy_month', ['/merch/new/cfy/<int:month>'])
 ld.url('data_merch.rex_rfm', ['/merch/rfm/<filename>'])
+ld.url('data_merch.new_customer_list', ['/merch/new_customers'])
 
 
 ld.url('starshipit.search_orders', ['/ssi/orders/search', '/ssi/orders/search/<string:phrase>'])
