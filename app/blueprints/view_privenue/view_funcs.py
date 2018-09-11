@@ -11,15 +11,15 @@ def date_of_payments_fy():
 	return data.rows
 
 
-@templatified('homepage')
+@templatified('homepage', title='Private Revenue Overview')
 def homepage():
 	today = datetime.date.today()
 	d1, d2 = TLMA.cfy_start_date, TLMA.cfy_end_date
 	progress = (today-d1).days/(d2-d1).days
-	return dict(title='Private Revenue Overview', date_progress=progress*100)
+	return dict(date_progress=progress*100)
 
 
-@templatified('comparative')
+@templatified('comparative', title='Comparative View')
 def comparative():
 	fy = int(request_arg('fy', TLMA.cfy, tests.is_year))
 	# Prepare for SQL parameters
@@ -32,29 +32,29 @@ def comparative():
 	data = Tq.query('PRIVENUE__BASE', *params, cached_timeout=180)
 	# Get Budget
 	budget = TLMA.budget()
-	return dict(title='Comparative View', cfy=fy, data=data, progress=progress, budget=budget)
+	return dict(cfy=fy, data=data, progress=progress, budget=budget)
 
 
-@templatified('pending')
+@templatified('pending', title='Pending Batches')
 def pending():
 	from app.blueprints.api.data_privenue import pending_split, approved_split
 	result = pending_split()
 	has_pending = False if len(result['data']) == 0 else True
 	if not has_pending:
 		result = approved_split()
-	return dict(title='Pending Batches', results=result, has_pending=has_pending)
+	return dict(results=result, has_pending=has_pending)
 
 
-@templatified('sourcecode1')
+@templatified('sourcecode1', title='Source Code 1 Created')
 def sourcecode1():
 	# Prepare for SQL parameters
 	d1, d2 = TLMA.ccy_date(TLMA.fy12m, 1), TLMA.cfy_end_date
 	params = Tq.format_date((d1, d2))
 	data = Tq.query('SOURCECODE_CREATED', *params, cached_timeout=10)
-	return dict(title='Source Code 1 Created', data=data, d1=d1, d2=d2)
+	return dict(data=data, d1=d1, d2=d2)
 
 
-@templatified('revenue_streams')
+@templatified('revenue_streams', title='Revenue Streams')
 def revenue_streams():
 	fy = int(request_arg('fy', TLMA.cfy, tests.is_year))
 	# Default to 3 minutes cache or else if the FY in URL is not CFY, then cache it for a longer period of time
@@ -64,10 +64,10 @@ def revenue_streams():
 	params = Tq.format_date((d1, d2))
 	# data = Tq.query(['PRIVENUE_REVENUE_STREAMS__BASE', 'PRIVENUE_REVENUE_STREAMS_UNION'], *params, cached_timeout=timeout)
 	data = Tq.query('PRIVENUE_REVENUE_STREAMS__BASE', *params, cached_timeout=timeout)
-	return dict(title='Revenue Streams', data=data, thisfy=fy, fys=date_of_payments_fy())
+	return dict(data=data, thisfy=fy, fys=date_of_payments_fy())
 
 
-@templatified('single_campaign')
+@templatified('single_campaign', title='Campaign Overview')
 def single_campaign():
 	fy = int(request_arg('fy', TLMA.cfy, tests.is_year))
 	# Default to 10 minutes cache or else if the FY in URL is not CFY, then cache it for a longer period of time
@@ -88,4 +88,4 @@ def single_campaign():
 		update = [('CAMPAIGN_CODE', str(campaign_code), '\'')]
 		data = Tq.query('PRIVENUE_SINGLE_CAMPAIGN', cached_timeout=200, updates=update)
 
-	return dict(title='Campaign Overview', thisfy=fy, fys=date_of_payments_fy(), data=data, thiscampaign=campaign_code, campaigncodes=campaign_codes)
+	return dict(thisfy=fy, fys=date_of_payments_fy(), data=data, thiscampaign=campaign_code, campaigncodes=campaign_codes)

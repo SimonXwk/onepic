@@ -1,0 +1,124 @@
+<div class="container-fluid">
+	{% set contacts =  data.rows|sum(attribute='CONTACTS') %}
+	{% set individuals =  data.rows|selectattr('CONTACTTYPE', '==', 'Individual')|sum(attribute='CONTACTS') %}
+	{% set dnmCnt =  data.rows|selectattr('DNM', '==', -1)|sum(attribute='CONTACTS')  %}
+	{% set decdCnt =  data.rows|selectattr('DECD', '==', -1)|sum(attribute='CONTACTS') %}
+	{% set estateCnt =  data.rows|selectattr('ESTATE', '==', -1)|sum(attribute='CONTACTS')  %}
+	{% set aliveEstateCnt =  data.rows|selectattr('ESTATE', '==', -1)|rejectattr('DECD', '==', -1)|sum(attribute='CONTACTS')  %}
+	{% set nodobCnt =  data.rows|selectattr('NODOB', '==', -1)|sum(attribute='CONTACTS')  %}
+
+	{% set groupCnt =  data.rows|selectattr('PRIMARYCATEGORY', '==', 'Group')|sum(attribute='CONTACTS')  %}
+	{% set chruchCnt =  data.rows|selectattr('PRIMARYCATEGORY', '==', 'Church')|sum(attribute='CONTACTS')  %}
+	{% set listCnt =  data.rows|selectattr('PRIMARYCATEGORY', '==', 'CC List')|sum(attribute='CONTACTS')  %}
+	{% set majdonCnt =  data.rows|selectattr('MAJORDONOR', '==', -1)|sum(attribute='CONTACTS')  %}
+
+	<div class="jumbotron bg-transparent">
+		<h1 >{{ contacts|number }} <span  class="font-weight-light">Contacts Found</span></h1>
+		<p class="lead"><small class="text-secondary">on {{ data.timestamp|dtAU }}, cached for {{ data.cached_timeout }} seconds</small></p>
+		<h5 class="font-italic font-weight-light">
+					{{ individuals|number }} ({{ individuals|pct(contacts) }}) Individuals
+						, {{(contacts - individuals)|number }} ({{ ( contacts - individuals)|pct(contacts) }}) Organisations
+		</h5>
+
+		<hr class="my-4">
+
+		<div class="row text-center">
+			<div class="col-md-3">
+				<div class="card border-danger shadow-type7">
+					<p class="card-header h5 bg-transparent border-danger text-danger">Do Not Mail</p>
+					<div class="card-body">
+						<h2 class="text-danger">{{ dnmCnt|number }} <small class="font-italic font-weight-light">({{ dnmCnt|pct(contacts) }})</small></h2>
+						<h5 class="text-success">{{ (contacts - dnmCnt) |number }} mailable <small class="font-italic font-weight-light">({{ (contacts - dnmCnt)|pct(contacts) }})</small></h5>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-3">
+				<div class="card border-danger shadow-type7">
+					<p class="card-header h5 bg-transparent border-danger text-danger">Deceased</p>
+					<div class="card-body">
+						<h2 class="text-danger">{{ decdCnt|number }} <small class="font-italic font-weight-light">({{ decdCnt|pct(contacts) }})</small></h2>
+						<h5 class="text-success">{{ (contacts - decdCnt) |number }} alive <small class="font-italic font-weight-light">({{ (contacts - decdCnt)|pct(contacts) }})</small></h5>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-3">
+				<div class="card border-warning shadow-type7">
+					<p class="card-header h5 bg-transparent border-warning text-warning">Estate</p>
+					<div class="card-body">
+						<h2 class="text-warning">{{ estateCnt|number }} <small class="font-italic font-weight-light">({{ estateCnt|pct(contacts) }})</small></h2>
+						<h5 class="text-warning">{{ (aliveEstateCnt) |number }} estates are not deceased <small class="font-italic font-weight-light">({{ (aliveEstateCnt)|pct(contacts) }})</small></h5>
+					</div>
+
+				</div>
+			</div>
+
+			<div class="col-md-3">
+				<div class="card border-danger shadow-type7">
+					<p class="card-header h5 bg-transparent border-danger text-danger">No DoB (Individual)</p>
+					<div class="card-body">
+						<h2 class="text-danger">{{ nodobCnt|number }} <small class="font-italic font-weight-light">({{ nodobCnt|pct(individuals) }})</small></h2>
+						<h5 class="text-success">{{ (individuals - nodobCnt) |number }} individuals have DoB <small class="font-italic font-weight-light">({{ (individuals - nodobCnt)|pct(individuals) }})</small></h5>
+					</div>
+				</div>
+			</div>
+
+		</div> <!-- END OF ROW -->
+
+		<br />
+
+		<div class="row text-center">
+			<div class="col-md-3">
+				<div class="card border-info shadow-type7">
+					<p class="card-header h5 bg-transparent border-info text-info">Groups</p>
+					<div class="card-body">
+						<h2 class="text-info">{{ groupCnt|number }} <small class="font-italic font-weight-light">({{ groupCnt|pct(contacts) }})</small></h2>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-3">
+				<div class="card border-info shadow-type7">
+					<p class="card-header h5 bg-transparent border-info text-info">Churches</p>
+					<div class="card-body">
+						<h2 class="text-info">{{ chruchCnt|number }} <small class="font-italic font-weight-light">({{ chruchCnt|pct(contacts) }})</small></h2>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-3">
+				<div class="card border-info shadow-type7">
+					<p class="card-header h5 bg-transparent border-info text-info">Lists</p>
+					<div class="card-body">
+						<h2 class="text-info">{{ listCnt|number }} <small class="font-italic font-weight-light">({{ listCnt|pct(contacts) }})</small></h2>
+					</div>
+
+				</div>
+			</div>
+
+			<div class="col-md-3">
+				<div class="card border-info shadow-type7">
+					<p class="card-header h5 bg-transparent border-info text-info">Major Donor Flags</p>
+					<div class="card-body">
+						<h2 class="text-info">{{ majdonCnt|number }} <small class="font-italic font-weight-light">({{ majdonCnt|pct(contacts) }})</small></h2>
+					</div>
+				</div>
+			</div>
+
+		</div> <!-- END OF ROW -->
+
+		<br />
+
+		<div class="row">
+			<div class="col-12">
+				<div class="chart" id="chart1" >{{ prototype('loading2') }}</div>
+			</div>
+		</div>
+
+	</div> <!-- END OF JUMBOTRON -->
+
+
+
+
+</div>

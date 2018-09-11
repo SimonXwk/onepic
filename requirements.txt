@@ -1,16 +1,12 @@
 flask
-pandas
 pyodbc
 openpyxl
+pandas
 requests
 
 SQLAlchemy
-blinker
-pyopenssl
-
+marshmallow
 
 flask_login
 flask_sqlalchemy
-flask_marshmallow
 flask-dance
-flask-SSLify

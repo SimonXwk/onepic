@@ -1,0 +1,76 @@
+{% extends framework_template %}
+
+{# Addiditonal Libraries #}
+{% block css_optional %}
+{% endblock %}
+
+{% block js_optional %}
+{{ Highchart([],[]) }}
+{% endblock %}
+
+
+{# My Own js and css #}
+{% block css_custom %}
+{% endblock %}
+
+{% block js_custom %}
+{% endblock %}
+
+
+{# Embedded CSS #}
+{% block css_embedded %}
+{% endblock %}
+
+
+{# Embedded Javascript After Libraries & Before Custom Javascript #}
+{% block js_embedded_before %}
+{% endblock %}
+
+
+{# Embedded Javascript At the Very End #}
+{% block js_embedded_after %}
+<Script>
+let data = {{ data.to_json()|safe }};
+
+fetchJSON(endpoint('/api/tq/contact_created_fy'), function (json) {
+	Highcharts.chart('chart1', {
+		chart: { type: 'spline' },
+	 	title: { text: null },
+		credits: { enabled: false },
+		xAxis: {
+			type: 'category',
+			categories: json['FY'].map(fy => 'FY' + fy)
+		},
+		yAxis: {
+			min: 0,
+			title: {
+				text: 'Number of Contacts Created in FY'
+			}
+		},
+		legend: {
+			enabled: false
+		},
+		tooltip: {
+			pointFormat: ' <b>{point.y:,.0f} contacts created </b>'
+		},
+	 	plotOptions: {
+			line: {
+				dataLabels: {
+					enabled: true,
+					format: '{point.y:,.0f}'
+				},
+			}
+    },
+		series: [{
+			name: 'All Contacts',
+			data: json['CONTACTS'],
+
+		}]
+	});
+});
+
+
+
+</Script>
+{% endblock %}
+

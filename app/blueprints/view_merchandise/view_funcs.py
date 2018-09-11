@@ -9,12 +9,12 @@ def rfm_upload_allowed_file(filename):
 	return '.' in filename and filename.rsplit('.', 1)[1].lower() in current_app.config.get('ALLOWED_EXTENSIONS')
 
 
-@templatified('homepage')
+@templatified('homepage', title='Merchandise Overview')
 def homepage():
-	return dict(title='Merchandise Overview')
+	return None
 
 
-@templatified('rfm_upload')
+@templatified('rfm_upload', title='RFM DATA')
 def upload():
 	if request.method == 'POST':
 		# check if the post request has the file part
@@ -43,21 +43,21 @@ def upload():
 			return redirect(request.url)
 
 	elif request.method == 'GET':
-		return dict(title='RFM Data', files=rfm_files())
+		return dict(files=rfm_files())
 
-	return dict(title='RFM Data')
+	return None
 
 
 @templatified('rfm_result')
 def rfm_result(filename):
-	return dict(title='RFM Result', filename=filename)
+	return dict(filename=filename)
 
 
 @templatified('track_order')
 def track_order():
-	return dict(title='Track Rex Order')
+	return None
 
 
-@templatified('merch_new_customer_courtesy_call')
+@templatified('merch_new_customer_courtesy_call', title='Merch Courtesy Call')
 def merchandise_new_courtesy_call():
-	return dict(title='CSD Courtesy Call Todo List')
+	return None

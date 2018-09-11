@@ -21,3 +21,9 @@ def segments():
 @templatified('donor_types')
 def donor_types():
 	return dict(title='Donor Types')
+
+
+@templatified('contacts_snapshot')
+def contacts_snapshot():
+	data = Tq.query('STATS_CONTACTS', cached_timeout=10)
+	return dict(title='Contacts', data=data)

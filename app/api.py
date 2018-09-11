@@ -1,4 +1,5 @@
 from flask import Response, json, Flask
+from app.helper import ExtendJSONEncoder
 from werkzeug.exceptions import HTTPException
 
 
@@ -10,7 +11,7 @@ class ApiResult(object):
 		self.dump = dump
 
 	def to_response(self):
-		return Response(json.dumps(self.value) if self.dump else self.value, status=self.status, mimetype='application/json')
+		return Response(json.dumps(self.value, cls=ExtendJSONEncoder) if self.dump else self.value, status=self.status, mimetype='application/json')
 
 
 # API Errors

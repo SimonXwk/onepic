@@ -69,30 +69,67 @@ def create_blueprint(blueprint_name, import_name, prefixed=True, **options) -> B
 	return bp
 
 
-def templatified(template=None, absolute=False, extension='.html', require_login=False):
+def templatified(template=None, title=None, absolute=False, extension='html', require_login=False):
+	""" Function that accepts arguments passed to decorator and creates the Actual Decorator
+	:param template: The Name of the template that will be used in flask.render_template(template)
+	:param title: The Name of page title, passed to flask.render_template() as a parameter
+	:param absolute: set to True when the template provided in its full path, no further process needed in this function
+	:param extension: default to .html if not provided, the template string will be checked if ends with extension string
+	:param require_login: whether login is required to have access to this view
+	:return: Decorator function
+	"""
+	""" When using 'a decorator with arguments @something(your own args)', the process is as follows:
+	1. 'templatified(your arguments)' is called (only once when using @... to create a decorator) and is expected to return the actual decorator function 'decorator'
+	2. 'decorator(f)' is called and expected to return 'decorated_function(*args, **kwargs)' as the decorated function'myCallingFunc'
+	3. 'decorated_function(*args, **kwargs)' is assign to the calling function 'myCallingFunc = decorated_function(myCallingFunc) '
+	4. When calling 'myCallingFunc', 'decorated_function' will be executed
+	step 1 is what defers the Decorator with argument from Decorator without argument
+	this is equivalent to 
+	"""
 	def decorator(f):
+		"""
+		Actual Decorator that will decorate the decorated function
+		:param f: function to be decorated
+		:return: new decorated function
+		"""
 		@wraps(f)
 		def decorated_function(*args, **kwargs):
-			template_name = template
 			""" Process the template variable and construct the template_name for flask.render_template(template_name)
 			Replace '.' in request.endpoint with '/'
 			Case 1: No template provided, use the /endpoint.html
 			Case 2: template provided as absolute path to root, template.html instead
 			Case 3: template provided as a name only, use the /endpoint(take out last part) + template.html 
 			"""
-			if template_name is None:
-				template_name = request.endpoint.replace('.', '/') + extension
-			else:
-				if template_name[-len(extension):] != extension:
-					template_name = template_name + extension
-				if not absolute:
-					template_name = '/'.join((request.endpoint.rsplit('.', 1)[0].replace('.', '/'), template_name))
+			template_name, page_title = template, title
+
+			# If template was not provided, use the endpoint path instead
+			if template_name is None or str(template_name).strip() == '':
+				template_name = request.endpoint.replace('.', '/')
+			# If template was not given by its full path, then append the sub-folder name in front of it (which should be created using its blueprint's name)
+			elif not absolute:
+				template_name = '/'.join((request.blueprint, template_name)) if request.blueprint else template_name
+			# If template does not end with the extension provided, append it
+			if template_name[-len(extension):] != extension:
+				template_name = '.'.join((template_name, extension))
+
+			# By default add a title parameter to flask.render_template() function using dictionary unpacking
+			page_title = request.endpoint.title() if request.blueprint is None else request.endpoint.rsplit('.', 1)[1].title() if page_title is None else page_title
+			default_dic = {'title': page_title}  # Page title block in global jinja template block
+
 			# Run the wrapped function, which should return a dictionary of Parameters
 			dic = f(*args, **kwargs)
-			if dic is None:
-				dic = {}
-			elif not isinstance(dic, dict):
-				return dic
+
+			if not isinstance(dic, dict):
+				try:
+					dic = dict(dic)
+				except TypeError:
+					# todo : Find a better way to deal with this scenario
+					print(f'ERR!!! Object of type [ {dic.__class__.__name__} ] returned by view function [ {f.__name__} ] needs to be a dictionary !')
+					dic = {}
+
+			# Merge two dic, default dic will be overwritten if same key appears in the dictionary returned by the function
+			dic = {**default_dic, **dic}
+
 			# Render the template
 			return render_template(template_name, **dic)
 
@@ -104,24 +141,29 @@ def templatified(template=None, absolute=False, extension='.html', require_login
 
 
 @singledispatch
-def convert(obj):
+def convert_extend_types(obj):
 	raise TypeError(f'can not convert {type(obj)}')
 
 
-@convert.register(datetime)
+@convert_extend_types.register(datetime)
 def _(obj):
 	return obj.strftime('%Y-%m-%dT%H:%M:%SZ')
 
 
-@convert.register(Decimal)
+@convert_extend_types.register(Decimal)
 def _(obj):
 	return float(obj)
+
+
+@convert_extend_types.register(set)
+def _(obj):
+	return tuple(obj)
 
 
 class ExtendJSONEncoder(json.JSONEncoder):
 	def default(self, obj):
 		try:
-			return convert(obj)
+			return convert_extend_types(obj)
 		except TypeError:
 			return super(ExtendJSONEncoder, self).default(obj)
 
@@ -149,7 +191,7 @@ def timeit(f):
 
 def request_arg(arg_name, default, check_func, strip=True):
 	arg = request.args.get(arg_name)
-	if arg is not None and check_func(arg):
+	if not (arg is None) and check_func(arg):
 		return arg if strip else arg.strip()
 	return default
 

@@ -11,6 +11,7 @@ ld.url('data_mail.date', ['/mailbox/ymd', '/mailbox/ymd/<string:str_date>'])
 ld.url('data_mail.year_month', ['/mailbox/ym/<string:str_yearmonth>'])
 
 ld.url('data_thankq_general.payments', ['/tq/payments'])
+ld.url('data_thankq_general.contact_created_fy', ['/tq/contact_created_fy'])
 
 
 ld.url('data_privenue.fy_total_all', ['/cash/fys'])

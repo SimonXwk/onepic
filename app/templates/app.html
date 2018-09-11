@@ -29,36 +29,36 @@ function sortByAttribute(arr, attributeName){
 
 
 
-
-
 // Using Fetch API to grab JSON data
 function fetchJSON(endpoint, func) {
+
 	function status(response) {
-		//console.log('✓ Response received', response);
+		// console.log('✓ Response received', response);
 		if (response.status >= 200 && response.status < 300) {
-			console.log('✓ Response status success (' + response.status + '), Promise.resolve response ... ');
+			// console.log('✓ Response status success (' + response.status + '), Promise.resolve response ... ');
 			return Promise.resolve(response)
 		} else {
 			console.log('✘ Response Status Failed, Promise.reject response now ...');
 			return Promise.reject(new Error(response.statusText))
 		}
 	}
+
 	function json(response) {
 		return response.json()
 	}
 
-	console.log('➠ Fetching Endpoint: ', endpoint);
+ 	console.log('➠ Fetching Endpoint: ', endpoint);
 	fetch(endpoint)
 		.then(status)
 		.then(json)
 		.then(function (data) {
-			console.log('✓ JSON data converted');
+			// console.log('✓ JSON data converted');
 			// console.log(data);
 			// ---------------------------------------------------------------------------------
 			// Call Processing Function
 			func(data);
 			// ---------------------------------------------------------------------------------
-			console.log('✓ JSON data processed for endpoint: ' + endpoint);
+		 console.log('✓ JSON data processed for endpoint: ' + endpoint);
 		}).catch(function(error) {
     	console.log('✘ Request failed', error);
   	});
@@ -106,12 +106,13 @@ function showTableAll(tableID){
   }
 }
 
+
 // Table Show All
 function applyDataTable(id) {
 	$(document).ready( function () {
 		$('#' + id).DataTable({
 				stateSave: true,
-				"lengthMenu": [[-1, 7, 10, 15, 20, 25, 50, 100 ], [ "All", 7, 10, 15, 20, 25, 50, 100 ]],
+				"lengthMenu": [[-1, 3, 5, 7, 10, 15, 20, 25, 50, 100 ], [ "All", 3, 5, 7, 10, 15, 20, 25, 50, 100 ]],
 		});
 	});
 }
@@ -168,6 +169,16 @@ function currency(val) {
 {% macro svg(file, file_type='.html') %}
 	{% include ('_svg' + '/' + file + file_type) %}
 {% endmacro %}
+
+
+
+
+
+
+
+
+
+
 
 
 {# Import global libraries #}
@@ -234,6 +245,9 @@ function currency(val) {
 		{# Do Nothing	#}
 	{% endif %}
 {% endmacro %}
+
+
+
 
 
 

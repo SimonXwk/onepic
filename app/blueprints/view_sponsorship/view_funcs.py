@@ -16,15 +16,15 @@ def pledge_dop_fys():
 	return data.rows
 
 
-@templatified()
+@templatified(title='Sponsorship Overview')
 def overview():
 	fy = int(request_arg('fy', TLMA.cfy, tests.is_year))
 	updates = [('FY', fy)]
 	data = Tq.query(('PLEDGE__BASE', 'PLEDGE_OVERVIEW'),  cached_timeout=30, updates=updates)
-	return dict(title='Sponsorship Overview', data=data, thisfy=fy)
+	return dict(data=data, thisfy=fy)
 
 
-@templatified()
+@templatified(title='Pledge Overview')
 def pledges(fy=TLMA.cfy):
 	d1, d2 = TLMA.fy_range(fy)
 	d2 = d2 + datetime.timedelta(days=1)
@@ -32,20 +32,20 @@ def pledges(fy=TLMA.cfy):
 	update = [('CREATED_START', d1, '\''), ('CREATED_END', d2, '\'')]
 	data = Tq.query(('PLEDGE__BASE', 'PLEDGE_DETAIL'), updates=update, cached_timeout=15)
 	fys = pledge_created_fys()
-	return dict(title='Pledge Overview', data=data, this_fy=fy, fys=fys)
+	return dict(data=data, this_fy=fy, fys=fys)
 
 
-@templatified()
+@templatified(title='Pledge Income')
 def pledge_income_fy(fy=TLMA.cfy):
 	d1, d2 = Tq.format_date(TLMA.fy_range(fy))
 	update = [('DOP_START', d1, '\''), ('DOP_END', d2, '\'')]
 	data = Tq.query(('PLEDGE__BASE', 'PLEDGE_INCOME'), updates=update, cached_timeout=25)
 	fys = pledge_dop_fys()
-	return dict(title='Pledge Income', data=data, this_fy=fy, fys=fys)
+	return dict(data=data, this_fy=fy, fys=fys)
 
 
-@templatified()
+@templatified(title='Delinquency Check')
 def delinquency():
 	data = Tq.query(('PLEDGE__BASE', 'PLEDGE_DELINQUENCY'),  cached_timeout=10 )
 	warning_days = 90
-	return dict(title='Delinquency Check', data=data, warning_days=warning_days)
+	return dict(data=data, warning_days=warning_days)
