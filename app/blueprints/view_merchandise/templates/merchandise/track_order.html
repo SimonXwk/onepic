@@ -67,6 +67,8 @@
 {% block js_embedded_after %}
 
 <script>
+let deafultOrder = '{{ order_number }}';
+deafultOrder = deafultOrder === null || deafultOrder.trim() === '' ? null : deafultOrder;
 
 let ssi = new Vue({
 		el: '#ssi',
@@ -136,6 +138,9 @@ let ssi = new Vue({
 				this.order.number = null;
 				this.initiateStatus();
 			}
+		},
+		mounted(){
+			this.order.number = deafultOrder;
 		},
 		components:{
 			// Component : Banner

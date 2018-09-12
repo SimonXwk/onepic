@@ -5,7 +5,7 @@ ld = LazyLoader(bp)
 
 # LazyLoading View Functions
 ld.url('view_funcs.homepage', ['/'], endpoint='index')
-ld.url('view_funcs.track_order', ['/track_order'])
+ld.url('view_funcs.track_order', ['/track_order', '/track_order/<string:order_number>'])
 ld.url('view_funcs.rfm_result', ['/rfm/result/<filename>'], endpoint='rfm_result')
 ld.url('view_funcs.upload', ['/rfm/upload'], methods=['GET', 'POST'])
 ld.url('view_funcs.merchandise_new_courtesy_call', ['/new_customer_courtesy_call'])

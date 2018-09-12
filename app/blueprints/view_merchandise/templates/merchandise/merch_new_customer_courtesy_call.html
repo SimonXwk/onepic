@@ -6,7 +6,6 @@
 
 {% block js_optional %}
 {{ import('vue') }}
-{{ import('datatables', ['bs4']) }}
 {% endblock %}
 {# ------------------------------------------------------------------- #}
 
@@ -23,6 +22,8 @@
 {# Embedded CSS #}
 {% block css_embedded %}
 <style type="text/css">
+
+
 /* slide */
 .slide-fade-enter-active {
   transition: all .3s ease;
@@ -54,6 +55,38 @@
     transform: scale(1);
   }
 }
+
+
+
+
+/* Hiding the checkbox, but allowing it to be focused */
+.badgebox {
+    opacity: 0;
+}
+
+.badgebox + .badge
+{
+    /* Move the check mark away when unchecked */
+    text-indent: -999999px;
+    /* Makes the badge's width stay the same checked and unchecked */
+	width: 27px;
+}
+
+.badgebox:focus + .badge
+{
+    /* Set something to make the badge looks focused */
+    /* This really depends on the application, in my case it was: */
+
+    /* Adding a light border */
+    box-shadow: inset 0px 0px 5px;
+    /* Taking the difference out of the padding */
+}
+
+.badgebox:checked + .badge
+{
+    /* Move the check mark back when checked */
+	text-indent: 0;
+}
 </style>
 {% endblock %}
 {# ------------------------------------------------------------------- #}
@@ -69,9 +102,9 @@
 {% block js_embedded_after %}
 <script>
 const vueBus = new Vue();
-
+// ******************************************************************************
 let vueColumn = Vue.component('vue-column', {
-	props: ['orderNumber', 'row'],
+	props: ['row'],
 	data: function(){
 		return {
 			fetch1: '/api/ssi/orders/search/',
@@ -79,128 +112,113 @@ let vueColumn = Vue.component('vue-column', {
 			fetch3: '/api/ssi/order/',
 			trackingNumber: null,
 			called1: false,
-			called2: false,
 			orders: 0,
-			trackingNumberExists: false,
-			orderID: null,
+			called2: false,
 			status: null,
 			statusDate: null,
 			statusDetail: null,
+			toggleColor: false,
+			show:true
 		}
 	},
 	computed: {
+		trClassObject: function(){
+			return {
+				'table-success': this.toggleColor
+			}
+		},
+		statusTextClassObject: function(){
+			return {
+				'text-success': (this.isDonor) || (!this.askAPI) || (this.askAPI && this.isDelivered),
+				'text-muted': (!this.isDonor && this.askAPI && !this.isDelivered && this.trackingNumber === null ),
+				'text-danger': (!this.isDonor && this.askAPI && !this.isDelivered && this.trackingNumber !== null ),
+			}
+		},
+		askAPI: function(){
+			return this.$parent.ask
+		},
 		ausLink: function(){
 			return 'https://auspost.com.au/mypost/track/#/details/' + this.trackingNumber
 		},
-		showing: function(){
-			return this.skip || this.status !== null && this.status.toUpperCase().indexOf('DELIVERED') !== -1
-		},
-		skip: function(row){
+		isDonor: function(row){
 			return this.row['FIRSTDATE_MERCHANDISE_PURCHASE'] + this.row['FIRSTDATE_MERCHANDISE_OTHER'] + this.row['FIRSTDATE_MERCHANDISE_PLEDGE'] === 0
 		},
-		showType: function(){
-			if(this.skip) {
-				return -2
-			}else if ( this.called1 === false ) {
-				return 0
-			}else if ( this.trackingNumber === null ) {
-				return 2
-			}else if ( this.called2 === false ) {
-				return 0
-			}else if ( this.status !== null && this.status.toUpperCase().indexOf('DELIVERED') !== -1 ) {
-				return -1
-			}else {
-				return 1
-			}
+		isDelivered:function(){
+			return this.status !== null && this.status.toUpperCase().indexOf('DELIVERED') !== -1
 		},
 		callDisplay : function () {
-			if(this.skip) {
-				this.show = true;
-				return '✅' + ' ' + 'Call Directly : Pure Donation or GOL ❤'
+			if(this.isDonor) {
+				return '❤' + ' ' + 'Pure Donation/GOL'
+			}else if (!this.askAPI){
+				return '⛲' + ' ' + 'No Further Checking Needed'
 			}else if ( this.called1 === false ) {
-				this.show = false;
-				return '☕' + ' searching ... step 1'
+				return '☕' + ' searching(1) ... '
 			}else if ( this.trackingNumber === null ) {
-				this.show = false;
-				return '☹' + ' Not Found (Starshipit)'
+				return '☹' + ' No Response From Starshipit'
 			}else if ( this.called2 === false ) {
-				this.show = false;
-				return '☕' + ' searching ... step 2'
+				return '☕' + ' searching(2) ... '
 			}else if ( this.status !== null && this.status.toUpperCase().indexOf('DELIVERED') !== -1 ) {
-				this.show = true;
-				return '✅' + ' ['+ this.orders + '] ' + this.status + ' ⛟ ' + this.formatDateTime(this.statusDate) + ''
+				return '✅' + ' ['+ this.orders + '] ' + this.status + ' ➠ ' + this.formatDateTime(this.statusDate) + ''
 			}else {
-				this.show = false;
 				return '❌' + ' ['+ this.orders + '] ' + this.status
 			}
 		}
 	},
 	created(){
-		let vCol = this;
-		fetchJSON(endpoint(vCol.fetch1 + vCol.orderNumber), function (json1) {
-			vCol.called1 = true;
-			let orders = json1.orders;
-			if(orders.length>0){
-				vCol.orders = orders.length;
-				vCol.trackingNumber = orders[0]['tracking_number'];
-				orders.forEach(order => {
-					fetchJSON(endpoint(vCol.fetch2 + vCol.trackingNumber), function (json2) {
-						vCol.called2 = true;
-						if(json2.success === true){
-							let events = json2['results']['tracking_events'];
-							let lastEvent = events[events.length - 1];
-							vCol.status = lastEvent['status'];
-							vCol.statusDate = lastEvent['event_datetime'];
-							vCol.statusDetail = lastEvent['details'];
-						}
-					});
-				});
-
+		// Toggle Buttons
+		vueBus.$on('toggleSuccessResults', (data) => {
+			if ( (this.isDonor) || (!this.askAPI) || (this.askAPI && this.isDelivered) ){
+				this.show = data;
 			}
-
 		});
+		vueBus.$on('toggleWaitingResults', (data) => {
+			if (!this.isDonor && this.askAPI && !this.isDelivered && this.trackingNumber !== null ){
+				this.show = data;
+			}
+		});
+		vueBus.$on('toggleMissingResults', (data) => {
+			if (!this.isDonor && this.askAPI && !this.isDelivered && this.trackingNumber === null ){
+				this.show = data;
+			}
+		});
+
+		// Initialize Status
+		this.updateShow();
+
+		let vCol = this;
+		if (this.askAPI) {
+			fetchJSON(endpoint(vCol.fetch1 + vCol.row['FIRSTORDER']), function (json1) {
+				vCol.called1 = true;
+				let orders = json1.orders;
+				if (orders.length > 0) {
+					vCol.orders = orders.length;
+					vCol.trackingNumber = orders[0]['tracking_number'];
+					orders.forEach(order => {
+						fetchJSON(endpoint(vCol.fetch2 + vCol.trackingNumber), function (json2) {
+							vCol.called2 = true;
+							if (json2.success === true) {
+								let events = json2['results']['tracking_events'];
+								let lastEvent = events[events.length - 1];
+								vCol.status = lastEvent['status'];
+								vCol.statusDate = lastEvent['event_datetime'];
+								vCol.statusDetail = lastEvent['details'];
+								vCol.show = vCol.updateShow()
+							}
+						});
+					});
+				}
+			});
+		} else {
+			vueBus.$emit('processedCustomer', 1);
+		}
 	},
-	template:`
-	<transition name="bounce">
-	<tr v-if="showType < 0">
-		<td scope="row">
-			<small class="text-danger"><< row.SERIALNUMBER >></small> <strong><< row.FULLNAME >></strong>
-			<span v-if="(row.MOBILENUMBER !== null && row.MOBILENUMBER.trim() !== '')" class="text-info"><br>
-				<small>&#9742;</small> Mobile Phone: << row.MOBILENUMBER >>
-			</span>
-			<span v-if="(row.DAYTELEPHONE !== null && row.DAYTELEPHONE.trim() !== '')" class="text-info"><br>
-				<small>&#9742;</small> Day Phone : << row.DAYTELEPHONE >>
-			</span>
-			<span v-if="(row.EVENINGTELEPHONE !== null && row.EVENINGTELEPHONE.trim() !== '')" class="text-info"><br>
-				<small>&#9742;</small> Evening Phone : << row.EVENINGTELEPHONE >>
-			</span>
-			<span class="text-muted"
-				v-if="!(row.MOBILENUMBER !== null && row.MOBILENUMBER.trim() !== '') && !(row.DAYTELEPHONE !== null && row.DAYTELEPHONE.trim() !== '') && !(row.EVENINGTELEPHONE !== null && row.EVENINGTELEPHONE.trim() !== '') "
-			>
-				<br><small><s>Phone Number Not Found</s></small>
-			</span>
-		</td>
-
-		<td >
-			 << orderNumber >><small><span class="text-secondary"> placed on << formatDate(row.FIRSTDATE) >></span></small>
-			 <br>
-			 <a v-if="showType === -1" target="blank" v-bind:href="ausLink"><< callDisplay >></a>
-			 <span v-else class="text-danger"><< callDisplay >></span>
-		</td>
-
-		<td>
-			<span v-if=" row.BOARDEDBY !== null ">
-				<mark>&#9924; << row.BOARDEDBY >></mark>
-				<br>
-				<small class="text-success">Boarded this contact already</small>
-			</span>
-			<span v-else></span>
-		</td>
-
-	</tr>
-	</transition>
-	`,
 	methods:{
+		updateShow:function(){
+			return this.show = !!((this.isDonor) || (!this.askAPI) || (this.askAPI && this.isDelivered))
+		},
+		checkShowStatus: function(){
+			this.show = !!((this.isDonor) || (!this.askAPI) || (this.askAPI && this.isDelivered));
+		},
 		formatDate: function (rawDate){
 			let d = new Date(rawDate);
 			return d.toLocaleDateString("en-AU", { year: 'numeric', month: 'long', day: 'numeric' });
@@ -209,24 +227,123 @@ let vueColumn = Vue.component('vue-column', {
 			let d = new Date(rawDate);
 			return d.toLocaleDateString("en-AU", { year: 'numeric', month: 'long', day: 'numeric' , hour:'numeric', minute:'numeric' });
 		},
-	}
-	}
-);
+	},
+	template:`
+	<transition name="bounce">
+	<tr v-if="show" v-on:dblclick="toggleColor=!toggleColor" v-bind:class="trClassObject" >
 
+		<td scope="row" style="width: 30%">
+			<< this.askAPI >> <strong><< row.FULLNAME >></strong> <small class="text-primary" v-if="row.SORTKEYREF1">(is << row.SORTKEYREFREL2 >>)</small>
+			<hr class="my-1">
+			<small class="text-secondary"><< row.SERIALNUMBER >>, << row.PRIMARYCATEGORY >>, <span class="text-success"> source : << row.SOURCE >></span></small>
+		</td>
+
+		<td style="width: 35%">
+			 <span class="text-muted"><< row.FIRSTORDER >><small> order date << formatDate(row.FIRSTDATE) >></small> <a target="blank" class="text-muted" v-bind:href="'/merchandise/track_order/'+row.FIRSTORDER"> &#9732;<small>starshipit</small></a></span>
+			 <hr class="my-1">
+			 <span v-bind:class="statusTextClassObject"><< callDisplay >></span>
+			 <a v-if="isDelivered" target="blank" class="text-secondary" v-bind:href="ausLink">&#9951; <small> AusPost</small></a>
+		</td>
+
+		<td style="width: 15%">
+			<span v-if="row.DONOTCALL == -1 || row.DONOTMAIL == -1">
+				<span v-if="row.DONOTCALL == -1" class="text-dark">&#9995;  Do not Call </span>
+				<span v-if="row.DONOTMAIL == -1" class="text-dark">&#9995;  Do not Mail </span>
+				<br>
+			</span>
+
+			<span v-if="(row.DONOTCALL != -1 && row.MOBILENUMBER !== null && row.MOBILENUMBER.trim() !== '')" class="text-info">
+				<small>&#9742;</small> Mobile : << row.MOBILENUMBER >><br>
+			</span>
+
+			<span v-if="(row.DONOTCALL != -1 && row.DAYTELEPHONE !== null && row.DAYTELEPHONE.trim() !== '')" class="text-info">
+				<small>&#9742;</small> Day : << row.DAYTELEPHONE >><br>
+			</span>
+
+			<span v-if="(row.DONOTCALL != -1 && row.EVENINGTELEPHONE !== null && row.EVENINGTELEPHONE.trim() !== '')" class="text-info">
+				<small>&#9742;</small> Evening : << row.EVENINGTELEPHONE >>
+			</span>
+
+			<span v-if="(row.DONOTCALL != -1 && row.FAXNUMBER !== null && row.FAXNUMBER.trim() !== '')" class="text-info">
+				<small>&#9742;</small> Fax : << row.FAXNUMBER >><br>
+			</span>
+
+			<span class="text-muted"
+				v-if="!(row.MOBILENUMBER !== null && row.MOBILENUMBER.trim() !== '')
+				&& !(row.DAYTELEPHONE !== null && row.DAYTELEPHONE.trim() !== '')
+				&& !(row.EVENINGTELEPHONE !== null && row.EVENINGTELEPHONE.trim() !== '')
+				&& !(row.FAXNUMBER !== null && row.FAXNUMBER.trim() !== '')
+			 	&& !(row.EMAILADDRESS !== null && row.EMAILADDRESS.trim() !== '')
+				">
+				<em ><s>Phone & Email Not Found</s></em>
+			</span>
+
+			<span class="text-muted"
+				v-if=" (row.MOBILENUMBER !== null && row.MOBILENUMBER.trim() !== '')
+				&& (
+					(
+					row.DONOTCALL != -1
+					&& !(row.MOBILENUMBER !== null && row.MOBILENUMBER.trim() !== '')
+					&& !(row.DAYTELEPHONE !== null && row.DAYTELEPHONE.trim() !== '')
+					&& !(row.EVENINGTELEPHONE !== null && row.EVENINGTELEPHONE.trim() !== '')
+					&& !(row.FAXNUMBER !== null && row.FAXNUMBER.trim() !== '')
+					)
+					|| (row.DONOTCALL == -1) )
+				">
+				&#9993; << row.EMAILADDRESS >>
+			</span>
+
+		</td>
+
+
+		<td style="width: 20%" class="text-left">
+			<span v-if=" row.BOARDEDBY !== null ">
+				&#9924; << row.BOARDEDBY >><span class="text-success"><small> created <span class="badge badge-success">Merch Onboarding profile</span></small></span>
+				<br>
+			</span>
+			<span v-if=" row.CALLEDBY !== null ">
+				&#9924; << row.CALLEDBY >><span class="text-success"><small> made <span class="badge badge-success">Courtesy Call 1</span></small></span>
+				<br>
+			</span>
+
+		</td>
+
+	</tr>
+	</transition>
+	`,
+});
+
+// ******************************************************************************
 let vueTable = Vue.component('vue-table', {
-	props: ['rows', 'theme'],
+	props: {
+		'rows': {
+		},
+		'theme': {
+			type: String
+		},
+		'ask' : {
+			type: Boolean
+		}
+	},
 	data: function() {
 		return {
-			headers: ['CUSTOMER', 'CALL ACTION', 'ON BOARDING PROFILE'],
 			orders: null,
 			ordersPrepared: false,
-			fetch1: '/api/ssi/orders/search/',
-			fetch2: '/api/ssi/track/',
-			fetch3: '/api/ssi/order/',
-			tableID: 'CallList',
-			loader: '<div class="container h-100"><div class="row h-100 justify-content-center align-items-center"><div class="loader2"><span></span><span></span><span></span></div></div></div>',
-
 		}
+	},
+	computed:{
+		trClassObject: function(){
+			return {
+				'table-primary': this.theme === 'primary',
+				'table-secondary': this.theme === 'secondary',
+				'table-success': this.theme === 'success',
+				'table-danger': this.theme === 'danger',
+				'table-warning': this.theme === 'warning',
+				'table-info': this.theme === 'info',
+				'table-light': this.theme === 'light',
+				'table-dark': this.theme === 'dark'
+			}
+		},
 	},
 	created(){
 		this.orders={};
@@ -238,36 +355,30 @@ let vueTable = Vue.component('vue-table', {
 			};
 			this.ordersPrepared = true;
 		}
-	},
-	mounted(){
-		$('#' + this.tableID).DataTable({
-				stateSave: true,
-				"lengthMenu": [[-1, 3, 5, 7, 10, 15, 20, 25, 50, 100 ], [ "All", 3, 5, 7, 10, 15, 20, 25, 50, 100 ]],
-		});
+		//console.log(this.orders);
 	},
 	components:{
 		'starship-column': vueColumn
 	},
 	template: `
 	<div class="table-responsive-lg">
-		<table class="table table-sm table-hover table-bordered" id="vue-table">
+		<table class="table table-sm table-hover table-bordered table-striped"" >
 			<thead>
-				<tr class="table-bordered " v-bind:class="{'table-success': theme === 'success', 'table-warning': theme === 'warning' , 'table-info': theme === 'info', 'table-danger': theme === 'danger'}">
-					 <th scope="col" v-for="header in headers"><< header >></th>
+				<tr class="table-bordered " v-bind:class="trClassObject">
+					 <th scope="col" style="width: 30%">CUSTOMER NAME</th>
+					 <th scope="col" style="width: 35%">CALL ACTION</th>
+					 <th scope="col" style="width: 15%">CONTACT METHOD</th>
+					 <th scope="col" style="width: 20%">ON-BOARD PROFILE</th>
 				</tr>
 			</thead>
 			<tbody>
-				<starship-column v-for="row in rows" v-bind:orderNumber='row.FIRSTORDER' v-bind:row='row'></starship-column>
+				<starship-column v-for="row in rows" v-bind:row='row'></starship-column>
 			</tbody>
 		</table>
  	</div>
-	`,
-	methods:{
-	}
+	`
 });
-
-
-
+// ******************************************************************************
 let rootVue = new Vue({
 	el: '#vue',
 	data: {
@@ -276,7 +387,21 @@ let rootVue = new Vue({
 			ready: false,
 			timestamp: undefined,
 		},
-
+		showSuccess: true,
+		showWaiting: false,
+		showMissing: false,
+		processed:0
+	},
+	watch:{
+		showSuccess: function(val){
+			vueBus.$emit('toggleSuccessResults', val);
+		},
+		showWaiting: function(val){
+			vueBus.$emit('toggleWaitingResults', val);
+		},
+		showMissing: function(val){
+			vueBus.$emit('toggleMissingResults', val);
+		},
 	},
 	template: `
 	<div v-if="!raw.ready">
@@ -293,46 +418,101 @@ let rootVue = new Vue({
 	</div>
 
 	<div v-else>
+
 		<div class="row">
 			<div class="col-12">
+				<div class="progress">
+					<div class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar"
+					style="width: 15%;" aria-valuenow="35" aria-valuemin="0" aria-valuemax="100" >
+						15%
+					</div>
+				</div>
+			</div>
+		</div>
 
-				<h4 class="text-dark"><< raw.rows.length >> New Merchandise Customers Found</h4>
-				<p class="lead font-weight-light text-info"><small>List Refreshed : << raw.timestamp >></small></p>
+		<div class="row">
+			<div class="col-12">
+				<h4 class="text-dark">
+					<< raw.rows.length >> New Merchandise Customers Found
+					<span class="lead font-weight-light text-info"><small>thankQ data retrieved : << raw.timestamp >></small></span>
+				</h4>
+			</div>
+		</div>
 
-				<ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+		<div class="row">
+			<div class="col-12">
+				<div class="card shadow-type6">
 
-					<li class="nav-item shadow-type1">
-						<a class="nav-link active" id="include-tab" data-toggle="pill" href="#include" role="tab" aria-controls="include" aria-selected="true">
-						 &#9742; Courtesy Call List <span class="badge badge-pill badge-info"> << includeRows.length >></span>
-						</a>
-					</li>
-					<li class="nav-item shadow-type1">
-						<a class="nav-link" id="exclude-tab" data-toggle="pill" href="#exclude" role="tab" aria-controls="exclude" aria-selected="false">
-						 &#9940; Ignored <span class="badge badge-pill badge-warning"> << excludeRows.length >></span>
-						</a>
-					</li>
-					<li class="nav-item shadow-type1">
-						<a class="nav-link" id="finished-tab" data-toggle="pill" href="#finished" role="tab" aria-controls="finished" aria-selected="false">
-						 &#9749; Finished <span class="badge badge-pill badge-success"> << finishedRows.length >></span>
-						</a>
-					</li>
+					<div class="card-header bg-transparent shadow-type8">
+						<span class="lead text-info align-top"> &#10024; StarShipit Result Types : </span>
+						<label class="switch align-middle">
+							<input type="checkbox" class="switch-success" v-model="showSuccess">
+							<span class="switch-slider round"></span>
+						</label>
 
-				</ul>
+						<label class="switch align-middle">
+							<input type="checkbox" class="switch-danger" v-model="showWaiting">
+							<span class="switch-slider round"></span>
+						</label>
 
-				<div class="tab-content" id="pills-tabContent">
+						<label class="switch align-middle">
+							<input type="checkbox" class="switch-secondary" v-model="showMissing">
+							<span class="switch-slider round"></span>
+						</label>
 
-					<div class="tab-pane fade show active" id="include" role="tabpanel" aria-labelledby="include-tab">
-						<vue-table v-bind:rows="includeRows" theme="info"></vue-table>
 					</div>
 
-					<div class="tab-pane fade" id="exclude" role="tabpanel" aria-labelledby="exclude-tab">
-						<vue-table v-bind:rows="excludeRows" theme="warning"></vue-table>
-					</div>
+  				<div class="card-body">
 
-					<div class="tab-pane fade" id="finished" role="tabpanel" aria-labelledby="finished-tab">
-						<vue-table v-bind:rows="finishedRows" theme="success"></vue-table>
-					</div>
+						<ul class="nav nav-tabs mb-3 nav-fill nav-justified" id="pills-tab" role="tablist">
 
+							<li class="nav-item ">
+								<a class="nav-link active" id="include-tab" data-toggle="pill" href="#include" role="tab" aria-controls="include" aria-selected="true">
+								 &#9742; Calling List <span class="badge badge-pill badge-info"> << includeRows.length >></span>
+								</a>
+							</li>
+
+							<li class="nav-item ">
+								<a class="nav-link" id="skip-tab" data-toggle="pill" href="#skip" role="tab" aria-controls="skip" aria-selected="false">
+								 &#9978; Prior to 07/09/18 <span class="badge badge-pill badge-secondary"> << skippedRows.length >></span>
+								</a>
+							</li>
+
+							<li class="nav-item ">
+								<a class="nav-link" id="finished-tab" data-toggle="pill" href="#finished" role="tab" aria-controls="finished" aria-selected="false">
+								 &#9749; Called <span class="badge badge-pill badge-success"> << finishedRows.length >></span>
+								</a>
+							</li>
+
+							<li class="nav-item ">
+								<a class="nav-link" id="exclude-tab" data-toggle="pill" href="#exclude" role="tab" aria-controls="exclude" aria-selected="false">
+								 &#9940; Excluded <span class="badge badge-pill badge-warning"> << excludeRows.length >></span>
+								</a>
+							</li>
+
+						</ul>
+
+						<div class="tab-content" id="pills-tabContent">
+
+							<div class="tab-pane fade show active" id="include" role="tabpanel" aria-labelledby="include-tab">
+								<vue-table v-bind:rows="includeRows" theme="primary" v-bind:ask="true" ></vue-table>
+							</div>
+
+							<div class="tab-pane fade show" id="skip" role="tabpanel" aria-labelledby="skip-tab">
+								<vue-table v-bind:rows="skippedRows" theme="info" v-bind:ask="true" ></vue-table>
+							</div>
+
+							<div class="tab-pane fade" id="exclude" role="tabpanel" aria-labelledby="exclude-tab">
+								<vue-table v-bind:rows="excludeRows" theme="warning" v-bind:ask="false" ></vue-table>
+							</div>
+
+							<div class="tab-pane fade" id="finished" role="tabpanel" aria-labelledby="finished-tab">
+								<vue-table v-bind:rows="finishedRows" theme="success" v-bind:ask="false" ></vue-table>
+							</div>
+
+						</div>
+
+					</div>
 				</div>
 
 			</div>
@@ -341,26 +521,34 @@ let rootVue = new Vue({
 	</div>
 	`,
 	computed: {
+		progress: function(){
+			return this.raw.rows === null ? 0 : this.raw.rows.length
+		},
 		includeRows: function () {
-			return this.raw.rows.filter(row => !this.excludeRow(row) && this.skipRow(row))
+			return this.raw.rows.filter(row => !this.excludeRow(row) && !this.finishRow(row) && !this.skipRow(row) )
+		},
+		skippedRows: function () {
+			return this.raw.rows.filter(row => !this.excludeRow(row) && !this.finishRow(row) && this.skipRow(row) )
+		},
+		finishedRows: function () {
+			return this.raw.rows.filter(row => !this.excludeRow(row) && this.finishRow(row) )
 		},
 		excludeRows: function () {
 			return this.raw.rows.filter(row => this.excludeRow(row) )
 		},
-		finishedRows: function () {
-			return this.raw.rows.filter(row => !this.excludeRow(row) && !this.skipRow(row) )
-		}
 	},
 	methods:{
 		excludeRow: function(row){
 			return (row['CONTACTTYPE'] === 'Organisation')
-					|| (row['PRIMARYCATEGORY'] === 'ESTATE')
+					|| (row['FIRSTDATE_MERCHANDISE_PLEDGE'] !== 0)
 					|| (row['DECD'] === -1)
-					|| (row['FIRSTDATE_MERCHANDISE_TOTAL'] === row['FIRSTDATE_MERCHANDISE_PLEDGE'])
+					|| (row['PRIMARYCATEGORY'] === 'ESTATE')
 		},
 		skipRow: function(row){
-			return (row['CALLEDBY'] === null )
-					|| (row['CALLEDBY'].trim() === '' )
+			return new Date(row['FIRSTDATE']) <= new Date(2018, 8, 7) // 2019 September the 7th
+		},
+		finishRow: function(row){
+			return !((row['CALLEDBY'] === null ) || (row['CALLEDBY'].trim() === '' ))
 		}
 	},
 	components:{
@@ -370,10 +558,9 @@ let rootVue = new Vue({
 		fetchJSON(endpoint('/api/merch/new_customers'), function(json){
 			rootVue.raw.rows = json;
 			rootVue.raw.ready = true;
-			rootVue.raw.timestamp = new Date();
-			rootVue.raw.timestamp = rootVue.raw.timestamp.toLocaleString()
+			rootVue.raw.timestamp = new Date().toLocaleString()
 		});
-	}
+	},
 });
 
 

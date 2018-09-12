@@ -45,7 +45,7 @@ def pending():
 	return dict(results=result, has_pending=has_pending)
 
 
-@templatified('sourcecode1', title='Source Code 1 Created')
+@templatified('sourcecode1', title='New Sourcecode')
 def sourcecode1():
 	# Prepare for SQL parameters
 	d1, d2 = TLMA.ccy_date(TLMA.fy12m, 1), TLMA.cfy_end_date

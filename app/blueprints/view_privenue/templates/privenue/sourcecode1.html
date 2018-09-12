@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block js_optional %}
-	{{ import('datatables') }}
+{{ import('datatables', ['bs4']) }}
 {% endblock %}
 
 
@@ -34,12 +34,7 @@ $(function () {
 	})
 });
 
-$(document).ready( function () {
-	{#$(tblSelector).DataTable({#}
-	{#	"lengthMenu": [[-1, 7, 10, 15, 20, 25, 50, 100 ], [ "All", 7, 10, 15, 20, 25, 50, 100 ]],#}
-	{#});#}
-
-});
+applyDataTable(tblSelector);
 </script>
 {% endblock %}
 

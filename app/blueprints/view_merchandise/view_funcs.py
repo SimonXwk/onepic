@@ -1,8 +1,10 @@
 from flask import render_template, current_app, render_template, request, flash, redirect, url_for, send_from_directory, jsonify
 from werkzeug.utils import secure_filename
 import os
-from .rfm_calc import RFM, list_all_files as rfm_files
-from app.helper import templatified
+from .rfm_calc import list_all_files as rfm_files
+from app.database.tlma import TLMA
+from app.helper import templatified, request_arg
+import app.tests as tests
 
 
 def rfm_upload_allowed_file(filename):
@@ -54,8 +56,11 @@ def rfm_result(filename):
 
 
 @templatified('track_order')
-def track_order():
-	return None
+def track_order(order_number=None):
+	order_number = order_number.strip() if order_number else None
+	if not order_number or len(order_number) != 11:
+		return None
+	return dict(order_number=order_number)
 
 
 @templatified('merch_new_customer_courtesy_call', title='Merch Courtesy Call')

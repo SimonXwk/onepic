@@ -47,7 +47,7 @@ function fetchJSON(endpoint, func) {
 		return response.json()
 	}
 
- 	console.log('➠ Fetching Endpoint: ', endpoint);
+ 	{#console.log('➠ Fetching Endpoint: ', endpoint);#}
 	fetch(endpoint)
 		.then(status)
 		.then(json)
@@ -58,7 +58,7 @@ function fetchJSON(endpoint, func) {
 			// Call Processing Function
 			func(data);
 			// ---------------------------------------------------------------------------------
-		 console.log('✓ JSON data processed for endpoint: ' + endpoint);
+		 {#console.log('✓ JSON data processed for endpoint: ' + endpoint);#}
 		}).catch(function(error) {
     	console.log('✘ Request failed', error);
   	});

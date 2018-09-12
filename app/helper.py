@@ -86,12 +86,14 @@ def templatified(template=None, title=None, absolute=False, extension='html', re
 	step 1 is what defers the Decorator with argument from Decorator without argument
 	this is equivalent to 
 	"""
+
 	def decorator(f):
 		"""
 		Actual Decorator that will decorate the decorated function
 		:param f: function to be decorated
 		:return: new decorated function
 		"""
+
 		@wraps(f)
 		def decorated_function(*args, **kwargs):
 			""" Process the template variable and construct the template_name for flask.render_template(template_name)
@@ -124,7 +126,7 @@ def templatified(template=None, title=None, absolute=False, extension='html', re
 					dic = dict(dic)
 				except TypeError:
 					# todo : Find a better way to deal with this scenario
-					print(f'ERR!!! Object of type [ {dic.__class__.__name__} ] returned by view function [ {f.__name__} ] needs to be a dictionary !')
+					print(f'!!! Failed Conversion: Object type [ {dic.__class__.__name__} ] returned by view function [ {f.__name__} ] needs to be a dictionary ! The whole result will be set to dict()')
 					dic = {}
 
 			# Merge two dic, default dic will be overwritten if same key appears in the dictionary returned by the function
@@ -137,6 +139,7 @@ def templatified(template=None, title=None, absolute=False, extension='html', re
 			decorated_function = login_required(decorated_function)
 
 		return decorated_function
+
 	return decorator
 
 
@@ -175,6 +178,7 @@ def jsonified(f):
 		if res is None:
 			res = {}
 		return json.dumps(res, cls=ExtendJSONEncoder)
+
 	return decorated_function
 
 
@@ -186,13 +190,14 @@ def timeit(f):
 		te = time.time()
 		print(f'::: execution time of [{f.__name__}] : {((te - ts) * 1000):,.2f} ms')
 		return res
+
 	return decorated_function
 
 
 def request_arg(arg_name, default, check_func, strip=True):
 	arg = request.args.get(arg_name)
 	if not (arg is None) and check_func(arg):
-		return arg if strip else arg.strip()
+		return arg.strip() if strip else arg
 	return default
 
 
@@ -207,5 +212,7 @@ def to_data_frame(header=None):
 			if header:
 				df.columns = header
 			return df
+
 		return decorated_function
+
 	return decorator

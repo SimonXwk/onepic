@@ -1,61 +1,81 @@
+
 /* The switch - the box around the slider */
 .switch {
   position: relative;
   display: inline-block;
-  padding-left: 0;
-  margin-right: 0;
-  cursor: pointer;
-
-  /* Hide default HTML checkbox */
-  input[type="checkbox"] {
-    display:none;
-  }
-
+  width: 60px;
+  height: 34px;
+  //float:right;
 }
 
+/* Hide default HTML checkbox */
+.switch input {display:none;}
 
-
-.switch .switch-slider {
-  content: "";
-  display: inline-block;
-  position: relative;
-  width: 30px;
-  height: 10px;
-  background-color: #818181;
-  border-radius: 15px;
-  -webkit-transition: background .3s ease;
-  transition: background .3s ease;
-  vertical-align: middle;
-  margin: 0 16px;
-  box-shadow: none;
-}
-
-.switch .switch-slider:after {
-  content: "";
+/* The slider */
+.switch-slider {
   position: absolute;
-  display: inline-block;
-  width: 18px;
-  height: 18px;
-  background-color: #f1f1f1;
-  border-radius: 21px;
-  box-shadow: 0 1px 3px 1px rgba(0, 0, 0, 0.4);
-  left: -2px;
-  top: -4px;
-  -webkit-transition: left .3s ease, background .3s ease, box-shadow .1s ease;
-  transition: left .3s ease, background .3s ease, box-shadow .1s ease;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
 }
 
-.switch .switch-input:checked ~ .switch-slider {
-  background-color: #84c7c1;
-  background-image: none;
-  box-shadow: none !important;
+.switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
 }
 
-.switch .switch-input:checked ~ .switch-slider:after {
-  background-color: #84c7c1;
-  left: 15px;
+input.switch-default:checked + .switch-slider {
+  background-color: #444;
+}
+input.switch-primary:checked + .switch-slider {
+  background-color: #2196F3;
+}
+input.switch-secondary:checked + .switch-slider {
+  background-color: #7d8387;
+}
+input.switch-success:checked + .switch-slider {
+  background-color: #8bc34a;
+}
+input.switch-info:checked + .switch-slider {
+  background-color: #3de0f5;
+}
+input.switch-warning:checked + .switch-slider {
+  background-color: #FFC107;
+}
+input.switch-danger:checked + .switch-slider {
+  background-color: #f44336;
+}
+input.switch-dark:checked + .switch-slider {
+  background-color: #000000;
 }
 
-.switch .switch-input:focus ~ .switch-slider {
-  box-shadow: none !important;
+input:focus + .switch-slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .switch-slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.switch-slider.round {
+  border-radius: 34px;
+}
+
+.switch-slider.round:before {
+  border-radius: 50%;
 }
