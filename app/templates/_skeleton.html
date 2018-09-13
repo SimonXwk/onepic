@@ -22,8 +22,6 @@
   {% block css_custom %}{% endblock %}
 	{#- Embedded CSS -#}
   {% block css_embedded %}{% endblock %}
-	{#- Sets a global variable to the prefix to the root of the application. -#}
-	<script type=text/javascript>$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};</script>
 	{% block js_embedded_header %}{% endblock %}
 </head>
 <body>

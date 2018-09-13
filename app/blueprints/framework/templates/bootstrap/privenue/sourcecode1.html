@@ -76,7 +76,13 @@
 			</tr>
 		</thead>
 		<tbody>{% for row in data.rows %}
-			<tr class="{% if row.DEP|string == '15' %}table-info{% elif row.DEP|string == '18' %}table-warning{% elif row.DEP|string == '20' %}{% else %}table-danger{% endif %}">
+			{% set isSponsorship = row.SOURCETYPE[-11:]|upper == 'SPONSORSHIP' %}
+			<tr class="{% if ((not row.CAMPAIGNCODE) and not (isSponsorship)) or (not row.ACCOUNT ) or (not row.CLASS ) or (not row.SOURCESTARTDATE ) %}table-danger
+								{% elif row.DEP|string == '15' %}table-info
+								{% elif row.DEP|string == '18' %}table-warning
+								{% elif row.DEP|string == '20' %}table-light
+								{% else %}table-secondary{% endif %}
+			">
 				<th scope="row"
 				tabindex="0" data-toggle="popover" data-placement="top" data-trigger="focus"
 						title='<strong >{{ row.SOURCEDESCRIPTION }}</strong>'
@@ -92,7 +98,7 @@
 				<td>{{row.ACCOUNT}}</td>
 				<td>CLASS {{row.CLASS}}</td>
 				<td>
-						{% set isSponsorship = row.SOURCETYPE[-11:]|upper == 'SPONSORSHIP' %}
+
 						{% if (not row.CAMPAIGNCODE) and isSponsorship %}<span class="text-black-50"><em><del>[Not Applicable]</del></em></span>
 						{% elif (not row.CAMPAIGNCODE) and not (isSponsorship) %}<span class="font-weight-bold">&#10067; Not Found</span>
 						{% elif row.CAMPAIGNCODE and isSponsorship %}<span class="text-danger">{{row.CAMPAIGNCODE}}</span>

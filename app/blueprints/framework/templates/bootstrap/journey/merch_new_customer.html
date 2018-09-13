@@ -196,8 +196,8 @@
 
 					 </td>
 					 <td><!--STATUS-->
-							{% if row.FIRSTDATETOTAL != row.FIRSTDATE_MERCHANDISE_TOTAL %}<span class="badge badge-pill badge-success">!MIX</span>{% endif %}
-					 		{% if row.FIRSTDATE_MERCHANDISE_PURCHASE==0 %}<span class="badge badge-pill badge-dark">!PMD</span>{% endif %}
+							{% if row.FIRSTDATE_NONMERCHANDISE_TOTAL != 0 %}<span class="badge badge-pill badge-info">!MIX</span>{% endif %}
+					 		{% if row.FIRSTDATE_MERCHANDISE_PURCHASE==0 %}<span class="badge badge-pill badge-info">!PMD</span>{% endif %}
 							{% if row.CONTACTTYPE|trim|upper == 'ORGANISATION' %}<span class="badge badge-pill badge-dark">!ORG</span>{% endif %}
 							{% if row.FIRSTDATE_MERCHANDISE_PLEDGE != 0 %}<span class="badge badge-pill badge-dark">!MSP</span>{% endif %}
 							{% if row.DECD|int == -1 %}<span class="badge badge-pill badge-danger">!DECD</span>{% endif %}

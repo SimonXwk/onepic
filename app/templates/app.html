@@ -2,40 +2,21 @@
 
 
 {% block js_embedded_header %}
-
 <script type=text/javascript>
-let $FY_MONTH_LIST_NUMBER = {{ fymths }};
-let $FY_MONTH_LIST_NAME = {{ fymths|map("mthname", abbr=True)|list|safe }};
+//Sets a global variable to the prefix to the root of the application
+const $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+const $FY_MONTH_LIST_NUMBER = {{ fymths }};
+const $FY_MONTH_LIST_NAME = {{ fymths|map("mthname", abbr=True)|list|safe }};
+
 // Build endpoint String
-function endpoint (url, parameter) {
-	return $SCRIPT_ROOT + url + (parameter ? parameter : '')
-}
-//let endpoint = (url, parameter) => $SCRIPT_ROOT + url + (parameter ? parameter : '');
+const endpoint = (url, parameter) => $SCRIPT_ROOT + url + (parameter ? parameter : '');
 
-
-// simple cumulative sum in javascript
-function cumsum(v) {
-	let r = [v[0]];
-	for(let i = 1; i < v.length; i++) {
-		r[i] = r[i - 1] + v[i];
-	}
-	return r;
-}
-
-// Sort An Array By its Object's Attribute and return the Array
-function sortByAttribute(arr, attributeName){
-	return arr.sort((a, b) => {return  (a[attributeName] < b[attributeName]) ? -1 : ((a[attributeName] > b[attributeName]) ? 1 : 0)});
-}
-
-
-
-// Using Fetch API to grab JSON data
-function fetchJSON(endpoint, func) {
-
-	function status(response) {
-		// console.log('✓ Response received', response);
+// Using Fetch API to grab JSON Data
+const fetchJSON = (endpoint, func, silent=false) => {
+	function checkStstus(response) {
+		if (!silent){ console.log('✓ Response received', response); }
 		if (response.status >= 200 && response.status < 300) {
-			// console.log('✓ Response status success (' + response.status + '), Promise.resolve response ... ');
+			if (!silent){ console.log('✓ Response status success (' + response.status + '), Promise.resolve response ... '); }
 			return Promise.resolve(response)
 		} else {
 			console.log('✘ Response Status Failed, Promise.reject response now ...');
@@ -43,26 +24,24 @@ function fetchJSON(endpoint, func) {
 		}
 	}
 
-	function json(response) {
+	function toJSON(response) {
 		return response.json()
 	}
 
- 	{#console.log('➠ Fetching Endpoint: ', endpoint);#}
+	if (!silent){ console.log('➠ Fetching Endpoint: ', endpoint); }
 	fetch(endpoint)
-		.then(status)
-		.then(json)
-		.then(function (data) {
-			// console.log('✓ JSON data converted');
-			// console.log(data);
+		.then(checkStstus)
+		.then(toJSON)
+		.then(jsonData => {
+			if (!silent){ console.log('✓ JSON data converted'); }
+			// console.log(jsonData);
 			// ---------------------------------------------------------------------------------
 			// Call Processing Function
-			func(data);
+			func(jsonData);
 			// ---------------------------------------------------------------------------------
-		 {#console.log('✓ JSON data processed for endpoint: ' + endpoint);#}
-		}).catch(function(error) {
-    	console.log('✘ Request failed', error);
-  	});
-}
+			if (!silent){ console.log('✓ JSON data processed for endpoint: ' + endpoint); }
+		}).catch((error) => { console.log('✘ Request Failed', error); });
+};
 
 
 // Table Filters
@@ -117,6 +96,20 @@ function applyDataTable(id) {
 	});
 }
 
+
+// simple cumulative sum in javascript
+function cumsum(v) {
+	let r = [v[0]];
+	for(let i = 1; i < v.length; i++) {
+		r[i] = r[i - 1] + v[i];
+	}
+	return r;
+}
+
+// Sort An Array By its Object's Attribute and return the Array
+function sortByAttribute(arr, attributeName){
+	return arr.sort((a, b) => {return  (a[attributeName] < b[attributeName]) ? -1 : ((a[attributeName] > b[attributeName]) ? 1 : 0)});
+}
 
 <!-- Formatters -->
 const today = new Date();

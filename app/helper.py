@@ -2,8 +2,8 @@ from werkzeug.utils import import_string, cached_property
 from flask import Blueprint, request, render_template
 from functools import wraps, singledispatch
 from flask_login import login_required
-from datetime import datetime
 from decimal import Decimal
+import datetime
 import time
 import json
 
@@ -115,7 +115,10 @@ def templatified(template=None, title=None, absolute=False, extension='html', re
 				template_name = '.'.join((template_name, extension))
 
 			# By default add a title parameter to flask.render_template() function using dictionary unpacking
-			page_title = request.endpoint.title() if request.blueprint is None else request.endpoint.rsplit('.', 1)[1].title() if page_title is None else page_title
+			if page_title is None:
+				page_title = request.endpoint.replace('_', ' ').title()
+				if not (request.blueprint is None):
+					page_title = page_title.rsplit('.', 1)[1]
 			default_dic = {'title': page_title}  # Page title block in global jinja template block
 
 			# Run the wrapped function, which should return a dictionary of Parameters
@@ -148,7 +151,12 @@ def convert_extend_types(obj):
 	raise TypeError(f'can not convert {type(obj)}')
 
 
-@convert_extend_types.register(datetime)
+@convert_extend_types.register(datetime.datetime)
+def _(obj):
+	return obj.strftime('%Y-%m-%dT%H:%M:%SZ')
+
+
+@convert_extend_types.register(datetime.date)
 def _(obj):
 	return obj.strftime('%Y-%m-%dT%H:%M:%SZ')
 
@@ -178,7 +186,6 @@ def jsonified(f):
 		if res is None:
 			res = {}
 		return json.dumps(res, cls=ExtendJSONEncoder)
-
 	return decorated_function
 
 

@@ -1,4 +1,7 @@
-;
+-- ----------------------------------------------------------------------------------------------------
+DECLARE @DATE1 VARCHAR (10) = /*<PAYMENT_DATE1>*/'2018/07/01'/*</PAYMENT_DATE1>*/,
+        @DATE2 VARCHAR (10) = /*<PAYMENT_DATE2>*/'2019/06/30'/*</PAYMENT_DATE2>*/;
+-- ----------------------------------------------------------------------------------------------------
 WITH
 -- ----------------------------------------------------------------------------------------------------
 cte_payments AS(
@@ -105,15 +108,17 @@ FROM
   LEFT JOIN Tbl_SOURCECODE      S1 ON (B1.SOURCECODE = S1.SOURCECODE)
 WHERE
   (B2.REVERSED IS NULL OR NOT(B2.REVERSED IN (1, -1))) AND (B4.STAGE ='Batch Approved')
-  AND B2.DATEOFPAYMENT BETWEEN /*<PAYMENT_DATE1>*/'20180701'/*</PAYMENT_DATE1>*/ AND /*<PAYMENT_DATE2>*/'20190630'/*</PAYMENT_DATE2>*/
+  AND B2.DATEOFPAYMENT BETWEEN @DATE1 AND @DATE2
 )
 -- ----------------------------------------------------------------------------------------------------
-, cte_first_date AS (
-  SELECT B2.SERIALNUMBER, MAX(B2.DATEOFPAYMENT) AS [PREVIOUS_DATE], YEAR(MAX(B2.DATEOFPAYMENT)) + CASE WHEN MONTH(MAX(B2.DATEOFPAYMENT)) <7 THEN 0 ELSE 1 END AS [PREVIOUS_FY]
+, cte_previous_date AS (
+  SELECT B2.SERIALNUMBER
+    , MAX(B2.DATEOFPAYMENT) AS [PREVIOUS_DATE]
+    , YEAR(MAX(B2.DATEOFPAYMENT)) + CASE WHEN MONTH(MAX(B2.DATEOFPAYMENT)) <7 THEN 0 ELSE 1 END AS [PREVIOUS_FY]
   FROM TBL_BATCHITEM B2
-  WHERE (B2.REVERSED IS NULL OR NOT(B2.REVERSED IN (1, -1))) AND B2.DATEOFPAYMENT <  /*<PAYMENT_DATE1>*/'20180701'/*</PAYMENT_DATE1>*/
+  WHERE (B2.REVERSED IS NULL OR NOT(B2.REVERSED IN (1, -1))) AND B2.DATEOFPAYMENT <  @DATE1
   GROUP BY B2.SERIALNUMBER
-  HAVING B2.SERIALNUMBER IN (SELECT [SERIALNUMBER] FROM TBL_BATCHITEM WHERE [DATEOFPAYMENT] BETWEEN  /*<PAYMENT_DATE1>*/'20180701'/*</PAYMENT_DATE1>*/ AND /*<PAYMENT_DATE2>*/'20190630'/*</PAYMENT_DATE2>*/ )
+  HAVING B2.SERIALNUMBER IN (SELECT [SERIALNUMBER] FROM TBL_BATCHITEM WHERE [DATEOFPAYMENT] BETWEEN  @DATE1 AND @DATE2 )
 )
 -- ----------------------------------------------------------------------------------------------------
 
@@ -131,5 +136,9 @@ select t1.*
     END AS [DONTYPE1]
 from
   cte_payments t1
-  left join cte_first_date t2 on (t1.SERIALNUMBER = t2.SERIALNUMBER)
+  left join cte_previous_date t2 on (t1.SERIALNUMBER = t2.SERIALNUMBER)
 /*</BASE_QUERY>*/
+
+-- ----------------------------------------------------------------------------------------------------
+-- OPTION(RECOMPILE)
+-- ----------------------------------------------------------------------------------------------------
