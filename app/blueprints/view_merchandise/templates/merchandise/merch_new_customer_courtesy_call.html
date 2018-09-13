@@ -206,23 +206,17 @@ let vueRow = Vue.component('vue-row', {
 		},
 		toggleSuccessResults: function (data) {
 			if ( this.showType === 'success' ){
-				console.log('success before', data, 'show', this.show);
 				this.show = data;
-				console.log('success after', data, 'show', this.show);
 			}
 		},
 		toggleWaitingResults: function (data) {
 			if ( this.showType === 'waiting' ){
-				console.log('waiting before', data, 'show', this.show);
 				this.show = data;
-				console.log('waiting after', data, 'show', this.show);
 			}
 		},
 		toggleMissingResults: function (data) {
 			if ( this.showType === 'missing' ){
-				console.log('missing before', data, 'show', this.show);
 				this.show = data;
-				console.log('missing after', data, 'show', this.show);
 			}
 		}
 	},
@@ -271,6 +265,19 @@ let vueRow = Vue.component('vue-row', {
 			</span>
 
 			<span class="text-muted"
+				v-if=" (row.EMAILADDRESS !== null && row.EMAILADDRESS.trim() !== '')
+					&& ((
+					row.DONOTCALL != -1
+					&& !(row.MOBILENUMBER !== null && row.MOBILENUMBER.trim() !== '')
+					&& !(row.DAYTELEPHONE !== null && row.DAYTELEPHONE.trim() !== '')
+					&& !(row.EVENINGTELEPHONE !== null && row.EVENINGTELEPHONE.trim() !== '')
+					&& !(row.FAXNUMBER !== null && row.FAXNUMBER.trim() !== '')
+					) || (row.DONOTCALL == -1) )
+				">
+				&#9993; << row.EMAILADDRESS >><br>
+			</span>
+
+			<span class="text-muted"
 				v-if="!(row.MOBILENUMBER !== null && row.MOBILENUMBER.trim() !== '')
 				&& !(row.DAYTELEPHONE !== null && row.DAYTELEPHONE.trim() !== '')
 				&& !(row.EVENINGTELEPHONE !== null && row.EVENINGTELEPHONE.trim() !== '')
@@ -280,20 +287,7 @@ let vueRow = Vue.component('vue-row', {
 				<em ><s>Phone & Email Not Found</s></em>
 			</span>
 
-			<span class="text-muted"
-				v-if=" (row.MOBILENUMBER !== null && row.MOBILENUMBER.trim() !== '')
-				&& (
-					(
-					row.DONOTCALL != -1
-					&& !(row.MOBILENUMBER !== null && row.MOBILENUMBER.trim() !== '')
-					&& !(row.DAYTELEPHONE !== null && row.DAYTELEPHONE.trim() !== '')
-					&& !(row.EVENINGTELEPHONE !== null && row.EVENINGTELEPHONE.trim() !== '')
-					&& !(row.FAXNUMBER !== null && row.FAXNUMBER.trim() !== '')
-					)
-					|| (row.DONOTCALL == -1) )
-				">
-				&#9993; << row.EMAILADDRESS >>
-			</span>
+
 
 		</td>
 
@@ -414,7 +408,7 @@ let rootVue = new Vue({
 	computed: {
 		dataAPI: function() {
 			if (this.fy === null || this.fy === undefined){
-				return this.defaultAPI + '?fy=2018'
+				return this.defaultAPI
 			} else {
 				if( String(this.fy).length === 4  ){
 					return this.defaultAPI + '?fy=' + this.fy
@@ -442,8 +436,8 @@ let rootVue = new Vue({
 		},
 		progressClassObj: function () {
 			return {
-				'bg-danger': this.progress >= 0 && this.progress <10 ,
-				'bg-warning': this.progress >= 10 && this.progress <50 ,
+				'bg-danger': this.progress >= 0 && this.progress <20 ,
+				'bg-warning': this.progress >= 20 && this.progress <50 ,
 				'bg-info': this.progress >= 50 && this.progress < 90 ,
 				'bg-success': this.progress >= 90
 			}
@@ -473,7 +467,7 @@ let rootVue = new Vue({
 					|| (row['PRIMARYCATEGORY'] === 'ESTATE')
 		},
 		skipRow: function(row){
-			return new Date(row['FIRSTDATE']) <= new Date(2018, 8, 7) // 2019 September the 7th midnight
+			return new Date(row['FIRSTDATE']) <= new Date(2018, 8, 5) // 2019 September the 5th midnight
 		},
 		finishRow: function(row){
 			return !((row['CALLEDBY'] === null ) || (row['CALLEDBY'].trim() === '' ))
@@ -524,7 +518,7 @@ let rootVue = new Vue({
 							<div class="col">
 								<blockquote class="blockquote">
 									<p class="mb-0"><< raw.rows.length >> Total New Merchandise Customers Found  in <span v-if="fy===null">Current Financial Year</span><span v-else>FY<< fy >></span></p>
-									<footer class="blockquote-footer" v-on:dblclick="showFYSelection=!showFYSelection"> data from thankQ <small><< raw.timestamp >>, << raw.processed >> / << raw.rows.length >> </small></footer>
+									<footer class="blockquote-footer" v-on:dblclick="showFYSelection=!showFYSelection"> from thankQ <small><< raw.timestamp >>, << raw.processed >>/<< raw.rows.length >> </small></footer>
 								</blockquote>
 
 								<div v-if="showFYSelection">
@@ -583,7 +577,7 @@ let rootVue = new Vue({
 
 							<li class="nav-item ">
 								<a class="nav-link" id="skip-tab" data-toggle="pill" href="#skip" role="tab" aria-controls="skip" aria-selected="false">
-								 &#9978; Skipped &#8828; 06/09/18 <span class="badge badge-pill badge-secondary"> << skippedRows.length >></span>
+								 &#9978; Skipped &#8828; 05/09/18 <span class="badge badge-pill badge-secondary"> << skippedRows.length >></span>
 								</a>
 							</li>
 
@@ -601,12 +595,12 @@ let rootVue = new Vue({
 								<vue-table v-bind:rows="includeRows" theme="primary" v-bind:ask="true" ></vue-table>
 							</div>
 
-							<div class="tab-pane fade show" id="skip" role="tabpanel" aria-labelledby="skip-tab">
-								<vue-table v-bind:rows="skippedRows" theme="secondary" v-bind:ask="true" ></vue-table>
-							</div>
-
 							<div class="tab-pane fade" id="exclude" role="tabpanel" aria-labelledby="exclude-tab">
 								<vue-table v-bind:rows="excludeRows" theme="warning" v-bind:ask="false" ></vue-table>
+							</div>
+
+							<div class="tab-pane fade show" id="skip" role="tabpanel" aria-labelledby="skip-tab">
+								<vue-table v-bind:rows="skippedRows" theme="secondary" v-bind:ask="true" ></vue-table>
 							</div>
 
 							<div class="tab-pane fade" id="finished" role="tabpanel" aria-labelledby="finished-tab">
