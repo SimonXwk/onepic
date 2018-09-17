@@ -14,6 +14,9 @@ ld.url('data_thankq_general.payments', ['/tq/payments'])
 ld.url('data_thankq_general.contact_created_fy', ['/tq/contact_created_fy'])
 
 
+ld.url('data_campaign.campaign_donors', ['/campaign/campaign_donors'])
+
+
 ld.url('data_privenue.fy_total_all', ['/cash/fys'])
 ld.url('data_privenue.fy_total_all_ltd', ['/cash/fysltd'])
 ld.url('data_privenue.cfy_platform_type_revenue', ['/cash/cfy/stream'])

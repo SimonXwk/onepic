@@ -201,11 +201,11 @@ def timeit(f):
 	return decorated_function
 
 
-def request_arg(arg_name, default, check_func, strip=True):
+def request_arg(arg_name, default_value, check_func, strip=True):
 	arg = request.args.get(arg_name)
 	if not (arg is None) and check_func(arg):
 		return arg.strip() if strip else arg
-	return default
+	return default_value
 
 
 def to_data_frame(header=None):

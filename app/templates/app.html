@@ -113,6 +113,10 @@ function sortByAttribute(arr, attributeName){
 
 <!-- Formatters -->
 const today = new Date();
+
+
+
+console.log(FMT);
 function dAU(date) {
 	return date.toLocaleDateString("en-AU", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
 }
@@ -158,15 +162,14 @@ function currency(val) {
 <script src="{{ url_for(current_blueprint_name + '.static', filename='js' + '/' + fname + file_type) }}"></script>
 {% endmacro %}
 
-{# Import svg #}
+{# IMPORT SVG #}
 {% macro svg(file, file_type='.html') %}
 	{% include ('_svg' + '/' + file + file_type) %}
 {% endmacro %}
-
-
-
-
-
+{# IMPORT CSS LOADER #}
+{% macro loader(file, file_type='.html') %}
+	{% include ('_loader' + '/' + file + file_type) %}
+{% endmacro %}
 
 
 
@@ -205,7 +208,10 @@ function currency(val) {
 {# -------------------- vue.js -------------------- #}
 	{% elif vendor == 'vue' %}
 	<script src="{{ url_for('vendor', filename='vue.min.js') }}"></script>
-	<script>Vue.options.delimiters = ['<<', '>>'];</script>
+	<script>
+			Vue.options.delimiters = ['<<', '>>'];
+			const vueBus = new Vue();
+	</script>
 
 {# -------------------- crossfilter.js -------------------- #}
 	{% elif vendor == 'crossfilter' %}

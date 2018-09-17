@@ -131,13 +131,14 @@
 					 <th scope="col">TAGS</th>
 					 <th scope="col">MERCH ONBOARDING STATUS</th>
 					 <th scope="col">COURTESY CALL</th>
+					 <th scope="col">WELCOME PACK</th>
 					</tr>
 				 </thead>
 				 <tbody>
 					{% for row in data.rows %}
 					<tr {% if not row[2] %}class=""{% endif %}>
 					 <th scope="row">
-						 {{ row.SERIALNUMBER }}
+						 {{ row.SERIALNUMBER }} <small class="text-secondary">{% if row.FIRST_REXID %}[{{ row.REXIDS }}]{{ row.FIRST_REXID }}[{{ row.REXIDSPOOL }}]{% else %}<s>REXID</s>{% endif %}</small>
 						 {% if row.SORTKEYREF1 %}
 								<small class="text-primary" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0" title="{{ row.SORTKEYREFREL1 }} : {{ row.SORTKEYREF1 }}">
 									(is {{ row.SORTKEYREFREL2 }})
@@ -233,10 +234,13 @@
 						{% if row.CALLEDBY %}
 							<span class="text-info" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
 							title="{{ row.COURTESYCALL_SUBJECT }}<hr>{{ row.COURTESYCALL_NOTES }}">
-							{{ row.CALLEDBY }}, {{ row.CALLED|dAU }}</span>
+							<span class="font-weight-bold">{{ row.CALLEDBY }}</span> called on <span class="text-success">{{ row.CALLED|dAU }}</span></span>
 						{% endif %}
 					 </td>
 
+						<td><!--Courtesy Call-->
+							NO THANKQ COMMUNICATION
+						</td>
 					</tr>
 					{% endfor %}
 				 </tbody>

@@ -5,12 +5,33 @@
 {% endblock %}
 
 {% block js_optional %}
+{{ import('vue') }}
 {% endblock %}
 {# ------------------------------------------------------------------- #}
 
 
 {# My Own js and css #}
 {% block css_custom %}
+<style type="text/css">
+/* bounce */
+.bounce-enter-active {
+  animation: bounce-in .5s;
+}
+.bounce-leave-active {
+  animation: bounce-in .5s reverse;
+}
+@keyframes bounce-in {
+  0% {
+    transform: scale(1.02);
+  }
+  50% {
+    transform: scale(0.98);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+</style>
 {% endblock %}
 
 {% block js_custom %}
@@ -32,5 +53,263 @@
 
 {# Embedded Javascript At the Very End #}
 {% block js_embedded_after %}
+<script>
+let vueRow = Vue.component('vue-row', {
+	props: ['row'],
+	data: function(){
+		return {
+			weekdays: ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
+			toggleColor: false
+		}
+	},
+	computed:{
+		conversionCallDueDate: function(){
+			let date1 = new Date(this.row['CAMPAIGN_FIRSTDATE']);
+			let date2 = new Date(date1.setDate(date1.getDate() + 7*5));
+			if ( date2.getDay() === 0 ) {
+				return new Date(date1.setDate(date1.getDate() + 7*5 + 1 ));
+			} else if ( date2.getDay() === 6 ) {
+				return new Date(date1.setDate(date1.getDate() + 7*5 + 2 ));
+			}else {
+				return date2
+			}
+
+		}
+	},
+	methods:{
+		formatDate: function (rawDate){
+			let d = new Date(rawDate);
+			return d.toLocaleDateString("en-AU", { year: 'numeric', month: 'long', day: 'numeric' });
+		},
+		formatCurrency: function(val){
+			return '$' + String(val.toFixed(2)).split("").reverse().join("")
+							.replace(/(\d{3}\B)/g, "$1,")
+							.split("").reverse().join("");
+		}
+	},
+	template: `
+	<tr class="text-left"  v-on:dblclick="toggleColor=!toggleColor" v-bind:class="{'table-warning': toggleColor}">
+		<td scope="row" style="width: 30%">
+
+			<strong><< row.FULLNAME >></strong> <small><span v-if="row.FIRSTFY===row.CFY" class="badge badge-success">NEW</span><span v-else class="badge badge-warning">OLD</span></small> <small class="text-primary" v-if="row.SORTKEYREF1">(is << row.SORTKEYREFREL2 >>)</small>
+			<hr class="my-1">
+			<small class="text-secondary"><< row.SERIALNUMBER >><span class="text-danger" v-if=" row.CONTACTTYPE === 'Organisation' ">, ORG</span>, << row.PRIMARYCATEGORY >>, <span class="text-success"> from << row.SOURCE >></span></small>
+			<small class="text-danger" v-if="row.DECD === -1">, Deceased</small>
+			<small class="text-danger" v-if="row.ESTATE === -1">, Estate</small>
+			<small class="text-danger" v-if="row.PLEDGES > 0">, [<< row.PLEDGES >>SP] << row.FIRST_PLEDGEID >></small>
+		</td>
+
+		<td style="width: 35%">
+			<span class="badge badge-success">Responed: << formatDate(row.CAMPAIGN_FIRSTDATE) >></span> <span class="text-secondary">, culmulative LTD total </span><span class="badge badge-info"><< formatCurrency(row.CAMPAIGN_TOAL) >></span>
+			<hr class="my-1">
+			<small class="text-info">With TLMA since << formatDate(row.FIRSTDATE) >>, LTD total << formatCurrency(row.LTD_TOTAL) >><br></small>
+			<small class="text-danger" v-if=" row.LTD_FISET_MERCHANDISE_DATE !== null ">WIth Merchandise Since << formatDate(row.LTD_FISET_MERCHANDISE_DATE) >></small>
+		</td>
+
+		<td style="width: 15%">
+			<span v-if="row.DONOTCALL == -1 || row.DONOTMAIL == -1">
+				<span v-if="row.DONOTCALL == -1" class="text-dark">&#9995;  Do not Call </span>
+				<span v-if="row.DONOTMAIL == -1" class="text-dark">&#9995;  Do not Mail </span>
+				<br>
+			</span>
+
+			<span v-if="(row.DONOTCALL != -1 && row.MOBILENUMBER !== null && row.MOBILENUMBER.trim() !== '')" class="text-info">
+				<small>&#9742;</small> Mobile : << row.MOBILENUMBER >><br>
+			</span>
+
+			<span v-if="(row.DONOTCALL != -1 && row.DAYTELEPHONE !== null && row.DAYTELEPHONE.trim() !== '')" class="text-info">
+				<small>&#9742;</small> Day : << row.DAYTELEPHONE >><br>
+			</span>
+
+			<span v-if="(row.DONOTCALL != -1 && row.EVENINGTELEPHONE !== null && row.EVENINGTELEPHONE.trim() !== '')" class="text-info">
+				<small>&#9742;</small> Evening : << row.EVENINGTELEPHONE >>
+			</span>
+
+			<span v-if="(row.DONOTCALL != -1 && row.FAXNUMBER !== null && row.FAXNUMBER.trim() !== '')" class="text-info">
+				<small>&#9742;</small> Fax : << row.FAXNUMBER >><br>
+			</span>
+
+			<span class="text-muted"
+				v-if=" (row.EMAILADDRESS !== null && row.EMAILADDRESS.trim() !== '')
+					&& ((
+					row.DONOTCALL != -1
+					&& !(row.MOBILENUMBER !== null && row.MOBILENUMBER.trim() !== '')
+					&& !(row.DAYTELEPHONE !== null && row.DAYTELEPHONE.trim() !== '')
+					&& !(row.EVENINGTELEPHONE !== null && row.EVENINGTELEPHONE.trim() !== '')
+					&& !(row.FAXNUMBER !== null && row.FAXNUMBER.trim() !== '')
+					) || (row.DONOTCALL == -1) )
+				">
+				&#9993; << row.EMAILADDRESS >><br>
+			</span>
+
+			<span class="text-muted"
+				v-if="!(row.MOBILENUMBER !== null && row.MOBILENUMBER.trim() !== '')
+				&& !(row.DAYTELEPHONE !== null && row.DAYTELEPHONE.trim() !== '')
+				&& !(row.EVENINGTELEPHONE !== null && row.EVENINGTELEPHONE.trim() !== '')
+				&& !(row.FAXNUMBER !== null && row.FAXNUMBER.trim() !== '')
+			 	&& !(row.EMAILADDRESS !== null && row.EMAILADDRESS.trim() !== '')
+				">
+				<em ><s>Phone & Email Not Found</s></em>
+			</span>
+
+		</td>
+
+		<td style="width: 20%">
+			<span v-if=" row.CONVERSIONCALLBY !== null ">
+				<mark>&#9924; << row.CONVERSIONCALLBY >></mark><span class="text-success"><small> made <span class="badge badge-success">Conversion Call</span></small></span>
+				<br>
+			</span>
+			<span v-else>
+				<span class="text-info"><small>&#10086; Due: << formatDate(conversionCallDueDate) >>, << weekdays[conversionCallDueDate.getDay()] >></small></span>
+			</span>
+
+		</td>
+	</tr>
+	`,
+});
+// ******************************************************************************
+let vueTable = Vue.component('vue-table', {
+	props: {
+		'rows': {
+		},
+		'theme': {
+			type: String
+		}
+	},
+	data: function() {
+		return {
+		}
+	},
+	computed:{
+		trClassObject: function(){
+			return {
+				'table-primary': this.theme === 'primary',
+				'table-secondary': this.theme === 'secondary',
+				'table-success': this.theme === 'success',
+				'table-danger': this.theme === 'danger',
+				'table-warning': this.theme === 'warning',
+				'table-info': this.theme === 'info',
+				'table-light': this.theme === 'light',
+				'table-dark': this.theme === 'dark'
+			}
+		},
+	},
+
+	template: `
+	<div class="table-responsive-lg">
+		<table class="table table-sm table-hover table-bordered table-striped"" >
+			<thead>
+				<tr class=" text-left" v-bind:class="trClassObject">
+					 <th scope="col" style="width: 30%">DONOR</th>
+					 <th scope="col" style="width: 35%">INFOMATION</th>
+					 <th scope="col" style="width: 20%">CONTACT METHOD</th>
+					 <th scope="col" style="width: 15%">CONVERSION</th>
+				</tr>
+			</thead>
+			<tbody>
+				<result-row v-for="row in rows" v-bind:row="row"></result-row>
+			</tbody>
+		</table>
+ 	</div>
+	`,
+	components:{
+		'result-row': vueRow
+	},
+});
+// ******************************************************************************
+let rootVue = new Vue({
+	el: '#vue',
+	data: {
+		raw: {
+			rows: null,
+			ready: false,
+			timestamp: null,
+		},
+		campaignCode: '19AC.Cure One Acquisition'
+
+	},
+	computed:{
+		defaultAPI: function(){
+			return '/api/campaign/campaign_donors' + '?camapgincode=' + this.campaignCode
+		},
+		callingRows: function () {
+			return this.raw.rows.filter(row => row['CONVERSIONCALLBY'] === null || row['CONVERSIONCALLBY'].trim() === '' )
+		},
+		calledRows: function () {
+			return this.raw.rows.filter(row => !(row['CONVERSIONCALLBY'] === null || row['CONVERSIONCALLBY'].trim() === ''))
+		},
+	},
+	created(){
+		this.getData();
+	},
+	methods:{
+		getData: function(){
+			fetchJSON(endpoint(this.defaultAPI), function(json){
+				rootVue.raw.rows = json;
+				rootVue.raw.ready = true;
+				rootVue.raw.timestamp = new Date().toLocaleString()
+			});
+		},
+	},
+	template:`
+	<div v-if="!raw.ready">
+		<div  class="row">
+			<div class="col-12 text-center">
+				<p class="lead text-danger ">Finding People Have A Heart for Cure One ... </p>
+				<div class="lds-heart"><div></div></div>
+			</div>
+		</div>
+	</div>
+
+	<div v-else>
+
+		<div  class="row">
+			<div class="col-12 text-center">
+
+				<div class="card shadow-type6">
+					<div class="card-header bg-transparent shadow-type8">
+						<p class="text-danger font-weight-bold mb-0"><< raw.rows.length >> Cure One Acquisition Donors Found <small class="text-muted">as at << raw.timestamp >> from thankQ</small></p>
+					</div>
+
+  				<div class="card-body">
+  					<ul class="nav nav-tabs mb-3 nav-fill nav-justified" id="pills-tab" role="tablist">
+
+							<li class="nav-item ">
+								<a class="nav-link active" id="calling-tab" data-toggle="pill" href="#calling" role="tab" aria-controls="calling" aria-selected="true">
+								 &#9742; To be Called  <span class="badge badge-pill badge-info"> << callingRows.length >></span>
+								</a>
+							</li>
+
+							<li class="nav-item ">
+								<a class="nav-link" id="called-tab" data-toggle="pill" href="#called" role="tab" aria-controls="called" aria-selected="false">
+								 &#9749; Called <span class="badge badge-pill badge-success"> << calledRows.length >></span>
+								</a>
+							</li>
+
+						</ul>
+
+						<div class="tab-content" id="pills-tabContent">
+
+							<div class="tab-pane fade show active" id="calling" role="tabpanel" aria-labelledby="calling-tab">
+								<vue-table v-bind:rows="callingRows" theme="primary"  ></vue-table>
+							</div>
+
+							<div class="tab-pane fade" id="called" role="tabpanel" aria-labelledby="called-tab">
+								<vue-table v-bind:rows="calledRows" theme="warning" ></vue-table>
+							</div>
+
+						</div>
+
+  				</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	`,
+	components:{
+		'vue-table': vueTable,
+	},
+});
+</script>
 {% endblock %}
 {# ------------------------------------------------------------------- #}

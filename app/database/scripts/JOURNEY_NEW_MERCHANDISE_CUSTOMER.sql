@@ -11,6 +11,7 @@ DECLARE
 -- ;
 -- When Uncomment the above, making sure replace the query part with the variables and uncomment OPTION(RECOMPILE) to speed up the query
 -- Here I choose static query that prove to be run fastest (considering the speed of replacing variable tags in program )
+-- --------------------------------------------------------------
 ;
 WITH
 cte_payments as (
@@ -53,8 +54,24 @@ cte_payments as (
   HAVING MIN(DATEOFPAYMENT) BETWEEN @DATE1 AND @DATE2
 )
 -- --------------------------------------------------------------
+,cte_rex_customerids AS(
+  -- BY default one contact can only have one REXID
+  SELECT SERIALNUMBER
+  ,MAX(PARAMETERVALUE) AS [FIRST_REXID]
+  ,MAX(PAT_SERIALNUMBER_ROW) AS [REXIDS]
+  ,SUM(PAT_REXID_ROW) AS [REXIDSPOOL]
+  FROM (
+    SELECT [SERIALNUMBER], [PARAMETERVALUE]
+      , ROW_NUMBER() OVER(PARTITION BY [SERIALNUMBER] ORDER BY [PARAMETERVALUE] DESC) AS [PAT_SERIALNUMBER_ROW]
+      , ROW_NUMBER() OVER(PARTITION BY [PARAMETERVALUE] ORDER BY [SERIALNUMBER] DESC) AS [PAT_REXID_ROW]
+    FROM TBL_CONTACTPARAMETER
+    WHERE [PARAMETERNAME] LIKE '%Customer%Number%'
+  ) tmp
+  GROUP BY [SERIALNUMBER]
+)
+-- --------------------------------------------------------------
 ,cte_onboard_last as (
-   -- The reason of not using aggregating function is all values from the same record are needed not individual aggreation
+  -- The reason of not using aggregating function is all values from the same record are needed not individual aggreation
   SELECT * FROM
   (
     SELECT [SERIALNUMBER],[PARAMETERNAME],[PARAMETERVALUE],[EFFECTIVEFROM],[EFFECTIVETO],[PARAMETERNOTE]
@@ -88,6 +105,10 @@ cte_payments as (
 -- --------------------------------------------------------------
 select
   t1.SERIALNUMBER ,[FIRSTDATE] = MIN(t1.FIRSTDATE)
+  --> REX INFO
+  ,[FIRST_REXID] = MIN(c3.FIRST_REXID)
+  ,[REXIDS] = MIN(c3.REXIDS)
+  ,[REXIDSPOOL] = MIN(c3.REXIDSPOOL)
   --> Payment Information
   ,[FULLNAME] = MIN(t2.FULLNAME)
   ,[FIRSTORDER] = MIN(t2.REXORDERID)
@@ -133,8 +154,10 @@ select
   --> Contact Information
   ,[CONTACTTYPE] = MIN(c1.CONTACTTYPE)
   ,[PRIMARYCATEGORY] = MIN(c1.PRIMARYCATEGORY)
-  ,[ESTATE] = CASE WHEN MIN(PRIMARYCATEGORY) LIKE '%estate%' THEN -1 ELSE 0 END
   ,[SOURCE] = MIN(c1.SOURCE)
+  ,[STATE] = MIN(c1.ADDRESSLINE4)
+  ,[POSTCODE] = MIN(c1.POSTCODE)
+  ,[ESTATE] = CASE WHEN MIN(PRIMARYCATEGORY) LIKE '%estate%' THEN -1 ELSE 0 END
 
   ,[DONOTMAIL] = CASE WHEN MIN(c1.DONOTMAIL) = -1 THEN -1 ELSE 0 END
   ,[DONOTMAILREASON] = MIN(c1.DONOTMAILREASON)
@@ -156,8 +179,9 @@ from
   left join cte_payments t2 on (t1.FIRSTDATE = t2.DATEOFPAYMENT and t1.SERIALNUMBER = t2.SERIALNUMBER)
   left join cte_onboard_last t3 on (t1.SERIALNUMBER = t3.SERIALNUMBER)
   left join cte_courtesy_call_last t4 on (t1.SERIALNUMBER = t4.SERIALNUMBER)
-  left join TBL_CONTACT C1 on (t1.SERIALNUMBER = c1.SERIALNUMBER)
-  left join TBL_CONTACTATTRIBUTE C2 on (t1.SERIALNUMBER = c2.SERIALNUMBER)
+  left join TBL_CONTACT c1 on (t1.SERIALNUMBER = c1.SERIALNUMBER)
+  left join TBL_CONTACTATTRIBUTE c2 on (t1.SERIALNUMBER = c2.SERIALNUMBER)
+  left join cte_rex_customerids c3 on (t1.SERIALNUMBER = c3.SERIALNUMBER)
 where
   (c1.CONTACTTYPE not like 'ADDRESS')
 group by

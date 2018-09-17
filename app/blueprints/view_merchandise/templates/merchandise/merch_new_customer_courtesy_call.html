@@ -69,7 +69,6 @@
 {# Embedded Javascript At the Very End #}
 {% block js_embedded_after %}
 <script>
-const vueBus = new Vue();
 // ******************************************************************************
 let vueRow = Vue.component('vue-row', {
 	props: ['row', 'ask'],
@@ -287,10 +286,7 @@ let vueRow = Vue.component('vue-row', {
 				<em ><s>Phone & Email Not Found</s></em>
 			</span>
 
-
-
 		</td>
-
 
 		<td style="width: 20%" class="text-left">
 			<span v-if=" row.BOARDEDBY !== null ">
@@ -307,7 +303,6 @@ let vueRow = Vue.component('vue-row', {
 				<mark>&#9924; << row.CALLEDBY >></mark><span class="text-success"><small> made <span class="badge badge-success">Courtesy Call 1</span></small></span>
 				<br>
 			</span>
-
 		</td>
 
 	</tr>
@@ -487,7 +482,7 @@ let rootVue = new Vue({
 			<div class="col-12">
 				<div class="alert alert-light text-center" role="alert">
 					<p class="lead">Finding New Merchandise Customers in ThankQ ... </p>
-					<p><div class="container h-100"><div class="row h-100 justify-content-center align-items-center"><div class="loader1"></div></div></div></p>
+					<p><div class="container h-100"><div class="row h-100 justify-content-center align-items-center"><div class="lds-heart"><div></div></div></div></div></p>
 				</div>
 			</div>
 		</div>
@@ -599,7 +594,7 @@ let rootVue = new Vue({
 								<vue-table v-bind:rows="excludeRows" theme="warning" v-bind:ask="false" ></vue-table>
 							</div>
 
-							<div class="tab-pane fade show" id="skip" role="tabpanel" aria-labelledby="skip-tab">
+							<div class="tab-pane fade" id="skip" role="tabpanel" aria-labelledby="skip-tab">
 								<vue-table v-bind:rows="skippedRows" theme="secondary" v-bind:ask="true" ></vue-table>
 							</div>
 

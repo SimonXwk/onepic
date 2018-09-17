@@ -40,6 +40,10 @@
 {% endmacro %}
 
 
+{% macro loading(name, filte_type = '.html') %}
+<div class="container h-100"><div class="row h-100 justify-content-center align-items-center">{{  loader(name, filte_type)  }}</div></div>
+{% endmacro %}
+
 
 {# *********************** Bootstrap Component: PAGINATION ************************************** #}
 {% macro compare_color(v1, v2) %}
