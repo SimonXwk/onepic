@@ -116,7 +116,7 @@ const today = new Date();
 
 
 
-console.log(FMT);
+
 function dAU(date) {
 	return date.toLocaleDateString("en-AU", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
 }
@@ -211,6 +211,17 @@ function currency(val) {
 	<script>
 			Vue.options.delimiters = ['<<', '>>'];
 			const vueBus = new Vue();
+			Object.defineProperties(Vue.prototype, {
+				$eventBus: {
+					get: function(){
+						return vueBus
+					}
+				}
+			});
+			Vue.filter('currency', (val, dec=2, sign='$') => sign + String(val.toFixed(dec)).split("").reverse().join("").replace(/(\d{3}\B)/g, "$1,").split("").reverse().join(""));
+			Vue.filter('number', (val, dec=0) => String(val.toFixed(dec)).split("").reverse().join("").replace(/(\d{3}\B)/g, "$1,").split("").reverse().join(""));
+			Vue.filter('dAU', val => new Date(val).toLocaleDateString("en-AU", { year: 'numeric', month: 'short', day: 'numeric' }));
+			Vue.filter('dtAU', val => new Date(val).toLocaleDateString("en-AU", { year: 'numeric', month: 'long', day: 'numeric', hour:'numeric', minute:'numeric', second:'numeric'}));
 	</script>
 
 {# -------------------- crossfilter.js -------------------- #}

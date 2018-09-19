@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block js_optional %}
-{{ import('datatables', ['bs4']) }}
+{{ import('vue') }}
 {% endblock %}
 {# ------------------------------------------------------------------- #}
 
@@ -15,26 +15,40 @@
 {% endblock %}
 
 {% block js_custom %}
+{{ bp_js('merch_new_customer_welcome_pack') }}
 {% endblock %}
 {# ------------------------------------------------------------------- #}
 
 
 {# Embedded CSS #}
 {% block css_embedded %}
+<style type="text/css">
+/* bounce */
+.bounce-enter-active {
+  animation: bounce-in .5s;
+}
+.bounce-leave-active {
+  animation: bounce-in .5s reverse;
+}
+@keyframes bounce-in {
+  0% {
+    transform: scale(1.02);
+  }
+  50% {
+    transform: scale(0.98);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+</style>
 {% endblock %}
 {# ------------------------------------------------------------------- #}
 
 
 {# Embedded Javascript After Libraries & Before Custom Javascript #}
 {% block js_embedded_before %}
-<script>
-$(function () {
-  $('[data-toggle="tooltip"]').tooltip({
-		html:true
-	});
-});
-applyDataTable(tblSelector);
-</script>
 {% endblock %}
 {# ------------------------------------------------------------------- #}
 
@@ -42,4 +56,3 @@ applyDataTable(tblSelector);
 {# Embedded Javascript At the Very End #}
 {% block js_embedded_after %}
 {% endblock %}
-{# ------------------------------------------------------------------- #}

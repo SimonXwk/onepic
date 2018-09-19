@@ -54,20 +54,21 @@ cte_payments as (
   HAVING MIN(DATEOFPAYMENT) BETWEEN @DATE1 AND @DATE2
 )
 -- --------------------------------------------------------------
-,cte_rex_customerids AS(
+,cte_rex_customerids as(
   -- BY default one contact can only have one REXID
   SELECT SERIALNUMBER
-  ,MAX(PARAMETERVALUE) AS [FIRST_REXID]
-  ,MAX(PAT_SERIALNUMBER_ROW) AS [REXIDS]
-  ,SUM(PAT_REXID_ROW) AS [REXIDSPOOL]
+  , [PARAMETERVALUE] AS [LAST_REXID]
+  , [REXIDS]
+  , [THQIDS] AS [LAST_REXID_POOL]
   FROM (
     SELECT [SERIALNUMBER], [PARAMETERVALUE]
-      , ROW_NUMBER() OVER(PARTITION BY [SERIALNUMBER] ORDER BY [PARAMETERVALUE] DESC) AS [PAT_SERIALNUMBER_ROW]
-      , ROW_NUMBER() OVER(PARTITION BY [PARAMETERVALUE] ORDER BY [SERIALNUMBER] DESC) AS [PAT_REXID_ROW]
+      , ROW_NUMBER() OVER(PARTITION BY [SERIALNUMBER] ORDER BY [CREATED] DESC) AS [PAT_SERIALNUMBER_ROW]
+      , COUNT(PARAMETERVALUE) OVER(PARTITION BY [SERIALNUMBER]) AS [REXIDS]
+      , COUNT(SERIALNUMBER) OVER(PARTITION BY [PARAMETERVALUE]) AS [THQIDS]
     FROM TBL_CONTACTPARAMETER
     WHERE [PARAMETERNAME] LIKE '%Customer%Number%'
   ) tmp
-  GROUP BY [SERIALNUMBER]
+  WHERE [PAT_SERIALNUMBER_ROW] = 1
 )
 -- --------------------------------------------------------------
 ,cte_onboard_last as (
@@ -84,19 +85,36 @@ cte_payments as (
   WHERE ROW =1
 )
 -- --------------------------------------------------------------
-,cte_courtesy_call_last as (
+,cte_courtesy_call1_last as (
    -- The reason of not using aggregating function is all values from the same record are needed not individual aggreation
   SELECT * FROM
   (
     SELECT [SERIALNUMBER]
-    , [COURTESYCALL_TYPE] = [COMMUNICATIONTYPE]
-    , [COURTESYCALL_SUBJECT] = [SUBJECT]
-    , [COURTESYCALL_NOTES] = [NOTES]
-    , [CALLEDBY] = [CREATEDBY]
-    , [CALLED] = [CREATED]
+    , [COURTESYCALL1_TYPE] = [COMMUNICATIONTYPE]
+    , [COURTESYCALL1_SUBJECT] = [SUBJECT]
+    , [COURTESYCALL1_NOTES] = [NOTES]
+    , [COURTESYCALL1_BY] = [CREATEDBY]
+    , [COURTESYCALL1_DATE] = [CREATED]
     , ROW_NUMBER() OVER(PARTITION BY SERIALNUMBER ORDER BY CREATED DESC) AS [ROW]
     FROM TBL_COMMUNICATION
     WHERE [CATEGORY] = 'Merch Onboarding' AND [SUBJECT] LIKE '%Court%sy%call%1%'
+  ) tmp
+  WHERE ROW =1
+)
+-- --------------------------------------------------------------
+,cte_welcome_pack_last as (
+   -- The reason of not using aggregating function is all values from the same record are needed not individual aggreation
+  SELECT * FROM
+  (
+    SELECT [SERIALNUMBER]
+    , [WELCOMEPACK_TYPE] = [COMMUNICATIONTYPE]
+    , [WELCOMEPACK_SUBJECT] = [SUBJECT]
+    , [WELCOMEPACK_NOTES] = [NOTES]
+    , [WELCOMEPACK_BY] = [CREATEDBY]
+    , [WELCOMEPACK_DATE] = [CREATED]
+    , ROW_NUMBER() OVER(PARTITION BY SERIALNUMBER ORDER BY CREATED DESC) AS [ROW]
+    FROM TBL_COMMUNICATION
+    WHERE [CATEGORY] = 'Merch Onboarding' AND [SUBJECT] LIKE '%welcome%pack%'
   ) tmp
   WHERE ROW =1
 )
@@ -106,9 +124,9 @@ cte_payments as (
 select
   t1.SERIALNUMBER ,[FIRSTDATE] = MIN(t1.FIRSTDATE)
   --> REX INFO
-  ,[FIRST_REXID] = MIN(c3.FIRST_REXID)
+  ,[LAST_REXID] = MIN(c3.LAST_REXID)
   ,[REXIDS] = MIN(c3.REXIDS)
-  ,[REXIDSPOOL] = MIN(c3.REXIDSPOOL)
+  ,[LAST_REXID_POOL] = MIN(c3.LAST_REXID_POOL)
   --> Payment Information
   ,[FULLNAME] = MIN(t2.FULLNAME)
   ,[FIRSTORDER] = MIN(t2.REXORDERID)
@@ -146,11 +164,17 @@ select
   , [BOARDEDBY] = MIN(t3.BOARDEDBY)
   , [BOARDEDCANCALLED] = MIN(t3.BOARDEDCANCALLED)
   --> Merchandise Communication
-  , [CALLEDBY] = MIN(t4.CALLEDBY)
-  , [CALLED] = MIN(t4.CALLED)
-  , [COURTESYCALL_TYPE]  = MIN(t4.COURTESYCALL_TYPE)
-  , [COURTESYCALL_SUBJECT]  = MIN(t4.COURTESYCALL_SUBJECT)
-  , [COURTESYCALL_NOTES]  = MIN(t4.COURTESYCALL_NOTES)
+  ,[COURTESYCALL1_BY] = MIN(t4.COURTESYCALL1_BY)
+  ,[COURTESYCALL1_DATE] = MIN(t4.COURTESYCALL1_DATE)
+  ,[COURTESYCALL1_TYPE]  = MIN(t4.COURTESYCALL1_TYPE)
+  ,[COURTESYCALL1_SUBJECT]  = MIN(t4.COURTESYCALL1_SUBJECT)
+  ,[COURTESYCALL1_NOTES]  = MIN(t4.COURTESYCALL1_NOTES)
+
+  ,[WELCOMEPACK_BY] = MIN(t5.WELCOMEPACK_BY)
+  ,[WELCOMEPACK_DATE] = MIN(t5.WELCOMEPACK_DATE)
+  ,[WELCOMEPACK_TYPE]  = MIN(t5.WELCOMEPACK_TYPE)
+  ,[WELCOMEPACK_SUBJECT]  = MIN(t5.WELCOMEPACK_SUBJECT)
+  ,[WELCOMEPACK_NOTES]  = MIN(t5.WELCOMEPACK_NOTES)
   --> Contact Information
   ,[CONTACTTYPE] = MIN(c1.CONTACTTYPE)
   ,[PRIMARYCATEGORY] = MIN(c1.PRIMARYCATEGORY)
@@ -178,7 +202,8 @@ from
   cte_first_date t1
   left join cte_payments t2 on (t1.FIRSTDATE = t2.DATEOFPAYMENT and t1.SERIALNUMBER = t2.SERIALNUMBER)
   left join cte_onboard_last t3 on (t1.SERIALNUMBER = t3.SERIALNUMBER)
-  left join cte_courtesy_call_last t4 on (t1.SERIALNUMBER = t4.SERIALNUMBER)
+  left join cte_courtesy_call1_last t4 on (t1.SERIALNUMBER = t4.SERIALNUMBER)
+  left join cte_welcome_pack_last t5 on (t1.SERIALNUMBER = t5.SERIALNUMBER)
   left join TBL_CONTACT c1 on (t1.SERIALNUMBER = c1.SERIALNUMBER)
   left join TBL_CONTACTATTRIBUTE c2 on (t1.SERIALNUMBER = c2.SERIALNUMBER)
   left join cte_rex_customerids c3 on (t1.SERIALNUMBER = c3.SERIALNUMBER)

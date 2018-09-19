@@ -153,11 +153,12 @@ def convert_extend_types(obj):
 
 @convert_extend_types.register(datetime.datetime)
 def _(obj):
-	return obj.strftime('%Y-%m-%dT%H:%M:%SZ')
+	return obj.isoformat()
 
 
 @convert_extend_types.register(datetime.date)
 def _(obj):
+
 	return obj.strftime('%Y-%m-%dT%H:%M:%SZ')
 
 

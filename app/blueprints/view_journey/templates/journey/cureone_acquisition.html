@@ -58,7 +58,7 @@ let vueRow = Vue.component('vue-row', {
 	props: ['row'],
 	data: function(){
 		return {
-			weekdays: ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
+			weekdays: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
 			toggleColor: false
 		}
 	},
@@ -77,15 +77,6 @@ let vueRow = Vue.component('vue-row', {
 		}
 	},
 	methods:{
-		formatDate: function (rawDate){
-			let d = new Date(rawDate);
-			return d.toLocaleDateString("en-AU", { year: 'numeric', month: 'long', day: 'numeric' });
-		},
-		formatCurrency: function(val){
-			return '$' + String(val.toFixed(2)).split("").reverse().join("")
-							.replace(/(\d{3}\B)/g, "$1,")
-							.split("").reverse().join("");
-		}
 	},
 	template: `
 	<tr class="text-left"  v-on:dblclick="toggleColor=!toggleColor" v-bind:class="{'table-warning': toggleColor}">
@@ -100,33 +91,33 @@ let vueRow = Vue.component('vue-row', {
 		</td>
 
 		<td style="width: 35%">
-			<span class="badge badge-success">Responed: << formatDate(row.CAMPAIGN_FIRSTDATE) >></span> <span class="text-secondary">, culmulative LTD total </span><span class="badge badge-info"><< formatCurrency(row.CAMPAIGN_TOAL) >></span>
+			<span class="badge badge-success">Responed: << row.CAMPAIGN_FIRSTDATE|dAU >></span> <span class="text-secondary">, culmulative LTD total </span><span class="badge badge-info"><< row.CAMPAIGN_TOAL|currency >></span>
 			<hr class="my-1">
-			<small class="text-info">With TLMA since << formatDate(row.FIRSTDATE) >>, LTD total << formatCurrency(row.LTD_TOTAL) >><br></small>
-			<small class="text-danger" v-if=" row.LTD_FISET_MERCHANDISE_DATE !== null ">WIth Merchandise Since << formatDate(row.LTD_FISET_MERCHANDISE_DATE) >></small>
+			<small class="text-info">With TLMA since << row.FIRSTDATE|dAU >>, LTD total << row.LTD_TOTAL|currency >><br></small>
+			<small class="text-danger" v-if=" row.LTD_FISET_MERCHANDISE_DATE !== null ">WIth Merchandise Since << row.LTD_FISET_MERCHANDISE_DATE|dAU >></small>
 		</td>
 
 		<td style="width: 15%">
 			<span v-if="row.DONOTCALL == -1 || row.DONOTMAIL == -1">
-				<span v-if="row.DONOTCALL == -1" class="text-dark">&#9995;  Do not Call </span>
-				<span v-if="row.DONOTMAIL == -1" class="text-dark">&#9995;  Do not Mail </span>
+				<span v-if="row.DONOTCALL == -1" class="text-danger">&#128263;  Do not Call </span>
+				<span v-if="row.DONOTMAIL == -1" class="text-danger">&#128075;  Do not Mail </span>
 				<br>
 			</span>
 
 			<span v-if="(row.DONOTCALL != -1 && row.MOBILENUMBER !== null && row.MOBILENUMBER.trim() !== '')" class="text-info">
-				<small>&#9742;</small> Mobile : << row.MOBILENUMBER >><br>
+				<small>&#128241;</small> Mobile : << row.MOBILENUMBER >><br>
 			</span>
 
 			<span v-if="(row.DONOTCALL != -1 && row.DAYTELEPHONE !== null && row.DAYTELEPHONE.trim() !== '')" class="text-info">
-				<small>&#9742;</small> Day : << row.DAYTELEPHONE >><br>
+				<small>&#128222;</small> Day : << row.DAYTELEPHONE >><br>
 			</span>
 
 			<span v-if="(row.DONOTCALL != -1 && row.EVENINGTELEPHONE !== null && row.EVENINGTELEPHONE.trim() !== '')" class="text-info">
-				<small>&#9742;</small> Evening : << row.EVENINGTELEPHONE >>
+				<small>&#128222;</small> Evening : << row.EVENINGTELEPHONE >>
 			</span>
 
 			<span v-if="(row.DONOTCALL != -1 && row.FAXNUMBER !== null && row.FAXNUMBER.trim() !== '')" class="text-info">
-				<small>&#9742;</small> Fax : << row.FAXNUMBER >><br>
+				<small>&#128224;</small> Fax : << row.FAXNUMBER >><br>
 			</span>
 
 			<span class="text-muted"
@@ -139,7 +130,7 @@ let vueRow = Vue.component('vue-row', {
 					&& !(row.FAXNUMBER !== null && row.FAXNUMBER.trim() !== '')
 					) || (row.DONOTCALL == -1) )
 				">
-				&#9993; << row.EMAILADDRESS >><br>
+				&#128231; << row.EMAILADDRESS >><br>
 			</span>
 
 			<span class="text-muted"
@@ -160,7 +151,7 @@ let vueRow = Vue.component('vue-row', {
 				<br>
 			</span>
 			<span v-else>
-				<span class="text-info"><small>&#10086; Due: << formatDate(conversionCallDueDate) >>, << weekdays[conversionCallDueDate.getDay()] >></small></span>
+				<span class="text-info">Due: << conversionCallDueDate|dAU >>, << weekdays[conversionCallDueDate.getDay()] >></span>
 			</span>
 
 		</td>
@@ -230,7 +221,10 @@ let rootVue = new Vue({
 	},
 	computed:{
 		defaultAPI: function(){
-			return '/api/campaign/campaign_donors' + '?camapgincode=' + this.campaignCode
+			return '/api/campaign/journey_cureone_acquisition' + '?camapgincode=' + this.campaignCode
+		},
+		totalCampaignValue: function(){
+			return new Array(this.raw.rows).reduce((acc, val) => { return acc + val['CAMPAIGN_TOAL'] })
 		},
 		callingRows: function () {
 			return this.raw.rows.filter(row => row['CONVERSIONCALLBY'] === null || row['CONVERSIONCALLBY'].trim() === '' )
@@ -245,9 +239,9 @@ let rootVue = new Vue({
 	methods:{
 		getData: function(){
 			fetchJSON(endpoint(this.defaultAPI), function(json){
-				rootVue.raw.rows = json;
+				rootVue.raw.rows = json.rows;
 				rootVue.raw.ready = true;
-				rootVue.raw.timestamp = new Date().toLocaleString()
+				rootVue.raw.timestamp = new Date(json.timestamp);
 			});
 		},
 	},
@@ -255,7 +249,7 @@ let rootVue = new Vue({
 	<div v-if="!raw.ready">
 		<div  class="row">
 			<div class="col-12 text-center">
-				<p class="lead text-danger ">Finding People Have A Heart for Cure One ... </p>
+				<p class="lead text-danger ">&#128270; Finding Donors Responded to Cure One Acqusition Campaign... </p>
 				<div class="lds-heart"><div></div></div>
 			</div>
 		</div>
@@ -268,7 +262,7 @@ let rootVue = new Vue({
 
 				<div class="card shadow-type6">
 					<div class="card-header bg-transparent shadow-type8">
-						<p class="text-danger font-weight-bold mb-0"><< raw.rows.length >> Cure One Acquisition Donors Found <small class="text-muted">as at << raw.timestamp >> from thankQ</small></p>
+						<p class="text-danger font-weight-bold mb-0"><< raw.rows.length >> Cure One Acquisition Donors Found <small class="text-muted">as at << raw.timestamp|dtAU >> from thankQ</small> </p>
 					</div>
 
   				<div class="card-body">
@@ -282,7 +276,7 @@ let rootVue = new Vue({
 
 							<li class="nav-item ">
 								<a class="nav-link" id="called-tab" data-toggle="pill" href="#called" role="tab" aria-controls="called" aria-selected="false">
-								 &#9749; Called <span class="badge badge-pill badge-success"> << calledRows.length >></span>
+								 &#128515; Called <span class="badge badge-pill badge-success"> << calledRows.length >></span>
 								</a>
 							</li>
 

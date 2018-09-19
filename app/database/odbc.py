@@ -19,7 +19,10 @@ class ODBCResult(object):
 				f'\n>> Types : {self.types!r}' \
 				f'\n>> First Row : {self.rows[0]}'
 
-	def to_shape(self, orient='records'):
+	def to_dict(self, rows):
+		return dict(rows=rows, headers=self.headers, bytes=self.bytes, timestamp=self.timestamp, cached_timeout=self.cached_timeout)
+
+	def reshape_rows(self, orient='records'):
 		if orient == 'records':
 			results = []
 			for row in self.rows:
@@ -39,7 +42,7 @@ class ODBCResult(object):
 
 	@jsonified
 	def to_json(self, orient='records'):
-		return self.to_shape(orient=orient)
+		return self.to_dict(self.reshape_rows(orient=orient))
 
 
 class ThankqODBC(object):

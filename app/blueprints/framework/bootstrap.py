@@ -1,14 +1,11 @@
-import json
-from .helper import get_version_package_json, create_framework_blueprint, package_json_path
+from app.weblibs import NPM
+from .helper import create_framework_blueprint
 
 
 class Bootstrap(object):
-	# Read NPM's package.json to get version information
-	with open(package_json_path) as f:
-		package_json = json.load(f)
-		bootstrap_package_version = get_version_package_json(package_json['dependencies']['bootstrap'])
-		bootstrap_jquery_package_version = get_version_package_json(package_json['dependencies']['jquery'])
-		bootstrap_popper_package_version = get_version_package_json(package_json['dependencies']['popper.js'])
+	bootstrap_package_version = NPM.read_dependency('bootstrap')
+	bootstrap_jquery_package_version = NPM.read_dependency('jquery')
+	bootstrap_popper_package_version = NPM.read_dependency('popper.js')
 
 	def __init__(self, app):
 		# Bound to Flask object

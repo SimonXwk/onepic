@@ -1,21 +1,21 @@
+from flask import current_app
 import os
 import glob
 import datetime
 import pandas as pd
-from flask import current_app
 from .rfm_segment import Segment1 as Segment
 from app.cache import cached
 
 
 def get_data_folder():
-	folder = current_app.config['RFM_UPLOAD_FOLDER']
+	folder = current_app.config['MERCHANDISE_RFM_UPLOAD_FOLDER']
 	if not os.path.exists(folder):
 		os.makedirs(folder)
 	return folder
 
 
 def get_result_folder():
-	folder = current_app.config['RFM_RESULT_FOLDER']
+	folder = current_app.config['MERCHANDISE_RFM_RESULT_FOLDER']
 	if not os.path.exists(folder):
 		os.makedirs(folder)
 	return folder

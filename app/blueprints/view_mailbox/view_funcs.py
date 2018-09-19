@@ -2,7 +2,7 @@ from flask import send_from_directory
 import os
 from app.helper import templatified
 from app.cache import cached
-from app.blueprints.api.data_mail import MailExcel
+from app.blueprints.api.data_excel_mail import MailExcel
 
 
 def excel_download(filename):

@@ -6,15 +6,14 @@ ld = LazyLoader(bp)
 # LazyLoading View Functions
 ld.url('data_user.get_current_user', ['/'], endpoint='index')
 
-ld.url('data_mail.today', ['/mailbox/today', '/mailbox/today/<int:year_offset>'])
-ld.url('data_mail.date', ['/mailbox/ymd', '/mailbox/ymd/<string:str_date>'])
-ld.url('data_mail.year_month', ['/mailbox/ym/<string:str_yearmonth>'])
+ld.url('data_excel_mail.today', ['/mailbox/today', '/mailbox/today/<int:year_offset>'])
+ld.url('data_excel_mail.date', ['/mailbox/ymd', '/mailbox/ymd/<string:str_date>'])
+ld.url('data_excel_mail.year_month', ['/mailbox/ym/<string:str_yearmonth>'])
 
-ld.url('data_thankq_general.payments', ['/tq/payments'])
-ld.url('data_thankq_general.contact_created_fy', ['/tq/contact_created_fy'])
-
-
-ld.url('data_campaign.campaign_donors', ['/campaign/campaign_donors'])
+ld.url('data_thankq.payments', ['/tq/payments'])
+ld.url('data_thankq.contact_created_fy', ['/tq/contact_created_fy'])
+ld.url('data_thankq.new_customer_list', ['/merch/new_customers'])
+ld.url('data_thankq.journey_cureone_acquisiton_donors', ['/campaign/journey_cureone_acquisition'])
 
 
 ld.url('data_privenue.fy_total_all', ['/cash/fys'])
@@ -22,8 +21,8 @@ ld.url('data_privenue.fy_total_all_ltd', ['/cash/fysltd'])
 ld.url('data_privenue.cfy_platform_type_revenue', ['/cash/cfy/stream'])
 
 # Merchandise related APIs
-ld.url('data_merch.rex_rfm', ['/merch/rfm/<filename>'])
-ld.url('data_merch.new_customer_list', ['/merch/new_customers'])
+ld.url('data_excel_merch.rex_rfm', ['/merch/rfm/<filename>'])
+ld.url('data_excel_merch.rex_fulfilment_excels', ['/merch/fulfilment_excels'])
 
 
 ld.url('starshipit.search_orders', ['/ssi/orders/search', '/ssi/orders/search/<string:phrase>'])

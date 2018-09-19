@@ -37,7 +37,7 @@ def upload():
 
 		if file and rfm_upload_allowed_file(file.filename):
 			filename = secure_filename(file.filename)
-			save_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+			save_path = os.path.join(current_app.config['MERCHANDISE_RFM_UPLOAD_FOLDER'], filename)
 			if os.path.exists(save_path):
 				flash('File {} already exists, and it will be replaced by the new upload'.format(filename), 'warning')
 			file.save(save_path)
@@ -65,4 +65,9 @@ def track_order(order_number=None):
 
 @templatified('merch_new_customer_courtesy_call', title='Merch Courtesy Call')
 def merchandise_new_courtesy_call():
+	return None
+
+
+@templatified('merch_new_customer_welcome_pack', title='Merch Welcome Pack')
+def merchandise_new_welcome_pack():
 	return None

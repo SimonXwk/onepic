@@ -36,16 +36,16 @@
 {% block js_embedded_after %}
 <script>
 console.log(thisFY);
-const cs = crossfilter(data);
-console.log(cs.groupAll().reduceCount().value())
-
-
-let dimStatus = cs.dimension(d => d['PLEDGESTATUS']);
-let dimFyCreated = cs.dimension(d => d['CREATED_FY']);
-dimStatus.filter('Active');
-{#dimFyCreated.filter(v => v <= thisFY );#}
-
-console.log(cs.groupAll().reduceCount().value());
+const rows = data.rows;
+{#const cs = crossfilter(rows);#}
+{#console.log(cs.groupAll().reduceCount().value());#}
+{##}
+{##}
+{#let dimStatus = cs.dimension(d => d['PLEDGESTATUS']);#}
+{#let dimFyCreated = cs.dimension(d => d['CREATED_FY']);#}
+{#dimStatus.filter('Active');#}
+{##}
+{#console.log(cs.groupAll().reduceCount().value());#}
 
 
 Highcharts.chart('chart1', {
@@ -76,23 +76,23 @@ Highcharts.chart('chart1', {
 		data: [
 		{
 			name: 'FY' + thisFY + ' New',
-			y: data.filter(d => d['PLEDGEPLAN'] === 'Continuous' && d['CREATED_FY'] <= thisFY && d['START_FY'] === thisFY ).length
+			y: rows.filter(d => d['PLEDGEPLAN'] === 'Continuous' && d['CREATED_FY'] <= thisFY && d['START_FY'] === thisFY ).length
 		}, {
 			name: 'New Cancelled',
 			color: '#f65a5b',
-			y: data.filter(d => d['PLEDGEPLAN'] === 'Continuous' && d['CREATED_FY'] <= thisFY && d['START_FY'] === thisFY && d['PLEDGESTATUS'] === 'Written Down' && d['WRITTENDOWN_FY'] === thisFY ).length * (-1)
+			y: rows.filter(d => d['PLEDGEPLAN'] === 'Continuous' && d['CREATED_FY'] <= thisFY && d['START_FY'] === thisFY && d['PLEDGESTATUS'] === 'Written Down' && d['WRITTENDOWN_FY'] === thisFY ).length * (-1)
 		},  {
 			name: 'New On Hold',
 			color: '#FFEB3B',
-			y: data.filter(d => d['PLEDGEPLAN'] === 'Continuous' && d['CREATED_FY'] <= thisFY && d['START_FY'] === thisFY && d['PLEDGESTATUS'] === 'On Hold' && d['ONHOLD_FY'] === thisFY ).length * (-1)
+			y: rows.filter(d => d['PLEDGEPLAN'] === 'Continuous' && d['CREATED_FY'] <= thisFY && d['START_FY'] === thisFY && d['PLEDGESTATUS'] === 'On Hold' && d['ONHOLD_FY'] === thisFY ).length * (-1)
 		}, {
 			name: 'Previous Cancelled',
 			color: '#f65a5b',
-			y: data.filter(d => d['PLEDGEPLAN'] === 'Continuous' && d['CREATED_FY'] <= thisFY && d['START_FY'] < thisFY && d['PLEDGESTATUS'] === 'Written Down' && d['WRITTENDOWN_FY'] === thisFY ).length * (-1)
+			y: rows.filter(d => d['PLEDGEPLAN'] === 'Continuous' && d['CREATED_FY'] <= thisFY && d['START_FY'] < thisFY && d['PLEDGESTATUS'] === 'Written Down' && d['WRITTENDOWN_FY'] === thisFY ).length * (-1)
 		},  {
 			name: 'Previous On Hold',
 			color: '#FFEB3B',
-			y: data.filter(d => d['PLEDGEPLAN'] === 'Continuous' && d['CREATED_FY'] <= thisFY && d['START_FY'] < thisFY && d['PLEDGESTATUS'] === 'On Hold' && d['ONHOLD_FY'] === thisFY ).length * (-1)
+			y: rows.filter(d => d['PLEDGEPLAN'] === 'Continuous' && d['CREATED_FY'] <= thisFY && d['START_FY'] < thisFY && d['PLEDGESTATUS'] === 'On Hold' && d['ONHOLD_FY'] === thisFY ).length * (-1)
 		},{
 			name: 'Net Growth',
 			isSum: true,
@@ -141,31 +141,31 @@ let chart2 = Highcharts.chart('chart2', {
 		data: [
 		{
 			name: 'FY' + thisFY + ' New',
-			y: data.filter(d => d['PLEDGEPLAN'] !== 'Continuous' && d['CREATED_FY'] <= thisFY && d['START_FY'] === thisFY ).length
+			y: rows.filter(d => d['PLEDGEPLAN'] !== 'Continuous' && d['CREATED_FY'] <= thisFY && d['START_FY'] === thisFY ).length
 		}, {
 			name: 'New Cancelled',
 			color: '#f65a5b',
-			y: data.filter(d => d['PLEDGEPLAN'] !== 'Continuous' && d['CREATED_FY'] <= thisFY && d['START_FY'] === thisFY && d['PLEDGESTATUS'] === 'Written Down' && d['WRITTENDOWN_FY'] === thisFY ).length * (-1)
+			y: rows.filter(d => d['PLEDGEPLAN'] !== 'Continuous' && d['CREATED_FY'] <= thisFY && d['START_FY'] === thisFY && d['PLEDGESTATUS'] === 'Written Down' && d['WRITTENDOWN_FY'] === thisFY ).length * (-1)
 		}, {
 			name: 'New Finished',
 			color: '#FF9800',
-			y: data.filter(d => d['PLEDGEPLAN'] !== 'Continuous' && d['CREATED_FY'] <= thisFY && d['START_FY'] === thisFY && d['PLEDGESTATUS'] === 'Closed' && d['CLOSED_FY'] === thisFY ).length * (-1)
+			y: rows.filter(d => d['PLEDGEPLAN'] !== 'Continuous' && d['CREATED_FY'] <= thisFY && d['START_FY'] === thisFY && d['PLEDGESTATUS'] === 'Closed' && d['CLOSED_FY'] === thisFY ).length * (-1)
 		}, {
 			name: 'New On Hold',
 			color: '#FFEB3B',
-			y: data.filter(d => d['PLEDGEPLAN'] !== 'Continuous' && d['CREATED_FY'] <= thisFY && d['START_FY'] === thisFY && d['PLEDGESTATUS'] === 'On Hold' && d['ONHOLD_FY'] === thisFY ).length * (-1)
+			y: rows.filter(d => d['PLEDGEPLAN'] !== 'Continuous' && d['CREATED_FY'] <= thisFY && d['START_FY'] === thisFY && d['PLEDGESTATUS'] === 'On Hold' && d['ONHOLD_FY'] === thisFY ).length * (-1)
 		}, {
 			name: 'Previous Cancelled',
 			color: '#f65a5b',
-			y: data.filter(d => d['PLEDGEPLAN'] !== 'Continuous' && d['CREATED_FY'] <= thisFY && d['START_FY'] < thisFY && d['PLEDGESTATUS'] === 'Written Down' && d['WRITTENDOWN_FY'] === thisFY ).length * (-1)
+			y: rows.filter(d => d['PLEDGEPLAN'] !== 'Continuous' && d['CREATED_FY'] <= thisFY && d['START_FY'] < thisFY && d['PLEDGESTATUS'] === 'Written Down' && d['WRITTENDOWN_FY'] === thisFY ).length * (-1)
 		}, {
 			name: 'Previous Finished',
 			color: '#FF9800',
-			y: data.filter(d => d['PLEDGEPLAN'] !== 'Continuous' && d['CREATED_FY'] <= thisFY && d['START_FY'] < thisFY && d['PLEDGESTATUS'] === 'Closed' && d['CLOSED_FY'] === thisFY ).length * (-1)
+			y: rows.filter(d => d['PLEDGEPLAN'] !== 'Continuous' && d['CREATED_FY'] <= thisFY && d['START_FY'] < thisFY && d['PLEDGESTATUS'] === 'Closed' && d['CLOSED_FY'] === thisFY ).length * (-1)
 		}, {
 			name: 'Previous On Hold',
 			color: '#FFEB3B',
-			y: data.filter(d => d['PLEDGEPLAN'] !== 'Continuous' && d['CREATED_FY'] <= thisFY && d['START_FY'] < thisFY && d['PLEDGESTATUS'] === 'On Hold' && d['ONHOLD_FY'] === thisFY ).length * (-1)
+			y: rows.filter(d => d['PLEDGEPLAN'] !== 'Continuous' && d['CREATED_FY'] <= thisFY && d['START_FY'] < thisFY && d['PLEDGESTATUS'] === 'On Hold' && d['ONHOLD_FY'] === thisFY ).length * (-1)
 		},{
 			name: 'Net Growth',
 			isSum: true,
