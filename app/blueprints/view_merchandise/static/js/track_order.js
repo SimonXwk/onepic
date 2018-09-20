@@ -5,6 +5,7 @@ let ssi = new Vue({
 			number: null,
 			regex: /^\d{2}-\d{8}$/g,
 		},
+		quickInput: null,
 		showBanner: true,
 		stage1: {
 			endpoint: '/api/ssi/orders/search/',
@@ -30,7 +31,16 @@ let ssi = new Vue({
 		</div>
 		</div>
 		`
-
+	},
+	watch:{
+		quickInput: function(v1, v2) {
+			let val = parseInt(this.quickInput);
+			if ( !isNaN(val) && val.toString().length <= 8  ){
+				console.log(val);
+				this.order.number = new Date().getFullYear().toString().slice(2,4) + '-' + '0'.repeat(8-val.toString().length) + val;
+				this.validateOrderNumberOnInput();
+			}
+		}
 	},
 	methods:{
 		initiateStatus: function(){
@@ -51,15 +61,12 @@ let ssi = new Vue({
 					let ok = (orderMatch !== null && orderMatch.length === 1);
 				if (ok){
 					this.stage1.status = 'init';
+					console.log(this.$refs.input);
 					return true
 				}else{
 					return false
 				}
 			}
-		},
-		clearOrderNumber: function(){
-			this.order.number = null;
-			this.initiateStatus();
 		}
 	},
 	mounted(){
@@ -69,9 +76,9 @@ let ssi = new Vue({
 		// Component : Banner
 		'ssi-banner':{
 		template: `
-		<transition name="bounce">
+		<transition name="slide-fade">
 			<div v-if="this.$parent.$data.showBanner ">
-			<div class="alert alert-success shadow-type8" role="alert" v-if="this.$parent.validateOrderNumberOnInput() ">&#10004 <span class="text-danger"><strong><< this.$parent.$data.order.number >></strong></span> is a legitimate input</div>
+			<div class="alert alert-success shadow-type1" role="alert" v-if="this.$parent.validateOrderNumberOnInput() ">&#10004 <span class="text-danger"><strong><< this.$parent.$data.order.number >></strong></span> is a legitimate input</div>
 			<div class="alert alert-secondary shadow-type1" role="alert" v-else-if="this.$parent.$data.order.number === '' || this.$parent.$data.order.number === null "><span class="text-muted">waiting for a rex order id as input ... ( eg  18-00004073 )</span></div>
 			<div class="alert alert-info shadow-type1" role="alert" v-else>&#10148 Reading Input : <span class="text-primary"><strong><< this.$parent.$data.order.number >></strong></span></div>
 			</div>
@@ -218,28 +225,26 @@ let ssi = new Vue({
 				</div>
 
 
-
-
 				<div class="card">
-				<p class="card-header lead">&#128230; Packages</p>
-				<ul class="list-group list-group-flush">
-					<li class="list-group-item" v-for="(package, index) in orderDetail.packages">
-					<p>
-						Package << index+1 >> :
-						<a title="Click me to check Aust Post" target="_blank" v-bind:href=package.tracking_url>
-						<span class="badge badge-warning text-dark">&#8690 << package.tracking_number >> (click me)</span>
-						</a>
-					</p>
-					<p><small><< package.carrier_service_name >></small></p>
-					<p><small>label created : << package.label_created_date|dtAU >></small></p>
-					<p>
-						<span class="badge badge-secondary">length <span class="text-warning"><< package.length >></span></span>
-						<span class="badge badge-secondary">width <span class="text-warning"><< package.width >></span></span>
-						<span class="badge badge-secondary">height <span class="text-warning"><< package.height >></span></span>
-						<span class="badge badge-secondary">weight <span class="text-warning"><< package.weight >></span></span>
-					</p>
-					</li>
-				</ul>
+					<p class="card-header lead">&#128230; Packages</p>
+					<ul class="list-group list-group-flush">
+						<li class="list-group-item" v-for="(package, index) in orderDetail.packages">
+							<p>
+								Package << index+1 >> :
+								<a title="Click me to check Aust Post" target="_blank" v-bind:href=package.tracking_url>
+								<span class="badge badge-warning text-dark">&#8690 << package.tracking_number >> (click me)</span>
+								</a>
+							</p>
+							<p><small><< package.carrier_service_name >></small></p>
+							<p><small>label created : << package.label_created_date|dtAU >></small></p>
+							<p>
+								<span class="badge badge-secondary">length <span class="text-warning"><< package.length >></span></span>
+								<span class="badge badge-secondary">width <span class="text-warning"><< package.width >></span></span>
+								<span class="badge badge-secondary">height <span class="text-warning"><< package.height >></span></span>
+								<span class="badge badge-secondary">weight <span class="text-warning"><< package.weight >></span></span>
+							</p>
+						</li>
+					</ul>
 				</div>
 
 			</div>
@@ -280,71 +285,36 @@ let ssi = new Vue({
 		// Component : Order Tracking Information
 		'ssi-order-track': {
 		template: `
-			<div v-if=" this.$parent.$data.stage3.status === 'init' ">
+		<div v-if=" this.$parent.$data.stage3.status === 'init' ">
 			<div v-html="this.$parent.$data.loader3"></div>
-			</div>
+		</div>
 
-			<div v-else-if=" this.$parent.$data.stage3.status === 'success' ">
-			<div v-for="result in this.$parent.$data.stage3.results">
-				<table class="table table-hover table-bordered table-sm">
-				<tbody>
-					<tr>
-					<th scope="row">Carrier</th>
-					<td><< result.carrier_name >> / << result.carrier_service >></td>
-					</tr>
-					<tr>
-					<th scope="row">Last Updated Date</th>
-					<td><< result.last_updated_date|dtAU  >></td>
-					</tr>
-
-					<tr>
-					<th scope="row">Order #</th>
-					<td><< result.order_number >></td>
-					</tr>
-					<tr>
-					<th scope="row">Order Status</th>
-					<td><< result.order_status >></td>
-					</tr>
-					<tr>
-					<th scope="row">Shipment Date</th>
-					<td><< result.shipment_date|dtAU >></td>
-					</tr>
-
-					<tr>
-					<th scope="row">Tracking #</th>
-					<td><< result.tracking_number >></td>
-					</tr>
-					<tr>
-					<th scope="row">&#128270  Tracking Status</th>
-					<td v-if="result.tracking_status.trim().slice(0,9)==='Delivered' "><span class="text-success"><strong>&#9989 << result.tracking_status >></strong></span></td>
-					<td v-else-if="result.tracking_status==='Exception'"><span class="text-danger"><strong>&#10071 << result.tracking_status >></strong></span></td>
-					<td v-else><span class="text-dark"><strong>&#10068 << result.tracking_status >></strong></span></td>
-					</tr>
-				</tbody>
-				</table>
-
-
-				<ul class="ul-timeline">
-				<li v-for="event in result.tracking_events">
-					<span class="badge" v-bind:class="[eventStatusClass(event, 'badge')]"><mark><< event.status >></mark></span>
-					<span class="badge badge-pill float-right" v-bind:class="[eventStatusClass(event, 'badge')]"><< event.event_datetime >></span >
-					<p v-bind:class="[eventStatusClass(event, 'text')]"><< event.details >></p>
-				</li>
-				</ul>
-
-			<hr class="my-1">
-
-			</div>
-			</div>
-
-			<div v-else-if=" this.$parent.$data.stage3.status === 'failed' ">
+		<div v-else-if=" this.$parent.$data.stage3.status === 'failed' ">
 			<p class="lead text-center">&#9785 Can not find << this.$parent.$data.order.number >> in starshipit</p>
+		</div>
+
+		<div v-else-if = "this.$parent.$data.stage3.status === 'wait'">
+		</div>
+
+		<div v-else-if=" this.$parent.$data.stage3.status === 'success' ">
+			<div v-for="result in this.$parent.$data.stage3.results">
+				<div id="tracking">
+          <div class="text-center" v-bind:class="[deliveryStatusClass(result.tracking_status, 'tracking-status-').class]">
+							<small class="text-tight"><< result.order_number >> (<< result.order_status >>) was <span class="font-weight-bold">shipped on << result.shipment_date|dtAU >></span> </small><br>
+							<small class="text-tight"><< result.tracking_number >> <span class="font-weight-bold">updated: << result.last_updated_date|dtAU >></span> by << result.carrier_name >>/<< result.carrier_service >></small>
+							<p class="tracking-status text-tight font-weight-bold">&#128073;<< result.tracking_status >>&#128072;</p>
+					</div>
+					<div class="tracking-list">
+						<div class="tracking-item" v-for="event in result.tracking_events">
+							<div class="tracking-icon" v-bind:class="[deliveryStatusClass(event.status, 'status-').class]" v-html="deliveryStatusClass(event.status, 'status-').icon" ></div>
+							<div class="tracking-date"><< event.event_datetime|dAU >><span><< event.event_datetime|tAU >></span></div>
+							<div class="tracking-content"><< event.status >><span><< event.details >></span></div>
+						</div>
+				 	</div>
+				</div>
+
 			</div>
-
-
-			<div v-else-if = "this.$parent.$data.stage3.status === 'wait'">
-
-			</div>
+		</div>
 		`,
 		data: function () {
 			return {
@@ -363,13 +333,55 @@ let ssi = new Vue({
 		},
 		methods:{
 			fetch: function(json){
-			if (json.success === true){
-				this.$parent.$data.stage3.results.push(json.results);
-				this.$parent.$data.stage3.status = 'success';
+				if (json.success === true){
+					this.$parent.$data.stage3.results.push(json.results);
+					this.$parent.$data.stage3.status = 'success';
+				}else{
+					this.$parent.$data.stage3.status = 'failed';
+				}
+			},
+			deliveryStatusClass: function(status, prefix){
+				status = status.trim().toUpperCase();
+				let cls, icon;
+				if(status.slice(0,9) === 'DELIVERED'){
+					cls = 'delivered';
+					icon = '&#129309;';
+				}else {
+					if(status.slice(0,9) === 'EXCEPTION' || status.indexOf('UNABLE') !== -1 ){
+						cls = 'exception';
+						icon = '&#128075;'
+					}else{
+						if(status.slice(0,19) === 'AWAITING COLLECTION'){
+							cls = 'deliveryoffice';
+							icon = '&#127972;'
+						}else {
+							if(status.slice(0,20) === 'ONBOARD FOR DELIVERY'){
+								cls = 'outfordelivery';
+								icon = '&#128641;'
+							}else {
+								if(status.slice(0,7) === 'PRINTED' || status.slice(0,21) === 'PICKED UP FROM SENDER' || status.indexOf('REQUESTED') !== -1){
+									cls = 'inforeceived';
+									icon = status.slice(0,7) === 'PRINTED' ? '&#128424;' : (status.indexOf('REQUESTED') !== -1 ? '&#128230;' : '&#128273;');
+								}else {
+									if(status.slice(0,7) === 'PENDING'){
+										cls = 'pending';
+										icon = '&#128666;'
+									}else {
+										if(status.slice(0,9) === 'ATTEMPTED'){
+											cls = 'attemptfail';
+											icon = '&#128682;'
+										}else {
+											cls = 'intransit';
+											icon = status.slice(0,26) === 'ITEM PROCESSED AT FACILITY' ? '&#128270;' : '&#128666;';
+										}
 
-			}else{
-				this.$parent.$data.stage3.status = 'failed';
-			}
+									}
+								}
+							}
+						}
+					}
+				}
+				return {class: prefix + cls, icon: icon}
 			},
 			eventStatusClass: function(event, prefix=''){
 			if (event.status === 'Delivered' || event.status === 'Delivered with signature' ){

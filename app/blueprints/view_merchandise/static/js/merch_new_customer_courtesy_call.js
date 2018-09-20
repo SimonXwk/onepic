@@ -101,12 +101,19 @@ let vueRow = Vue.component('vue-row', {
 					orders.forEach(order => {
 						fetchJSON(endpoint(vCol.fetch2 + vCol.trackingNumber), function (json2) {
 							vCol.called2 = true;
-							if (json2.success === true && json2['results']['tracking_events'] ) {
+							if (json2.success === true ) {
 								let events = json2['results']['tracking_events'];
-								let lastEvent = events[events.length - 1];
-								vCol.status = lastEvent['status'];
-								vCol.statusDate = lastEvent['event_datetime'];
-								vCol.statusDetail = lastEvent['details'];
+
+								if( !events ){
+									vCol.status = json2['results']['tracking_status'];
+									vCol.statusDate = json2['results']['last_updated_date'];
+									vCol.statusDetail = json2['results']['order_status'];
+								} else {
+									let lastEvent = events[events.length - 1];
+									vCol.status = lastEvent['status'];
+									vCol.statusDate = lastEvent['event_datetime'];
+									vCol.statusDetail = lastEvent['details'];
+								}
 								vCol.show = vCol.isDelivered;
 								vCol.$eventBus.$emit('processedCustomer', vCol.row['SERIALNUMBER'], vCol.showType);
 							} else {
@@ -163,7 +170,7 @@ let vueRow = Vue.component('vue-row', {
 		</td>
 
 		<td style="width: 35%">
-			 <span class="text-muted"><< row.FIRSTORDER >><small> order date << formatDate(row.FIRSTDATE) >></small> <a target="blank" class="text-muted" v-bind:href="linkTrack + row.FIRSTORDER"> &#128230;<small>starshipit</small></a></span>
+			 <span class="text-muted"><< row.FIRSTORDER >><small> payment: << formatDate(row.FIRSTDATE) >></small> <a target="blank" class="text-muted" v-bind:href="linkTrack + row.FIRSTORDER"> &#128230;<small>starshipit</small></a></span>
 			 <hr class="my-1">
 			 <span v-bind:class="statusTextClassObject"><< resultDisplay >></span>
 			 <span v-if="statusDetail!==status" calss="text-danger"><small>, << statusDetail >></small></span>
@@ -544,14 +551,14 @@ let rootVue = new Vue({
 							</li>
 
 							<li class="nav-item ">
-								<a class="nav-link" id="finished-tab" data-toggle="pill" href="#finished" role="tab" aria-controls="finished" aria-selected="false">
-								 &#128515; Called <span class="badge badge-pill badge-success"> << finishedRowsShowCount >>/<< finishedRows.length >></span>
+								<a class="nav-link" id="skip-tab" data-toggle="pill" href="#skip" role="tab" aria-controls="skip" aria-selected="false">
+								 &#9975; Skipped &#8828; 05/09/18 <span class="badge badge-pill badge-secondary"> << skippedRowsShowCount >>/<< skippedRows.length >></span>
 								</a>
 							</li>
 
 							<li class="nav-item ">
-								<a class="nav-link" id="skip-tab" data-toggle="pill" href="#skip" role="tab" aria-controls="skip" aria-selected="false">
-								 &#127880; Skipped &#8828; 05/09/18 <span class="badge badge-pill badge-secondary"> << skippedRowsShowCount >>/<< skippedRows.length >></span>
+								<a class="nav-link" id="finished-tab" data-toggle="pill" href="#finished" role="tab" aria-controls="finished" aria-selected="false">
+								 &#128515; Called <span class="badge badge-pill badge-success"> << finishedRowsShowCount >>/<< finishedRows.length >></span>
 								</a>
 							</li>
 

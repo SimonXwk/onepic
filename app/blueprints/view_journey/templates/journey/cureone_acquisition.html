@@ -227,10 +227,22 @@ let rootVue = new Vue({
 			return new Array(this.raw.rows).reduce((acc, val) => { return acc + val['CAMPAIGN_TOAL'] })
 		},
 		callingRows: function () {
-			return this.raw.rows.filter(row => row['CONVERSIONCALLBY'] === null || row['CONVERSIONCALLBY'].trim() === '' )
+			return this.raw.rows.filter(row => this.calcSubLists(row) === 'todo')
 		},
 		calledRows: function () {
-			return this.raw.rows.filter(row => !(row['CONVERSIONCALLBY'] === null || row['CONVERSIONCALLBY'].trim() === ''))
+			return this.raw.rows.filter(row => this.calcSubLists(row) === 'called')
+		},
+		doNotMailCount:function(){
+			return this.raw.rows.reduce((acc, cur) => {
+				acc += cur.DONOTMAIL === -1 ? 1 : 0;
+				return acc
+			}, 0)
+		},
+		cfyNewCount:function(){
+			return this.raw.rows.reduce((acc, cur) => {
+				acc += (cur.FIRSTFY === cur.CFY && cur.FIRSTFY ) ? 1 : 0;
+				return acc
+			}, 0)
 		},
 	},
 	created(){
@@ -243,6 +255,13 @@ let rootVue = new Vue({
 				rootVue.raw.ready = true;
 				rootVue.raw.timestamp = new Date(json.timestamp);
 			});
+		},
+		calcSubLists: function(row){
+			if (row['CONVERSIONCALLBY'] === null || row['CONVERSIONCALLBY'].trim() === '') {
+				return 'todo'
+			}else {
+				return 'called'
+			}
 		},
 	},
 	template:`
@@ -262,7 +281,19 @@ let rootVue = new Vue({
 
 				<div class="card shadow-type6">
 					<div class="card-header bg-transparent shadow-type8">
-						<p class="text-danger font-weight-bold mb-0"><< raw.rows.length >> Cure One Acquisition Donors Found <small class="text-muted">as at << raw.timestamp|dtAU >> from thankQ</small> </p>
+						<p class="text-danger font-weight-bold mb-0"><< raw.rows.length >> Cure One Acquisition Donors Found
+						<span class="badge badge-success">
+						  NEW <span class="badge badge-light"><< cfyNewCount >></span>
+						  <span class="sr-only">new in current financial year</span>
+						</span>
+						<span class="badge badge-warning">
+						  DNM <span class="badge badge-light"><< doNotMailCount >></span>
+						  <span class="sr-only">do not mails</span>
+						</span>
+
+
+
+						<small class="text-muted">as at << raw.timestamp|dtAU >> from thankQ</small> </p>
 					</div>
 
   				<div class="card-body">

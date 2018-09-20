@@ -221,6 +221,7 @@ function currency(val) {
 			Vue.filter('currency', (val, dec=2, sign='$') => sign + String(val.toFixed(dec)).split("").reverse().join("").replace(/(\d{3}\B)/g, "$1,").split("").reverse().join(""));
 			Vue.filter('number', (val, dec=0) => String(val.toFixed(dec)).split("").reverse().join("").replace(/(\d{3}\B)/g, "$1,").split("").reverse().join(""));
 			Vue.filter('dAU', val => new Date(val).toLocaleDateString("en-AU", { year: 'numeric', month: 'short', day: 'numeric' }));
+			Vue.filter('tAU', val => new Date(val).toLocaleTimeString("en-AU", { hour:'numeric', minute:'numeric', second:'numeric' }));
 			Vue.filter('dtAU', val => new Date(val).toLocaleDateString("en-AU", { year: 'numeric', month: 'long', day: 'numeric', hour:'numeric', minute:'numeric', second:'numeric'}));
 	</script>
 

@@ -422,11 +422,11 @@ let rootVue = new Vue({
 		<div class="row">
 			<div class="col-12">
 
-				<div class="card shadow-type6">
+				<div class="card shadow-type1">
 
 					<div class="card-header bg-transparent shadow-type8">
-						<div v-if="fulfilment.processed>0">
 
+						<div v-if="fulfilment.processed>0">
 						</div>
 
 						<div v-else>
@@ -434,48 +434,40 @@ let rootVue = new Vue({
 						</div>
 					</div>
 
-
-	                <div class="card-body">
-
-						<ul class="nav nav-tabs mb-3 nav-fill nav-justified" id="pills-tab" role="tablist">
-
+					<div class="card-header bg-transparent">
+						<ul class="nav nav-tabs  nav-fill nav-justified" id="pills-tab" role="tablist">
 							<li class="nav-item ">
 								<a class="nav-link active" id="include-tab" data-toggle="pill" href="#include" role="tab" aria-controls="include" aria-selected="true">
 								 &#127873; Welcome Pack  <span class="badge badge-pill badge-info"> << todoRows.length >></span>
 								</a>
 							</li>
-
 							<li class="nav-item ">
 								<a class="nav-link" id="finished-tab" data-toggle="pill" href="#finished" role="tab" aria-controls="finished" aria-selected="false">
 								 &#128230; Sent <span class="badge badge-pill badge-success"> << finishedRows.length >></span>
 								</a>
 							</li>
-
 							<li class="nav-item ">
 								<a class="nav-link" id="exclude-tab" data-toggle="pill" href="#exclude" role="tab" aria-controls="exclude" aria-selected="false">
 								 &#128683; Excluded <span class="badge badge-pill badge-warning"> << excludedRows.length >></span>
 								</a>
 							</li>
-
 						</ul>
+					</div>
 
+					<div class="card-body">
 						<div class="tab-content" id="pills-tabContent">
-
 							<div class="tab-pane fade show active" id="include" role="tabpanel" aria-labelledby="include-tab">
 								<vue-table v-bind:rows="todoRows" theme="primary" v-bind:ask="true" ></vue-table>
 							</div>
-
 							<div class="tab-pane fade" id="finished" role="tabpanel" aria-labelledby="finished-tab">
 								<vue-table v-bind:rows="finishedRows" theme="success" v-bind:ask="false" ></vue-table>
 							</div>
-
 							<div class="tab-pane fade" id="exclude" role="tabpanel" aria-labelledby="exclude-tab">
 								<vue-table v-bind:rows="excludedRows" theme="warning" v-bind:ask="false" ></vue-table>
 							</div>
-
 						</div>
-
 					</div>
+
 				</div>
 
 			</div>

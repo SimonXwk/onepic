@@ -1,20 +1,42 @@
 <div class="container">
 	<div id="ssi">
 
-		<div class="row"><!-- ROW -->
-			<div class="col-12">
-				<div class="input-group mb-3">
+		<div class="row">
+
+			<div class="col-lg-6">
+				<div class="input-group mb-2">
+						<div class="input-group-prepend">
+							<label class="input-group-text" for="inputGroupSelect01">Quick Search</label>
+						</div>
+						<input type="text" class="form-control"
+				 								 placeholder="trailing digits"
+				 								 aria-label="Rex Order Number"
+				 								 aria-describedby="ssi-search-quick"
+				 								 id="ssi-search-text-quick"
+				 								 v-model.trim.lazy="quickInput" >
+						<div class="input-group-prepend ">
+			 				<button class="btn btn-outline-danger " type="button" id="ssi-search-clear" @click="quickInput=null">Clear</button>
+		 				</div>
+				</div>
+			</div>
+
+			<div class="col-lg-6">
+				<div class="input-group mb-2">
+					<div class="input-group-prepend">
+						<label class="input-group-text" for="inputGroupSelect01">Full Search</label>
+					</div>
 					<input type="text" class="form-control"
 								 placeholder="type in rex order number"
 								 aria-label="Rex Order Number"
 								 aria-describedby="ssi-search"
 								 id="ssi-search-text"
 								 v-model.trim="order.number" @input="validateOrderNumberOnInput()" >
-					<div class="input-group-prepend ">
-						<button class="btn btn-outline-danger shadow-type1" type="button" id="ssi-search-clear" @click="clearOrderNumber()">Clear</button>
-					</div>
-				</div>
+						<div class="input-group-prepend ">
+		 					<button class="btn btn-outline-danger " type="button" id="ssi-search-clear" @click="order.number=null">Clear</button>
+		 				</div>
+				 </div>
 			</div>
+
 		</div>
 
 		<div class="row"><!-- ROW -->
@@ -45,7 +67,6 @@
 				</div> <!-- END OF ROW -->
 
 			</div>
-
 
 			<div class="col-md-7">
 				<div id="ssi-order-tracking">
