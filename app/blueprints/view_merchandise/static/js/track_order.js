@@ -84,7 +84,7 @@ let ssi = new Vue({
 			</div>
 		</transition>
 		`
-	  	},
+  	},
 
 		// Component : Order Header Information
 		'ssi-order-header': {

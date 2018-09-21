@@ -77,7 +77,7 @@ let vueRow = Vue.component('vue-row', {
 			}else if ( this.called2 === false ) {
 				return '☕' + ' searching(2) ... '
 			}else if ( this.status !== null && this.status.toUpperCase().indexOf('DELIVERED') !== -1 ) {
-				return '✔️' + ' ['+ this.orders + '] ' + this.status + ' ➠ ' + this.formatDateTime(this.statusDate) + ''
+				return '✔️' + ' ['+ this.orders + '] ' + this.status + ' ➠ ' + new Date(this.statusDate).toLocaleDateString("en-AU", { year: 'numeric', month: 'long', day: 'numeric' , hour:'numeric', minute:'numeric' }) + ''
 			}else {
 				return '❌' + ' ['+ this.orders + '] ' + this.status
 			}
@@ -132,14 +132,6 @@ let vueRow = Vue.component('vue-row', {
 
 	},
 	methods:{
-		formatDate: function (rawDate){
-			let d = new Date(rawDate);
-			return d.toLocaleDateString("en-AU", { year: 'numeric', month: 'long', day: 'numeric' });
-		},
-		formatDateTime: function (rawDate){
-			let d = new Date(rawDate);
-			return d.toLocaleDateString("en-AU", { year: 'numeric', month: 'long', day: 'numeric' , hour:'numeric', minute:'numeric' });
-		},
 		toggleSuccessResults: function (data) {
 			if ( this.showType === 'success' ){
 				this.show = data;
@@ -157,7 +149,7 @@ let vueRow = Vue.component('vue-row', {
 		}
 	},
 	template:`
-	<transition name="bounce">
+
 	<tr v-if="show" v-on:dblclick="toggleColor=!toggleColor" v-bind:class="trClassObject" >
 
 		<td scope="row" style="width: 30%">
@@ -170,7 +162,7 @@ let vueRow = Vue.component('vue-row', {
 		</td>
 
 		<td style="width: 35%">
-			 <span class="text-muted"><< row.FIRSTORDER >><small> payment: << formatDate(row.FIRSTDATE) >></small> <a target="blank" class="text-muted" v-bind:href="linkTrack + row.FIRSTORDER"> &#128230;<small>starshipit</small></a></span>
+			 <span class="text-muted"><< row.FIRSTORDER >><small> payment: << row.FIRSTDATE|dAY >></small> <a target="blank" class="text-muted" v-bind:href="linkTrack + row.FIRSTORDER"> &#128230;<small>starshipit</small></a></span>
 			 <hr class="my-1">
 			 <span v-bind:class="statusTextClassObject"><< resultDisplay >></span>
 			 <span v-if="statusDetail!==status" calss="text-danger"><small>, << statusDetail >></small></span>
@@ -243,7 +235,7 @@ let vueRow = Vue.component('vue-row', {
 		</td>
 
 	</tr>
-	</transition>
+
 	`,
 });
 

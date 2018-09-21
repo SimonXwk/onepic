@@ -1,0 +1,76 @@
+// Navbar Hover effect
+#navbar-global {
+	background: #414b56;
+
+	.navbar-brand{
+		color: #f5de50;
+	}
+
+	.navbar-nav {
+		// Style for each individual nav item(<li>) on the nav-bar(<ul>)
+		.nav-item {
+			&:not(.active){
+				&::after {
+					content: '';
+					display: block;
+					width: 0%;
+					height: 1px;
+					background: #f5de50;
+					transition: 0.2s;
+				}
+				&:hover::after {
+					width: 100%;
+				}
+				.nav-link:hover {
+					color: rgba(255,255,255,1);
+				}
+			}
+
+
+			// Reveal the dropdown on mouse hovering
+			&.dropdown:hover > .dropdown-menu {
+				// display: block;
+				opacity: 0.9;
+			}
+
+			// Hide the dropdown on mouse not hovering(preventing it from showing if the nav-item was clicked instead of hovered)
+			&.dropdown:not(:hover) > .dropdown-menu {
+			  // display: none;
+			}
+
+			// Navlink is the level1 narbar item that show directly one the bar, this class applies to <a> tag
+			.nav-link {
+				color: rgba(255,255,255,0.50);
+
+				&.active {
+					color: #f5de50;
+				}
+
+				&:hover {
+					transition-duration: 0.2s;
+				}
+			}//END OF .nav-link
+
+			.dropdown-menu{
+
+				.dropdown-item {
+					&.active{
+						color: #ffe600;
+					}
+					&:hover {
+						background: #d0e6da;
+					}
+				}//END OF .dropdown-item
+			}//END OF .dropdown-menu
+
+		}//END OF .nav-item
+	}//END OF .navbar-nav
+}//END OF #navbar-globalv
+
+Custom Navbar Toggler
+.custom-toggler.navbar-toggler {
+  border-color: rgba(255,203,0,0.25);
+}
+.custom-toggler .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255,150,0, 0.7)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
+}

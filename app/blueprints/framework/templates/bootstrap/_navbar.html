@@ -1,8 +1,8 @@
 {% macro blueprintNavItem(blueprint, maxlevel, links) %}
 <li class="nav-item {% if maxlevel > 1 %}dropdown{% endif %} {% if request.blueprint == blueprint %}active{% endif %}">
 {% if maxlevel > 1 %}
-	<a class="nav-link dropdown-toggle" href="#" id="{{ blueprint }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ blueprint|title }}</a>
-	<div class="dropdown-menu" aria-labelledby="{{ blueprint }}">
+	<a class="nav-link dropdown-toggle {% if request.blueprint == blueprint %}active{% endif %}" href="#" id="{{ blueprint }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ blueprint|title }}</a>
+	<div class="dropdown-menu aria-labelledby="{{ blueprint }}">
 	{% for endpoint, text in links %}
 
 		{% if endpoint %}
@@ -23,9 +23,9 @@
 
 
 {#- -------------------------------- -#}
-<nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark " id="navbar-global">
+<nav class="navbar navbar-expand-lg fixed-top" id="navbar-global">
 	<a class="navbar-brand" href="/logged">
-		ONEPIC
+		&#127912;ONEPIC
 	</a>
 	<button class="navbar-toggler custom-toggler" type="button" data-toggle="collapse" data-target="#onepic_nav_global" aria-controls="onepic_nav_global" aria-expanded="false" aria-label="Toggle navigation">
 		<span class="navbar-toggler-icon"></span>
@@ -34,11 +34,11 @@
 	<div class="collapse navbar-collapse" id="onepic_nav_global">
 		<ul class="navbar-nav mr-auto">
 			<!-- Dictionary -->
-			{{ blueprintNavItem('dictionary', 2,
+			<!-- {{ blueprintNavItem('dictionary', 2,
 				 [('index', 'General')
 				,('donor_type', 'On Donor Type')
 				,('marketing_cycle', 'On Marketing Cycle')
-			]) }}
+			]) }} -->
 
 			<!-- MailBox -->
 			{{ blueprintNavItem('mailbox', 2,
@@ -84,8 +84,8 @@
 
 			<!-- Merchandise -->
 			{{ blueprintNavItem('merchandise', 2,
-				[('track_order', 'Track REX Order')
-				,('upload', 'REX RFM')
+				[('track_order', 'REX Order Tracking')
+				,('upload', 'REX RFM Analysis')
 				,(none, none)
 				,('merchandise_new_courtesy_call', 'Todo : New Customer Courtesy Call')
 				,('merchandise_new_welcome_pack', 'Todo : New Customer Welcome Pack')
