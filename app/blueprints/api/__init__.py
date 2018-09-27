@@ -15,6 +15,7 @@ ld.url('data_thankq.contact_created_fy', ['/tq/contact_created_fy'])
 ld.url('data_thankq.new_customer_list', ['/merch/new_customers'])
 ld.url('data_thankq.journey_cureone_acquisiton_donors', ['/campaign/journey_cureone_acquisition'])
 
+ld.url('data_budget.budget', ['/budget'])
 
 ld.url('data_privenue.fy_total_all', ['/cash/fys'])
 ld.url('data_privenue.fy_total_all_ltd', ['/cash/fysltd'])

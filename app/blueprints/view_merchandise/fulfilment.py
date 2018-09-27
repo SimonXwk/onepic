@@ -38,3 +38,7 @@ def list_all_files():
 			result['timestamp'] =  datetime.datetime.now()
 
 	return result
+
+
+def read_one_slip():
+	pass

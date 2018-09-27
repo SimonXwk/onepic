@@ -129,7 +129,7 @@ def templatified(template=None, title=None, absolute=False, extension='html', re
 					dic = dict(dic)
 				except TypeError:
 					# todo : Find a better way to deal with this scenario
-					print(f'!!! Failed Conversion: Object type [ {dic.__class__.__name__} ] returned by view function [ {f.__name__} ] needs to be a dictionary ! The whole result will be set to dict()')
+					print(f'!!! View Function not returning dict convertible object : [ {dic.__class__.__name__} ] returned by view function [ {f.__name__} ]  will be set to dict()')
 					dic = {}
 
 			# Merge two dic, default dic will be overwritten if same key appears in the dictionary returned by the function

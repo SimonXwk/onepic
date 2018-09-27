@@ -5,7 +5,8 @@
 {% endblock %}
 
 {% block js_optional %}
-{{ Highchart([], ['variable-pie'], (true,false,false)) }}
+{{ import('vue') }}
+{{ Highchart([],[],(true,false,false)) }}
 {{ import('crossfilter') }}
 {% endblock %}
 
@@ -15,7 +16,7 @@
 {% endblock %}
 
 {% block js_custom %}
-	{{ bp_js('comparative') }}
+{{ bp_js('revenue_fy') }}
 {% endblock %}
 
 

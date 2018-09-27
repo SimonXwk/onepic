@@ -71,3 +71,11 @@ def merchandise_new_courtesy_call():
 @templatified('merch_new_customer_welcome_pack', title='Merch Welcome Pack')
 def merchandise_new_welcome_pack():
 	return None
+
+
+@templatified('revenue_fy', title='Merch Revenue')
+def merchandise_revenue_by_fy():
+	fy = int(request_arg('fy', TLMA.cfy, tests.is_year))
+	# Prepare for SQL parameters
+	d1, d2 = TLMA.fy_range(fy)
+	return dict(thisfy=fy)

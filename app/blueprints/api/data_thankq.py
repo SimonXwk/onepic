@@ -6,6 +6,8 @@ import app.tests as tests
 
 
 def payments():
+	d1 = request_arg('fy', TLMA.cfy, tests.is_year)
+	d2 = request_arg('fy', TLMA.cfy, tests.is_year)
 	d1, d2 = TLMA.fy_range(TLMA.cfy)
 	updates = [('PAYMENT_DATE1', Tq.format_date(d1), '\''), ('PAYMENT_DATE2', Tq.format_date(d2), '\'')]
 	results = Tq.query('PAYMENTS', cached_timeout=120, updates=updates)
