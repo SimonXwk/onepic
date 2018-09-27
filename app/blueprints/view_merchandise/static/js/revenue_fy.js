@@ -320,7 +320,7 @@ let rootVue = new Vue({
 			<div class="card-counter warning">
 				<span class="count-icon">&#128526;</span>
 				<span class="count-numbers"><< (countUnique("SERIALNUMBER") - countMixedMerchCustomer())|number >></span>
-				<span class="count-name">Pure Purchasing Customers</span>
+				<span class="count-name">Pure Merchandise Platformer</span>
 			</div>
 		</div>
 
