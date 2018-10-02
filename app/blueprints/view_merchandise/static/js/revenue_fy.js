@@ -149,6 +149,21 @@ let rootVue = new Vue({
 				return bgt
 			}
 		},
+		calcMonthlyTotal: function(dim, isCulmulative=false) {
+			return  [this.merchRows.filter(r => isCulmulative ? r.PAYMENT_FYMTH <= 1 : r.PAYMENT_FYMTH === 1 ).reduce((acc, cur) => acc + cur[dim], 0),
+          this.merchRows.filter(r => isCulmulative ? r.PAYMENT_FYMTH <= 2 : r.PAYMENT_FYMTH === 2 ).reduce((acc, cur) => acc + cur[dim], 0),
+          this.merchRows.filter(r => isCulmulative ? r.PAYMENT_FYMTH <= 3 : r.PAYMENT_FYMTH === 3 ).reduce((acc, cur) => acc + cur[dim], 0),
+          this.merchRows.filter(r => isCulmulative ? r.PAYMENT_FYMTH <= 4 : r.PAYMENT_FYMTH === 4 ).reduce((acc, cur) => acc + cur[dim], 0),
+          this.merchRows.filter(r => isCulmulative ? r.PAYMENT_FYMTH <= 5 : r.PAYMENT_FYMTH === 5 ).reduce((acc, cur) => acc + cur[dim], 0),
+          this.merchRows.filter(r => isCulmulative ? r.PAYMENT_FYMTH <= 6 : r.PAYMENT_FYMTH === 6 ).reduce((acc, cur) => acc + cur[dim], 0),
+          this.merchRows.filter(r => isCulmulative ? r.PAYMENT_FYMTH <= 7 : r.PAYMENT_FYMTH === 7 ).reduce((acc, cur) => acc + cur[dim], 0),
+          this.merchRows.filter(r => isCulmulative ? r.PAYMENT_FYMTH <= 8 : r.PAYMENT_FYMTH === 8 ).reduce((acc, cur) => acc + cur[dim], 0),
+          this.merchRows.filter(r => isCulmulative ? r.PAYMENT_FYMTH <= 9 : r.PAYMENT_FYMTH === 9 ).reduce((acc, cur) => acc + cur[dim], 0),
+          this.merchRows.filter(r => isCulmulative ? r.PAYMENT_FYMTH <= 10 : r.PAYMENT_FYMTH === 10 ).reduce((acc, cur) => acc + cur[dim], 0),
+          this.merchRows.filter(r => isCulmulative ? r.PAYMENT_FYMTH <= 11 : r.PAYMENT_FYMTH === 11 ).reduce((acc, cur) => acc + cur[dim], 0),
+          this.merchRows.filter(r => isCulmulative ? r.PAYMENT_FYMTH <= 12 : r.PAYMENT_FYMTH === 12 ).reduce((acc, cur) => acc + cur[dim], 0),
+        ]
+		},
 	},
 	created() {
 		fetchJSON(endpoint(this.paymentAPI), (pmtJSON) => {
@@ -208,74 +223,24 @@ let rootVue = new Vue({
 			});
 
 			chart1.series[2].update({
-				data:  [this.merchRows.filter(r => r.PAYMENT_FYMTH === 1 ).reduce((acc, cur) => acc + cur.GSTAMOUNT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH === 2 ).reduce((acc, cur) => acc + cur.GSTAMOUNT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH === 3 ).reduce((acc, cur) => acc + cur.GSTAMOUNT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH === 4 ).reduce((acc, cur) => acc + cur.GSTAMOUNT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH === 5 ).reduce((acc, cur) => acc + cur.GSTAMOUNT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH === 6 ).reduce((acc, cur) => acc + cur.GSTAMOUNT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH === 7 ).reduce((acc, cur) => acc + cur.GSTAMOUNT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH === 8 ).reduce((acc, cur) => acc + cur.GSTAMOUNT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH === 9 ).reduce((acc, cur) => acc + cur.GSTAMOUNT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH === 10 ).reduce((acc, cur) => acc + cur.GSTAMOUNT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH === 11 ).reduce((acc, cur) => acc + cur.GSTAMOUNT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH === 12 ).reduce((acc, cur) => acc + cur.GSTAMOUNT, 0),
-				]
+				data: this.calcMonthlyTotal('GSTAMOUNT')
 			});
 			chart1.series[3].update({
-				data:  [this.merchRows.filter(r => r.PAYMENT_FYMTH === 1 ).reduce((acc, cur) => acc + cur.PAYMENTAMOUNTNETT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH === 2 ).reduce((acc, cur) => acc + cur.PAYMENTAMOUNTNETT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH === 3 ).reduce((acc, cur) => acc + cur.PAYMENTAMOUNTNETT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH === 4 ).reduce((acc, cur) => acc + cur.PAYMENTAMOUNTNETT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH === 5 ).reduce((acc, cur) => acc + cur.PAYMENTAMOUNTNETT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH === 6 ).reduce((acc, cur) => acc + cur.PAYMENTAMOUNTNETT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH === 7 ).reduce((acc, cur) => acc + cur.PAYMENTAMOUNTNETT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH === 8 ).reduce((acc, cur) => acc + cur.PAYMENTAMOUNTNETT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH === 9 ).reduce((acc, cur) => acc + cur.PAYMENTAMOUNTNETT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH === 10 ).reduce((acc, cur) => acc + cur.PAYMENTAMOUNTNETT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH === 11 ).reduce((acc, cur) => acc + cur.PAYMENTAMOUNTNETT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH === 12 ).reduce((acc, cur) => acc + cur.PAYMENTAMOUNTNETT, 0),
-				]
+				data: this.calcMonthlyTotal('PAYMENTAMOUNTNETT')
 			});
 
 			chart2.series[2].update({
-				data:  [this.merchRows.filter(r => r.PAYMENT_FYMTH <= 1 ).reduce((acc, cur) => acc + cur.GSTAMOUNT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH <= 2 ).reduce((acc, cur) => acc + cur.GSTAMOUNT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH <= 3 ).reduce((acc, cur) => acc + cur.GSTAMOUNT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH <= 4 ).reduce((acc, cur) => acc + cur.GSTAMOUNT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH <= 5 ).reduce((acc, cur) => acc + cur.GSTAMOUNT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH <= 6 ).reduce((acc, cur) => acc + cur.GSTAMOUNT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH <= 7 ).reduce((acc, cur) => acc + cur.GSTAMOUNT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH <= 8 ).reduce((acc, cur) => acc + cur.GSTAMOUNT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH <= 9 ).reduce((acc, cur) => acc + cur.GSTAMOUNT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH <= 10 ).reduce((acc, cur) => acc + cur.GSTAMOUNT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH <= 11 ).reduce((acc, cur) => acc + cur.GSTAMOUNT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH <= 12 ).reduce((acc, cur) => acc + cur.GSTAMOUNT, 0),
-				]
+				data: this.calcMonthlyTotal('GSTAMOUNT', true)
 			});
 			chart2.series[3].update({
-				data:  [this.merchRows.filter(r => r.PAYMENT_FYMTH <= 1 ).reduce((acc, cur) => acc + cur.PAYMENTAMOUNTNETT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH <= 2 ).reduce((acc, cur) => acc + cur.PAYMENTAMOUNTNETT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH <= 3 ).reduce((acc, cur) => acc + cur.PAYMENTAMOUNTNETT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH <= 4 ).reduce((acc, cur) => acc + cur.PAYMENTAMOUNTNETT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH <= 5 ).reduce((acc, cur) => acc + cur.PAYMENTAMOUNTNETT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH <= 6 ).reduce((acc, cur) => acc + cur.PAYMENTAMOUNTNETT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH <= 7 ).reduce((acc, cur) => acc + cur.PAYMENTAMOUNTNETT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH <= 8 ).reduce((acc, cur) => acc + cur.PAYMENTAMOUNTNETT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH <= 9 ).reduce((acc, cur) => acc + cur.PAYMENTAMOUNTNETT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH <= 10 ).reduce((acc, cur) => acc + cur.PAYMENTAMOUNTNETT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH <= 11 ).reduce((acc, cur) => acc + cur.PAYMENTAMOUNTNETT, 0),
-					this.merchRows.filter(r => r.PAYMENT_FYMTH <= 12 ).reduce((acc, cur) => acc + cur.PAYMENTAMOUNTNETT, 0),
-				]
+				data: this.calcMonthlyTotal('PAYMENTAMOUNTNETT', true)
 			});
 		}
 
 
-
-
 	},
 	template:`<div>
-
+	<p class="lead font-weight-bold">Merchandise Performance in current financial year</p>
 	<div class="row">
 		<div class="col-xs-12 col-sm-6 col-md-6 col-lg-3">
 			<div class="card-counter success">

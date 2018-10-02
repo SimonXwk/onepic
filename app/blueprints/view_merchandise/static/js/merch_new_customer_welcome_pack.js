@@ -1,197 +1,98 @@
 // ******************************************************************************
 let vueRow = Vue.component('vue-row', {
-	props: ['row', 'ask'],
+	props: ['row', 'sublist'],
 	data: function(){
 		return {
-			fetch1: '/api/ssi/orders/search/',
-			fetch2: '/api/ssi/track/',
-			fetch3: '/api/ssi/order/',
 			linkTrack: '/merchandise/track_order/',
-			linkAusPost: 'https://auspost.com.au/mypost/track/#/details/',
-			trackingNumber: null,
-			called1: false,
-			orders: 0,
-			called2: false,
-			status: null,
-			statusDate: null,
-			statusDetail: null,
 			toggleColor: false,
-			show: false
+			welcomepackRecords: null,
+			show: true,
 		}
 	},
 	computed: {
-		trClassObject: function(){
+		trToggleClassObject: function(){
 			return {
-				'table-success': this.toggleColor
+				'table-danger': this.toggleColor,
+				'table-success': this.welcomepackRecords !==null && this.welcomepackRecords.length > 0
 			}
 		},
-		statusTextClassObject: function(){
-			return {
-				'text-success': this.showType === 'success',
-				'text-info': this.showType === 'waiting',
-				'text-danger': this.showType === 'missing',
-			}
-		},
-		ausLink: function(){
-			return this.linkAusPost + this.trackingNumber
-		},
-		hasOrderNumber: function(){
-			return this.row['FIRSTORDER'] !== null
-		},
-		isDonor: function(){
-			return (this.row['FIRSTDATE_MERCHANDISE_TOTAL'] - this.row['FIRSTDATE_MERCHANDISE_DONATION'] - this.row['FIRSTDATE_MERCHANDISE_GOL']) === 0
-		},
-		isDelivered:function(){
-			return this.status !== null && this.status.toUpperCase().indexOf('DELIVERED') !== -1
-		},
-		show: {
-			get: function () {
-				return this.isDonor || !this.ask || this.isDelivered;
-			},
-			set: function (newVal) {
-				return newVal
-			}
-		},
-		showType: function(){
-			if ( this.isDonor || !this.ask || (this.ask && this.isDelivered)){
-				return 'success'
-			}else {
-				if( this.trackingNumber === null || !this.hasOrderNumber ) {
-					return 'missing'
-				}else{
-					return 'waiting'
-				}
-			}
-		},
-		resultDisplay : function () {
-
-			if(this.isDonor) {
-				return '❤' + ' ' + 'Pure Donation/GOL'
-			}else if (!this.ask){
-				return '⛲' + ' ' + 'No Further Checking Needed'
-			}else if ( !this.hasOrderNumber ) {
-				return '❌' + ' Order Number Not In ThankQ '
-			}else if ( this.called1 === false ) {
-				return '☕' + ' searching(1) ... '
-			}else if ( this.trackingNumber === null ) {
-				return '☹' + ' No Response From Starshipit'
-			}else if ( this.called2 === false ) {
-				return '☕' + ' searching(2) ... '
-			}else if ( this.status !== null && this.status.toUpperCase().indexOf('DELIVERED') !== -1 ) {
-				return '✅' + ' ['+ this.orders + '] ' + this.status + ' ➠ ' + this.formatDateTime(this.statusDate) + ''
-			}else {
-				return '❌' + ' ['+ this.orders + '] ' + this.status
+		welcomepackResult: function(){
+			if ( this.welcomepackRecords === null ){
+				return '<span class="text-muted">&#128269; searching for welcome pack in all pciking slips</span>'
+			}else if (this.welcomepackRecords.length === 0) {
+				return '<span class="text-danger">&#128560; No Welcome Pack Found</span>'
+			}else{
+				// let result = this.welcomepackRecords.reduce((acc, cur) => acc += ' | ' cur.workbook , '')
+				let msg = ''
+				this.welcomepackRecords.forEach(r => {
+					msg += '<span class="text-success">&#128294; Found WP <span class="badge badge-light">' +  r.workbook + '</span></span><br>'
+				});
+				return msg
 			}
 		}
 	},
-
 	created(){
-		// Toggle Buttons
-		vueBus.$on('toggleSuccessResults', (data) => this.toggleSuccessResults(data));
-		vueBus.$on('toggleWaitingResults', (data) => this.toggleWaitingResults(data));
-		vueBus.$on('toggleMissingResults', (data) => this.toggleMissingResults(data));
+		this.$eventBus.$on('startProcessCustomer', (slipData) => {
+			let res = slipData.filter(d => d.OrderNumber === this.row.FIRSTORDER && d.Manufacturer_Code === 'WP')
+			this.welcomepackRecords = [];
+			this.welcomepackRecords = this.welcomepackRecords.concat(res);
+			this.$eventBus.$emit('processedOneCustomer', 1);
+		});
 
-		let vCol = this;
-		// if (this.ask && !this.isDonor && this.hasOrderNumber && !this.isDelivered) {
-		// 	fetchJSON(endpoint(vCol.fetch1 + vCol.row['FIRSTORDER']), function (json1) {
-		// 		vCol.called1 = true;
-		// 		let orders = json1.orders;
-		// 		if (orders.length > 0) {
-		// 			vCol.orders = orders.length;
-		// 			vCol.trackingNumber = orders[0]['tracking_number'];
-		// 			orders.forEach(order => {
-		// 				fetchJSON(endpoint(vCol.fetch2 + vCol.trackingNumber), function (json2) {
-		// 					vCol.called2 = true;
-		// 					if (json2.success === true) {
-		// 						let events = json2['results']['tracking_events'];
-		// 						let lastEvent = events[events.length - 1];
-		// 						vCol.status = lastEvent['status'];
-		// 						vCol.statusDate = lastEvent['event_datetime'];
-		// 						vCol.statusDetail = lastEvent['details'];
-		// 						vCol.show = vCol.isDelivered;
-		// 						vueBus.$emit('processedCustomer', 1);
-		// 					}
-		// 				}, true);
-		// 			});
-		// 		} else {
-		// 			vueBus.$emit('processedCustomer', 1);
-		// 		}
-		// 	}, true);
-		// } else {
-		// 	vCol.show = this.isDonor || !this.ask;
-		// 	vueBus.$emit('processedCustomer', 1);
-		// }
+		this.$eventBus.$on('toggleNotFoundResults', toggle => {
+			if (this.welcomepackRecords.length === 0 ||  this.welcomepackRecords === null){
+				this.show = toggle
+				this.$eventBus.$emit('addShowItem', toggle ? 1 : -1, this.sublist);
 
+			}
+		});
+		this.$eventBus.$on('toggleFoundResults', toggle => {
+			if (this.welcomepackRecords.length !== 0 &&  this.welcomepackRecords !== null){
+				this.show = toggle
+				this.$eventBus.$emit('addShowItem',toggle ? 1 : -1, this.sublist);
+			}
+		});
 	},
-	methods:{
-		formatDate: function (rawDate){
-			let d = new Date(rawDate);
-			return d.toLocaleDateString("en-AU", { year: 'numeric', month: 'long', day: 'numeric' });
-		},
-		formatDateTime: function (rawDate){
-			let d = new Date(rawDate);
-			return d.toLocaleDateString("en-AU", { year: 'numeric', month: 'long', day: 'numeric' , hour:'numeric', minute:'numeric' });
-		},
-		toggleSuccessResults: function (data) {
-			if ( this.showType === 'success' ){
-				this.show = data;
-			}
-		},
-		toggleWaitingResults: function (data) {
-			if ( this.showType === 'waiting' ){
-				this.show = data;
-			}
-		},
-		toggleMissingResults: function (data) {
-			if ( this.showType === 'missing' ){
-				this.show = data;
-			}
-		}
+	mounted() {
+		this.$eventBus.$emit('addShowItem', 1, this.sublist);
 	},
-	template:`
-	<transition name="bounce">
-	<tr v-if="show" v-on:dblclick="toggleColor=!toggleColor" v-bind:class="trClassObject" >
-
-		<td scope="row" style="width: 30%">
-			<strong><< row.FULLNAME >></strong> <small class="text-primary" v-if="row.SORTKEYREF1">(is << row.SORTKEYREFREL2 >>)</small>
-			<hr class="my-1">
-			<small class="text-secondary"><< row.SERIALNUMBER >><span class="text-danger" v-if=" row.CONTACTTYPE === 'Organisation' ">, ORG</span>, << row.PRIMARYCATEGORY >>, <span class="text-success"> from << row.SOURCE >></span></small>
-			<small class="text-danger" v-if="row.DECD === -1">, Deceased</small>
-			<small class="text-danger" v-if="row.ESTATE === -1">, Estate</small>
-			<small class="text-danger" v-if="row.PLEDGES > 0">, [<< row.PLEDGES >>SP] << row.FIRST_PLEDGEID >></small>
+	template: `<tr v-if="show" v-on:dblclick="toggleColor=!toggleColor" v-bind:class="trToggleClassObject" >
+		<td scope="row" style="width: 26%" class="align-middle">
+			<mark class="text-dark"><< row.FULLNAME >> <small class="text-primary" v-if="row.SORTKEYREF1">(is << row.SORTKEYREFREL2 >>)</small> <small>(<span class="text-success"><< row.SOURCE >></span>)</small></mark>
+			<br>
+			<span class="badge badge-secondary"><< row.SERIALNUMBER >></span>
+			<span class="badge badge-secondary" v-if="row.LAST_REXID "><< row.LAST_REXID >></span>
+			<span class="badge badge-danger" v-if=" row.CONTACTTYPE === 'Organisation' "><< row.PRIMARYCATEGORY >></span>
+			<span class="badge badge-danger" v-if="row.DECD === -1">DECEASED</span>
+			<span class="badge badge-danger" v-if="row.ESTATE === -1">ESTATE</span>
+			<span class="badge badge-warning" v-if="row.PLEDGES > 0">[<< row.PLEDGES >>SP] << row.FIRST_PLEDGEID >></span>
 		</td>
 
-		<td style="width: 30%">
-			 <span class="text-muted"><< row.FIRSTORDER >><small> order date << formatDate(row.FIRSTDATE) >></small> <a target="blank" class="text-muted" v-bind:href="linkTrack + row.FIRSTORDER"> &#9735;<small>starshipit</small></a></span>
-			 <hr class="my-1">
-			 <span v-bind:class="statusTextClassObject">Rex Info</span>
-
+		<td style="width: 24%" class="align-middle">
+			<span class="text-muted"><span class="text-danger ">ThankQ</span> 1st Order : <a target="blank" class="text-muted" v-bind:href="linkTrack + row.FIRSTORDER"><< row.FIRSTORDER >></a> <small>(<< row.FIRSTDATE|dAU >>)</small> <small class="text-success" v-if="row.FIRSTORDERS>1"> + << row.FIRSTORDERS-1 >> more</small></span>
+			<br>
+			<span v-html="welcomepackResult"></span>
 		</td>
 
-		<td style="width: 20%">
+		<td style="width: 20%" class="align-middle">
 			<span v-if=" row.WELCOMEPACK_BY !== null ">
 				<mark>&#9924; << row.WELCOMEPACK_BY >></mark><span class="text-success"><small> updated <span class="badge badge-success">Welcome pack communication</span></small></span>
-				<br>
+				<p class="lead"><small><< row.WELCOMEPACK_SUBJECT >></small></p>
 			</span>
 		</td>
 
-		<td style="width: 20%" class="text-left">
-			<span v-if=" row.BOARDEDBY !== null ">
-				<mark>&#9924; << row.BOARDEDBY >></mark>
-				<span class="text-success" v-if=" row.BOARDEDCANCALLED === 0 ">
-					<small> created <span class="badge badge-success">Merch Onboarding Profile</span></small>
+		<td style="width: 25%" class="align-middle text-left">
+			<span v-if=" row.JOURNEY_BY !== null ">
+				<span class="text-secondary" v-if=" row.JOURNEY_CANCALLED === 0 ">
+					<mark class="text-success">&#128526; << row.JOURNEY_BY >> Created Journey Profile</mark>
 				</span>
-				<span class="text-secondary" v-else-if="row.BOARDEDCANCALLED === -1 ">
-					<small> cancelled <span class="badge badge-secondary">Merch Onboarding Profile</span></small>
+				<span class="text-secondary" v-else-if="row.JOURNEY_CANCALLED === -1 ">
+					<mark class="text-danger">&#129300; << row.JOURNEY_BY >> Cancelled Journey</mark>
+					<p class="lead"><small><< row.JOURNEY_NOTE >></small></p>
 				</span>
-				<br>
 			</span>
-
 		</td>
-
-	</tr>
-	</transition>
-	`,
+	</tr>`,
 });
 
 // ******************************************************************************
@@ -202,15 +103,15 @@ let vueTable = Vue.component('vue-table', {
 		'theme': {
 			type: String
 		},
-		'ask' : {
-			type: Boolean
+		'sublist' : {
+			type: String
 		}
 	},
 	data: function() {
 		return {
 		}
 	},
-	computed:{
+	computed: {
 		trClassObject: function(){
 			return {
 				'table-primary': this.theme === 'primary',
@@ -227,58 +128,74 @@ let vueTable = Vue.component('vue-table', {
 	components:{
 		'result-row': vueRow
 	},
-	template: `
-	<div class="table-responsive-lg">
+	template: `<div class="table-responsive-lg">
 		<table class="table table-sm table-hover table-bordered table-striped"" >
 			<thead>
 				<tr class="table-bordered " v-bind:class="trClassObject">
-					 <th scope="col" style="width: 30%">CUSTOMER</th>
-					 <th scope="col" style="width: 30%">REX REFERENCE</th>
-					 <th scope="col" style="width: 20%">WELCOME PACK COMMUNICATION</th>
-					 <th scope="col" style="width: 20%">ON BOARD PROFILE</th>
+					 <th scope="col" style="width: 26%">CUSTOMER</th>
+					 <th scope="col" style="width: 24%">REX REFERENCE</th>
+					 <th scope="col" style="width: 20%">THANKQ COMMUNICATION</th>
+					 <th scope="col" style="width: 25%">ON BOARDING PROFILE</th>
 				</tr>
 			</thead>
 			<tbody>
-				<result-row v-for="row in rows" v-bind:row="row" v-bind:ask="ask"></result-row>
+				<result-row v-for="row in rows" v-bind:row="row" v-bind:sublist="sublist"></result-row>
 			</tbody>
 		</table>
- 	</div>
-	`
+ 	</div>`
 });
 // ******************************************************************************
 let rootVue = new Vue({
 	el: '#vue',
 	data: {
 		raw: {
-			rows: null,
+			rows: [],
 			ready: false,
 			timestamp: null,
 			processed:0,
 			api: '/api/merch/new_customers'
 		},
 		fulfilment:{
-			rows: null,
+			rows: [],
 			ready: false,
 			timestamp: null,
-			processed:0,
 			api: '/api/merch/fulfilment_excels'
 		},
+		pickingSlip: {
+			rows: [],
+			api: '/api/merch/rex_picking_slip'
+		},
+		pickingSlipRead: 0,
 		fy:null,
 		showFYSelection: false,
 		showFulfilmentFiles: false,
-
+		showNotFound: true,
+		showFound: true,
+		todoRowsCount: 0,
+		finishedRowsCount: 0,
+		excludedRowsCount: 0,
 	},
-
 	watch:{
 		fy: function(){
-			this.raw = {
-				rows: null,
-				ready: false,
-				timestamp: null,
-				processed:0
-			};
-			this.getCustomerData();
-		}
+
+			this.raw.rows = [];
+			this.raw.ready = false;
+			this.raw.timestamp = null;
+			this.raw.processed = 0;
+
+			this.fulfilment.rows = [],;
+			this.fulfilment.ready = false;
+			this.fulfilment.timestamp = null;
+	
+			this.pickingSlipRead = 0;
+			this.getData();
+		},
+		showNotFound: function(){
+			this.$eventBus.$emit('toggleNotFoundResults', this.showNotFound);
+		},
+		showFound: function(){
+			this.$eventBus.$emit('toggleFoundResults', this.showFound);
+		},
 	},
 	computed: {
 		customerDataAPI: function() {
@@ -303,62 +220,80 @@ let rootVue = new Vue({
 		fulfilmentFileNames: function(){
 			let files = [];
 			if (this.fulfilment.ready){
-				files = this.fulfilment.rows.map(d => d['filePath'] + ' , sheet:  ' + d['dataSheet']['title'] + ' , row: ' + d['dataSheet']['minRow'] + ' - ' + d['dataSheet']['maxRow'] + ' , column: '+ d['dataSheet']['minColumn'] + ' - ' + d['dataSheet']['maxColumn'] + '' )
+				files = this.fulfilment.rows.map(d => d['workbook'] + ' [' + d['dataSheet']['title'] + '] , row: ' + d['dataSheet']['minRow'] + ' - ' + d['dataSheet']['maxRow'] + ' , column: '+ d['dataSheet']['minColumn'] + ' - ' + d['dataSheet']['maxColumn'] + '' )
 			}
 			return files
 		},
-		progress: function(){
-			if ( this.raw.rows === null || this.raw.rows.length === 0 ) {
-				return 0
-			} else if ( this.raw.processed === this.raw.rows.length ) {
-				return 100
-	  	} else {
-				return ((this.raw.processed / this.raw.rows.length)*100).toFixed(1)
-			}
-		},
 		todoRows: function () {
-			return this.raw.rows.filter(row => !this.excludeRow(row) && !this.finishRow(row) )
+			return this.raw.rows.filter(row => this.calcSubListType(row) === 'todo' )
 		},
 		finishedRows: function () {
-			return this.raw.rows.filter(row => !this.excludeRow(row) && this.finishRow(row) )
+			return this.raw.rows.filter(row => this.calcSubListType(row) === 'finished' )
 		},
 		excludedRows: function () {
-			return this.raw.rows.filter(row => this.excludeRow(row) )
-		},
+			return this.raw.rows.filter(row => this.calcSubListType(row) === 'exlcude' )
+		}
 	},
 	created(){
-		this.getFulfilmentData();
-		this.getCustomerData();
-		vueBus.$on('processedCustomer', (data) => this.raw.processed +=data );
+		this.getData();
+		this.$eventBus.$on('processedOneCustomer', (data) => this.raw.processed +=data );
+		this.$eventBus.$on('addShowItem', (data, type) => {
+			if (type === 'todo'){
+				this.todoRowsCount += data;
+			}else if(type === 'done'){
+				this.finishedRowsCount += data;
+			}else if(type === 'exclude'){
+				this.excludedRowsCount += data;
+			}
+		});
 	},
 	methods:{
-		excludeRow: function(row){
-			return (row['CONTACTTYPE'] === 'Organisation')
+		calcSubListType: function(row){
+			if (  (row['CONTACTTYPE'] === 'Organisation')
 					|| (row['FIRSTDATE_MERCHANDISE_PLEDGE'] !== 0)
 					|| (row['DECD'] === -1)
 					|| (row['PRIMARYCATEGORY'] === 'ESTATE')
+					|| (row['JOURNEY_CANCALLED'] === -1)
+				) {
+				return 'exlcude'
+			}else {
+				if ( !((row['WELCOMEPACK_BY'] === null ) || (row['WELCOMEPACK_BY'].trim() === '' )) ) {
+					return 'finished'
+				}else {
+					return 'todo'
+				}
+			}
 		},
-		finishRow: function(row){
-			return !((row['WELCOMEPACK_BY'] === null ) || (row['WELCOMEPACK_BY'].trim() === '' ))
-		},
-		getCustomerData: function(){
+		getData: function(){
 			fetchJSON(endpoint(this.customerDataAPI), function(json){
-				rootVue.raw.rows = json.rows;
+				rootVue.raw.rows = json.rows.sort((a, b) => new Date(a.FIRSTDATE) <  new Date(b.FIRSTDATE) );
 				rootVue.raw.ready = true;
 				rootVue.raw.timestamp = new Date(json.timestamp);
+				rootVue.initProcessing();
 			});
-		},
-		getFulfilmentData: function(){
 			fetchJSON(endpoint(this.fulfilment.api), function(json){
 				rootVue.fulfilment.rows = json.rows;
 				rootVue.fulfilment.ready = true;
 				rootVue.fulfilment.timestamp = new Date(json.timestamp);
+				rootVue.initProcessing();
+				for (let i=0; i<json.rows.length; i++) {
+					fetchJSON(endpoint(rootVue.pickingSlip.api + '?filename=' + json.rows[i].workbook + '&tab=' + json.rows[i].dataSheet.title), function(slipJSON){
+						rootVue.pickingSlip.rows = rootVue.pickingSlip.rows.concat(slipJSON.rows.map(obj => Object.assign(obj, {workbook: slipJSON.workbook}) ));
+						rootVue.pickingSlipRead += 1;
+						rootVue.initProcessing();
+					}, i===json.rows.length -1 ? false : true);
+				}
 			});
 		},
+		initProcessing: function(){
+			if (this.raw.ready &&  this.fulfilment.ready && this.pickingSlipRead !== 0 && this.pickingSlipRead === this.fulfilment.rows.length) {
+				this.$eventBus.$emit('startProcessCustomer', this.pickingSlip.rows);
+			}
+		},
+
 	},
 	template: `
-	<div v-if="!raw.ready ">
-
+	<div v-if="!raw.ready && !fulfilment.ready">
 		<div class="row">
 			<div class="col-12">
 				<div class="alert alert-light text-center" role="alert">
@@ -369,7 +304,6 @@ let rootVue = new Vue({
 				</div>
 			</div>
 		</div>
-
 	</div>
 
 	<div v-else>
@@ -383,10 +317,9 @@ let rootVue = new Vue({
 						<div class="row">
 
 							<div class="col-lg-6">
-
 								<blockquote class="blockquote">
 									<p class="mb-0"><< raw.rows.length|number >> Total New Merchandise Customers Found in <span v-if="fy===null">CFY</span><span v-else>FY<< fy >></span></p>
-									<footer class="blockquote-footer" v-on:dblclick="showFYSelection=!showFYSelection"> from thankQ <small><< raw.timestamp|dtAU >>, << raw.processed >>/<< raw.rows.length >> </small></footer>
+									<footer class="blockquote-footer" v-on:dblclick="showFYSelection=!showFYSelection"> from thankQ <small><< raw.timestamp|dtAU >>, <span v-if="raw.processed !== raw.rows.length || raw.processed === 0" class="text-danger"><< raw.processed >>/<< raw.rows.length >></span><span v-else class="text-success">&#128079;Checked << raw.rows.length >> customers against << pickingSlipRead >> slips</span></small></footer>
 								</blockquote>
 
 								<div v-if="showFYSelection">
@@ -397,12 +330,10 @@ let rootVue = new Vue({
 							</div>
 
 							<div class="col-lg-6">
-
 								<blockquote class="blockquote">
-									<p class="mb-0"  v-if="fulfilment.ready"><< fulfilment.rows.length|number >> fulfilment exports found</p>
-									<footer class="blockquote-footer" v-on:dblclick="showFulfilmentFiles=!showFulfilmentFiles"> from merchandise folder <small>@<< fulfilment.timestamp|dtAU >>, << fulfilment.processed >>/<< fulfilment.rows.length >> </small></footer>
+									<p class="mb-0"  v-if="fulfilment.ready"><< fulfilment.rows.length|number >> fulfilment excel workbooks found</p>
+									<footer class="blockquote-footer" v-on:dblclick="showFulfilmentFiles=!showFulfilmentFiles"> from merchandise folder <small>@<< fulfilment.timestamp|dtAU >>, <span v-if="pickingSlipRead !== fulfilment.rows.length || pickingSlipRead === 0" class="text-danger"><< pickingSlipRead >>/<< fulfilment.rows.length >></span><span v-else class="text-success">&#128079;<< fulfilment.rows.length >> All Collected</span></small></footer>
 								</blockquote>
-
 
 								<div v-if="showFulfilmentFiles">
 									<select class="custom-select" id="fileSelect" >
@@ -425,8 +356,22 @@ let rootVue = new Vue({
 				<div class="card shadow-type1">
 
 					<div class="card-header bg-transparent shadow-type8">
-
-						<div v-if="fulfilment.processed>0">
+						<div v-if="pickingSlipRead > 0">
+							<div class="progress" v-if="pickingSlipRead !== fulfilment.rows.length">
+								<div class="progress-bar bg-warning" role="progressbar"
+									v-bind:aria-valuenow="((pickingSlipRead/fulfilment.rows.length)*100)" aria-valuemin="0" v-bind:aria-valuemax="fulfilment.rows.length" v-bind:style="{ width: ((pickingSlipRead/fulfilment.rows.length)*100).toFixed(1) + '%' }"
+								><< pickingSlipRead >>/<< fulfilment.rows.length >></div>
+							</div>
+							<div v-if="raw.rows.length === raw.processed && raw.processed !== 0">
+								<label class="switch align-middle">
+									<input type="checkbox" class="switch-success" v-model="showFound" v-bind:disabled="raw.rows.length !== raw.processed" >
+									<span class="switch-slider "></span>
+								</label>
+								<label class="switch align-middle">
+									<input type="checkbox" class="switch-warning" v-model="showNotFound" v-bind:disabled="raw.rows.length !== raw.processed" >
+									<span class="switch-slider "></span>
+								</label>
+							</div>
 						</div>
 
 						<div v-else>
@@ -438,17 +383,17 @@ let rootVue = new Vue({
 						<ul class="nav nav-tabs  nav-fill nav-justified" id="pills-tab" role="tablist">
 							<li class="nav-item ">
 								<a class="nav-link active" id="include-tab" data-toggle="pill" href="#include" role="tab" aria-controls="include" aria-selected="true">
-								 &#127873; Welcome Pack  <span class="badge badge-pill badge-info"> << todoRows.length >></span>
+								 &#127873; Welcome Pack  <span class="badge badge-pill badge-info"><< todoRowsCount >>/<< todoRows.length >></span>
 								</a>
 							</li>
 							<li class="nav-item ">
 								<a class="nav-link" id="finished-tab" data-toggle="pill" href="#finished" role="tab" aria-controls="finished" aria-selected="false">
-								 &#128230; Sent <span class="badge badge-pill badge-success"> << finishedRows.length >></span>
+								 &#128230; Sent <span class="badge badge-pill badge-success"><< finishedRowsCount >>/<< finishedRows.length >></span>
 								</a>
 							</li>
 							<li class="nav-item ">
 								<a class="nav-link" id="exclude-tab" data-toggle="pill" href="#exclude" role="tab" aria-controls="exclude" aria-selected="false">
-								 &#128683; Excluded <span class="badge badge-pill badge-warning"> << excludedRows.length >></span>
+								 &#128683; Excluded <span class="badge badge-pill badge-warning"><< excludedRowsCount >>/<< excludedRows.length >></span>
 								</a>
 							</li>
 						</ul>
@@ -457,13 +402,13 @@ let rootVue = new Vue({
 					<div class="card-body">
 						<div class="tab-content" id="pills-tabContent">
 							<div class="tab-pane fade show active" id="include" role="tabpanel" aria-labelledby="include-tab">
-								<vue-table v-bind:rows="todoRows" theme="primary" v-bind:ask="true" ></vue-table>
+								<vue-table v-bind:rows="todoRows" theme="primary" sublist="todo" ></vue-table>
 							</div>
 							<div class="tab-pane fade" id="finished" role="tabpanel" aria-labelledby="finished-tab">
-								<vue-table v-bind:rows="finishedRows" theme="success" v-bind:ask="false" ></vue-table>
+								<vue-table v-bind:rows="finishedRows" theme="success" sublist="done" ></vue-table>
 							</div>
 							<div class="tab-pane fade" id="exclude" role="tabpanel" aria-labelledby="exclude-tab">
-								<vue-table v-bind:rows="excludedRows" theme="warning" v-bind:ask="false" ></vue-table>
+								<vue-table v-bind:rows="excludedRows" theme="warning" sublist="exclude" ></vue-table>
 							</div>
 						</div>
 					</div>
@@ -478,5 +423,4 @@ let rootVue = new Vue({
 	components:{
 		'vue-table': vueTable,
 	},
-
 });

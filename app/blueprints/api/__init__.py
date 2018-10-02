@@ -24,6 +24,7 @@ ld.url('data_privenue.cfy_platform_type_revenue', ['/cash/cfy/stream'])
 # Merchandise related APIs
 ld.url('data_excel_merch.rex_rfm', ['/merch/rfm/<filename>'])
 ld.url('data_excel_merch.rex_fulfilment_excels', ['/merch/fulfilment_excels'])
+ld.url('data_excel_merch.rex_picking_slip', ['/merch/rex_picking_slip'])
 
 
 ld.url('starshipit.search_orders', ['/ssi/orders/search', '/ssi/orders/search/<string:phrase>'])

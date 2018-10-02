@@ -109,6 +109,36 @@
 									<td scope="row">Do not Call</td>
 								</tr>
 
+								<tr>
+									<td>
+										<span class="badge badge-success">
+											ALL <span class="badge badge-light">{{ data.rows|selectattr('CATALOGUE_ALL', '>', 0)|list|length }}</span>
+											<span class="sr-only">Mail Profile: Catalogue All</span>
+										</span>
+									</td>
+									<td scope="row">Catalogue All</td>
+								</tr>
+
+								<tr>
+									<td>
+										<span class="badge badge-success">
+											eALL <span class="badge badge-light">{{ data.rows|selectattr('ECATALOGUE_ALL', '>', 0)|list|length }}</span>
+											<span class="sr-only">Mail Profile: eCatalogue All</span>
+										</span>
+									</td>
+									<td scope="row">eCatalogue All</td>
+								</tr>
+
+								<tr>
+									<td>
+										<span class="badge badge-success">
+											!EXTRA <span class="badge badge-light">{{ data.rows|selectattr('NO_EXTRA_MAIL', '>', 0)|list|length }}</span>
+											<span class="sr-only">Mail Profile: No Extra Mail</span>
+										</span>
+									</td>
+									<td scope="row">No Extra Mail</td>
+								</tr>
+
 							</tbody>
 						</table>
 					</div>
@@ -203,6 +233,9 @@
 							{% if row.FIRSTDATE_MERCHANDISE_PLEDGE != 0 %}<span class="badge badge-pill badge-dark">!MSP</span>{% endif %}
 							{% if row.DECD|int == -1 %}<span class="badge badge-pill badge-danger">!DECD</span>{% endif %}
 							{% if row.PRIMARYCATEGORY|trim|upper == 'ESTATE' %}<span class="badge badge-pill badge-danger">!ESTATE</span>{% endif %}
+							{% if row.CATALOGUE_ALL > 0 %}<span class="badge badge-pill badge-success">ALL</span>{% endif %}
+							{% if row.ECATALOGUE_ALL > 0 %}<span class="badge badge-pill badge-success">eALL</span>{% endif %}
+							{% if row.NO_EXTRA_MAIL > 0 %}<span class="badge badge-pill badge-success">!EXTRA</span>{% endif %}
 
 							{% if row.DONOTMAIL|int == -1 %}
 							<span class="badge badge-pill badge-warning" data-toggle="tooltip" data-html="true" data-placement="top" tabindex="0"
@@ -214,15 +247,15 @@
 					 </td>
 
 					 <td><!--ON BOARDING STATUS-->
-						{% if row.PARAMETERNAME %}
-								 {% if row.EFFECTIVEFROM != row.EFFECTIVETO %}
-								 <span class="text-success" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0" title='{{ row.PARAMETERNOTE or '' }}'>
-										<span class="badge badge-success">Boarded by {{ row.BOARDEDBY }} &#10084; <span class="text-warning">{{ row.PARAMETERVALUE }}</span>/{{ row.EFFECTIVEFROM|dAU }}</span>
+						{% if row.JOURNEY_NAME %}
+								 {% if row.JOURNEY_FROM != row.JOURNEY_TO %}
+								 <span class="text-success" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0" title='{{ row.JOURNEY_NOTE or '' }}'>
+										<span class="badge badge-success">Boarded by {{ row.JOURNEY_BY }} &#10084; <span class="text-warning">{{ row.JOURNEY_VALUE }}</span>/{{ row.JOURNEY_FROM|dAU }}</span>
 									</span>
 								 {% else %}
 									<span class="text-secondary" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
-										 title='{{ row.PARAMETERNOTE }}'>
-									 <span class="badge badge-secondary">Cancelled by {{ row.BOARDEDBY }} &#9785;</span>
+										 title='{{ row.JOURNEY_NOTE }}'>
+									 <span class="badge badge-secondary">Cancelled by {{ row.JOURNEY_BY }} &#9785;</span>
 									</span>
 								 {% endif %}
 						{% else %}

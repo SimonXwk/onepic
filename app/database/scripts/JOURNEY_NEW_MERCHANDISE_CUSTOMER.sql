@@ -119,6 +119,21 @@ cte_payments as (
   WHERE ROW =1
 )
 -- --------------------------------------------------------------
+,cte_mail_porfile as (
+  SELECT *
+  FROM
+  (
+    SELECT [SERIALNUMBER], [SERIALNUMBER] AS [SN], [PARAMETERNAME], [PARAMETERVALUE]
+    FROM TBL_CONTACTPARAMETER
+    WHERE [PARAMETERVALUE] IN ('Catalogue All', 'eCatalogue All' , 'No Extra Mail') AND [PARAMETERNAME] = 'Catalogue'
+  ) D
+  PIVOT
+  (
+    COUNT([SN])
+    FOR [PARAMETERVALUE] IN ([Catalogue All], [eCatalogue All] , [No Extra Mail])
+  ) P
+)
+-- --------------------------------------------------------------
 -- Null Value Will be eliminated from aggregation functions
 -- --------------------------------------------------------------
 select
@@ -148,11 +163,11 @@ select
   ,[FIRST_PLEDGEID] = MIN(t2.PLEDGEID)
   ,[PLEDGES] = COUNT(DISTINCT t2.PLEDGEID)
   --> Merchandise On Boarding Profile
-  ,[PARAMETERNAME] = MIN(t3.PARAMETERNAME)
-  ,[PARAMETERVALUE] = MIN(t3.PARAMETERVALUE)
-  ,[EFFECTIVEFROM] = MIN(t3.EFFECTIVEFROM)
-  ,[EFFECTIVETO] = MIN(t3.EFFECTIVETO)
-  ,[PARAMETERNOTE] = MIN(t3.PARAMETERNOTE)
+  ,[JOURNEY_NAME] = MIN(t3.PARAMETERNAME)
+  ,[JOURNEY_VALUE] = MIN(t3.PARAMETERVALUE)
+  ,[JOURNEY_FROM] = MIN(t3.EFFECTIVEFROM)
+  ,[JOURNEY_TO] = MIN(t3.EFFECTIVETO)
+  ,[JOURNEY_NOTE] = MIN(t3.PARAMETERNOTE)
   , CASE WHEN MIN(t3.PARAMETERNAME) IS NULL OR RTRIM(MIN(t3.PARAMETERNAME)) = ''
     THEN 0 -- Has no profile
     ELSE
@@ -161,8 +176,8 @@ select
       ELSE -1  -- Has profile && it's not cancelled
       END
     END AS [BOARDED]
-  , [BOARDEDBY] = MIN(t3.BOARDEDBY)
-  , [BOARDEDCANCALLED] = MIN(t3.BOARDEDCANCALLED)
+  ,[JOURNEY_BY] = MIN(t3.BOARDEDBY)
+  ,[JOURNEY_CANCALLED] = MIN(t3.BOARDEDCANCALLED)
   --> Merchandise Communication
   ,[COURTESYCALL1_BY] = MIN(t4.COURTESYCALL1_BY)
   ,[COURTESYCALL1_DATE] = MIN(t4.COURTESYCALL1_DATE)
@@ -175,6 +190,10 @@ select
   ,[WELCOMEPACK_TYPE]  = MIN(t5.WELCOMEPACK_TYPE)
   ,[WELCOMEPACK_SUBJECT]  = MIN(t5.WELCOMEPACK_SUBJECT)
   ,[WELCOMEPACK_NOTES]  = MIN(t5.WELCOMEPACK_NOTES)
+  --> Mailing Profile
+  ,[CATALOGUE_ALL] = ISNULL(MAX(mp1.[Catalogue All]), 0)
+  ,[ECATALOGUE_ALL] = ISNULL(MAX(mp1.[eCatalogue All]), 0)
+  ,[NO_EXTRA_MAIL] = ISNULL(MAX(mp1.[No Extra Mail]), 0)
   --> Contact Information
   ,[CONTACTTYPE] = MIN(c1.CONTACTTYPE)
   ,[PRIMARYCATEGORY] = MIN(c1.PRIMARYCATEGORY)
@@ -207,6 +226,7 @@ from
   left join TBL_CONTACT c1 on (t1.SERIALNUMBER = c1.SERIALNUMBER)
   left join TBL_CONTACTATTRIBUTE c2 on (t1.SERIALNUMBER = c2.SERIALNUMBER)
   left join cte_rex_customerids c3 on (t1.SERIALNUMBER = c3.SERIALNUMBER)
+  left join cte_mail_porfile mp1 on (t1.SERIALNUMBER = mp1.SERIALNUMBER)
 where
   (c1.CONTACTTYPE not like 'ADDRESS')
 group by

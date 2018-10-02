@@ -80,18 +80,20 @@ let vueRow = Vue.component('vue-row', {
 	},
 	template: `
 	<tr class="text-left"  v-on:dblclick="toggleColor=!toggleColor" v-bind:class="{'table-warning': toggleColor}">
-		<td scope="row" style="width: 30%">
 
-			<strong><< row.FULLNAME >></strong> <small><span v-if="row.FIRSTFY===row.CFY" class="badge badge-success">NEW</span><span v-else class="badge badge-warning">OLD</span></small> <small class="text-primary" v-if="row.SORTKEYREF1">(is << row.SORTKEYREFREL2 >>)</small>
-			<hr class="my-1">
-			<small class="text-secondary"><< row.SERIALNUMBER >><span class="text-danger" v-if=" row.CONTACTTYPE === 'Organisation' ">, ORG</span>, << row.PRIMARYCATEGORY >>, <span class="text-success"> from << row.SOURCE >></span></small>
-			<small class="text-danger" v-if="row.DECD === -1">, Deceased</small>
-			<small class="text-danger" v-if="row.ESTATE === -1">, Estate</small>
-			<small class="text-danger" v-if="row.PLEDGES > 0">, [<< row.PLEDGES >>SP] << row.FIRST_PLEDGEID >></small>
+		<td scope="row" style="width: 30%" class="align-middle">
+			<mark class="text-dark"><< row.FULLNAME >> <small class="text-primary" v-if="row.SORTKEYREF1">(is << row.SORTKEYREFREL2 >>)</small> <small>(<span class="text-success"><< row.SOURCE >></span>)</small></mark>
+			<br>
+			<span v-if="row.FIRSTFY===row.CFY" class="badge badge-success">NEW</span><span v-else class="badge badge-warning">OLD</span>
+			<span class="badge badge-secondary"><< row.SERIALNUMBER >></span>
+			<span class="badge badge-danger" v-if=" row.CONTACTTYPE === 'Organisation' "><< row.PRIMARYCATEGORY >></span>
+			<span class="badge badge-danger" v-if="row.DECD === -1">DECEASED</span>
+			<span class="badge badge-danger" v-if="row.ESTATE === -1">ESTATE</span>
+			<span class="badge badge-warning" v-if="row.PLEDGES > 0">[<< row.PLEDGES >>SP] << row.FIRST_PLEDGEID >></span>
 		</td>
 
 		<td style="width: 35%">
-			<span class="badge badge-success">Responed: << row.CAMPAIGN_FIRSTDATE|dAU >></span> <span class="text-secondary">, culmulative LTD total </span><span class="badge badge-info"><< row.CAMPAIGN_TOAL|currency >></span>
+			<span class="text-success">Responed: << row.CAMPAIGN_FIRSTDATE|dAU >></span> <span class="text-secondary">, culmulative LTD total </span><span class="badge badge-info"><< row.CAMPAIGN_TOAL|currency >></span>
 			<hr class="my-1">
 			<small class="text-info">With TLMA since << row.FIRSTDATE|dAU >>, LTD total << row.LTD_TOTAL|currency >><br></small>
 			<small class="text-danger" v-if=" row.LTD_FISET_MERCHANDISE_DATE !== null ">WIth Merchandise Since << row.LTD_FISET_MERCHANDISE_DATE|dAU >></small>

@@ -22,7 +22,7 @@ let vueRow = Vue.component('vue-row', {
 	computed: {
 		trClassObject: function(){
 			return {
-				'table-success': this.toggleColor
+				'table-danger': this.toggleColor
 			}
 		},
 		statusTextClassObject: function(){
@@ -150,26 +150,28 @@ let vueRow = Vue.component('vue-row', {
 	},
 	template:`
 
-	<tr v-if="show" v-on:dblclick="toggleColor=!toggleColor" v-bind:class="trClassObject" >
+	<tr v-show="show" v-on:dblclick="toggleColor=!toggleColor" v-bind:class="trClassObject" >
 
-		<td scope="row" style="width: 30%">
-			<strong><< row.FULLNAME >></strong> <small class="text-primary" v-if="row.SORTKEYREF1">(is << row.SORTKEYREFREL2 >>)</small>
-			<hr class="my-1">
-			<small class="text-secondary"><< row.SERIALNUMBER >><span class="text-danger" v-if=" row.CONTACTTYPE === 'Organisation' ">, ORG</span>, << row.PRIMARYCATEGORY >>, <span class="text-success"> from << row.SOURCE >></span></small>
-			<small class="text-danger" v-if="row.DECD === -1">, Deceased</small>
-			<small class="text-danger" v-if="row.ESTATE === -1">, Estate</small>
-			<small class="text-danger" v-if="row.PLEDGES > 0">, [<< row.PLEDGES >>SP] << row.FIRST_PLEDGEID >></small>
+		<td scope="row" style="width: 30%" class="align-middle">
+			<mark class="text-dark"><< row.FULLNAME >> <small class="text-primary" v-if="row.SORTKEYREF1">(is << row.SORTKEYREFREL2 >>)</small> <small>(<span class="text-success"><< row.SOURCE >></span>)</small></mark>
+			<br>
+			<span class="badge badge-secondary"><< row.SERIALNUMBER >></span>
+			<span class="badge badge-secondary" v-if="row.LAST_REXID "><< row.LAST_REXID >></span>
+			<span class="badge badge-danger" v-if=" row.CONTACTTYPE === 'Organisation' "><< row.PRIMARYCATEGORY >></span>
+			<span class="badge badge-danger" v-if="row.DECD === -1">DECEASED</span>
+			<span class="badge badge-danger" v-if="row.ESTATE === -1">ESTATE</span>
+			<span class="badge badge-warning" v-if="row.PLEDGES > 0">[<< row.PLEDGES >>SP] << row.FIRST_PLEDGEID >></span>
 		</td>
 
-		<td style="width: 35%">
-			 <span class="text-muted"><< row.FIRSTORDER >><small> payment: << row.FIRSTDATE|dAY >></small> <a target="blank" class="text-muted" v-bind:href="linkTrack + row.FIRSTORDER"> &#128230;<small>starshipit</small></a></span>
-			 <hr class="my-1">
-			 <span v-bind:class="statusTextClassObject"><< resultDisplay >></span>
-			 <span v-if="statusDetail!==status" calss="text-danger"><small>, << statusDetail >></small></span>
-			 <a v-if="isDelivered" target="blank" class="text-secondary" v-bind:href="ausLink"> &#128238; <small>AusPost</small></a>
+		<td style="width: 35%" class="align-middle">
+			<span class="text-muted"><< row.FIRSTORDER >><small> payment: << row.FIRSTDATE|dAU >></small> <a target="blank" class="text-muted" v-bind:href="linkTrack + row.FIRSTORDER"> &#128230;<small>starshipit</small></a></span>
+			<br>
+			<span v-bind:class="statusTextClassObject"><< resultDisplay >></span>
+			<span v-if="statusDetail!==status" calss="text-danger"><small>, << statusDetail >></small></span>
+			<a v-if="isDelivered" target="blank" class="text-secondary" v-bind:href="ausLink"> &#128238; <small>AusPost</small></a>
 		</td>
 
-		<td style="width: 15%">
+		<td style="width: 15%" class="align-middle">
 			<span v-if="row.DONOTCALL == -1 || row.DONOTMAIL == -1">
 				<span v-if="row.DONOTCALL == -1" class="text-danger">&#128263;  Do not Call </span>
 				<span v-if="row.DONOTMAIL == -1" class="text-danger">&#128075;  Do not Mail </span>
@@ -217,20 +219,19 @@ let vueRow = Vue.component('vue-row', {
 
 		</td>
 
-		<td style="width: 20%" class="text-left">
-			<span v-if=" row.BOARDEDBY !== null ">
-				<mark>&#9924; << row.BOARDEDBY >></mark>
-				<span class="text-success" v-if=" row.BOARDEDCANCALLED === 0 ">
-					<small> created <span class="badge badge-success">Merch Onboarding Profile</span></small>
+		<td style="width: 20%" class="text-left align-middle">
+			<span v-if=" row.JOURNEY_BY !== null ">
+				<span class="text-success" v-if=" row.JOURNEY_CANCALLED === 0 ">
+					<mark class="text-success">&#128526; << row.JOURNEY_BY >> Created Journey Profile</mark>
 				</span>
-				<span class="text-secondary" v-else-if="row.BOARDEDCANCALLED === -1 ">
-					<small> cancelled <span class="badge badge-secondary">Merch Onboarding Profile</span></small>
+				<span class="text-secondary" v-else-if="row.JOURNEY_CANCALLED === -1 ">
+					<mark class="text-danger">&#129300; << row.JOURNEY_BY >> Cancelled Journey</mark>
+					<p class="lead"><small><< row.JOURNEY_NOTE >></small></p>
 				</span>
-				<br>
 			</span>
 			<span v-if=" row.COURTESYCALL1_BY !== null ">
-				<mark>&#9924; << row.COURTESYCALL1_BY >></mark><span class="text-success"><small> made <span class="badge badge-success">Courtesy Call 1</span></small></span>
 				<br>
+				<mark>&#128512; << row.COURTESYCALL1_BY >></mark><span class="text-success"><small> made <span class="badge badge-success">Courtesy Call 1</span></small></span>
 			</span>
 		</td>
 
@@ -371,16 +372,16 @@ let rootVue = new Vue({
 			}
 		},
 		includeRows: function () {
-			return this.raw.rows.filter(row => this.calcSubListType(row) === 'todo' )
+			return this.raw.rows.filter(row => this.calcSubListType(row) === 'todo').sort((a,b) => new Date(a.FIRSTDATE) > new Date(b.FIRSTDATE))
 		},
 		skippedRows: function () {
-			return this.raw.rows.filter(row => this.calcSubListType(row) === 'skip' )
+			return this.raw.rows.filter(row => this.calcSubListType(row) === 'skip').sort((a,b) => new Date(a.FIRSTDATE) > new Date(b.FIRSTDATE))
 		},
 		finishedRows: function () {
-			return this.raw.rows.filter(row => this.calcSubListType(row) === 'finished' )
+			return this.raw.rows.filter(row => this.calcSubListType(row) === 'finished').sort((a,b) => new Date(a.FIRSTDATE) < new Date(b.FIRSTDATE))
 		},
 		excludeRows: function () {
-			return this.raw.rows.filter(row => this.calcSubListType(row) === 'exlcude' )
+			return this.raw.rows.filter(row => this.calcSubListType(row) === 'exlcude').sort((a,b) => new Date(a.FIRSTDATE) < new Date(b.FIRSTDATE))
 		},
 		includeRowsShowCount: function () {
 			return Object.keys(this.customers).filter(sn => this.customers[sn].show === true && this.customers[sn].sublist === 'todo' ).length;
@@ -397,7 +398,11 @@ let rootVue = new Vue({
 	},
 	created(){
 		this.$eventBus.$on('processedCustomer', (sn, type) => {
-			this.raw.processed += 1;
+			if (this.customers[sn].processed === false){
+				this.raw.processed += 1;
+			}else{
+				console.log('Processing Multiple Times : ', sn);
+			}
 			// console.log(this.raw.rows.filter(row => row['SERIALNUMBER']  === sn )[0]['SERIALNUMBER']);
 			if (type === 'success'){
 				this.customers[sn].processed = true;
@@ -421,13 +426,16 @@ let rootVue = new Vue({
 					|| (row['FIRSTDATE_MERCHANDISE_PLEDGE'] !== 0)
 					|| (row['DECD'] === -1)
 					|| (row['PRIMARYCATEGORY'] === 'ESTATE')
+					|| (row['JOURNEY_CANCALLED'] === -1)
 				) {
 				return 'exlcude'
 			}else {
 				if ( !((row['COURTESYCALL1_BY'] === null ) || (row['COURTESYCALL1_BY'].trim() === '' )) ) {
 				  return 'finished'
 				}else {
-					if ( new Date(row['FIRSTDATE']) <= new Date(2018, 8, 5) ) {
+					let d = new Date(row['FIRSTDATE']);
+					let m = new Date(row['FIRSTDATE']).getMonth() + 1;
+					if ( (m < 9 && m >= 7) || (m ===9 && d.getDate() <=5) ) {
 						return 'skip' // 2019 September the 5th midnight
 					}else {
 						return 'todo'
@@ -544,7 +552,7 @@ let rootVue = new Vue({
 
 							<li class="nav-item ">
 								<a class="nav-link" id="skip-tab" data-toggle="pill" href="#skip" role="tab" aria-controls="skip" aria-selected="false">
-								 &#9975; Skipped &#8828; 05/09/18 <span class="badge badge-pill badge-secondary"> << skippedRowsShowCount >>/<< skippedRows.length >></span>
+								 &#9975; Skipped &#8828; 05/09 <span class="badge badge-pill badge-secondary"> << skippedRowsShowCount >>/<< skippedRows.length >></span>
 								</a>
 							</li>
 

@@ -46,14 +46,14 @@ class ExcelWorkbook(object):
 	def get_range_by_name(self, sheet_name=None, range_address=None):
 		if self.workbook:
 			sheet_name = self.workbook[self.workbook.sheetnames[0]] if sheet_name is None else sheet_name
-			ws = self.workbook.get_sheet_by_name(sheet_name)
+			ws = self.workbook[sheet_name]
 			if range_address is None:
 				return ws.get_squared_range(ws.min_column, ws.min_row, ws.max_column, ws.max_row)
 			return ws[range_address]
 		return None
 
-	def get_range_by_square(self, sheet_name, min_column, min_row, max_column, max_row):
+	def get_range_by_square(self, sheet_name, min_row, min_column, max_row, max_column):
 		if self.workbook:
 			sheet_name = self.workbook[self.workbook.sheetnames[0]] if sheet_name is None else sheet_name
-			return self.workbook.get_sheet_by_name(sheet_name).get_squared_range(min_column, min_row, max_column, max_row)
+			return self.workbook[sheet_name].get_squared_range(min_column, min_row, max_column, max_row)
 		return None
