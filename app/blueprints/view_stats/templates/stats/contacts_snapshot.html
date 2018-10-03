@@ -32,14 +32,16 @@
 <Script>
 let data = {{ data.to_json()|safe }};
 
+
+
 fetchJSON(endpoint('/api/tq/contact_created_fy'), function (json) {
 	Highcharts.chart('chart1', {
-		chart: { type: 'spline' },
+		chart: { type: 'column' },
 	 	title: { text: null },
 		credits: { enabled: false },
 		xAxis: {
 			type: 'category',
-			categories: json['FY'].map(fy => 'FY' + fy)
+			categories: json['rows']['FY'].map(fy => 'FY' + fy)
 		},
 		yAxis: {
 			min: 0,
@@ -63,7 +65,7 @@ fetchJSON(endpoint('/api/tq/contact_created_fy'), function (json) {
     },
 		series: [{
 			name: 'All Contacts',
-			data: json['CONTACTS'],
+			data: json['rows']['CONTACTS'],
 
 		}]
 	});

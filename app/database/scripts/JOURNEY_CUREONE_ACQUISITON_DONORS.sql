@@ -1,5 +1,5 @@
 DECLARE
-  @CAMPAIGNCODE VARCHAR (30) = /*<CAMPAIGN_CODE>*/'%19AC.Cure%One%Acquisition%'/*</CAMPAIGN_CODE>*/,
+  @CAMPAIGNCODE VARCHAR (30) = /*<CAMPAIGN_CODE>*/'%19AC.Cure One Acquisition%'/*</CAMPAIGN_CODE>*/,
   @DATE1 VARCHAR (10) = /*<PAYMENT_DATE1>*/'2018/07/01'/*</PAYMENT_DATE1>*/,
   @DATE2 VARCHAR (10) = /*<PAYMENT_DATE2>*/'2019/06/30'/*</PAYMENT_DATE2>*/;
 -- --------------------------------------------------------------
@@ -31,6 +31,7 @@ cte_payments as (
     LEFT JOIN TBL_BATCHHEADER ON (TBL_BATCHITEMSPLIT.ADMITNAME = TBL_BATCHHEADER.ADMITNAME)
   WHERE TBL_SOURCECODE.ADDITIONALCODE3 LIKE @CAMPAIGNCODE
      AND (TBL_BATCHHEADER.STAGE ='Batch Approved')
+  GROUP BY SERIALNUMBER
 )
 -- --------------------------------------------------------------
 ,cte_first_date as (
@@ -48,13 +49,30 @@ cte_payments as (
     , [CONVERSIONCALL_TYPE] = [COMMUNICATIONTYPE]
     , [CONVERSIONCALL_SUBJECT] = [SUBJECT]
     , [CONVERSIONCALL_NOTES] = [NOTES]
-    , [CONVERSIONCALLBY] = [CREATEDBY]
-    , [CONVERSIONCALLED] = [CREATED]
+    , [CONVERSIONCALL_BY] = [CREATEDBY]
+    , [CONVERSIONCALL_DATE] = [CREATED]
     , ROW_NUMBER() OVER(PARTITION BY SERIALNUMBER ORDER BY CREATED DESC) AS [ROW]
     FROM TBL_COMMUNICATION
     WHERE [CATEGORY] = 'Cure One Acquisition' AND [SUBJECT] LIKE '%conversion%call%'
   ) tmp
   WHERE ROW =1
+)
+-- --------------------------------------------------------------
+,cte_mail_porfile as (
+  SELECT *
+  FROM
+  (
+    SELECT [SERIALNUMBER], [SERIALNUMBER] AS [SN], [PARAMETERNAME], [PARAMETERVALUE]
+    FROM TBL_CONTACTPARAMETER
+    WHERE
+      [PARAMETERVALUE] IN ('Action Update B', 'Action Update B Email' , 'Action Update A', 'Action Update A Email', 'Action A', 'Action A Email', 'Action B', 'Action B Email')
+      AND [PARAMETERNAME] = 'Magazine'
+  ) D
+  PIVOT
+  (
+    COUNT([SN])
+    FOR [PARAMETERVALUE] IN ([Action Update B], [Action Update B Email] , [Action Update A], [Action Update A Email], [Action A], [Action A Email], [Action B], [Action B Email])
+  ) P
 )
 -- --------------------------------------------------------------
 -- Null Value Will be eliminated from aggregation functions
@@ -75,11 +93,23 @@ select
   ,[LTD_FISET_MERCHANDISE_DATE] = MIN(t2.MERCHANDISE_DATEOFPAYMENT)
 
   --> Conversion Call
-  ,[CONVERSIONCALLBY] = MIN(t4.CONVERSIONCALLBY)
-  ,[CONVERSIONCALLED] = MIN(t4.CONVERSIONCALLED)
+  ,[CONVERSIONCALL_BY] = MIN(t4.CONVERSIONCALL_BY)
+  ,[CONVERSIONCALL_DATE] = MIN(t4.CONVERSIONCALL_DATE)
   ,[CONVERSIONCALL_TYPE]  = MIN(t4.CONVERSIONCALL_TYPE)
   ,[CONVERSIONCALL_SUBJECT]  = MIN(t4.CONVERSIONCALL_SUBJECT)
   ,[CONVERSIONCALL_NOTES]  = MIN(t4.CONVERSIONCALL_NOTES)
+
+  --> Mailing Profile
+  ,[ACTION_B_UPDATE] = ISNULL(MAX(mp1.[Action Update B]), 0)
+  ,[ACTION_A_UPDATE] = ISNULL(MAX(mp1.[Action Update A]), 0)
+  ,[ACTION_A] = ISNULL(MAX(mp1.[Action A]), 0)
+  ,[ACTION_B] = ISNULL(MAX(mp1.[Action B]), 0)
+
+  ,[EACTION_B_UPDATE] = ISNULL(MAX(mp1.[Action Update B Email]), 0)
+  ,[EACTION_A_UPDATE] = ISNULL(MAX(mp1.[Action Update A Email]), 0)
+  ,[EACTION_A] = ISNULL(MAX(mp1.[Action A Email]), 0)
+  ,[EACTION_B] = ISNULL(MAX(mp1.[Action B Email]), 0)
+
   --> Contact Information
   , CONCAT(
         CASE WHEN MIN(c1.TITLE) IS NULL OR RTRIM(MIN(c1.TITLE))='' THEN '' ELSE RTRIM(MIN(c1.TITLE)) + ' ' END
@@ -116,6 +146,7 @@ from
   left join cte_conversion_call_last t4 on (t1.SERIALNUMBER = t4.SERIALNUMBER)
   left join TBL_CONTACT c1 on (t1.SERIALNUMBER = c1.SERIALNUMBER)
   left join TBL_CONTACTATTRIBUTE c2 on (t1.SERIALNUMBER = c2.SERIALNUMBER)
+  left join cte_mail_porfile mp1 on (t1.SERIALNUMBER = mp1.SERIALNUMBER)
 where
   (c1.CONTACTTYPE not like 'ADDRESS')
 group by

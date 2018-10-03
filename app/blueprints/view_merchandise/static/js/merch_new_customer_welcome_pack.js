@@ -25,7 +25,7 @@ let vueRow = Vue.component('vue-row', {
 				// let result = this.welcomepackRecords.reduce((acc, cur) => acc += ' | ' cur.workbook , '')
 				let msg = ''
 				this.welcomepackRecords.forEach(r => {
-					msg += '<span class="text-success">&#128294; Found WP <span class="badge badge-light">' +  r.workbook + '</span></span><br>'
+					msg += '<span class="badge badge-light">' +  r.workbook + '</span> <span class="badge badge-light">Welcome Pack Sent With ' + r.OrderNumber + '</span><br>'
 				});
 				return msg
 			}
@@ -76,7 +76,7 @@ let vueRow = Vue.component('vue-row', {
 
 		<td style="width: 20%" class="align-middle">
 			<span v-if=" row.WELCOMEPACK_BY !== null ">
-				<mark>&#9924; << row.WELCOMEPACK_BY >></mark><span class="text-success"><small> updated <span class="badge badge-success">Welcome pack communication</span></small></span>
+				<mark>&#129303; << row.WELCOMEPACK_BY >><span class="text-success"><small> updated <span class="badge badge-success"><< row.WELCOMEPACK_TYPE >></span> <span class="badge badge-success"><< row.WELCOMEPACK_DATE|dAU >></span></small></span></mark>
 				<p class="lead"><small><< row.WELCOMEPACK_SUBJECT >></small></p>
 			</span>
 		</td>
@@ -183,10 +183,10 @@ let rootVue = new Vue({
 			this.raw.timestamp = null;
 			this.raw.processed = 0;
 
-			this.fulfilment.rows = [],;
+			this.fulfilment.rows = [];
 			this.fulfilment.ready = false;
 			this.fulfilment.timestamp = null;
-	
+
 			this.pickingSlipRead = 0;
 			this.getData();
 		},
@@ -286,11 +286,12 @@ let rootVue = new Vue({
 			});
 		},
 		initProcessing: function(){
-			if (this.raw.ready &&  this.fulfilment.ready && this.pickingSlipRead !== 0 && this.pickingSlipRead === this.fulfilment.rows.length) {
-				this.$eventBus.$emit('startProcessCustomer', this.pickingSlip.rows);
+			if (this.raw.ready &&  this.fulfilment.ready && this.pickingSlipRead !== 0) {
+				if ( this.pickingSlipRead === this.fulfilment.rows.length && this.fulfilment.rows.length !== 0 ) {
+					this.$eventBus.$emit('startProcessCustomer', this.pickingSlip.rows);
+				}
 			}
 		},
-
 	},
 	template: `
 	<div v-if="!raw.ready && !fulfilment.ready">

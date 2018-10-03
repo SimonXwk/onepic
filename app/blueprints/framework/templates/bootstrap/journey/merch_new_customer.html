@@ -168,35 +168,37 @@
 					{% for row in data.rows %}
 					<tr {% if not row[2] %}class=""{% endif %}>
 					 <th scope="row">
-						 {{ row.SERIALNUMBER }} <small class="text-secondary">{% if row.LAST_REXID %}[{{ row.REXIDS }}]{{ row.LAST_REXID }}[{{ row.LAST_REXID_POOL }}]{% else %}<s>REXID</s>{% endif %}</small>
+						 {{ row.SERIALNUMBER }}
 						 {% if row.SORTKEYREF1 %}
 								<small class="text-primary" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0" title="{{ row.SORTKEYREFREL1 }} : {{ row.SORTKEYREF1 }}">
 									(is {{ row.SORTKEYREFREL2 }})
 								</small>
 						 {% endif %}
+						 {% if row.LAST_REXID %}<br /><small class="text-info">{{ row.LAST_REXID }}<small> [{{ row.REXIDS }}]{% if row.LAST_REXID_POOL > 1 %}<span class="text-danger"> [shared {{ row.LAST_REXID_POOL }}]{% endif %}</span></small></small>{% else %}<small><s>REXID</s></small>{% endif %}
 						 <br />
-						 <small class="text-muted"> {{ row.FULLNAME }}</small>
+						 <small class="text-muted">{{ row.FULLNAME }}</small>
 					 </th>
 
 
-						<td>{{ row.FIRSTDATE|dSort }}</td>
+						<td class="text-muted">{{ row.FIRSTDATE|dSort }}</td>
 					 <td><!--First Order ID-->
 						{% if row.FIRSTORDER %}
-								 {% if row.FIRSTORDERS|int > 1 %}
+								{% set trackingURL = url_for('merchandise.track_order', order_number = row.FIRSTORDER|string)  %}
+								{% if row.FIRSTORDERS|int > 1 %}
 								 <span class="text-primary" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
 										title='
 										Order ID was retrieved from <span class="text-warning">{{ row.FIRST_ORDER_SOURCE }}</span><hr />
 										Plus other <span class="text-success"><strong>{{ (row.FIRSTORDERS|int) - 1 }}</strong></span> more orders
 													 '
 								 >
-									<strong>{{ row.FIRSTORDER }}</strong>
+									<strong> <a target="blank" class="text-muted" href="{{ trackingURL }}">{{ row.FIRSTORDER }}</a></strong>
 								 </span>
 								 {% else %}
 								 <span class="text-primary" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
 										title='
 										Order ID was retrieved from <span class="text-warning">{{ row.FIRST_ORDER_SOURCE }}</span>'
 								 >
-									{{ row.FIRSTORDER }}
+									<a target="blank" class="text-muted" href="{{ trackingURL }}">{{ row.FIRSTORDER }}</a>
 								 </span>
 								 {% endif %}
 						{% endif %}
@@ -233,10 +235,6 @@
 							{% if row.FIRSTDATE_MERCHANDISE_PLEDGE != 0 %}<span class="badge badge-pill badge-dark">!MSP</span>{% endif %}
 							{% if row.DECD|int == -1 %}<span class="badge badge-pill badge-danger">!DECD</span>{% endif %}
 							{% if row.PRIMARYCATEGORY|trim|upper == 'ESTATE' %}<span class="badge badge-pill badge-danger">!ESTATE</span>{% endif %}
-							{% if row.CATALOGUE_ALL > 0 %}<span class="badge badge-pill badge-success">ALL</span>{% endif %}
-							{% if row.ECATALOGUE_ALL > 0 %}<span class="badge badge-pill badge-success">eALL</span>{% endif %}
-							{% if row.NO_EXTRA_MAIL > 0 %}<span class="badge badge-pill badge-success">!EXTRA</span>{% endif %}
-
 							{% if row.DONOTMAIL|int == -1 %}
 							<span class="badge badge-pill badge-warning" data-toggle="tooltip" data-html="true" data-placement="top" tabindex="0"
 								 title="{{ row.DONOTMAILREASON }}">
@@ -246,7 +244,7 @@
 							{% if row.DONOTCALL|int == -1 %}<span class="badge badge-pill badge-warning">!CALL</span>{% endif %}
 					 </td>
 
-					 <td><!--ON BOARDING STATUS-->
+					 <td class="align-middle"><!--ON BOARDING STATUS-->
 						{% if row.JOURNEY_NAME %}
 								 {% if row.JOURNEY_FROM != row.JOURNEY_TO %}
 								 <span class="text-success" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0" title='{{ row.JOURNEY_NOTE or '' }}'>
@@ -261,18 +259,26 @@
 						{% else %}
 								<span class="badge badge-light">&#10067; Waiting to be boarded</span>
 						{% endif %}
+						<br />
+						{% if row.CATALOGUE_ALL > 0 %}<span class="badge badge-pill badge-success">ALL</span> {% endif %}
+						{% if row.ECATALOGUE_ALL > 0 %}<span class="badge badge-pill badge-success">eALL</span> {% endif %}
+						{% if row.NO_EXTRA_MAIL > 0 %}<span class="badge badge-pill badge-success">!EXTRA</span> {% endif %}
 					 </td>
 
 						<td><!--Courtesy Call-->
 						{% if row.COURTESYCALL1_BY %}
 							<span class="text-info" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
 							title="{{ row.COURTESYCALL1_SUBJECT }}<hr>{{ row.COURTESYCALL1_NOTES }}">
-							<span class="font-weight-bold">{{ row.COURTESYCALL1_BY }}</span> called on <span class="text-success">{{ row.COURTESYCALL1_DATE|dAU }}</span></span>
+							<span class="font-weight-bold">{{ row.COURTESYCALL1_BY }}</span> made a <span class="text-danger">{{ row.COURTESYCALL1_TYPE }}</span> on <span class="text-success">{{ row.COURTESYCALL1_DATE|dAU }}</span></span>
 						{% endif %}
 					 </td>
 
 						<td><!--Courtesy Call-->
-							NO THANKQ COMMUNICATION
+							{% if row.WELCOMEPACK_BY %}
+								<span class="text-info" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
+								title="{{ row.WELCOMEPACK_SUBJECT }}<hr>{{ row.WELCOMEPACK_NOTES }}">
+								<span class="font-weight-bold">{{ row.WELCOMEPACK_BY }}</span> created a <span class="text-danger">{{ row.WELCOMEPACK_TYPE }}</span> on <span class="text-success">{{ row.WELCOMEPACK_DATE|dAU }}</span></span>
+							{% endif %}
 						</td>
 					</tr>
 					{% endfor %}

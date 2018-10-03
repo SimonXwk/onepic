@@ -81,8 +81,8 @@ let vueRow = Vue.component('vue-row', {
 	template: `
 	<tr class="text-left"  v-on:dblclick="toggleColor=!toggleColor" v-bind:class="{'table-warning': toggleColor}">
 
-		<td scope="row" style="width: 30%" class="align-middle">
-			<mark class="text-dark"><< row.FULLNAME >> <small class="text-primary" v-if="row.SORTKEYREF1">(is << row.SORTKEYREFREL2 >>)</small> <small>(<span class="text-success"><< row.SOURCE >></span>)</small></mark>
+		<td scope="row" style="width: 25%" class="align-middle">
+			<mark class="text-dark"><< row.FULLNAME >> <small class="text-primary" v-if="row.SORTKEYREF1">(is << row.SORTKEYREFREL2 >>)</small> <small>(<span class="text-success"><< row.SOURCE >></span>, <span class="text-primary"><< row.STATE >></span>)</small></mark>
 			<br>
 			<span v-if="row.FIRSTFY===row.CFY" class="badge badge-success">NEW</span><span v-else class="badge badge-warning">OLD</span>
 			<span class="badge badge-secondary"><< row.SERIALNUMBER >></span>
@@ -92,18 +92,33 @@ let vueRow = Vue.component('vue-row', {
 			<span class="badge badge-warning" v-if="row.PLEDGES > 0">[<< row.PLEDGES >>SP] << row.FIRST_PLEDGEID >></span>
 		</td>
 
-		<td style="width: 35%">
-			<span class="text-success">Responed: << row.CAMPAIGN_FIRSTDATE|dAU >></span> <span class="text-secondary">, culmulative LTD total </span><span class="badge badge-info"><< row.CAMPAIGN_TOAL|currency >></span>
-			<hr class="my-1">
-			<small class="text-info">With TLMA since << row.FIRSTDATE|dAU >>, LTD total << row.LTD_TOTAL|currency >><br></small>
-			<small class="text-danger" v-if=" row.LTD_FISET_MERCHANDISE_DATE !== null ">WIth Merchandise Since << row.LTD_FISET_MERCHANDISE_DATE|dAU >></small>
+		<td style="width: 20%" class="text-muted align-middle">
+			&#128236;
+			<span class="badge badge-success shadow-type8" v-if="row.ACTION_B_UPDATE===1">B UPDATE</span><span class="badge badge-light text-muted" v-else>B UPDATE</span>
+			<span class="badge badge-success shadow-type8" v-if="row.ACTION_A_UPDATE===1">A UPDATE</span><span class="badge badge-light text-muted" v-else>A UPDATE</span>
+			<span class="badge badge-success shadow-type8" v-if="row.ACTION_A===1">ACTION A</span><span class="badge badge-light text-muted" v-else>ACTION A</span>
+			<span class="badge badge-success shadow-type8" v-if="row.ACTION_B===1">ACTION B</span><span class="badge badge-light text-muted" v-else>ACTION B</span>
+			<br />
+			&#128231;
+			<span class="badge badge-success shadow-type8" v-if="row.EACTION_B_UPDATE===1">B UPDATE</span><span class="badge badge-light text-muted" v-else>B UPDATE</span>
+			<span class="badge badge-success shadow-type8" v-if="row.EACTION_A_UPDATE===1">A UPDATE</span><span class="badge badge-light text-muted" v-else>A UPDATE</span>
+			<span class="badge badge-success shadow-type8" v-if="row.EACTION_A===1">ACTION A</span><span class="badge badge-light text-muted" v-else>ACTION A</span>
+			<span class="badge badge-success shadow-type8" v-if="row.EACTION_B===1">ACTION B</span><span class="badge badge-light text-muted" v-else>ACTION B</span>
 		</td>
 
-		<td style="width: 15%">
+		<td style="width: 23%" class="text-muted align-middle">
+			First gift towards campaign on <span class="text-success font-weight-bold"><< row.CAMPAIGN_FIRSTDATE|dAU >></span>
+			<br />
+			Gave <span class="text-primary font-weight-bold"><< row.CAMPAIGN_TOAL|currency >></span> to campaign cumulatively
+			<br />
+			<small class="text-info">New Since << row.FIRSTDATE|dAU >>, gave TLMA << row.LTD_TOTAL|currency >> in total<br></small>
+			<small class="text-danger" v-if=" row.LTD_FISET_MERCHANDISE_DATE !== null ">Started Merchandise since << row.LTD_FISET_MERCHANDISE_DATE|dAU >></small>
+		</td>
+
+		<td style="width: 15%" class="align-middle">
 			<span v-if="row.DONOTCALL == -1 || row.DONOTMAIL == -1">
-				<span v-if="row.DONOTCALL == -1" class="text-danger">&#128263;  Do not Call </span>
-				<span v-if="row.DONOTMAIL == -1" class="text-danger">&#128075;  Do not Mail </span>
-				<br>
+				<span v-if="row.DONOTCALL == -1" class="text-danger">&#128263;  Do not Call <br></span>
+				<span v-if="row.DONOTMAIL == -1" class="text-danger">&#128075;  Do not Mail <br></span>
 			</span>
 
 			<span v-if="(row.DONOTCALL != -1 && row.MOBILENUMBER !== null && row.MOBILENUMBER.trim() !== '')" class="text-info">
@@ -147,13 +162,14 @@ let vueRow = Vue.component('vue-row', {
 
 		</td>
 
-		<td style="width: 20%">
-			<span v-if=" row.CONVERSIONCALLBY !== null ">
-				<mark>&#9924; << row.CONVERSIONCALLBY >></mark><span class="text-success"><small> made <span class="badge badge-success">Conversion Call</span></small></span>
-				<br>
+		<td style="width: 18%" class="align-middle">
+			<span v-if=" row.CONVERSIONCALL_BY !== null ">
+				<mark>&#128521;
+				<span class="font-weight-bold"><< row.CONVERSIONCALL_TYPE >></span> by <span class="font-weight-bold"><< row.CONVERSIONCALL_BY >></span> <small class="text-success">()<< row.CONVERSIONCALL_DATE|dAU >>)</small>
+				</mark>
 			</span>
 			<span v-else>
-				<span class="text-info">Due: << conversionCallDueDate|dAU >>, << weekdays[conversionCallDueDate.getDay()] >></span>
+			 	&#128560; Due Date : <span class="text-info"><< conversionCallDueDate|dAU >>, << weekdays[conversionCallDueDate.getDay()] >></span>
 			</span>
 
 		</td>
@@ -193,10 +209,11 @@ let vueTable = Vue.component('vue-table', {
 		<table class="table table-sm table-hover table-bordered table-striped"" >
 			<thead>
 				<tr class=" text-left" v-bind:class="trClassObject">
-					 <th scope="col" style="width: 30%">DONOR</th>
-					 <th scope="col" style="width: 35%">INFOMATION</th>
-					 <th scope="col" style="width: 20%">CONTACT METHOD</th>
-					 <th scope="col" style="width: 15%">CONVERSION</th>
+					 <th scope="col" style="width: 25%">DONOR</th>
+					 <th scope="col" style="width: 20%">ACTION MAGAZINE MAIL PROFILE</th>
+					 <th scope="col" style="width: 23%">INFOMATION</th>
+					 <th scope="col" style="width: 15%">CONTACT METHOD</th>
+					 <th scope="col" style="width: 18%">CONVERSION CALL</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -246,6 +263,12 @@ let rootVue = new Vue({
 				return acc
 			}, 0)
 		},
+		totalValue: function(){
+			return this.raw.rows.reduce((acc, cur) => {
+				acc += cur.CAMPAIGN_TOAL;
+				return acc
+			}, 0)
+		}
 	},
 	created(){
 		this.getData();
@@ -259,7 +282,7 @@ let rootVue = new Vue({
 			});
 		},
 		calcSubLists: function(row){
-			if (row['CONVERSIONCALLBY'] === null || row['CONVERSIONCALLBY'].trim() === '') {
+			if (row['CONVERSIONCALL_BY'] === null || row['CONVERSIONCALL_BY'].trim() === '') {
 				return 'todo'
 			}else {
 				return 'called'
@@ -283,7 +306,7 @@ let rootVue = new Vue({
 
 				<div class="card shadow-type6">
 					<div class="card-header bg-transparent shadow-type8">
-						<p class="text-danger font-weight-bold mb-0"><< raw.rows.length >> Cure One Acquisition Donors Found
+						<p class="text-danger font-weight-bold mb-0"><span class="text-primary"><< totalValue|currency >></span> from <span class="text-primary"><< raw.rows.length|number >></span> Cure One Acquisition (campaign) Donors
 						<span class="badge badge-success">
 						  NEW <span class="badge badge-light"><< cfyNewCount >></span>
 						  <span class="sr-only">new in current financial year</span>
@@ -292,8 +315,6 @@ let rootVue = new Vue({
 						  DNM <span class="badge badge-light"><< doNotMailCount >></span>
 						  <span class="sr-only">do not mails</span>
 						</span>
-
-
 
 						<small class="text-muted">as at << raw.timestamp|dtAU >> from thankQ</small> </p>
 					</div>
