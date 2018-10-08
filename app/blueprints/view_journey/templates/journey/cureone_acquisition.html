@@ -55,11 +55,12 @@
 {% block js_embedded_after %}
 <script>
 let vueRow = Vue.component('vue-row', {
-	props: ['row'],
+	props: ['row', 'sublist'],
 	data: function(){
 		return {
 			weekdays: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
-			toggleColor: false
+			toggleColor: false,
+			nextCodes: null
 		}
 	},
 	computed:{
@@ -77,6 +78,15 @@ let vueRow = Vue.component('vue-row', {
 		}
 	},
 	methods:{
+	},
+	created() {
+		if (this.row.CONVERSIONCALL_BY !== null ){
+			let v = this;
+			let sn = this.row.SERIALNUMBER;
+			let since = new Date(this.row.CONVERSIONCALL_DATE);
+			api = '/api/tq/get_first_date_source1_by_contacts_since' + '?sn=' + sn + '&since=' + since.getFullYear() + '/' + (since.getMonth() + 1) + '/' + since.getDate();
+			fetchJSON(endpoint(api), json => v.nextCodes = json.rows[0]['FIRSTDATE_SOURCECODES']);
+		}
 	},
 	template: `
 	<tr class="text-left"  v-on:dblclick="toggleColor=!toggleColor" v-bind:class="{'table-warning': toggleColor}">
@@ -111,8 +121,14 @@ let vueRow = Vue.component('vue-row', {
 			<br />
 			Gave <span class="text-primary font-weight-bold"><< row.CAMPAIGN_TOAL|currency >></span> to campaign cumulatively
 			<br />
-			<small class="text-info">New Since << row.FIRSTDATE|dAU >>, gave TLMA << row.LTD_TOTAL|currency >> in total<br></small>
-			<small class="text-danger" v-if=" row.LTD_FISET_MERCHANDISE_DATE !== null ">Started Merchandise since << row.LTD_FISET_MERCHANDISE_DATE|dAU >></small>
+			<div v-if="row.CONVERSIONCALL_BY === null">
+				<small class="text-info">New Since << row.FIRSTDATE|dAU >>, gave TLMA << row.LTD_TOTAL|currency >> in total<br></small>
+				<small class="text-danger" v-if=" row.LTD_FISET_MERCHANDISE_DATE !== null ">Started Merchandise since << row.LTD_FISET_MERCHANDISE_DATE|dAU >></small>
+			</div>
+			<div v-else>
+				<small class="font-weight-bold text-primary" v-if="nextCodes">Responded SourceCodes: << nextCodes >></small>
+				<small class="font-weight-bold text-danger" v-else>No Response Yet</small>
+			</div>
 		</td>
 
 		<td style="width: 15%" class="align-middle">
@@ -163,13 +179,22 @@ let vueRow = Vue.component('vue-row', {
 		</td>
 
 		<td style="width: 18%" class="align-middle">
-			<span v-if=" row.CONVERSIONCALL_BY !== null ">
+			<span v-if="row.CONVERSIONCALL_BY !== null">
 				<mark>&#128521;
-				<span class="font-weight-bold"><< row.CONVERSIONCALL_TYPE >></span> by <span class="font-weight-bold"><< row.CONVERSIONCALL_BY >></span> <small class="text-success">()<< row.CONVERSIONCALL_DATE|dAU >>)</small>
+				<span class="font-weight-bold"><< row.CONVERSIONCALL_TYPE >></span> by <span class="font-weight-bold"><< row.CONVERSIONCALL_BY >></span> <small class="text-success"> << row.CONVERSIONCALL_DATE|dAU >></small>
 				</mark>
+				<small class="text-muted"><< row.CONVERSIONCALL_NOTES >></small>
+			</span>
+			<span v-else-if="sublist==='excluded'" class="text-muted">
+				&#128549; Excluded from the Journey
 			</span>
 			<span v-else>
-			 	&#128560; Due Date : <span class="text-info"><< conversionCallDueDate|dAU >>, << weekdays[conversionCallDueDate.getDay()] >></span>
+				<span v-if="conversionCallDueDate <= new Date()" class="text-danger">&#128562;
+					Overdue : <span class="text-muted"><< conversionCallDueDate|dAU >>, << weekdays[conversionCallDueDate.getDay()] >></span>
+				</span>
+				<span v-else>&#128560;
+			 	 Due Date : <span class="text-info"><< conversionCallDueDate|dAU >>, << weekdays[conversionCallDueDate.getDay()] >></span>
+			 	</span>
 			</span>
 
 		</td>
@@ -181,7 +206,7 @@ let vueTable = Vue.component('vue-table', {
 	props: {
 		'rows': {
 		},
-		'theme': {
+		'sublist': {
 			type: String
 		}
 	},
@@ -192,14 +217,9 @@ let vueTable = Vue.component('vue-table', {
 	computed:{
 		trClassObject: function(){
 			return {
-				'table-primary': this.theme === 'primary',
-				'table-secondary': this.theme === 'secondary',
-				'table-success': this.theme === 'success',
-				'table-danger': this.theme === 'danger',
-				'table-warning': this.theme === 'warning',
-				'table-info': this.theme === 'info',
-				'table-light': this.theme === 'light',
-				'table-dark': this.theme === 'dark'
+				'table-success': this.sublist === 'called',
+				'table-info': this.sublist === 'todo',
+				'table-danger': this.sublist === 'excluded'
 			}
 		},
 	},
@@ -217,7 +237,7 @@ let vueTable = Vue.component('vue-table', {
 				</tr>
 			</thead>
 			<tbody>
-				<result-row v-for="row in rows" v-bind:row="row"></result-row>
+				<result-row v-for="row in rows" v-bind:row="row" v-bind:sublist="sublist"></result-row>
 			</tbody>
 		</table>
  	</div>
@@ -251,6 +271,9 @@ let rootVue = new Vue({
 		calledRows: function () {
 			return this.raw.rows.filter(row => this.calcSubLists(row) === 'called')
 		},
+		excludedRows: function () {
+			return this.raw.rows.filter(row => this.calcSubLists(row) === 'excluded')
+		},
 		doNotMailCount:function(){
 			return this.raw.rows.reduce((acc, cur) => {
 				acc += cur.DONOTMAIL === -1 ? 1 : 0;
@@ -282,7 +305,9 @@ let rootVue = new Vue({
 			});
 		},
 		calcSubLists: function(row){
-			if (row['CONVERSIONCALL_BY'] === null || row['CONVERSIONCALL_BY'].trim() === '') {
+			if (row.ANONYMOUS === -1 || row.DECD === -1 || row.PRIMARYCATEGORY === 'Estate' || row.PLEDGES > 0){
+				return 'excluded'
+			}else if (row['CONVERSIONCALL_BY'] === null || row['CONVERSIONCALL_BY'].trim() === '') {
 				return 'todo'
 			}else {
 				return 'called'
@@ -324,7 +349,7 @@ let rootVue = new Vue({
 
 							<li class="nav-item ">
 								<a class="nav-link active" id="calling-tab" data-toggle="pill" href="#calling" role="tab" aria-controls="calling" aria-selected="true">
-								 &#9742; To be Called  <span class="badge badge-pill badge-info"> << callingRows.length >></span>
+								 &#9742; Todo <span class="badge badge-pill badge-info"> << callingRows.length >></span>
 								</a>
 							</li>
 
@@ -334,17 +359,28 @@ let rootVue = new Vue({
 								</a>
 							</li>
 
+							<li class="nav-item ">
+								<a class="nav-link" id="excluded-tab" data-toggle="pill" href="#excluded" role="tab" aria-controls="excluded" aria-selected="false">
+								 &#128164; Excluded <span class="badge badge-pill badge-warning"> << excludedRows.length >></span>
+								</a>
+							</li>
+
 						</ul>
 
 						<div class="tab-content" id="pills-tabContent">
 
 							<div class="tab-pane fade show active" id="calling" role="tabpanel" aria-labelledby="calling-tab">
-								<vue-table v-bind:rows="callingRows" theme="primary"  ></vue-table>
+								<vue-table v-bind:rows="callingRows" sublist="todo"  ></vue-table>
 							</div>
 
 							<div class="tab-pane fade" id="called" role="tabpanel" aria-labelledby="called-tab">
-								<vue-table v-bind:rows="calledRows" theme="warning" ></vue-table>
+								<vue-table v-bind:rows="calledRows" sublist="called" ></vue-table>
 							</div>
+
+							<div class="tab-pane fade" id="excluded" role="tabpanel" aria-labelledby="excluded-tab">
+								<vue-table v-bind:rows="excludedRows" sublist="excluded" ></vue-table>
+							</div>
+
 
 						</div>
 

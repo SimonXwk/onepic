@@ -43,7 +43,6 @@ let vueRow = Vue.component('vue-row', {
 			if (this.welcomepackRecords.length === 0 ||  this.welcomepackRecords === null){
 				this.show = toggle
 				this.$eventBus.$emit('addShowItem', toggle ? 1 : -1, this.sublist);
-
 			}
 		});
 		this.$eventBus.$on('toggleFoundResults', toggle => {

@@ -28,3 +28,9 @@ def journey_cureone_acquisiton_donors():
 	campaign_code = request_arg('camapgincode', '%19AC.Cure%One%Acquisition%', lambda x: tests.is_valid_string(x, nosql=True, max_length=30))
 	updates = [('CAMPAIGN_CODE', campaign_code, '\'')]
 	return ApiResult(Tq.query('JOURNEY_CUREONE_ACQUISITON_DONORS', cached_timeout=10, updates=updates).to_json(), dump=False)
+
+
+def get_first_date_source1_by_contacts_since():
+	sn = request_arg('sn', '', lambda x: tests.is_valid_string(x, max_length=7))
+	since = request_arg('since', Tq.format_date(TLMA.fy_range(TLMA.cfy)[0]), lambda x: tests.is_valid_string(x, max_length=10))
+	return ApiResult(Tq.query('CONTACTS_FIRSTDAY_SOURCECODES_SINCE', sn, since, cached_timeout=120).to_json(), dump=False)

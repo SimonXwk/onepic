@@ -18,12 +18,12 @@
 		<div class="col-lg-6 col-md-12">
 
 			<div class="table-responsive-lg">
-				<table class="table table-sm table-hover table-bordered shadow-type1">
+				<table class="table table-sm table-hover table-bordered text-right">
 					<thead>
 						<tr class="bg-secondary text-light">
-							<th scope="col">TYPE 1</th>
-							<th scope="col">CREATED</th><th scope="col">NEW</th><th scope="col">ACTIVE</th>
-							<th scope="col">ONHOLD</th><th scope="col">CANCEL</th><th scope="col">FINISH</th>
+							<th scope="col" style="width: 30%">SPONSORSHIP CATEGORY</th>
+							<th scope="col" style="width: 10%">CREATED</th><th scope="col" style="width: 10%" class="text-warning">NEW</th><th scope="col" style="width: 10%">ACTIVE</th>
+							<th scope="col" style="width: 10%">ONHOLD</th><th scope="col" style="width: 10%">CANCEL</th><th scope="col" style="width: 10%">FINISH</th>
 						</tr>
 					</thead><!-- End of Table Head -->
 					<tbody>
@@ -60,12 +60,12 @@
 			</div><!-- End of Table Responsive -->
 
 			<div class="table-responsive-lg">
-				<table class="table table-sm table-hover table-bordered shadow-type1">
+				<table class="table table-sm table-hover table-bordered text-right">
 					<thead>
 						<tr class="bg-secondary text-light">
-							<th scope="col">TYPE 2</th>
-							<th scope="col">CREATED</th><th scope="col">NEW</th><th scope="col">ACTIVE</th>
-							<th scope="col">ONHOLD</th><th scope="col">CANCEL</th><th scope="col">FINISH</th>
+							<th scope="col" style="width: 30%">SPONSORSHIP SUBCATEGORY</th>
+							<th scope="col" style="width: 10%">CREATED</th><th scope="col" style="width: 10%" class="text-warning">NEW</th><th scope="col" style="width: 10%">ACTIVE</th>
+							<th scope="col" style="width: 10%">ONHOLD</th><th scope="col" style="width: 10%">CANCEL</th><th scope="col" style="width: 10%">FINISH</th>
 						</tr>
 					</thead><!-- End of Table Head -->
 					<tbody>
@@ -77,7 +77,7 @@
 						{% set calc5 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Written Down')|selectattr('WRITTENDOWN_FY','equalto',thisfy)|list|length %}
 						{% set calc6 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Closed')|selectattr('CLOSED_FY','equalto',thisfy)|list|length %}
 							<tr>
-							<th scope="row" style="color:{{ typeList[0].SPONSORSHIP1_COLOR }}">{{ type }}</th>
+							<th scope="row" style="color:{{ typeList[0].SPONSORSHIP1_COLOR }}"><small class="font-weight-bold">{{ type }}</small></th>
 							<td>{{ calc1|number or '' }}</td>
 							<td>{{ calc2|number or '' }}</td>
 							<td>{{ calc3|number or '' }}</td>
