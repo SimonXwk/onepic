@@ -1,29 +1,37 @@
 <div class="container-fluid">
 
-	<div class="row"><!-- ROW -->
+	<div class="row">
 		<div class="col-12">
-			<p>
-				<small class="text-secondary">Data Captured : {{ data.timestamp|dtAU }}, result will be cached for {{ '{:,}'.format(data.cached_timeout) }} seconds</small>
-			</p>
-
-
 			<p class="lead text-primary">
-				<strong>FY{{ thisfy }} : {{ data.rows|length|number }} Pledges Involved </strong>
+				<strong>FY{{ thisfy }} : <span class="text-dark">{{ data.rows|length|number }} Pledge </span><span class="text-muted"> (either created, started or status changed)</span></strong>
+				<small class="text-secondary font-italic">data captured : {{ data.timestamp|dtAU }}, cached for {{ '{:,}'.format(data.cached_timeout) }} seconds</small>
 			</p>
+		</div>
+	</div>
 
+	<div class="row">
+		<div class="col-lg-6">
+			<div class="chart" id="flow1" >{{ loading('ellipsis') }}</div>
+		</div>
+		<div class="col-lg-6">
+			<div class="chart" id="flow2" >{{ loading('ellipsis') }}</div>
 		</div>
 	</div>
 
 	<div class="row"><!-- ROW -->
-		<div class="col-lg-6 col-md-12">
+		<div class="col-lg-7 col-md-12">
 
 			<div class="table-responsive-lg">
 				<table class="table table-sm table-hover table-bordered text-right">
 					<thead>
 						<tr class="bg-secondary text-light">
 							<th scope="col" style="width: 30%">SPONSORSHIP CATEGORY</th>
-							<th scope="col" style="width: 10%">CREATED</th><th scope="col" style="width: 10%" class="text-warning">NEW</th><th scope="col" style="width: 10%">ACTIVE</th>
-							<th scope="col" style="width: 10%">ONHOLD</th><th scope="col" style="width: 10%">CANCEL</th><th scope="col" style="width: 10%">FINISH</th>
+							<th scope="col" style="width: 10%">CREATED</th><th scope="col" style="width: 10%" class="text-warning">NEW</th>
+							<th scope="col" style="width: 10%">ACTIVE</th>
+							<th scope="col" style="width: 10%">ONHOLD</th>
+							<th scope="col" style="width: 10%">CANCELLED</th>
+							<th scope="col" style="width: 10%">FINISHED</th>
+							<th scope="col" style="width: 10%">CLOSED</th>
 						</tr>
 					</thead><!-- End of Table Head -->
 					<tbody>
@@ -33,7 +41,8 @@
 						{% set calc3 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Active')|list|length %}
 						{% set calc4 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','On Hold')|selectattr('ONHOLD_FY','equalto',thisfy)|list|length %}
 						{% set calc5 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Written Down')|selectattr('WRITTENDOWN_FY','equalto',thisfy)|list|length %}
-						{% set calc6 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Closed')|selectattr('CLOSED_FY','equalto',thisfy)|list|length %}
+						{% set calc6 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Closed')|selectattr('FINISHED_FY','equalto',thisfy)|list|length %}
+						{% set calc7 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Closed')|selectattr('CLOSED_FY','equalto',thisfy)|list|length %}
 						<tr>
 							<th scope="row" style="color:{{ typeList[0].SPONSORSHIP1_COLOR }}">{{ type }}</th>
 							<td>{{ calc1|number or '' }}</td>
@@ -42,6 +51,7 @@
 							<td>{{ calc4|number or '' }}</td>
 							<td>{{ calc5|number or '' }}</td>
 							<td>{{ calc6|number or '' }}</td>
+							<td>{{ calc7|number or '' }}</td>
 						</tr>
 						{% endfor %}
 					</tbody><!-- End of Table Body -->
@@ -53,6 +63,7 @@
 							<td>{{ data.rows|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Active')|list|length|number }}</td>
 							<td>{{ data.rows|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','On Hold')|selectattr('ONHOLD_FY','equalto',thisfy)|list|length|number }}</td>
 							<td>{{ data.rows|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Written Down')|selectattr('WRITTENDOWN_FY','equalto',thisfy)|list|length|number }}</td>
+							<td>{{ data.rows|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Closed')|selectattr('FINISHED_FY','equalto',thisfy)|list|length|number }}</td>
 							<td>{{ data.rows|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Closed')|selectattr('CLOSED_FY','equalto',thisfy)|list|length|number }}</td>
 						</tr>
 					</tfoot>
@@ -64,8 +75,12 @@
 					<thead>
 						<tr class="bg-secondary text-light">
 							<th scope="col" style="width: 30%">SPONSORSHIP SUBCATEGORY</th>
-							<th scope="col" style="width: 10%">CREATED</th><th scope="col" style="width: 10%" class="text-warning">NEW</th><th scope="col" style="width: 10%">ACTIVE</th>
-							<th scope="col" style="width: 10%">ONHOLD</th><th scope="col" style="width: 10%">CANCEL</th><th scope="col" style="width: 10%">FINISH</th>
+							<th scope="col" style="width: 10%">CREATED</th><th scope="col" style="width: 10%" class="text-warning">NEW</th>
+							<th scope="col" style="width: 10%">ACTIVE</th>
+							<th scope="col" style="width: 10%">ONHOLD</th>
+							<th scope="col" style="width: 10%">CANCELLED</th>
+							<th scope="col" style="width: 10%">FINISHED</th>
+							<th scope="col" style="width: 10%">CLOSED</th>
 						</tr>
 					</thead><!-- End of Table Head -->
 					<tbody>
@@ -75,8 +90,9 @@
 						{% set calc3 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Active')|list|length %}
 						{% set calc4 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','On Hold')|selectattr('ONHOLD_FY','equalto',thisfy)|list|length %}
 						{% set calc5 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Written Down')|selectattr('WRITTENDOWN_FY','equalto',thisfy)|list|length %}
-						{% set calc6 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Closed')|selectattr('CLOSED_FY','equalto',thisfy)|list|length %}
-							<tr>
+						{% set calc6 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Closed')|selectattr('FINISHED_FY','equalto',thisfy)|list|length %}
+						{% set calc7 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Closed')|selectattr('CLOSED_FY','equalto',thisfy)|list|length %}
+						<tr>
 							<th scope="row" style="color:{{ typeList[0].SPONSORSHIP1_COLOR }}"><small class="font-weight-bold">{{ type }}</small></th>
 							<td>{{ calc1|number or '' }}</td>
 							<td>{{ calc2|number or '' }}</td>
@@ -84,6 +100,7 @@
 							<td>{{ calc4|number or '' }}</td>
 							<td>{{ calc5|number or '' }}</td>
 							<td>{{ calc6|number or '' }}</td>
+							<td>{{ calc7|number or '' }}</td>
 						</tr>
 						{% endfor %}
 					</tbody><!-- End of Table Body -->
@@ -95,7 +112,9 @@
 							<td>{{ data.rows|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Active')|list|length|number }}</td>
 							<td>{{ data.rows|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','On Hold')|selectattr('ONHOLD_FY','equalto',thisfy)|list|length|number }}</td>
 							<td>{{ data.rows|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Written Down')|selectattr('WRITTENDOWN_FY','equalto',thisfy)|list|length|number }}</td>
+							<td>{{ data.rows|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Closed')|selectattr('FINISHED_FY','equalto',thisfy)|list|length|number }}</td>
 							<td>{{ data.rows|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Closed')|selectattr('CLOSED_FY','equalto',thisfy)|list|length|number }}</td>
+						</tr>
 						</tr>
 					</tfoot>
 				</table><!-- End of Table -->
@@ -103,7 +122,7 @@
 
 		</div><!-- End of COLUMN -->
 
-		<div class="col-xl-6 col-md-12">
+		<div class="col-xl-5 col-md-12">
 			<div class="row"><!-- ROW -->
 				<div class="col-12">
 					<div class="chart " id="chart1" >{{ loading('ellipsis') }}</div>
@@ -124,5 +143,4 @@
 <script>
 let data = JSON.parse({{ data.to_json()|tojson }});
 let thisFY = {{ thisfy }};
-
 </script>

@@ -481,18 +481,6 @@ let rootVue = new Vue({
 					<div class="card-body">
 
 						<div class="row">
-							<div class="col-12">
-								<div class="progress" v-if=" progress!==100 ">
-									<div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
-										v-bind:aria-valuenow="progress" aria-valuemin="0" v-bind:aria-valuemax="raw.rows.length" v-bind:style="{ width: progress + '%' }"
-										v-bind:class="progressClassObj"
-									><< progress >> %</div>
-								</div>
-
-							</div>
-						</div>
-
-						<div class="row">
 							<div class="col">
 								<blockquote class="blockquote">
 									<p class="mb-0"><< raw.rows.length >> Total New Merchandise Customers Found  in <span v-if="fy===null">Current Financial Year</span><span v-else>FY<< fy >></span></p>
@@ -519,23 +507,33 @@ let rootVue = new Vue({
 				<div class="card shadow-type6">
 
 					<transition name="slide-fade">
-					<div class="card-header bg-transparent" v-if="progress === 100">
-						<span class="lead text-info align-top">&#10024; Views : </span>
+					<div class="card-header bg-transparent" >
+						<div v-if="progress === 100">
+							<span class="lead text-info align-top">&#10024; Views : </span>
 
-						<label class="switch align-middle">
-							<input type="checkbox" class="switch-success" v-model="showSuccess" v-bind:disabled="progress !== 100" >
-							<span class="switch-slider round"></span>
-						</label>
+							<label class="switch align-middle">
+								<input type="checkbox" class="switch-success" v-model="showSuccess" v-bind:disabled="progress !== 100" >
+								<span class="switch-slider round"></span>
+							</label>
 
-						<label class="switch align-middle">
-							<input type="checkbox" class="switch-info" v-model="showWaiting" v-bind:disabled="progress !== 100">
-							<span class="switch-slider round"></span>
-						</label>
+							<label class="switch align-middle">
+								<input type="checkbox" class="switch-info" v-model="showWaiting" v-bind:disabled="progress !== 100">
+								<span class="switch-slider round"></span>
+							</label>
 
-						<label class="switch align-middle">
-							<input type="checkbox" class="switch-danger" v-model="showMissing" v-bind:disabled="progress !== 100">
-							<span class="switch-slider round"></span>
-						</label>
+							<label class="switch align-middle">
+								<input type="checkbox" class="switch-danger" v-model="showMissing" v-bind:disabled="progress !== 100">
+								<span class="switch-slider round"></span>
+							</label>
+						</div>
+
+
+						<div class="progress" v-else>
+							<div class="progress-bar" role="progressbar"
+								v-bind:aria-valuenow="progress" aria-valuemin="0" v-bind:aria-valuemax="raw.rows.length" v-bind:style="{ width: progress + '%' }"
+								v-bind:class="progressClassObj"
+							><< progress >> %</div>
+						</div>
 
 					</div>
 					</transition>
