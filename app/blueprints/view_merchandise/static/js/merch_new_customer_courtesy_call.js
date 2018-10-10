@@ -8,6 +8,7 @@ let vueRow = Vue.component('vue-row', {
 			fetch3: '/api/ssi/order/',
 			linkTrack: '/merchandise/track_order/',
 			linkAusPost: 'https://auspost.com.au/mypost/track/#/details/',
+			subTodo: -1,
 			trackingNumber: null,
 			called1: false,
 			orders: 0,
@@ -81,14 +82,26 @@ let vueRow = Vue.component('vue-row', {
 			}else {
 				return '❌' + ' ['+ this.orders + '] ' + this.status
 			}
+		},
+		subTodoFlag: function() {
+			if (this.subTodo === -1){
+				return '❓'
+			} else if(this.subTodo === 0){
+				return '🐨'
+			} else {
+				return '🐯'
+			}
 		}
 	},
 
 	created(){
 		// Toggle Buttons
-		this.$eventBus.$on('toggleSuccessResults', (data) => this.toggleSuccessResults(data));
-		this.$eventBus.$on('toggleWaitingResults', (data) => this.toggleWaitingResults(data));
-		this.$eventBus.$on('toggleMissingResults', (data) => this.toggleMissingResults(data));
+		this.$eventBus.$on('toggleResultShowType', (showType, data) => this.toggleShowResults(showType, data));
+		this.$eventBus.$on('calcTodoSubList', (sn, res) => {
+			if (this.row.SERIALNUMBER === sn ) {
+				this.subTodo = res
+			}
+		});
 
 		let vCol = this;
 		if (this.ask && !this.isDonor && this.hasOrderNumber && !this.isDelivered) {
@@ -115,45 +128,46 @@ let vueRow = Vue.component('vue-row', {
 									vCol.statusDetail = lastEvent['details'];
 								}
 								vCol.show = vCol.isDelivered;
-								vCol.$eventBus.$emit('processedCustomer', vCol.row['SERIALNUMBER'], vCol.showType);
+								if (vCol.isDelivered) {
+									vCol.emitTodoCount();
+								}
+								vCol.emitProcessed();
 							} else {
-								vCol.$eventBus.$emit('processedCustomer', vCol.row['SERIALNUMBER'], vCol.showType);
+								vCol.emitProcessed();
 							}
 						}, true);
 					});
 				} else {
-					vCol.$eventBus.$emit('processedCustomer', vCol.row['SERIALNUMBER'], vCol.showType);
+					vCol.emitProcessed();
 				}
 			}, true);
 		} else {
+			if (this.ask && this.isDonor) {
+				vCol.emitTodoCount();
+			}
 			vCol.show = this.isDonor || !this.ask;
-			vCol.$eventBus.$emit('processedCustomer', vCol.row['SERIALNUMBER'], vCol.showType);
+			vCol.emitProcessed();
 		}
 
 	},
 	methods:{
-		toggleSuccessResults: function (data) {
-			if ( this.showType === 'success' ){
+		toggleShowResults: function (type, data) {
+			if ( this.showType === type ){
 				this.show = data;
 			}
 		},
-		toggleWaitingResults: function (data) {
-			if ( this.showType === 'waiting' ){
-				this.show = data;
-			}
+		emitTodoCount: function(){
+			this.$eventBus.$emit('addTodo', this.row['SERIALNUMBER']);
 		},
-		toggleMissingResults: function (data) {
-			if ( this.showType === 'missing' ){
-				this.show = data;
-			}
-		}
+		emitProcessed: function(){
+			this.$eventBus.$emit('processedCustomer', this.row['SERIALNUMBER'], this.showType);
+		},
 	},
 	template:`
-
 	<tr v-show="show" v-on:dblclick="toggleColor=!toggleColor" v-bind:class="trClassObject" >
 
 		<td scope="row" style="width: 30%" class="align-middle">
-			<mark class="text-dark"><< row.FULLNAME >> <small class="text-primary" v-if="row.SORTKEYREF1">(is << row.SORTKEYREFREL2 >>)</small> <small>(<span class="text-success"><< row.SOURCE >></span>)</small></mark>
+			<mark class="text-dark"><< subTodoFlag >><< row.FULLNAME >> <small class="text-primary" v-if="row.SORTKEYREF1">(is << row.SORTKEYREFREL2 >>)</small> <small>(<span class="text-success"><< row.SOURCE >></span>)</small></mark>
 			<br>
 			<span class="badge badge-secondary"><< row.SERIALNUMBER >></span>
 			<span class="badge badge-secondary" v-if="row.LAST_REXID "><< row.LAST_REXID >></span>
@@ -236,7 +250,6 @@ let vueRow = Vue.component('vue-row', {
 		</td>
 
 	</tr>
-
 	`,
 });
 
@@ -302,6 +315,7 @@ let rootVue = new Vue({
 			processed:0
 		},
 		customers: {},
+		todoCount: 0,
 		defaultAPI: '/api/merch/new_customers',
 		fy:null,
 		showFYSelection: false,
@@ -309,27 +323,27 @@ let rootVue = new Vue({
 		showWaiting: false,
 		showMissing: false,
 	},
-
 	watch:{
 		showSuccess: function(val){
-			this.$eventBus.$emit('toggleSuccessResults', val);
+			this.$eventBus.$emit('toggleResultShowType', 'success', val);
 		 	Object.keys(this.customers).filter(sn => this.customers[sn].displayType === 'success' ).forEach(sn => this.customers[sn].show = val);
 		},
 		showWaiting: function(val){
-			this.$eventBus.$emit('toggleWaitingResults', val);
+			this.$eventBus.$emit('toggleResultShowType', 'waiting', val);
 			Object.keys(this.customers).filter(sn => this.customers[sn].displayType === 'waiting' ).forEach(sn => this.customers[sn].show = val);
 		},
 		showMissing: function(val){
-			this.$eventBus.$emit('toggleMissingResults', val);
+			this.$eventBus.$emit('toggleResultShowType', 'missing', val);
 			Object.keys(this.customers).filter(sn => this.customers[sn].displayType === 'missing' ).forEach(sn => this.customers[sn].show = val);
 		},
-		fy: function(){
+		fy: function(val){
 			this.raw = {
 				rows: null,
 				ready: false,
 				timestamp: null,
 				processed:0
 			};
+			this.todoCount = 0,
 			this.customers = {};
 			this.getData();
 		},
@@ -371,32 +385,22 @@ let rootVue = new Vue({
 				'bg-success': this.progress >= 90
 			}
 		},
-		includeRows: function () {
+		todoRows: function () {
 			return this.raw.rows.filter(row => this.calcSubListType(row) === 'todo').sort((a,b) => new Date(a.FIRSTDATE) > new Date(b.FIRSTDATE))
-		},
-		skippedRows: function () {
-			return this.raw.rows.filter(row => this.calcSubListType(row) === 'skip').sort((a,b) => new Date(a.FIRSTDATE) > new Date(b.FIRSTDATE))
 		},
 		finishedRows: function () {
 			return this.raw.rows.filter(row => this.calcSubListType(row) === 'finished').sort((a,b) => new Date(a.FIRSTDATE) < new Date(b.FIRSTDATE))
 		},
 		excludeRows: function () {
-			return this.raw.rows.filter(row => this.calcSubListType(row) === 'exlcude').sort((a,b) => new Date(a.FIRSTDATE) < new Date(b.FIRSTDATE))
-		},
-		includeRowsShowCount: function () {
-			return Object.keys(this.customers).filter(sn => this.customers[sn].show === true && this.customers[sn].sublist === 'todo' ).length;
-		},
-		skippedRowsShowCount: function () {
-			return Object.keys(this.customers).filter(sn => this.customers[sn].show === true && this.customers[sn].sublist === 'skip' ).length;
-		},
-		finishedRowsShowCount: function () {
-			return Object.keys(this.customers).filter(sn => this.customers[sn].show === true && this.customers[sn].sublist === 'finished' ).length;
-		},
-		excludeRowsShowCount: function () {
-			return Object.keys(this.customers).filter(sn => this.customers[sn].show === true && this.customers[sn].sublist === 'exlcude' ).length;
+			return this.raw.rows.filter(row => this.calcSubListType(row) === 'exclude').sort((a,b) => new Date(a.FIRSTDATE) < new Date(b.FIRSTDATE))
 		},
 	},
 	created(){
+		this.$eventBus.$on('addTodo', (sn) => {
+			this.customers[sn].todo = true;
+			this.todoCount += 1;
+			this.$eventBus.$emit('calcTodoSubList', sn, this.todoCount%2);
+		});
 		this.$eventBus.$on('processedCustomer', (sn, type) => {
 			if (this.customers[sn].processed === false){
 				this.raw.processed += 1;
@@ -428,18 +432,12 @@ let rootVue = new Vue({
 					|| (row['PRIMARYCATEGORY'] === 'ESTATE')
 					|| (row['JOURNEY_CANCALLED'] === -1)
 				) {
-				return 'exlcude'
+				return 'exclude'
 			}else {
 				if ( !((row['COURTESYCALL1_BY'] === null ) || (row['COURTESYCALL1_BY'].trim() === '' )) ) {
 				  return 'finished'
 				}else {
-					let d = new Date(row['FIRSTDATE']);
-					let m = new Date(row['FIRSTDATE']).getMonth() + 1;
-					if ( (m < 9 && m >= 7) || (m ===9 && d.getDate() <=5) ) {
-						return 'skip' // 2019 September the 5th midnight
-					}else {
-						return 'todo'
-					}
+					return 'todo'
 				}
 			}
 		},
@@ -449,13 +447,15 @@ let rootVue = new Vue({
 				rootVue.raw.ready = true;
 				rootVue.raw.timestamp = new Date(json.timestamp)
 				rootVue.customers = json.rows
-				.map(row => { return {SERIALNUMBER: row.SERIALNUMBER, SUBLIST: rootVue.calcSubListType(row)}; } )
-				.reduce( (acc, cur) => {
-					acc[cur.SERIALNUMBER] = acc[cur.SERIALNUMBER] ? acc[cur.SERIALNUMBER] : { sublist: cur.SUBLIST, processed:false, displayType:null, show:false  };
-					return acc
-				}, {});
-
+					.map(row => { return {SERIALNUMBER: row.SERIALNUMBER, SUBLIST: rootVue.calcSubListType(row)}; } )
+					.reduce( (acc, cur) => {
+						acc[cur.SERIALNUMBER] = acc[cur.SERIALNUMBER] ? acc[cur.SERIALNUMBER] : { sublist: cur.SUBLIST, processed:false, displayType:null, show:false, todo:false };
+						return acc
+					}, {});
 			});
+		},
+		countVisible: function(subListType){
+			return Object.keys(this.customers).filter(sn => this.customers[sn].show === true && this.customers[sn].sublist === subListType ).length;
 		},
 	},
 	template: `
@@ -483,7 +483,7 @@ let rootVue = new Vue({
 						<div class="row">
 							<div class="col">
 								<blockquote class="blockquote">
-									<p class="mb-0"><< raw.rows.length >> Total New Merchandise Customers Found  in <span v-if="fy===null">Current Financial Year</span><span v-else>FY<< fy >></span></p>
+									<p class="mb-0"><span class="text-primary font-weight-bold"><< raw.rows.length >></span> Total New Merchandise Customers <span class="text-muted">(<span class="text-success font-weight-bold"><< todoCount >></span> to be called)</span> Found in <span v-if="fy===null">Current Financial Year</span><span v-else>FY<< fy >></span></p>
 									<footer class="blockquote-footer" v-on:dblclick="showFYSelection=!showFYSelection"> from thankQ <small><< raw.timestamp|dtAU >>, << raw.processed >>/<< raw.rows.length >> </small></footer>
 								</blockquote>
 
@@ -504,6 +504,7 @@ let rootVue = new Vue({
 
 		<div class="row">
 			<div class="col-12">
+
 				<div class="card shadow-type6">
 
 					<transition name="slide-fade">
@@ -527,7 +528,6 @@ let rootVue = new Vue({
 							</label>
 						</div>
 
-
 						<div class="progress" v-else>
 							<div class="progress-bar" role="progressbar"
 								v-bind:aria-valuenow="progress" aria-valuemin="0" v-bind:aria-valuemax="raw.rows.length" v-bind:style="{ width: progress + '%' }"
@@ -541,51 +541,32 @@ let rootVue = new Vue({
   				<div class="card-body">
 
 						<ul class="nav nav-tabs mb-3 nav-fill nav-justified" id="pills-tab" role="tablist">
-
 							<li class="nav-item ">
 								<a class="nav-link active" id="include-tab" data-toggle="pill" href="#include" role="tab" aria-controls="include" aria-selected="true">
-								 &#128204; To be Called  <span class="badge badge-pill badge-info"> << includeRowsShowCount >>/<< includeRows.length >></span>
+								 &#128222; Todo <span class="badge badge-pill badge-info"> << countVisible('todo') >>/<< todoRows.length >></span>
 								</a>
 							</li>
-
-							<li class="nav-item ">
-								<a class="nav-link" id="skip-tab" data-toggle="pill" href="#skip" role="tab" aria-controls="skip" aria-selected="false">
-								 &#9975; Skipped &#8828; 05/09 <span class="badge badge-pill badge-secondary"> << skippedRowsShowCount >>/<< skippedRows.length >></span>
-								</a>
-							</li>
-
 							<li class="nav-item ">
 								<a class="nav-link" id="finished-tab" data-toggle="pill" href="#finished" role="tab" aria-controls="finished" aria-selected="false">
-								 &#128515; Called <span class="badge badge-pill badge-success"> << finishedRowsShowCount >>/<< finishedRows.length >></span>
+								 &#128515; Called <span class="badge badge-pill badge-success"> << countVisible('finished') >>/<< finishedRows.length >></span>
 								</a>
 							</li>
-
 							<li class="nav-item ">
 								<a class="nav-link" id="exclude-tab" data-toggle="pill" href="#exclude" role="tab" aria-controls="exclude" aria-selected="false">
-								 &#128683; Excluded <span class="badge badge-pill badge-warning"> << excludeRowsShowCount >>/<< excludeRows.length >></span>
+								 &#128683; Excluded <span class="badge badge-pill badge-warning"> << countVisible('exclude') >>/<< excludeRows.length >></span>
 								</a>
 							</li>
-
 						</ul>
-
 						<div class="tab-content" id="pills-tabContent">
-
 							<div class="tab-pane fade show active" id="include" role="tabpanel" aria-labelledby="include-tab">
-								<vue-table v-bind:rows="includeRows" theme="primary" v-bind:ask="true" ></vue-table>
+								<vue-table v-bind:rows="todoRows" theme="primary" v-bind:ask="true" ></vue-table>
 							</div>
-
 							<div class="tab-pane fade" id="exclude" role="tabpanel" aria-labelledby="exclude-tab">
 								<vue-table v-bind:rows="excludeRows" theme="warning" v-bind:ask="false" ></vue-table>
 							</div>
-
-							<div class="tab-pane fade" id="skip" role="tabpanel" aria-labelledby="skip-tab">
-								<vue-table v-bind:rows="skippedRows" theme="secondary" v-bind:ask="true" ></vue-table>
-							</div>
-
 							<div class="tab-pane fade" id="finished" role="tabpanel" aria-labelledby="finished-tab">
 								<vue-table v-bind:rows="finishedRows" theme="success" v-bind:ask="false" ></vue-table>
 							</div>
-
 						</div>
 
 					</div>

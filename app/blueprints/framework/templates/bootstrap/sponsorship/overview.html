@@ -30,8 +30,8 @@
 							<th scope="col" style="width: 10%">ACTIVE</th>
 							<th scope="col" style="width: 10%">ONHOLD</th>
 							<th scope="col" style="width: 10%">CANCELLED</th>
-							<th scope="col" style="width: 10%">FINISHED</th>
 							<th scope="col" style="width: 10%">CLOSED</th>
+							<th scope="col" style="width: 10%">FINISHED</th>
 						</tr>
 					</thead><!-- End of Table Head -->
 					<tbody>
@@ -41,8 +41,8 @@
 						{% set calc3 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Active')|list|length %}
 						{% set calc4 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','On Hold')|selectattr('ONHOLD_FY','equalto',thisfy)|list|length %}
 						{% set calc5 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Written Down')|selectattr('WRITTENDOWN_FY','equalto',thisfy)|list|length %}
-						{% set calc6 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Closed')|selectattr('FINISHED_FY','equalto',thisfy)|list|length %}
-						{% set calc7 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Closed')|selectattr('CLOSED_FY','equalto',thisfy)|list|length %}
+						{% set calc6 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Closed')|selectattr('CLOSED_FY','equalto',thisfy)|list|length %}
+						{% set calc7 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Closed')|selectattr('FINISHED_FY','equalto',thisfy)|list|length %}
 						<tr>
 							<th scope="row" style="color:{{ typeList[0].SPONSORSHIP1_COLOR }}">{{ type }}</th>
 							<td>{{ calc1|number or '' }}</td>
@@ -63,8 +63,8 @@
 							<td>{{ data.rows|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Active')|list|length|number }}</td>
 							<td>{{ data.rows|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','On Hold')|selectattr('ONHOLD_FY','equalto',thisfy)|list|length|number }}</td>
 							<td>{{ data.rows|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Written Down')|selectattr('WRITTENDOWN_FY','equalto',thisfy)|list|length|number }}</td>
-							<td>{{ data.rows|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Closed')|selectattr('FINISHED_FY','equalto',thisfy)|list|length|number }}</td>
 							<td>{{ data.rows|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Closed')|selectattr('CLOSED_FY','equalto',thisfy)|list|length|number }}</td>
+							<td>{{ data.rows|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Closed')|selectattr('FINISHED_FY','equalto',thisfy)|list|length|number }}</td>
 						</tr>
 					</tfoot>
 				</table><!-- End of Table -->
@@ -79,8 +79,8 @@
 							<th scope="col" style="width: 10%">ACTIVE</th>
 							<th scope="col" style="width: 10%">ONHOLD</th>
 							<th scope="col" style="width: 10%">CANCELLED</th>
-							<th scope="col" style="width: 10%">FINISHED</th>
 							<th scope="col" style="width: 10%">CLOSED</th>
+							<th scope="col" style="width: 10%">FINISHED</th>
 						</tr>
 					</thead><!-- End of Table Head -->
 					<tbody>
@@ -90,8 +90,8 @@
 						{% set calc3 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Active')|list|length %}
 						{% set calc4 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','On Hold')|selectattr('ONHOLD_FY','equalto',thisfy)|list|length %}
 						{% set calc5 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Written Down')|selectattr('WRITTENDOWN_FY','equalto',thisfy)|list|length %}
-						{% set calc6 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Closed')|selectattr('FINISHED_FY','equalto',thisfy)|list|length %}
-						{% set calc7 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Closed')|selectattr('CLOSED_FY','equalto',thisfy)|list|length %}
+						{% set calc6 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Closed')|selectattr('CLOSED_FY','equalto',thisfy)|list|length %}
+						{% set calc7 = typeList|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Closed')|selectattr('FINISHED_FY','equalto',thisfy)|list|length %}
 						<tr>
 							<th scope="row" style="color:{{ typeList[0].SPONSORSHIP1_COLOR }}"><small class="font-weight-bold">{{ type }}</small></th>
 							<td>{{ calc1|number or '' }}</td>
@@ -112,8 +112,8 @@
 							<td>{{ data.rows|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Active')|list|length|number }}</td>
 							<td>{{ data.rows|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','On Hold')|selectattr('ONHOLD_FY','equalto',thisfy)|list|length|number }}</td>
 							<td>{{ data.rows|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Written Down')|selectattr('WRITTENDOWN_FY','equalto',thisfy)|list|length|number }}</td>
-							<td>{{ data.rows|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Closed')|selectattr('FINISHED_FY','equalto',thisfy)|list|length|number }}</td>
 							<td>{{ data.rows|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Closed')|selectattr('CLOSED_FY','equalto',thisfy)|list|length|number }}</td>
+							<td>{{ data.rows|selectattr('CREATED_FY','<=',thisfy)|selectattr('PLEDGESTATUS','equalto','Closed')|selectattr('FINISHED_FY','equalto',thisfy)|list|length|number }}</td>
 						</tr>
 						</tr>
 					</tfoot>
