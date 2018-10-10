@@ -25,7 +25,7 @@ let vueRow = Vue.component('vue-row', {
 				// let result = this.welcomepackRecords.reduce((acc, cur) => acc += ' | ' cur.workbook , '')
 				let msg = ''
 				this.welcomepackRecords.forEach(r => {
-					msg += '<span class="badge badge-light">' +  r.workbook + '</span> <span class="badge badge-light">Welcome Pack Sent With ' + r.OrderNumber + '</span><br>'
+					msg += '<span class="badge badge-light">' +  r.workbook + '</span> <small><span class="badge badge-light">Welcome Pack Sent With ' + r.OrderNumber + '</span></small><br>'
 				});
 				return msg
 			}

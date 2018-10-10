@@ -87,9 +87,9 @@ let vueRow = Vue.component('vue-row', {
 			if (this.subTodo === -1){
 				return '❓'
 			} else if(this.subTodo === 0){
-				return '🐨'
+				return '🍓'
 			} else {
-				return '🐯'
+				return '🥝'
 			}
 		}
 	},
@@ -178,11 +178,11 @@ let vueRow = Vue.component('vue-row', {
 		</td>
 
 		<td style="width: 35%" class="align-middle">
-			<span class="text-muted"><< row.FIRSTORDER >><small> payment: << row.FIRSTDATE|dAU >></small> <a target="blank" class="text-muted" v-bind:href="linkTrack + row.FIRSTORDER"> &#128230;<small>starshipit</small></a></span>
+			<span class="text-muted"><< row.FIRSTORDER >><small> payment: << row.FIRSTDATE|dAU >></small> <a target="blank" class="text-muted" v-bind:href="linkTrack + row.FIRSTORDER"> &#128073;<small>starshipit</small></a></span>
 			<br>
 			<span v-bind:class="statusTextClassObject"><< resultDisplay >></span>
 			<span v-if="statusDetail!==status" calss="text-danger"><small>, << statusDetail >></small></span>
-			<a v-if="isDelivered" target="blank" class="text-secondary" v-bind:href="ausLink"> &#128238; <small>AusPost</small></a>
+			<a v-if="isDelivered" target="blank" class="text-secondary" v-bind:href="ausLink"> &#128073; <small>AusPost</small></a>
 		</td>
 
 		<td style="width: 15%" class="align-middle">

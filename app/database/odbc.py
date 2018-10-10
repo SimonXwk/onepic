@@ -115,8 +115,11 @@ class ThankqODBC(object):
 
 			opening_tag, closing_tag = f'/*<{tag}>*/', f'/*</{tag}>*/'
 
-			start = script.index(opening_tag) + len(opening_tag)
-			end = script.index(closing_tag, start)
+			try:
+				start = script.index(opening_tag) + len(opening_tag)
+				end = script.index(closing_tag, start)
+			except ValueError:
+				return script
 
 			old_value = f'{opening_tag}{script[start:end]}{closing_tag}'
 			new_value = f'{opening_tag}{wrapper_left}{value}{wrapper_right}{closing_tag}'
