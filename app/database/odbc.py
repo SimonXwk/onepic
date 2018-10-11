@@ -48,6 +48,7 @@ class ODBCResult(object):
 class ThankqODBC(object):
 	__connection_string = current_app.config.get('TQ_ODBC_CONNECTION_STRING')
 	__script_folder = os.path.join(current_app.root_path, 'database\scripts')
+	default_cache_timeout = 120
 
 	@classmethod
 	def format_date(cls, value, fmt='%Y/%m/%d'):
@@ -75,7 +76,7 @@ class ThankqODBC(object):
 
 	@classmethod
 	@timeit
-	def query(cls, file_names, *parameters, cached_timeout=120, updates=None):
+	def query(cls, file_names, *parameters, cached_timeout=default_cache_timeout, updates=None):
 		if isinstance(file_names, list) or isinstance(file_names, tuple):
 			script = cls.__merge_script(file_names)
 		else:

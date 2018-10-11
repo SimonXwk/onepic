@@ -16,6 +16,9 @@ ld.url('data_thankq.new_customer_list', ['/merch/new_customers'])
 ld.url('data_thankq.journey_cureone_acquisiton_donors', ['/campaign/journey_cureone_acquisition'])
 ld.url('data_thankq.get_first_date_source1_by_contacts_since', ['/tq/get_first_date_source1_by_contacts_since'])
 
+ld.url('data_thankq.list_pledges', ['/tq/pledges'])
+
+
 
 ld.url('data_budget.budget', ['/budget'])
 

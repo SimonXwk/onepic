@@ -288,7 +288,7 @@ let vueTable = Vue.component('vue-table', {
 	},
 	template: `
 	<div class="table-responsive-lg">
-		<table class="table table-sm table-hover table-bordered table-striped"" >
+		<table class="table table-sm table-hover table-bordered">
 			<thead>
 				<tr class="table-bordered " v-bind:class="trClassObject">
 					 <th scope="col" style="width: 30%">CUSTOMER NAME</th>
@@ -543,7 +543,7 @@ let rootVue = new Vue({
 						<ul class="nav nav-tabs mb-3 nav-fill nav-justified" id="pills-tab" role="tablist">
 							<li class="nav-item ">
 								<a class="nav-link active" id="include-tab" data-toggle="pill" href="#include" role="tab" aria-controls="include" aria-selected="true">
-								 &#128222; Todo <span class="badge badge-pill badge-info"> << countVisible('todo') >>/<< todoRows.length >></span>
+								 &#128222; ToCall <span class="badge badge-pill badge-info"> << countVisible('todo') >>/<< todoRows.length >></span>
 								</a>
 							</li>
 							<li class="nav-item ">
@@ -553,7 +553,7 @@ let rootVue = new Vue({
 							</li>
 							<li class="nav-item ">
 								<a class="nav-link" id="exclude-tab" data-toggle="pill" href="#exclude" role="tab" aria-controls="exclude" aria-selected="false">
-								 &#128683; Excluded <span class="badge badge-pill badge-warning"> << countVisible('exclude') >>/<< excludeRows.length >></span>
+								 &#128683; Cancel <span class="badge badge-pill badge-warning"> << countVisible('exclude') >>/<< excludeRows.length >></span>
 								</a>
 							</li>
 						</ul>

@@ -1,12 +1,11 @@
+<div id="root"></div>
+
 <div class="container-fluid">
+
+
 	{% set dataSet = data.rows|selectattr('CREATED_FY','<=',thisfy)|list %}
-	<div class="row">
-		<div class="col-12">
-			<p class="lead text-primary">
-				<strong><span class="text-dark font-weight-bold">{{ dataSet|length|number }} Legitimate Pledges Found <span class="text-info">(created on or before FY{{ thisfy }})</span></strong>
-				<small class="text-secondary font-italic">data captured : {{ data.timestamp|dtAU }}, cached for {{ '{:,}'.format(data.cached_timeout) }} seconds</small>
-			</p>
-		</div>
+
+
 	</div>
 
 	<div class="row">
