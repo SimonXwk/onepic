@@ -17,10 +17,10 @@ def pledge_dop_fys():
 
 @templatified(title='Sponsorship Overview')
 def overview():
-	fy = int(request_arg('fy', TLMA.cfy, tests.is_year))
-	updates = [('FY', fy)]
-	data = Tq.query(('PLEDGE_[BASE]', 'PLEDGE_OVERVIEW'),  cached_timeout=30, updates=updates)
-	return dict(data=data, thisfy=fy)
+	# fy = int(request_arg('fy', TLMA.cfy, tests.is_year))
+	# updates = [('FY', fy)]
+	# data = Tq.query(('PLEDGE_[BASE]', 'PLEDGE_OVERVIEW'),  cached_timeout=30, updates=updates)
+	pass
 
 
 @templatified(title='Pledge Overview')

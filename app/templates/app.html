@@ -7,6 +7,7 @@
 const $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
 const $FY_MONTH_LIST_NUMBER = {{ fymths }};
 const $FY_MONTH_LIST_NAME = {{ fymths|map("mthname", abbr=True)|list|safe }};
+const $CFY = {{ cfy }};
 
 // Build endpoint String
 const endpoint = (url, parameter) => $SCRIPT_ROOT + url + (parameter ? parameter : '');
@@ -112,11 +113,6 @@ function sortByAttribute(arr, attributeName){
 }
 
 <!-- Formatters -->
-const today = new Date();
-
-
-
-
 function dAU(date) {
 	return date.toLocaleDateString("en-AU", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
 }
@@ -402,4 +398,3 @@ function setHighchartColors(colorList) {
 }
 </script>
 {% endmacro %}
-

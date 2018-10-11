@@ -84,7 +84,9 @@ let vueRow = Vue.component('vue-row', {
 			}
 		},
 		subTodoFlag: function() {
-			if (this.subTodo === -1){
+			if (!this.ask){
+				return ''
+			} else if(this.subTodo === -1){
 				return '❓'
 			} else if(this.subTodo === 0){
 				return '🍓'
@@ -322,6 +324,7 @@ let rootVue = new Vue({
 		showSuccess: true,
 		showWaiting: false,
 		showMissing: false,
+		csvEncodedURI: null,
 	},
 	watch:{
 		showSuccess: function(val){
@@ -339,6 +342,7 @@ let rootVue = new Vue({
 		fy: function(val){
 			this.raw = {
 				rows: null,
+				headers: [],
 				ready: false,
 				timestamp: null,
 				processed:0
@@ -347,6 +351,27 @@ let rootVue = new Vue({
 			this.customers = {};
 			this.getData();
 		},
+		progress: function (val) {
+			if (val == 100) {
+				let csvArr = [];
+				csvArr.push("data:text/csv;charset=utf-8," + this.raw.headers.join(","));
+				console.log(csvArr);
+				console.log(typeof csvArr);
+				csvArr = this.raw.rows
+					.filter(d => this.customers[d.SERIALNUMBER].todo)
+					.forEach(obj => {
+						csvArr.push(Object.values(obj).join(","));
+					})
+
+
+				console.log(typeof csvArr, csvArr);
+
+
+				let csvContent = csvArr.join("\n");
+				console.log(csvContent);
+				this.csvEncodedURI = encodeURI(csvContent);
+			}
+		}
 	},
 	computed: {
 		dataAPI: function() {
@@ -444,6 +469,7 @@ let rootVue = new Vue({
 		getData: function(){
 			fetchJSON(endpoint(this.dataAPI), function(json){
 				rootVue.raw.rows = json.rows;
+				rootVue.raw.headers = json.headers,
 				rootVue.raw.ready = true;
 				rootVue.raw.timestamp = new Date(json.timestamp)
 				rootVue.customers = json.rows
@@ -526,6 +552,8 @@ let rootVue = new Vue({
 								<input type="checkbox" class="switch-danger" v-model="showMissing" v-bind:disabled="progress !== 100">
 								<span class="switch-slider round"></span>
 							</label>
+
+							<a v-bind:href="csvEncodedURI" class="btn btn-primary align-middle" role="button" aria-pressed="true" download="courtesy_call_data.csv">CSV</a>
 						</div>
 
 						<div class="progress" v-else>

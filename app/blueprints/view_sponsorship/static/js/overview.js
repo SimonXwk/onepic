@@ -1,4 +1,4 @@
-let renderFlow1Cht1 = () => new Highcharts.chart({
+let renderFlow1Cht1 = () => { console.log('asd');new Highcharts.chart({
 	responsive: {
 		rules: [{
 			condition: {
@@ -184,7 +184,7 @@ let renderFlow1Cht1 = () => new Highcharts.chart({
 			color: '#003366'
 		}
 	}
-});
+})}
 
 
 let renderFlow1Cht2 = () => new Highcharts.chart({
@@ -685,9 +685,9 @@ let renderCht2 = () => { Highcharts.chart('chart2', {
 });}
 
 
-console.log(thisFY, data);
+// console.log(thisFY, data);
 
-const rows = data.rows;
+// const rows = data.rows;
 // const cs = crossfilter(rows);
 //
 // console.log(cs.groupAll().reduceCount().value());
@@ -702,15 +702,12 @@ let rootVue = new Vue({
 	el: '#root',
 	data: {
 		rawData: null,
-		thisFY: thisFY,
 		defaultAPI: '/api/tq/pledges',
-		fy: null,
-
+		thisFY: $CFY,
 	},
 	computed: {
 		dataAPI: function() {
-			let dft = endpoint(this.defaultAPI);
-			return this.fy === null ? dft : dft + '?fy=' & this.fy
+			return endpoint(this.defaultAPI) + '?fy=' + this.thisFY
 		},
 		dataRows: function() {
 			if (this.thisFY) {
@@ -730,21 +727,31 @@ let rootVue = new Vue({
 		},
 	},
 	created() {
-		this.getPledgeHeaderData();
+
 	},
 	mounted() {
+		this.getPledgeHeaderData();
 		renderFlow1Cht1();
-		renderFlow1Cht2();
-		renderCht1();
-		renderCht2();
+		// renderFlow1Cht2();
+		// renderCht1();
+		// renderCht2();
 	},
-	template: `<div class="container-fluid" v-if="rawData === null"><p class="lead">&#128270; Retrieve Pledge Information from ThankQ ... </p></div><div class="container-fluid" v-else>
+	template: `<div class="container" v-if="rawData === null"><p class="lead">&#128270; Retrieve Pledge Information from ThankQ ... </p></div><div class="container-fluid" v-else>
 	<div class="row">
 		<div class="col-12">
 			<p class="lead text-primary">
 				<strong><span class="text-dark font-weight-bold"><< dataRows.length >> Legitimate Pledges Found <span class="text-info">(created on or before FY<< thisFY >>)</span></strong>
 				<small class="text-secondary font-italic">data captured : << rawData.timestamp|dtAU >>, cached for << rawData.cached_timeout|number >> seconds</small>
 			</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-lg-6">
+			<div class="chart" id="flow1"></div>
+		</div>
+		<div class="col-lg-6">
+			<div class="chart" id="flow2"></div>
 		</div>
 	</div>
 

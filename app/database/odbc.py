@@ -46,7 +46,8 @@ class ODBCResult(object):
 
 
 class ThankqODBC(object):
-	__connection_string = current_app.config.get('TQ_ODBC_CONNECTION_STRING')
+	__connection_string_report_live = current_app.config.get('TQ_REPORTL_CONNECTION_STRING')
+	__connection_string_report_rep = current_app.config.get('TQ_REPORTR_CONNECTION_STRING')
 	__script_folder = os.path.join(current_app.root_path, 'database\scripts')
 	default_cache_timeout = 120
 
@@ -76,7 +77,7 @@ class ThankqODBC(object):
 
 	@classmethod
 	@timeit
-	def query(cls, file_names, *parameters, cached_timeout=default_cache_timeout, updates=None):
+	def query(cls, file_names, *parameters, use_live=True, cached_timeout=default_cache_timeout, updates=None):
 		if isinstance(file_names, list) or isinstance(file_names, tuple):
 			script = cls.__merge_script(file_names)
 		else:
@@ -100,7 +101,7 @@ class ThankqODBC(object):
 				timestamp = datetime.datetime.now()
 				return headers, types, rows, byte_size, timestamp  # returning a comma separated set of elements creates a tuple
 
-		return ODBCResult(run(cls.__connection_string, script, *parameters), cached_timeout)
+		return ODBCResult(run(cls.__connection_string_report_live if use_live else cls.__connection_string_report_rep, script, *parameters), cached_timeout)
 
 	@classmethod
 	def __change_parameter(cls, script, update_list):

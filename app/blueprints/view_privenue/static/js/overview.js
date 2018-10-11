@@ -1,4 +1,4 @@
-const cfy = today.getMonth()+1 < 7 ? today.getFullYear() : today.getFullYear()+1;
+const cfy = $CFY;
 
 let valueChart1 =
   Highcharts.chart('fyTotal', {
@@ -70,5 +70,3 @@ fetchJSON(endpoint('/api/cash/fysltd'), function(json){
     },
   });
 });
-
-
