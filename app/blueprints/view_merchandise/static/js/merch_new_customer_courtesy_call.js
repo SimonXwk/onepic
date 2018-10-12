@@ -131,7 +131,7 @@ let vueRow = Vue.component('vue-row', {
 								}
 								vCol.show = vCol.isDelivered;
 								if (vCol.isDelivered) {
-									vCol.emitTodoCount();
+									vCol.emitTodoCount(false, vCol.statusDate);
 								}
 								vCol.emitProcessed();
 							} else {
@@ -145,7 +145,7 @@ let vueRow = Vue.component('vue-row', {
 			}, true);
 		} else {
 			if (this.ask && this.isDonor) {
-				vCol.emitTodoCount();
+				vCol.emitTodoCount(true, null);
 			}
 			vCol.show = this.isDonor || !this.ask;
 			vCol.emitProcessed();
@@ -158,8 +158,8 @@ let vueRow = Vue.component('vue-row', {
 				this.show = data;
 			}
 		},
-		emitTodoCount: function(){
-			this.$eventBus.$emit('addTodo', this.row['SERIALNUMBER']);
+		emitTodoCount: function(isDonor, deliDate){
+			this.$eventBus.$emit('addTodo', this.row['SERIALNUMBER'], isDonor, deliDate);
 		},
 		emitProcessed: function(){
 			this.$eventBus.$emit('processedCustomer', this.row['SERIALNUMBER'], this.showType);
@@ -347,29 +347,25 @@ let rootVue = new Vue({
 				timestamp: null,
 				processed:0
 			};
-			this.todoCount = 0,
+			this.csvEncodedURI = null;
+			this.todoCount = 0;
 			this.customers = {};
 			this.getData();
 		},
 		progress: function (val) {
 			if (val == 100) {
 				let csvArr = [];
-				csvArr.push("data:text/csv;charset=utf-8," + this.raw.headers.join(","));
-				console.log(csvArr);
-				console.log(typeof csvArr);
-				csvArr = this.raw.rows
+				csvArr.push(("data:text/csv;charset=utf-8," + ['SERIALNUMBER', 'REXID', 'FULLNAME', 'FIRSTORDER', 'MOBILENUMBER', 'DAYTELEPHONE', 'EVENINGTELEPHONE', 'FAXNUMBER', 'EMAILADDRESS', 'DONATION&GOL_ONLY', 'DELIVERYDATE', 'COMMENT'].join(",")));
+				this.raw.rows
 					.filter(d => this.customers[d.SERIALNUMBER].todo)
-					.forEach(obj => {
-						csvArr.push(Object.values(obj).join(","));
+					.map(d => ["=\"" + d.SERIALNUMBER + "\"", d.LAST_REXID, d.FULLNAME, d.FIRSTORDER, d.MOBILENUMBER, d.DAYTELEPHONE, d.EVENINGTELEPHONE, d.FAXNUMBER, d.EMAILADDRESS, this.customers[d.SERIALNUMBER].isDonor, this.customers[d.SERIALNUMBER].deliveryDate, ''])
+					.forEach(arr => {
+						csvArr.push(arr.join(","));
 					})
 
-
-				console.log(typeof csvArr, csvArr);
-
-
 				let csvContent = csvArr.join("\n");
-				console.log(csvContent);
 				this.csvEncodedURI = encodeURI(csvContent);
+				console.log(this.csvEncodedURI);
 			}
 		}
 	},
@@ -421,8 +417,10 @@ let rootVue = new Vue({
 		},
 	},
 	created(){
-		this.$eventBus.$on('addTodo', (sn) => {
+		this.$eventBus.$on('addTodo', (sn, isDonor, deliDate) => {
 			this.customers[sn].todo = true;
+			this.customers[sn].isDonor = isDonor;
+			this.customers[sn].deliveryDate = deliDate;
 			this.todoCount += 1;
 			this.$eventBus.$emit('calcTodoSubList', sn, this.todoCount%2);
 		});
@@ -475,7 +473,7 @@ let rootVue = new Vue({
 				rootVue.customers = json.rows
 					.map(row => { return {SERIALNUMBER: row.SERIALNUMBER, SUBLIST: rootVue.calcSubListType(row)}; } )
 					.reduce( (acc, cur) => {
-						acc[cur.SERIALNUMBER] = acc[cur.SERIALNUMBER] ? acc[cur.SERIALNUMBER] : { sublist: cur.SUBLIST, processed:false, displayType:null, show:false, todo:false };
+						acc[cur.SERIALNUMBER] = acc[cur.SERIALNUMBER] ? acc[cur.SERIALNUMBER] : { sublist: cur.SUBLIST, processed:false, displayType:null, show:false, todo:false, isDonor:null, deliveryDate:null };
 						return acc
 					}, {});
 			});
@@ -553,7 +551,7 @@ let rootVue = new Vue({
 								<span class="switch-slider round"></span>
 							</label>
 
-							<a v-bind:href="csvEncodedURI" class="btn btn-primary align-middle" role="button" aria-pressed="true" download="courtesy_call_data.csv">CSV</a>
+							<a v-if="csvEncodedURI!==null"  v-bind:href="csvEncodedURI" class="btn btn-primary align-middle" role="button" aria-pressed="true" download="courtesy_call_data.csv">CSV</a>
 						</div>
 
 						<div class="progress" v-else>
