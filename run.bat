@@ -45,12 +45,12 @@ if exist "%env_folder%\" (
 	echo [%env_folder%] Exists !
 ) else (
 
-	rd /s /q "env"
+	rd /s /q "%env_folder%"
 	echo.
 	echo -------------------------------------------------------------------------------
 	echo ^ ^ ^> creating python virtual environment [%env_folder%]
 	echo -------------------------------------------------------------------------------
-	python -m venv env
+	python -m venv %env_folder%
 )
 
 echo.

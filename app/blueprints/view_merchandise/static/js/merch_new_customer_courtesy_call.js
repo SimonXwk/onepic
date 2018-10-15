@@ -210,17 +210,8 @@ let vueRow = Vue.component('vue-row', {
 				<small>&#128224;</small> Fax : << row.FAXNUMBER >><br>
 			</span>
 
-			<span class="text-muted"
-				v-if=" (row.EMAILADDRESS !== null && row.EMAILADDRESS.trim() !== '')
-					&& ((
-					row.DONOTCALL != -1
-					&& !(row.MOBILENUMBER !== null && row.MOBILENUMBER.trim() !== '')
-					&& !(row.DAYTELEPHONE !== null && row.DAYTELEPHONE.trim() !== '')
-					&& !(row.EVENINGTELEPHONE !== null && row.EVENINGTELEPHONE.trim() !== '')
-					&& !(row.FAXNUMBER !== null && row.FAXNUMBER.trim() !== '')
-					) || (row.DONOTCALL == -1) )
-				">
-				&#128231; << row.EMAILADDRESS >><br>
+			<span v-if="row.EMAILADDRESS !== null && row.EMAILADDRESS.trim() !== ''" class="text-muted">
+				<small>&#128231;</small> << row.EMAILADDRESS >><br>
 			</span>
 
 			<span class="text-muted"
@@ -247,7 +238,13 @@ let vueRow = Vue.component('vue-row', {
 			</span>
 			<span v-if=" row.COURTESYCALL1_BY !== null ">
 				<br>
-				<mark>&#128512; << row.COURTESYCALL1_BY >></mark><span class="text-success"><small> made <span class="badge badge-success">Courtesy Call 1</span></small></span>
+				<mark>&#128512; << row.COURTESYCALL1_BY >>
+					<span class="text-success"><small> finalized
+					<span class="badge badge-success" v-if="row.COURTESYCALL1_SUBJECT.toUpperCase().indexOf('CALL')!==-1"><< row.COURTESYCALL1_SUBJECT >></span>
+					<span class="badge badge-info" v-else-if="row.COURTESYCALL1_SUBJECT.toUpperCase().indexOf('MAIL')!==-1"><< row.COURTESYCALL1_SUBJECT >></span>
+					<span class="badge badge-warning" v-else><< row.COURTESYCALL1_SUBJECT >></span>
+					</small></span>
+				</mark>
 			</span>
 		</td>
 
@@ -355,17 +352,16 @@ let rootVue = new Vue({
 		progress: function (val) {
 			if (val == 100) {
 				let csvArr = [];
-				csvArr.push(("data:text/csv;charset=utf-8," + ['SERIALNUMBER', 'REXID', 'FULLNAME', 'FIRSTORDER', 'MOBILENUMBER', 'DAYTELEPHONE', 'EVENINGTELEPHONE', 'FAXNUMBER', 'EMAILADDRESS', 'DONATION&GOL_ONLY', 'DELIVERYDATE', 'COMMENT'].join(",")));
+				csvArr.push(("data:text/csv;charset=utf-8," + ['SERIALNUMBER', 'REXID', 'FULLNAME', 'FIRSTORDER', 'MOBILENUMBER', 'DAYTELEPHONE', 'EVENINGTELEPHONE', 'FAXNUMBER', 'EMAILADDRESS', 'STATE','DONATION&GOL_ONLY', 'DELIVERYDATE', 'COMMENT'].join(",")));
 				this.raw.rows
 					.filter(d => this.customers[d.SERIALNUMBER].todo)
-					.map(d => ["=\"" + d.SERIALNUMBER + "\"", d.LAST_REXID, d.FULLNAME, d.FIRSTORDER, d.MOBILENUMBER, d.DAYTELEPHONE, d.EVENINGTELEPHONE, d.FAXNUMBER, d.EMAILADDRESS, this.customers[d.SERIALNUMBER].isDonor, this.customers[d.SERIALNUMBER].deliveryDate, ''])
+					.map(d => ["'" + d.SERIALNUMBER , d.LAST_REXID, d.FULLNAME, d.FIRSTORDER, d.MOBILENUMBER, d.DAYTELEPHONE, d.EVENINGTELEPHONE, d.FAXNUMBER, d.EMAILADDRESS, d.STATE, this.customers[d.SERIALNUMBER].isDonor, this.customers[d.SERIALNUMBER].deliveryDate, ''])
 					.forEach(arr => {
 						csvArr.push(arr.join(","));
 					})
-
+					// d.SERIALNUMBER + "'" to make sure encodeURI() won't remove the leading zeros
 				let csvContent = csvArr.join("\n");
 				this.csvEncodedURI = encodeURI(csvContent);
-				console.log(this.csvEncodedURI);
 			}
 		}
 	},
@@ -551,7 +547,7 @@ let rootVue = new Vue({
 								<span class="switch-slider round"></span>
 							</label>
 
-							<a v-if="csvEncodedURI!==null"  v-bind:href="csvEncodedURI" class="btn btn-primary align-middle" role="button" aria-pressed="true" download="courtesy_call_data.csv">CSV</a>
+							<a v-if="csvEncodedURI!==null"  v-bind:href="csvEncodedURI" class="btn btn-outline-success align-middle" role="button" aria-pressed="true" download="courtesy_call_data.csv">CSV</a>
 						</div>
 
 						<div class="progress" v-else>
