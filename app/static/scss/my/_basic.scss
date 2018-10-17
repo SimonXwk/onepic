@@ -6,9 +6,12 @@ $body-bg-color: #8efff8;
 
 body {
   padding-top: 4rem;  // Leaving Space for Fixed NavBar
-  //padding-bottom: $footer_height;
-  // Flushing footer to bottom
-  // position: relative;
-  // padding-bottom: 6rem;
-  min-height: 100%;
+}
+
+
+.footer {
+	margin-top: 2rem;
+  padding: 1rem;
+	text-align: center;
+  background-color: #f5f5f5;
 }

@@ -1,6 +1,6 @@
 from app.helper import create_blueprint, LazyLoader
 
-bp = create_blueprint('merchandise', __name__)
+bp = create_blueprint('merch', __name__)
 ld = LazyLoader(bp)
 
 # LazyLoading View Functions

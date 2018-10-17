@@ -2,7 +2,7 @@ from flask import current_app
 import os
 import glob
 import datetime
-from app.database.excel import ExcelWorkbook
+from app.database.excel import Workbook
 import pandas as pd
 from app.cache import cached
 from app.helper import request_arg, jsonified
@@ -28,16 +28,16 @@ def list_all_files():
 		for file in files:
 			file_obj = dict(workbook=file.rsplit(os.sep, 1)[1])
 
-			wb = ExcelWorkbook(file)
-			if wb is not None:
-				file_obj['sheets'] = len(wb.worksheets)
+			excel = Workbook(file)
+			if excel is not None:
+				file_obj['sheets'] = len(excel.worksheets)
 				# Take the last sheet as default data sheet
-				ws = wb.get_sheet_by_name(wb.sheet_names[-1])
+				ws = excel.get_sheet_by_name(excel.sheet_names[-1])
 
-				for ws_name in wb.sheet_names:
+				for ws_name in excel.sheet_names:
 					if 'FULFILLMENTREPORT' in ws_name.upper():
 						# If the tab's name contains 'Fulfillmentreport', treat the last sheet meet this condition as data sheet
-						ws = wb.get_sheet_by_name(ws_name)
+						ws = excel.get_sheet_by_name(ws_name)
 						file_obj.setdefault('dataSheet', {}).update(dict(title=ws.title, state=ws.sheet_state, minRow=ws.min_row, maxRow=ws.max_row, minColumn=ws.min_column, maxColumn=ws.max_column))
 			result.setdefault('rows', []).append(file_obj)
 			result['timestamp'] = datetime.datetime.now()
@@ -50,13 +50,15 @@ def read_one_slip(filename, tab):
 	files = get_matched_files(str(filename))
 	if files:
 		f = files[0]
-		wb = ExcelWorkbook(f)
+		wb = Workbook(f)
 		if wb is not None:
+			if tab is None:
+				tab = wb.sheet_names[0]
 			ws = wb.get_sheet_by_name(tab)
 			rng = wb.get_range_by_square(tab, ws.min_row,  ws.min_column, ws.max_row, ws.max_column)
 			rows = [[cell.value for cell in r] for r in rng]
 			result['headers'] = rows[0]
 			result['rows'] = [dict(zip(rows[0], r)) for r in rows[1:]]
-			result.update(dict(headers=rows[0], workbook=filename, tab=tab, timestamp=datetime.datetime.now(), minRow=ws.min_row, maxRow=ws.max_row, minColumn=ws.min_column, maxColumn=ws.max_column))
+			result.update(dict(headers=rows[0], workbook=filename, creator=wb.creator, created=wb.created, tab=tab, timestamp=datetime.datetime.now(), minRow=ws.min_row, maxRow=ws.max_row, minColumn=ws.min_column, maxColumn=ws.max_column))
 	return result
 

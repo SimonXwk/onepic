@@ -20,12 +20,18 @@
 			<p class="lead text-center">Hi, <span class="text-primary"><strong>{{ current_user.name }}</strong></span>
 				{% if current_user.email %}( {{ current_user.email }} ){% endif %}</p>
 		{% endif %}
-		<h3 class="text-center text-info">
-			<div class="typewrite"
-					 data-type='["WELCOME TO ONEPIC REPORTING PORTAL {{ current_user.name|upper }}","TODAY IS {{ now|dAU }}"]'>
 
+		<div class="dropdown text-center">
+			<a class="btn btn-outline-info dropdown-toggle" href="#" role="button" id="thankQDataSource" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				Choose ThankQ Data Source
+			</a>
+			<div class="dropdown-menu" aria-labelledby="thankQDataSource">
+				<a class="dropdown-item {% if tq_use_live %}active{% endif %}" href="/use_thankq_live_reporter"><small>ThankQ Reporter Live</small></a>
+				<a class="dropdown-item {% if not tq_use_live %}active{% endif %}" href="/use_thankq_replicate_reporter"><small>ThankQ Reporter Replicate</small></a>
 			</div>
-		</h3>
+		</div>
+
+
   </div>
 </div>
 

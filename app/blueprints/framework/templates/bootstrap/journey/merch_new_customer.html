@@ -9,7 +9,7 @@
 	<div class="row">
 
 		<div class="col-md-4 col-xl-3">
-			<div class="card border-primary mb-3 shadow-type4">
+			<div class="card border-primary mb-3">
 				<h5 class="card-header">Listing <strong>{{ '{:,}'.format(data.rows|length) }}</strong> customers found</h5>
 				<div class="card-body">
 					<h6 class="card-title"><mark><span class="text-info">Searching Time Frame</span></mark></h6>
@@ -23,7 +23,7 @@
 				</div>
 			</div>
 
-			<div class="card border-info mb-3 shadow-type4">
+			<div class="card border-info mb-3">
 				<div class="card-body">
 					<h5 class="card-title text-center">Tags</h5>
 					<div class="table-responsive-lg">
@@ -112,7 +112,7 @@
 								<tr>
 									<td>
 										<span class="badge badge-success">
-											ALL <span class="badge badge-light">{{ data.rows|selectattr('CATALOGUE_ALL', '>', 0)|list|length }}</span>
+											cALL <span class="badge badge-light">{{ data.rows|selectattr('CATALOGUE_ALL', '>', 0)|list|length }}</span>
 											<span class="sr-only">Mail Profile: Catalogue All</span>
 										</span>
 									</td>
@@ -128,6 +128,37 @@
 									</td>
 									<td scope="row">eCatalogue All</td>
 								</tr>
+
+								<tr>
+									<td>
+										<span class="badge badge-success">
+											ePMO <span class="badge badge-light">{{ data.rows|selectattr('EMONTHLY_PROMO', '>', 0)|list|length }}</span>
+											<span class="sr-only">Mail Profile: eMonthly Promo</span>
+										</span>
+									</td>
+									<td scope="row">eMonthly Promo</td>
+								</tr>
+
+								<tr>
+									<td>
+										<span class="badge badge-success">
+											TAX <span class="badge badge-light">{{ data.rows|selectattr('ANNUAL_TAX', '>', 0)|list|length }}</span>
+											<span class="sr-only">Mail Profile: Annual Tax</span>
+										</span>
+									</td>
+									<td scope="row">Annual Tax</td>
+								</tr>
+
+								<tr>
+									<td>
+										<span class="badge badge-success">
+											R2R <span class="badge badge-light">{{ data.rows|selectattr('RECORD_TO_REVIEW', '>', 0)|list|length }}</span>
+											<span class="sr-only">Mail Profile:Record to Review</span>
+										</span>
+									</td>
+									<td scope="row">Record to Review</td>
+								</tr>
+
 
 								<tr>
 									<td>
@@ -150,7 +181,7 @@
 		<div class="col-md-8 col-xl-9">
 		{% set table_name = 'merchandise-new-customer'  %}
 			<div class="table-responsive-lg">
-				<table class="table table-sm table-hover table-bordered shadow-type1" id="{{ table_name }}">
+				<table class="table table-sm table-hover table-bordered" id="{{ table_name }}">
 				 <caption><strong>Data Captured : </strong>{{ data.timestamp|dtAU }}, result will be cached for {{ '{:,}'.format(data.cached_timeout) }} seconds</caption>
 				 <thead>
 					<tr class="table-bordered bg-info text-light">
@@ -183,7 +214,7 @@
 						<td class="text-muted">{{ row.FIRSTDATE|dSort }}</td>
 					 <td><!--First Order ID-->
 						{% if row.FIRSTORDER %}
-								{% set trackingURL = url_for('merchandise.track_order', order_number = row.FIRSTORDER|string)  %}
+								{% set trackingURL = url_for('merch.track_order', order_number = row.FIRSTORDER|string)  %}
 								{% if row.FIRSTORDERS|int > 1 %}
 								 <span class="text-primary" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
 										title='
@@ -222,7 +253,6 @@
 							<div class="alert alert-warning" role="alert"><small>Non-Merchandise Total</small></div>
 								{% if (row.FIRSTDATETOTAL - row.FIRSTDATE_MERCHANDISE_TOTAL) ==0  %}None
 								{% else %}<span class="border border-light">{{ (row.FIRSTDATETOTAL - row.FIRSTDATE_MERCHANDISE_TOTAL) }}</span>{% endif %}
-
 											'
 						><strong>{{ row.FIRSTDATE_MERCHANDISE_TOTAL|currency }}</strong>
 						</span>
@@ -260,9 +290,12 @@
 								<span class="badge badge-light">&#10067; Waiting to be boarded</span>
 						{% endif %}
 						<br />
-						{% if row.CATALOGUE_ALL > 0 %}<span class="badge badge-pill badge-success">ALL</span> {% endif %}
-						{% if row.ECATALOGUE_ALL > 0 %}<span class="badge badge-pill badge-success">eALL</span> {% endif %}
-						{% if row.NO_EXTRA_MAIL > 0 %}<span class="badge badge-pill badge-success">!EXTRA</span> {% endif %}
+						{% if row.CATALOGUE_ALL > 0 %}<span class="badge badge-success">cALL</span> {% endif %}
+						{% if row.ECATALOGUE_ALL > 0 %}<span class="badge badge-success">eALL</span> {% endif %}
+					 	{% if row.EMONTHLY_PROMO > 0 %}<span class="badge badge-success">ePMO</span> {% endif %}
+						{% if row.ANNUAL_TAX > 0 %}<span class="badge badge-success">TAX</span> {% endif %}
+						{% if row.NO_EXTRA_MAIL > 0 %}<span class="badge badge-success">!EXTRA</span> {% endif %}
+					 	{% if row.RECORD_TO_REVIEW > 0 %}<span class="badge badge-success">R2R</span> {% endif %}
 					 </td>
 
 						<td><!--Courtesy Call-->

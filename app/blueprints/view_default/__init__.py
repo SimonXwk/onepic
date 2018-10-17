@@ -10,6 +10,8 @@ ld.url('view_funcs.logged', ['/logged'])
 ld.url('view_funcs.login', ['/login'], methods=['POST'])
 ld.url('view_funcs.login_as_guest', ['/login_as_guest'])
 ld.url('view_funcs.logout', ['/logout'])
+ld.url('view_funcs.use_thankq_live_reporter', ['/use_thankq_live_reporter'])
+ld.url('view_funcs.use_thankq_replicate_reporter', ['/use_thankq_replicate_reporter'])
 
 
 # App context
@@ -24,6 +26,12 @@ def inject_now():
 def inject_cfy():
 	from app.database.tlma import TLMA
 	return dict(cfy=TLMA.cfy)
+
+
+@bp.app_context_processor
+def inject_thankq_data_source():
+	from app.database.odbc import ThankqODBC
+	return dict(tq_use_live=ThankqODBC.use_live)
 
 
 @bp.app_context_processor

@@ -1,0 +1,43 @@
+{% macro AccordionCard(id, header, content, show=false) %}
+<div class="card">
+	<div class="card-header" id="heading-{{ id }}">
+		<h5 class="mb-0">
+			<button class="btn btn-link {% if show == false %}collapsed{% endif %}" type="button" data-toggle="collapse" data-target="#collapse-{{ id }}" aria-expanded="true" aria-controls="collapse-{{ id }}">
+				<span class="text-primary font-weight-bold">{{ header }}</span>
+			</button>
+		</h5>
+	</div>
+	<div id="collapse-{{ id }}" class="collapse {% if show %}show{% endif %}" aria-labelledby="heading-{{ id }}" data-parent="#accordion-questions">
+		<div class="card-body">
+			{{ content }}
+		</div>
+	</div>
+</div>
+{% endmacro %}
+{% set accordionID = "accordion-questions" %}
+
+<div class="container">
+
+	<p class="lead">"To be discussed later" Items by topic</p>
+
+	<div class="accordion" id="{{ accordionID }}">
+
+		{% macro Content1() %}
+		...
+		{% endmacro %}
+
+		{% macro Content2() %}
+		<ul>
+			<li>The ability of relating one pledge to another <span class="text-info">(Renewal of finite pledge  & Resurrection of imperfectly cancelled infinite pledge)</span></li>
+			<li>The need for daily credit card transaction</li>
+			<li>By preserving the acquisition campaign, how to allocate continuous pledge's revenue to stewardship campaign <span class="text-info">(1st installment proposal)</span></li>
+			<li>The case of Cure One Acquisition welcome pack sent with receipt and Action Magazine (which campaign?)</li>
+		</ul>
+		{% endmacro %}
+
+
+		{{ AccordionCard(1, "General", Content1()) }}
+		{{ AccordionCard(2, "Sponsorship", Content2()) }}
+	</div>
+
+</div>

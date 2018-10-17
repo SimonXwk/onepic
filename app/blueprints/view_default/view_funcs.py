@@ -1,7 +1,8 @@
-from flask import flash, redirect
+from flask import flash, redirect, request
 from app.helper import templatified
 from flask_login import login_user, logout_user, current_user
 from app.user import anonymous_user
+from app.database.odbc import ThankqODBC as Tq
 
 
 @templatified('index')
@@ -24,21 +25,16 @@ def login_as_guest():
 def logout():
 	logout_user()
 	flash('logout successfully', 'success')
-	return redirect('/')
 
 
-# def login():
-# 	if request.method == 'POST':
-# 		usr = request.form['username']
-# 		pwd = request.form['password']
-# 		if usr != '' and pwd != '':
-# 			session['user_name'] = usr
-# 			return redirect('/logged')
-# 		elif usr is None and pwd is None:
-# 			flash('empty fields')
-# 		else:
-# 			flash('wrong login detail', 'error')
-# 	return redirect('/')
+def use_thankq_live_reporter():
+	Tq.use_live = True
+	return redirect('/logged')
+
+
+def use_thankq_replicate_reporter():
+	Tq.use_live = False
+	return redirect('/logged')
 
 
 @templatified('test')
@@ -51,8 +47,6 @@ def test():
 	from app.database.sqlalchemy_database import pledge_header as Md
 	d = Md.select(Md.c.STARTDATE >= (datetime(year=2018, month=4, day=30, hour=0, minute=0, second=0, microsecond=0)))\
 		.execute().first()
-
-	d = d['PLEDGEID']
 
 	# from .model_vanilla import sa, Session, BatchHeader, BatchItem, BatchItemSplit
 	# session = Session()`

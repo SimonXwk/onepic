@@ -6,12 +6,20 @@ echo Default Python Virtual Environment is ^/%env_folder%
 
 :ask1
 echo -------------------------------------------------------------------------------
-echo Press [1] Development Mode
-echo Press [2] Production Mode
-set /P ENV_MODE=Your Choice: %=%
-If /I "%ENV_MODE%"=="1" goto setToDevelopment
-If /I "%ENV_MODE%"=="2" goto setToProduction
-cls & echo ! Please Choose from given list only & goto ask1
+echo Press [1] for Development Mode
+echo Press [2] for Production Mode
+
+rem set /P ENV_MODE=Your Choice: %=%
+rem If /I "%ENV_MODE%"=="1" goto setToDevelopment
+rem If /I "%ENV_MODE%"=="2" goto setToProduction
+rem cls & echo ! Please Choose from given list only & goto ask1
+
+set choice1Timeout=10
+choice /t %choice1Timeout% /c 12 /N /d 2 /m "(Decision will be defaulted after %choice1Timeout% seconds) Your Choice ?"
+rem The construct if errorlevel n checks if the errorlevel is at least n, therefor the way to do the test is go from higher errorlevel to lower errorlevel
+if errorlevel 2 goto setToProduction
+if errorlevel 1 goto setToDevelopment
+
 
 :setToDevelopment
 set FLASK_ENV=development
@@ -27,13 +35,21 @@ echo ^> flask environment variable will be set to %FLASK_ENV% later
 
 :ask2
 echo -------------------------------------------------------------------------------
-echo Press [1] Skip project environment Setup
-echo Press [2] Prepare project environment Setup
-set INPUT=
-set /P INPUT=Your Choice: %=%
-If /I "%INPUT%"=="1" goto skipSetupEnv
-If /I "%INPUT%"=="2" goto setupEnv
-cls & echo ! Please Type Y/N only & goto ask2
+echo Press [1] for Skipping project environment Setup
+echo Press [2] for Preparing project environment Setup
+
+rem set INPUT=
+rem set /P INPUT=Your Choice: %=%
+rem If /I "%INPUT%"=="1" goto skipSetupEnv
+rem If /I "%INPUT%"=="2" goto setupEnv
+rem cls & echo ! Please Type Y/N only & goto ask2
+
+set choice2Timeout=10
+choice /t %choice2Timeout% /c 12 /N /d 1 /m "(Decision will be defaulted after %choice2Timeout% seconds) Your Choice ?"
+rem The construct if errorlevel n checks if the errorlevel is at least n, therefor the way to do the test is go from higher errorlevel to lower errorlevel
+if errorlevel 2 goto setupEnv
+if errorlevel 1 goto skipSetupEnv
+
 
 :setupEnv
 
@@ -117,7 +133,6 @@ echo ---------------------------------------------------------------------------
 echo ^ ^ ^> run flask server ...
 echo -------------------------------------------------------------------------------
 cmd /k "flask run -h 0.0.0.0 -p 80"
-
 
 
 rem npm init -y

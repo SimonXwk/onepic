@@ -1,27 +1,47 @@
-// Navbar Hover effect
+$navbar-highlight-color: #f5de50;
+$navbar-highlight-bg-color: #4f9da6;
+$navbar-bg-color: #5f5f5f;
+$navbrand-color: #fefefe;
+$hamberger-width: 25px;
+$hamberger-height: 3px;
+
 #navbar-global {
-	background: #414b56;
+	background: $navbar-bg-color;
+	font-family: Verdana,arial,x-locale-body,sans-serif;
+	opacity: 0.9;
 
 	.navbar-brand{
-		color: #f5de50;
+		color: $navbrand-color;
+		font-family: Impact, Charcoal, sans-serif;
 	}
 
 	.navbar-nav {
 		// Style for each individual nav item(<li>) on the nav-bar(<ul>)
 		.nav-item {
+			&.active{
+				.nav-link {
+					text-shadow: 5px 5px 10px  $navbar-highlight-color;
+				}
+				.nav-link:hover {
+					text-shadow: 5px 5px 10px #CDDC39;
+					color:#CDDC39;
+				}
+			}
+
 			&:not(.active){
 				&::after {
 					content: '';
 					display: block;
 					width: 0%;
 					height: 1px;
-					background: #f5de50;
+					background: $navbar-highlight-color;
 					transition: 0.2s;
 				}
 				&:hover::after {
 					width: 100%;
 				}
 				.nav-link:hover {
+					text-shadow: 5px 5px .4rem $navbar-highlight-color;
 					color: rgba(255,255,255,1);
 				}
 			}
@@ -30,7 +50,6 @@
 			// Reveal the dropdown on mouse hovering
 			&.dropdown:hover > .dropdown-menu {
 				// display: block;
-				opacity: 0.9;
 			}
 
 			// Hide the dropdown on mouse not hovering(preventing it from showing if the nav-item was clicked instead of hovered)
@@ -40,10 +59,10 @@
 
 			// Navlink is the level1 narbar item that show directly one the bar, this class applies to <a> tag
 			.nav-link {
-				color: rgba(255,255,255,0.50);
+				color: rgba(255,255,255,0.45);
 
 				&.active {
-					color: #f5de50;
+					color: $navbar-highlight-color;
 				}
 
 				&:hover {
@@ -52,26 +71,89 @@
 			}//END OF .nav-link
 
 			.dropdown-menu{
-
 				.dropdown-item {
 					&.active{
-						color: #ffe600;
+						color: $navbar-highlight-color;
+						background: $navbar-highlight-bg-color;
 					}
 					&:hover {
-						color: #05007b;
-						background: #d0e6da;
+						color: #228c7b;
+						background: $navbar-highlight-color;
+					}
+					&.active:hover {
+						color: #51e898;
+						background: $navbar-highlight-bg-color;
 					}
 				}//END OF .dropdown-item
 			}//END OF .dropdown-menu
 
 		}//END OF .nav-item
 	}//END OF .navbar-nav
-}//END OF #navbar-globalv
 
-Custom Navbar Toggler
-.custom-toggler.navbar-toggler {
-  border-color: rgba(255,203,0,0.25);
-}
-.custom-toggler .navbar-toggler-icon {
-  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255,150,0, 0.7)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
-}
+	.custome-toggler {
+		opacity: 0.75;
+		border: none;
+
+		&:focus, &:active {
+			outline: 0;
+		}
+
+		span {
+			display: block;
+			background-color: $navbrand-color;
+			height: $hamberger-height;
+			width: $hamberger-width;
+			margin-top: 4px;
+			margin-bottom: 4px;
+			position: relative;
+			left: 0;
+
+			-webkit-transition: transform .35s ease-in-out;
+			-moz-transition: transform .35s ease-in-out;
+			-o-transition: transform .35s ease-in-out;
+			transition: transform .35s ease-in-out;
+
+			&:nth-child(2) {
+				width: $hamberger-width - 5px;
+			}
+			&:nth-child(3) {
+				width: $hamberger-width - 10px;
+			}
+		}
+
+		&:hover {
+			span{
+				&:nth-child(2), &:nth-child(3){
+					width: $hamberger-width;
+					transition: ease all .2s;
+				}
+			}
+		}
+
+		&:not(.collapsed) {
+			span {
+				background-color:  $navbar-highlight-color;
+				&:nth-child(1) {
+					width: $hamberger-width ;
+					-webkit-transform: rotate(45deg) translate(5px, 5px);
+					-moz-transform: rotate(45deg) translate(5px, 5px);
+					-o-transform: rotate(45deg) translate(5px, 5px);
+					transform: rotate(45deg) translate(5px, 5px);
+				}
+				&:nth-child(2) {
+					opacity: 0;
+					visibility: hidden;
+	  			transition: ease all .1s;
+				}
+				&:nth-child(3) {
+					width: $hamberger-width;
+					-webkit-transform: rotate(-45deg) translate(5px, 5px);
+					-moz-transform: rotate(-45deg) translate(5px, 5px);
+					-o-transform: rotate(-45deg) translate(5px, 5px);
+					transform: rotate(-45deg) translate(5px, -5px);
+				}
+			}
+		}
+	}
+
+}//END OF #navbar-globalv

@@ -1,12 +1,11 @@
-{% macro blueprintNavItem(blueprint, maxlevel, links) %}
-<li class="nav-item {% if maxlevel > 1 %}dropdown{% endif %} {% if request.blueprint == blueprint %}active{% endif %}">
+{% macro blueprintNavItem(blueprint, maxlevel, isCompact, links) %}
+<li class="nav-item {% if isCompact %}py-0{% endif %} {% if maxlevel > 1 %}dropdown{% endif %} {% if request.blueprint == blueprint %}active{% endif %}">
 {% if maxlevel > 1 %}
-	<a class="nav-link dropdown-toggle {% if request.blueprint == blueprint %}active{% endif %}" href="#" id="{{ blueprint }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ blueprint|title }}</a>
-	<div class="dropdown-menu aria-labelledby="{{ blueprint }}">
+	<a class="nav-link dropdown-toggle {% if isCompact %}py-0{% endif %} {% if request.blueprint == blueprint %}active{% endif %}" href="#" id="{{ blueprint }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ blueprint|title }}</a>
+	<div class="dropdown-menu shadow-lg" aria-labelledby="{{ blueprint }}">
 	{% for endpoint, text in links %}
-
 		{% if endpoint %}
-		<a class="dropdown-item {% if request.endpoint == blueprint+'.'+endpoint %}active{% endif %}" href="{{ url_for(blueprint+'.'+endpoint) }}">{{ text }}</a>
+		<a class="dropdown-item {% if isCompact %}py-0{% endif %} {% if request.endpoint == blueprint+'.'+endpoint %}active{% endif %}" href="{{ url_for(blueprint+'.'+endpoint) }}">{{ text }}</a>
 		{% else %}
 		<div class="dropdown-divider"></div>
 		{% endif %}
@@ -14,42 +13,31 @@
 	</div>
 {% elif maxlevel == 1 %}
 	{% for endpoint, text in links %}
-	<a class="nav-link {% if request.endpoint == blueprint+'.'+endpoint %}active{% endif %}" href="{{ url_for(blueprint+'.'+endpoint) }}">{{ text }}</a>
+	<a class="nav-link {% if isCompact %}py-0{% endif %} {% if request.endpoint == blueprint+'.'+endpoint %}active{% endif %}" href="{{ url_for(blueprint+'.'+endpoint) }}">{{ text }}</a>
 	{% endfor %}
 {% else %}
 {% endif %}
 </li>
 {% endmacro %}
 
-
-{#- -------------------------------- -#}
-<nav class="navbar navbar-expand-lg fixed-top" id="navbar-global">
-	<a class="navbar-brand" href="/logged">
-		&#127912;ONEPIC
-	</a>
-	<button class="navbar-toggler custom-toggler" type="button" data-toggle="collapse" data-target="#onepic_nav_global" aria-controls="onepic_nav_global" aria-expanded="false" aria-label="Toggle navigation">
-		<span class="navbar-toggler-icon"></span>
+{% set compact = true %}
+<nav class="navbar navbar-expand-lg fixed-top {% if compact %}py-0 py-md-0{% endif %} shadow-sm"  id="navbar-global">
+	<a class="navbar-brand align-middle" href="/logged">ONEPIC</a>
+	<button class="navbar-toggler custome-toggler collapsed {% if compact %}py-0{% endif %}" type="button" data-toggle="collapse" data-target="#onepic_nav_global" aria-controls="onepic_nav_global" aria-expanded="false" aria-label="Toggle navigation">
+		<span></span><span></span><span></span>
 	</button>
-
+	{#	Actual #}
 	<div class="collapse navbar-collapse" id="onepic_nav_global">
 		<ul class="navbar-nav mr-auto">
-			<!-- Dictionary -->
-			<!-- {{ blueprintNavItem('dictionary', 2,
-				 [('index', 'General')
-				,('donor_type', 'On Donor Type')
-				,('marketing_cycle', 'On Marketing Cycle')
-			]) }} -->
-
-			<!-- MailBox -->
-			{{ blueprintNavItem('mailbox', 2,
+			{# MailBox #}
+			{{ blueprintNavItem('mailbox', 2, compact,
 				[('index', 'Today')
 				,('daily', 'Daily')
 				,('monthly', 'Monthly')
 				,('excel_list', 'Excel List')
 			]) }}
-
-			<!-- Private Revenue -->
-			{{ blueprintNavItem('privenue', 2,
+			{# Private Revenue #}
+			{{ blueprintNavItem('privenue', 2, compact,
 				[('index', 'Overview')
 				,('comparative', 'Comparative View')
 				,('revenue_streams', 'Revenue Streams')
@@ -57,33 +45,29 @@
 				,('sourcecode1', 'Source Codes Checking List')
 				,('pending', 'Pending Batches')
 			]) }}
-
-			<!-- Donor Statistics -->
-			{{ blueprintNavItem('stats', 2,
+			{# Donor Statistics #}
+			{{ blueprintNavItem('stats', 2, compact,
 				[('contacts_snapshot', 'Contacts Snapshot')
 				,('fishing_pool', 'Fishing Pool')
 				,('segments', 'Segments')
 			]) }}
-		{# ,('donor_types', 'Donor Types') #}
-
-			<!-- Sponsorship -->
-			{{ blueprintNavItem('sponsorship', 2,
-				[('overview', 'Overview')
+			{# Sponsorship #}
+			{{ blueprintNavItem('pledge', 2, compact,
+				[('lifecycle', 'Lifecycle ')
+				,('overview', 'Overview')
 				,('pledge_income_fy', 'Revenue by Financial Year')
 				,('pledges', 'Created by Financial Year')
 				,('delinquency', 'Delinquency Warning')
 			]) }}
-
-			<!-- Journey -->
-			{{ blueprintNavItem('journey', 2,
+			{# Journey #}
+			{{ blueprintNavItem('journey', 2, compact,
 				[('cure_one', 'Cure One Pledger')
 				,('merchandise_new', 'New Merchandise Customer')
 				,('cure_one_acquisition', 'Cure One Acquisition Donor')
 				,('general_new', 'General New Donor')
 			]) }}
-
-			<!-- Merchandise -->
-			{{ blueprintNavItem('merchandise', 2,
+			{# Merchandise #}
+			{{ blueprintNavItem('merch', 2, compact,
 				[('merchandise_revenue_by_fy', 'ThankQ FY Revenue')
 				,('track_order', 'REX Order Tracking')
 				,('upload', 'REX RFM Analysis')
@@ -92,23 +76,27 @@
 				,('merchandise_new_welcome_pack', 'Todo : New Customer Welcome Pack')
 
 			]) }}
-
-			<!-- Budget -->
-			{{ blueprintNavItem('budget', 2,
+			{# Budget #}
+			{{ blueprintNavItem('budget', 2, compact,
 				[('scoping_fy20', 'FY20 Budget Scoping')
 			]) }}
-
-			<!-- API -->
-			{{ blueprintNavItem('api', 1,
-				[('index', 'API')
+			{# Miscellaneous #}
+			{{ blueprintNavItem('misc', 2, compact,
+				 [('questions', 'Historical Questions')
+				 ,('basic', 'General Definitions')
+				,('marketing_cycle', 'On Marketing Cycle')
 			]) }}
-
 		</ul>
 
-		{% if current_user.is_authenticated %}
 		<form class="form-inline my-2 my-md-0">
-			<a href="/logout" class="btn btn-outline-warning btn-sm" role="button" aria-pressed="true">Logout</a>
+			<a href="{{ url_for('api.index') }}" class="btn text-light btn-sm mr-1 {% if compact %}py-0{% endif %}" role="button" aria-pressed="true">&#128297;API</a>
+			{% if current_user.is_authenticated %}
+			<a href="#" class="btn text-warning btn-sm {% if compact %}py-0{% endif %}" role="button" aria-pressed="true">&#128273;Logout</a>
+			{% else %}
+			<a href="#" class="btn text-warning btn-sm {% if compact %}py-0{% endif %}" role="button" aria-pressed="true">&#128477;Login</a>
+			{% endif %}
+			<a href="#" class="btn text-warning btn-sm {% if compact %}py-0{% endif %} disabled">{% if tq_use_live %}&#127765;{% else %}&#127769;{% endif %}</a>
 		</form>
-		{% endif %}
+
 	</div>
 </nav>

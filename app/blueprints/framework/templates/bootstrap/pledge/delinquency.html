@@ -1,30 +1,36 @@
 <div class="container-fluid">
+	{% set general_warning =  data.rows|selectattr('FIRSTOVERDUE_LAPSED_DAYS','greaterthan',general_warning_days)|groupby(attribute='PLEDGEID')|length  %}
+	{% set dd_warning =  data.rows|selectattr('PAYMENTTYPE','==','Direct Debit')|selectattr('FIRSTOVERDUE_LAPSED_DAYS','greaterthan',dd_warning_days)|groupby(attribute='PLEDGEID')|length  %}
+	{% set cc_warning =  data.rows|selectattr('PAYMENTTYPE','==','Credit Card')|selectattr('FIRSTOVERDUE_LAPSED_DAYS','greaterthan',cc_warning_days)|groupby(attribute='PLEDGEID')|length  %}
 
-	<div class="row"><!-- ROW -->
-		<div class="col-12"></div>
-	</div>
+	{% if data.rows|length == 1 %}
+	<h3 class="card-title">One Active Pledge <small class="text-muted">that has due date before <span class="text-info">{{ now|dAU }}</span></small></h3>
+	{% else %}
+	<h3 class="card-title"><span class="text-danger">&#10148 {{ data.rows|length|number }}</span> <span class="text-success">Active Pledges</span>
+		<small class="text-muted">that has due date before <span class="text-info">{{ now|dAU }}</span></small>
+	</h3>
+	{% endif %}
 
-	{% set warnings =  data.rows|selectattr('FIRSTOVERDUE_LAPSED_DAYS','greaterthan',warning_days)|groupby(attribute='PLEDGEID')|length  %}
 	<div class="row"><!-- ROW -->
 		<div class="col-12">
 			<div class="card shadow-type6">
 				<div class="card-body">
-					{% if data.rows|length == 1 %}
-					<h3 class="card-title">One Active Pledge</h3>
-					<p class="card-text">that has due date before <span class="text-info">{{ now|dAU }}</span>,
-						and pledges that have lapsed for more than <span class="text-danger">{{ warning_days|number }}</span> days will be red-out :
-						<span class="text-danger">found {{  warnings|number }}</span>
+
+					<p class="card-text text-secondary">
+					 	Pledges (<span class="text-danger">General</span>) that have lapsed for more than <span class="text-danger">{{ general_warning_days|number }} days</span> :
+						{% if general_warning != 0 %}<span class="text-danger">found {{  general_warning|number }}</span>{% else %}<span class="text-success">None &#10003</span>{% endif %}
 					</p>
-					{% else %}
-					<h3 class="card-title text-danger"> &#10148 {{ data.rows|length|number }} <span class="text-success">Active Pledges</span></h3>
-					<p class="card-text text-secondary">that have due date before <span class="text-info">{{ now|dAU }}</span>,
-						and pledges that have lapsed for more than <span class="text-danger">{{ warning_days|number }}</span> days will be red-out :
-						{% if warnings != 0 %}<span class="text-danger">found {{  warnings|number }}</span>{% else %}<span class="text-success">None &#10003</span>{% endif %}
+					<p class="card-text text-secondary">
+					 	Pledges (<span class="text-danger">Direct Debit</span>) that have lapsed for more than <span class="text-danger">{{ dd_warning_days|number }} days</span>  :
+						{% if dd_warning != 0 %}<span class="text-danger">found {{  dd_warning|number }}</span>{% else %}<span class="text-success">None &#10003</span>{% endif %}
 					</p>
-					{% endif %}
-					<hr/>
+					<p class="card-text text-secondary">
+					 	Pledges (<span class="text-danger">Credit Card</span>) that have lapsed for more than <span class="text-danger">{{ cc_warning_days|number }} days</span>  :
+						{% if cc_warning != 0 %}<span class="text-danger">found {{  cc_warning|number }}</span>{% else %}<span class="text-success">None &#10003</span>{% endif %}
+					</p>
+
 					<div class="table-responsive-lg">
-						<table class="table table-sm table-hover table-bordered shadow-type1" id="delinquency">
+						<table class="table table-sm table-hover table-bordered shadow-sm" id="delinquency">
 							<caption>
 								<strong>Data Captured : </strong>{{ data.timestamp|dtAU }}, result will be cached for {{ '{:,}'.format(data.cached_timeout) }} seconds
 							</caption><!-- End of Table Caption -->
@@ -46,7 +52,11 @@
 
 							<tbody>
 								{% for row in data.rows %}
-								<tr class="{% if row.FIRSTOVERDUE_LAPSED_DAYS > warning_days %}table-danger{% endif %}">
+								<tr class="
+									{% if row.FIRSTOVERDUE_LAPSED_DAYS > general_warning_days
+											or (row.PAYMENTTYPE == 'Credit Card' and row.FIRSTOVERDUE_LAPSED_DAYS > cc_warning_days)
+											or (row.PAYMENTTYPE == 'Direct Debit' and row.FIRSTOVERDUE_LAPSED_DAYS > dd_warning_days)
+										%}table-danger{% endif %}">
 									<td scope="row" class="text-dark">{{ row.PLEDGEID }}</td>
 									<td>{{ row.CREATED|dtSort }}&#10;<small class="text-secondary">{{ row.CREATEDBY }}</small></td>
 									<td>{{ row.FULLNAME }} <small class="text-secondary">({{ row.SERIALNUMBER }})</small></td>

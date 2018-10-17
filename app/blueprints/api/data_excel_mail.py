@@ -4,7 +4,7 @@ import datetime
 import glob
 import os
 import pandas as pd
-from app.database.excel import ExcelWorkbook
+from app.database.excel import Workbook
 from app.helper import jsonified
 from app.api import ApiResult, ApiException
 
@@ -144,7 +144,7 @@ def read_mail_data(file, sheet_name='Sheet1', range_address='A1:A1'):
 	"""
 	rows = None
 	if file:
-		rng = ExcelWorkbook(file).get_range_by_name(sheet_name, range_address)
+		rng = Workbook(file).get_range_by_name(sheet_name, range_address)
 		if rng:
 			rows = ((cell.value for cell in row) for row in rng if isinstance(row[0].value, datetime.datetime))
 	return rows
@@ -188,7 +188,7 @@ def today(year_offset=0):
 	excels = MailExcel.locate_excel(td.year, td.month)
 	data = []
 	if excels:
-		rng = ExcelWorkbook(excels[0]).get_range_by_name(MailExcel.summary_sheet['name'], MailExcel.summary_sheet['range'])
+		rng = Workbook(excels[0]).get_range_by_name(MailExcel.summary_sheet['name'], MailExcel.summary_sheet['range'])
 		if rng:
 			for row in rng:
 				if isinstance(row[0].value, datetime.datetime) \

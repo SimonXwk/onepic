@@ -61,7 +61,7 @@ function setOptionCompareBarChart(config) {
 
 
 let rootVue = new Vue({
-	el: '#vue',
+	el: '#root',
 	data: {
 		paymentAPI: '/api/tq/payments',
 		budgetAPI: '/api/budget',
@@ -237,9 +237,11 @@ let rootVue = new Vue({
 			});
 		}
 
-
 	},
-	template:`<div>
+	components:{
+		'vue-loader': vueLoader
+	},
+	template:`<div class="container-fluid">
 	<p class="lead font-weight-bold">Merchandise Performance in current financial year</p>
 	<div class="row">
 		<div class="col-xs-12 col-sm-6 col-md-6 col-lg-3">

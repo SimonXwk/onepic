@@ -33,8 +33,9 @@
 		{#- Content -#}
 		{% block content %}{% endblock %}
 	 	{#- Footer -#}
-		{% block footer %}{% endblock %}
+		<footer class="footer">{% block footer %}{% endblock %}</footer>
 	{% endblock %}
+
 
 	{#- Framework Required JavaScript Library -#}
   {% block js_framework %}{% endblock %}

@@ -2,7 +2,7 @@ import openpyxl
 import io
 
 
-class ExcelWorkbook(object):
+class Workbook(object):
 	def __init__(self, filename, *args, **kwargs):
 		self.full_path = filename
 		self.workbook = self.__read_workbook(*args, **kwargs)
@@ -18,6 +18,22 @@ class ExcelWorkbook(object):
 				print(f'Can not open {self.full_path}')
 				return None
 		return None
+
+	@property
+	def creator(self):
+		return self.workbook.properties.creator
+
+	@property
+	def created(self):
+		return self.workbook.properties.created
+
+	@property
+	def modified(self):
+		return self.workbook.properties.modified
+
+	@property
+	def last_modified_by(self):
+		return self.workbook.properties.lastModifiedBy
 
 	@property
 	def sheet_names(self):

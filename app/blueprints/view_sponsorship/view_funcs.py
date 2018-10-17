@@ -15,12 +15,26 @@ def pledge_dop_fys():
 	return data.rows
 
 
+@templatified(title='Pledge Lifecycle')
+def lifecycle():
+	pass
+
+
 @templatified(title='Sponsorship Overview')
 def overview():
-	# fy = int(request_arg('fy', TLMA.cfy, tests.is_year))
-	# updates = [('FY', fy)]
-	# data = Tq.query(('PLEDGE_[BASE]', 'PLEDGE_OVERVIEW'),  cached_timeout=30, updates=updates)
-	pass
+	fy = int(request_arg('fy', TLMA.cfy, tests.is_year))
+	updates = [('FY', fy)]
+	return dict(data=Tq.query(('PLEDGE_[BASE]', 'PLEDGE_OVERVIEW'),  cached_timeout=30, updates=updates), thisfy=fy)
+
+
+@templatified(title='Delinquency Check')
+def delinquency():
+	data = dict()
+	data['data'] = Tq.query(('PLEDGE_[BASE]', 'PLEDGE_DELINQUENCY'),  cached_timeout=10)
+	data['general_warning_days'] = 90
+	data['dd_warning_days'] = 20
+	data['cc_warning_days'] = 5
+	return data
 
 
 @templatified(title='Pledge Overview')
@@ -43,8 +57,4 @@ def pledge_income_fy(fy=TLMA.cfy):
 	return dict(data=data, this_fy=fy, fys=fys)
 
 
-@templatified(title='Delinquency Check')
-def delinquency():
-	data = Tq.query(('PLEDGE_[BASE]', 'PLEDGE_DELINQUENCY'),  cached_timeout=10 )
-	warning_days = 90
-	return dict(data=data, warning_days=warning_days)
+

@@ -1,0 +1,114 @@
+<div class="container-fluid">
+	{% set dataSet = data.rows|selectattr('CREATED_FY','<=', thisfy)|list %}
+	<div class="row"><!-- ROW -->
+		<div class="col-lg-6">
+			<div class="table-responsive-lg">
+				<table class="table table-sm table-hover table-bordered text-right">
+					<thead>
+						<tr class="bg-secondary text-light">
+							<th scope="col" style="width: 28%">SPONSORSHIP CATEGORY</th>
+							<th scope="col" style="width: 12%">CREATED</th>
+							<th scope="col" style="width: 12%" class="text-warning">STARTED</th>
+							<th scope="col" style="width: 12%">ONHOLDED</th>
+							<th scope="col" style="width: 12%">CANCELLED</th>
+							<th scope="col" style="width: 12%">CLOSED</th>
+							<th scope="col" style="width: 12%">FINISHED</th>
+						</tr>
+					</thead><!-- End of Table Head -->
+					<tbody>
+						{% for type, typeList in dataSet|groupby('SPONSORSHIP1') %}
+						{% set calc1 = typeList|selectattr('CREATED_FY','==',thisfy)|list|length %}
+						{% set calc2 = typeList|selectattr('START_FY','==',thisfy)|list|length %}
+						{% set calc4 = typeList|selectattr('PLEDGESTATUS','==','On Hold')|selectattr('ONHOLD_FY','==',thisfy)|list|length %}
+						{% set calc5 = typeList|selectattr('PLEDGESTATUS','==','Written Down')|selectattr('WRITTENDOWN_FY','==',thisfy)|list|length %}
+						{% set calc6 = typeList|selectattr('PLEDGESTATUS','==','Closed')|selectattr('CLOSED_FY','==',thisfy)|list|length %}
+						{% set calc7 = typeList|selectattr('PLEDGESTATUS','==','Closed')|selectattr('FINISHED_FY','==',thisfy)|list|length %}
+						<tr>
+							<th scope="row" style="color:{{ typeList[0].SPONSORSHIP1_COLOR }}">{{ type }}</th>
+							<td>{{ calc1|number or '' }}</td>
+							<td>{{ calc2|number or '' }}</td>
+							<td>{{ calc4|number or '' }}</td>
+							<td>{{ calc5|number or '' }}</td>
+							<td>{{ calc6|number or '' }}</td>
+							<td>{{ calc7|number or '' }}</td>
+						</tr>
+						{% endfor %}
+					</tbody><!-- End of Table Body -->
+					<tfoot>
+						<tr class="bg-light text-dark font-weight-bold">
+							<th>Total</th>
+							<td>{{ dataSet|selectattr('CREATED_FY','==',thisfy)|list|length|number }}</td>
+							<td>{{ dataSet|selectattr('START_FY','==',thisfy)|list|length|number }}</td>
+							<td>{{ dataSet|selectattr('PLEDGESTATUS','==','On Hold')|selectattr('ONHOLD_FY','==',thisfy)|list|length|number }}</td>
+							<td>{{ dataSet|selectattr('PLEDGESTATUS','==','Written Down')|selectattr('WRITTENDOWN_FY','==',thisfy)|list|length|number }}</td>
+							<td>{{ dataSet|selectattr('PLEDGESTATUS','==','Closed')|selectattr('CLOSED_FY','==',thisfy)|list|length|number }}</td>
+							<td>{{ dataSet|selectattr('PLEDGESTATUS','==','Closed')|selectattr('FINISHED_FY','==',thisfy)|list|length|number }}</td>
+						</tr>
+					</tfoot>
+				</table><!-- End of Table -->
+			</div><!-- End of Table Responsive -->
+		</div><!-- END OF ROW -->
+
+		<div class="col-lg-6">
+			<div class="table-responsive-lg">
+				<table class="table table-sm table-hover table-bordered text-right">
+					<thead>
+						<tr class="bg-secondary text-light">
+							<th scope="col" style="width: 28%">SPONSORSHIP SUBCATEGORY</th>
+							<th scope="col" style="width: 12%">CREATED</th>
+							<th scope="col" style="width: 12%" class="text-warning">STARTED</th>
+							<th scope="col" style="width: 12%">ONHOLDED</th>
+							<th scope="col" style="width: 12%">CANCELLED</th>
+							<th scope="col" style="width: 12%">CLOSED</th>
+							<th scope="col" style="width: 12%">FINISHED</th>
+						</tr>
+					</thead><!-- End of Table Head -->
+					<tbody>
+						{% for type, typeList in dataSet|groupby('SPONSORSHIP2') %}
+						{% set calc1 = typeList|selectattr('CREATED_FY','==',thisfy)|list|length %}
+						{% set calc2 = typeList|selectattr('START_FY','==',thisfy)|list|length %}
+						{% set calc4 = typeList|selectattr('PLEDGESTATUS','==','On Hold')|selectattr('ONHOLD_FY','==',thisfy)|list|length %}
+						{% set calc5 = typeList|selectattr('PLEDGESTATUS','==','Written Down')|selectattr('WRITTENDOWN_FY','==',thisfy)|list|length %}
+						{% set calc6 = typeList|selectattr('PLEDGESTATUS','==','Closed')|selectattr('CLOSED_FY','==',thisfy)|list|length %}
+						{% set calc7 = typeList|selectattr('PLEDGESTATUS','==','Closed')|selectattr('FINISHED_FY','==',thisfy)|list|length %}
+						<tr>
+							<th scope="row" style="color:{{ typeList[0].SPONSORSHIP1_COLOR }}"><small class="font-weight-bold">{{ type }}</small></th>
+							<td>{{ calc1|number or '' }}</td>
+							<td>{{ calc2|number or '' }}</td>
+							<td>{{ calc4|number or '' }}</td>
+							<td>{{ calc5|number or '' }}</td>
+							<td>{{ calc6|number or '' }}</td>
+							<td>{{ calc7|number or '' }}</td>
+						</tr>
+						{% endfor %}
+					</tbody><!-- End of Table Body -->
+					<tfoot>
+						<tr class="bg-light text-dark font-weight-bold">
+							<th>Total</th>
+							<td>{{ dataSet|selectattr('CREATED_FY','==',thisfy)|list|length|number }}</td>
+							<td>{{ dataSet|selectattr('START_FY','==',thisfy)|list|length|number }}</td>
+							<td>{{ dataSet|selectattr('PLEDGESTATUS','==','On Hold')|selectattr('ONHOLD_FY','==',thisfy)|list|length|number }}</td>
+							<td>{{ dataSet|selectattr('PLEDGESTATUS','==','Written Down')|selectattr('WRITTENDOWN_FY','==',thisfy)|list|length|number }}</td>
+							<td>{{ dataSet|selectattr('PLEDGESTATUS','==','Closed')|selectattr('CLOSED_FY','==',thisfy)|list|length|number }}</td>
+							<td>{{ dataSet|selectattr('PLEDGESTATUS','==','Closed')|selectattr('FINISHED_FY','==',thisfy)|list|length|number }}</td>
+						</tr>
+						</tr>
+					</tfoot>
+				</table><!-- End of Table -->
+			</div><!-- End of Table Responsive -->
+
+		</div><!-- End of COLUMN -->
+
+
+
+	</div><!-- END OF ROW -->
+
+</div>
+
+
+{{ div('root') }}
+
+{#<script>#}
+{#let data = JSON.parse({{ data.to_json()|tojson }});#}
+{#let thisFY = {{ thisfy }};#}
+{#</script>#}

@@ -5,8 +5,8 @@
 {% endblock %}
 
 {% block js_framework %}
-{% for js in framework_js %}<script src="{{ js }}"></script>{% endfor %}
 <script src="{{ url_for('static',filename= 'js/main.js') }}"></script>
+{% for js in framework_js %}<script src="{{ js }}"></script>{% endfor %}
 {% endblock %}
 
 {# Clear out css except for framework ones #}
@@ -22,8 +22,6 @@
 {# Clear out LocalNavBar  #}
 {% block navbar_local %}{% endblock %}
 
-{# tile comes from render_template 'title' keyword argument #}
-{% block title %}{% if title %}{{ title }}{% else %}{{ request.endpoint }}{% endif %}{% endblock %}
 {# Default Nav Bar and Footer #}
 {% block navbar_global %}{% include (framework_folder,'_navbar.html' )|join('/') %}{% endblock %}
 {% block footer %}{% include  (framework_folder,'_footer.html' )|join('/') %}{% endblock %}
@@ -43,6 +41,20 @@
 {% macro loading(name, filte_type = '.html') %}
 <div class="container h-100"><div class="row h-100 justify-content-center align-items-center">{{  loader(name, filte_type)  }}</div></div>
 {% endmacro %}
+
+{% macro preload() %}
+<p class="lead text-center">Rendering View</p><div class="container h-100"><div class="row h-100 justify-content-center align-items-center"><div class="lds-ripple"><div></div><div></div></div></div></div>
+{% endmacro %}
+
+
+{% macro div(id, preload=True) %}
+<div id="{{ id }}">
+{% if preload  %}
+<p class="lead text-center">Initializing View</p><div class="container h-100"><div class="row h-100 justify-content-center align-items-center"><div class="lds-ripple"><div></div><div></div></div></div></div>
+{% endif %}
+</div>
+{% endmacro %}
+
 
 
 {# *********************** Bootstrap Component: PAGINATION ************************************** #}

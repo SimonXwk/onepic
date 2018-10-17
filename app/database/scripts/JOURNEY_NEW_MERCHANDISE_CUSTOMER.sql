@@ -123,14 +123,21 @@ cte_payments as (
   SELECT *
   FROM
   (
-    SELECT [SERIALNUMBER], [SERIALNUMBER] AS [SN], [PARAMETERNAME], [PARAMETERVALUE]
+    SELECT [SERIALNUMBER], [SERIALNUMBER] AS [SN], [PARAMETERNAME]
+    , CASE WHEN [PARAMETERNAME] = 'Record to Review'
+      THEN 'Record to Review'
+      ELSE [PARAMETERVALUE]
+      END AS [PARAMETERVALUE]
     FROM TBL_CONTACTPARAMETER
-    WHERE [PARAMETERVALUE] IN ('Catalogue All', 'eCatalogue All' , 'No Extra Mail') AND [PARAMETERNAME] = 'Catalogue'
+    WHERE ([PARAMETERVALUE] IN ('Catalogue All', 'eCatalogue All', 'eMonthly Promo') AND [PARAMETERNAME] = 'Catalogue')
+      OR ([PARAMETERVALUE] IN ('No Extra Mail') AND [PARAMETERNAME] = 'Mailings')
+      OR ([PARAMETERVALUE] IN ('Annual Tax') AND [PARAMETERNAME] = 'Appeals')
+      OR ([PARAMETERNAME] = 'Record to Review')
   ) D
   PIVOT
   (
     COUNT([SN])
-    FOR [PARAMETERVALUE] IN ([Catalogue All], [eCatalogue All] , [No Extra Mail])
+    FOR [PARAMETERVALUE] IN ([Catalogue All], [eCatalogue All], [eMonthly Promo],[No Extra Mail], [Record to Review], [Annual Tax])
   ) P
 )
 -- --------------------------------------------------------------
@@ -194,6 +201,10 @@ select
   ,[CATALOGUE_ALL] = ISNULL(MAX(mp1.[Catalogue All]), 0)
   ,[ECATALOGUE_ALL] = ISNULL(MAX(mp1.[eCatalogue All]), 0)
   ,[NO_EXTRA_MAIL] = ISNULL(MAX(mp1.[No Extra Mail]), 0)
+  ,[EMONTHLY_PROMO] = ISNULL(MAX(mp1.[eMonthly Promo]), 0)
+  ,[ANNUAL_TAX] = ISNULL(MAX(mp1.[Annual Tax]), 0)
+  ,[RECORD_TO_REVIEW] = ISNULL(MAX(mp1.[Record to Review]), 0)
+
   --> Contact Information
   ,[CONTACTTYPE] = MIN(c1.CONTACTTYPE)
   ,[PRIMARYCATEGORY] = MIN(c1.PRIMARYCATEGORY)

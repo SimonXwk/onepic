@@ -1,5 +1,7 @@
 {% extends '_skeleton.html' %}
 
+{# tile comes from render_template 'title' keyword argument #}
+{% block title %}{% if title %}{{ title }}{% else %}{{ request.endpoint }}{% endif %}{% endblock %}
 
 {% block js_embedded_header %}
 <script type=text/javascript>
@@ -232,6 +234,21 @@ function currency(val) {
 			Vue.filter('dAU', val => new Date(val).toLocaleDateString("en-AU", { year: 'numeric', month: 'short', day: 'numeric' }));
 			Vue.filter('tAU', val => new Date(val).toLocaleTimeString("en-AU", { hour:'numeric', minute:'numeric', second:'numeric' }));
 			Vue.filter('dtAU', val => new Date(val).toLocaleDateString("en-AU", { year: 'numeric', month: 'long', day: 'numeric', hour:'numeric', minute:'numeric', second:'numeric'}));
+			let vueLoader = Vue.component('vueLoader', {
+				props: ['msg'],
+				template: `
+				<div class="row"><div class="col">
+						<div class="alert alert-light text-center" role="alert">
+							<p class="lead">&#128270; << msg >></p>
+							<div class="container h-100">
+								<div class="row h-100 justify-content-center align-items-center">
+									<div class="lds-hourglass"></div>
+								</div>
+							</div>
+						</div>
+				</div></div>`
+			});
+
 	</script>
 
 {# -------------------- crossfilter.js -------------------- #}

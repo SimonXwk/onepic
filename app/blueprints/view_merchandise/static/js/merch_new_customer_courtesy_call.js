@@ -6,7 +6,7 @@ let vueRow = Vue.component('vue-row', {
 			fetch1: '/api/ssi/orders/search/',
 			fetch2: '/api/ssi/track/',
 			fetch3: '/api/ssi/order/',
-			linkTrack: '/merchandise/track_order/',
+			linkTrack: '/merch/track_order/',
 			linkAusPost: 'https://auspost.com.au/mypost/track/#/details/',
 			subTodo: -1,
 			trackingNumber: null,
@@ -110,7 +110,7 @@ let vueRow = Vue.component('vue-row', {
 			fetchJSON(endpoint(vCol.fetch1 + vCol.row['FIRSTORDER']), function (json1) {
 				vCol.called1 = true;
 				let orders = json1.orders;
-				if (orders.length > 0) {
+				if (orders && orders.length > 0) {
 					vCol.orders = orders.length;
 					vCol.trackingNumber = orders[0]['tracking_number'];
 					orders.forEach(order => {
@@ -305,7 +305,7 @@ let vueTable = Vue.component('vue-table', {
 });
 // ******************************************************************************
 let rootVue = new Vue({
-	el: '#vue',
+	el: '#root',
 	data: {
 		raw: {
 			rows: null,
@@ -322,48 +322,6 @@ let rootVue = new Vue({
 		showWaiting: false,
 		showMissing: false,
 		csvEncodedURI: null,
-	},
-	watch:{
-		showSuccess: function(val){
-			this.$eventBus.$emit('toggleResultShowType', 'success', val);
-		 	Object.keys(this.customers).filter(sn => this.customers[sn].displayType === 'success' ).forEach(sn => this.customers[sn].show = val);
-		},
-		showWaiting: function(val){
-			this.$eventBus.$emit('toggleResultShowType', 'waiting', val);
-			Object.keys(this.customers).filter(sn => this.customers[sn].displayType === 'waiting' ).forEach(sn => this.customers[sn].show = val);
-		},
-		showMissing: function(val){
-			this.$eventBus.$emit('toggleResultShowType', 'missing', val);
-			Object.keys(this.customers).filter(sn => this.customers[sn].displayType === 'missing' ).forEach(sn => this.customers[sn].show = val);
-		},
-		fy: function(val){
-			this.raw = {
-				rows: null,
-				headers: [],
-				ready: false,
-				timestamp: null,
-				processed:0
-			};
-			this.csvEncodedURI = null;
-			this.todoCount = 0;
-			this.customers = {};
-			this.getData();
-		},
-		progress: function (val) {
-			if (val == 100) {
-				let csvArr = [];
-				csvArr.push(("data:text/csv;charset=utf-8," + ['SERIALNUMBER', 'REXID', 'FULLNAME', 'FIRSTORDER', 'MOBILENUMBER', 'DAYTELEPHONE', 'EVENINGTELEPHONE', 'FAXNUMBER', 'EMAILADDRESS', 'STATE','DONATION&GOL_ONLY', 'DELIVERYDATE', 'COMMENT'].join(",")));
-				this.raw.rows
-					.filter(d => this.customers[d.SERIALNUMBER].todo)
-					.map(d => ["'" + d.SERIALNUMBER , d.LAST_REXID, d.FULLNAME, d.FIRSTORDER, d.MOBILENUMBER, d.DAYTELEPHONE, d.EVENINGTELEPHONE, d.FAXNUMBER, d.EMAILADDRESS, d.STATE, this.customers[d.SERIALNUMBER].isDonor, this.customers[d.SERIALNUMBER].deliveryDate, ''])
-					.forEach(arr => {
-						csvArr.push(arr.join(","));
-					})
-					// d.SERIALNUMBER + "'" to make sure encodeURI() won't remove the leading zeros
-				let csvContent = csvArr.join("\n");
-				this.csvEncodedURI = encodeURI(csvContent);
-			}
-		}
 	},
 	computed: {
 		dataAPI: function() {
@@ -412,11 +370,53 @@ let rootVue = new Vue({
 			return this.raw.rows.filter(row => this.calcSubListType(row) === 'exclude').sort((a,b) => new Date(a.FIRSTDATE) < new Date(b.FIRSTDATE))
 		},
 	},
+	watch:{
+		showSuccess: function(val){
+			this.$eventBus.$emit('toggleResultShowType', 'success', val);
+		 	Object.keys(this.customers).filter(sn => this.customers[sn].displayType === 'success' ).forEach(sn => this.customers[sn].show = val);
+		},
+		showWaiting: function(val){
+			this.$eventBus.$emit('toggleResultShowType', 'waiting', val);
+			Object.keys(this.customers).filter(sn => this.customers[sn].displayType === 'waiting' ).forEach(sn => this.customers[sn].show = val);
+		},
+		showMissing: function(val){
+			this.$eventBus.$emit('toggleResultShowType', 'missing', val);
+			Object.keys(this.customers).filter(sn => this.customers[sn].displayType === 'missing' ).forEach(sn => this.customers[sn].show = val);
+		},
+		fy: function(val){
+			this.raw = {
+				rows: null,
+				headers: [],
+				ready: false,
+				timestamp: null,
+				processed:0
+			};
+			this.csvEncodedURI = null;
+			this.todoCount = 0;
+			this.customers = {};
+			this.getData();
+		},
+		progress: function (val) {
+			if (val == 100) {
+				let csvArr = [];
+				csvArr.push(("data:text/csv;charset=utf-8," + ['SERIALNUMBER', 'REXID', 'FULLNAME', 'FIRSTORDER', 'MOBILENUMBER', 'DAYTELEPHONE', 'EVENINGTELEPHONE', 'FAXNUMBER', 'EMAILADDRESS', 'STATE','DONATION&GOL_ONLY', 'DELIVERYDATE', 'COMMENT'].join(",")));
+				this.raw.rows
+					.filter(d => this.customers[d.SERIALNUMBER].todo)  //&& !this.customers[d.SERIALNUMBER].isDonor && d.EMAILADDRESS
+					.map(d => ["=\"" + d.SERIALNUMBER + "\"" , d.LAST_REXID, d.FULLNAME, d.FIRSTORDER, d.MOBILENUMBER, d.DAYTELEPHONE, d.EVENINGTELEPHONE, d.FAXNUMBER, d.EMAILADDRESS, d.STATE, this.customers[d.SERIALNUMBER].isDonor, this.customers[d.SERIALNUMBER].deliveryDate, ''])
+					.forEach(arr => {
+						csvArr.push(arr.join(","));
+					});
+					// d.SERIALNUMBER + "'" to make sure encodeURI() won't remove the leading zeros
+				let csvContent = csvArr.join("\n");
+				this.csvEncodedURI = encodeURI(csvContent);
+			}
+		}
+	},
 	created(){
 		this.$eventBus.$on('addTodo', (sn, isDonor, deliDate) => {
 			this.customers[sn].todo = true;
 			this.customers[sn].isDonor = isDonor;
-			this.customers[sn].deliveryDate = deliDate;
+			this.customers[sn].deliveryDate = new Date(deliDate);
 			this.todoCount += 1;
 			this.$eventBus.$emit('calcTodoSubList', sn, this.todoCount%2);
 		});
@@ -478,21 +478,12 @@ let rootVue = new Vue({
 			return Object.keys(this.customers).filter(sn => this.customers[sn].show === true && this.customers[sn].sublist === subListType ).length;
 		},
 	},
-	template: `
-	<div v-if="!raw.ready">
-
-		<div class="row">
-			<div class="col-12">
-				<div class="alert alert-light text-center" role="alert">
-					<p class="lead">&#128270; Finding New Merchandise Customers in ThankQ ... </p>
-					<p><div class="container h-100"><div class="row h-100 justify-content-center align-items-center"><div class="lds-heart"><div></div></div></div></div></p>
-				</div>
-			</div>
-		</div>
-
-	</div>
-
-	<div v-else>
+	components:{
+		'vue-loader': vueLoader,
+		'vue-table': vueTable,
+	},
+	template: `<vue-loader msg="Finding New Merchandise Customers in ThankQ ..." v-if="!raw.ready"></vue-loader>
+	<div class="container-fluid" v-else >
 
 		<div class="row">
 			<div class="col-12">
@@ -598,9 +589,5 @@ let rootVue = new Vue({
 		</div>
 
 	</div>
-	`,
-	components:{
-		'vue-table': vueTable,
-	},
-
+	`
 });
