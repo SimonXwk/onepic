@@ -28,16 +28,18 @@ def list_all_files():
 		for file in files:
 			file_obj = dict(workbook=file.rsplit(os.sep, 1)[1])
 
-			excel = Workbook(file)
-			if excel is not None:
-				file_obj['sheets'] = len(excel.worksheets)
+			wb = Workbook(file)
+			if wb is not None:
+				file_obj['sheets'] = len(wb.worksheets)
+				file_obj['created'] = wb.created
+				file_obj['creator'] = wb.creator
 				# Take the last sheet as default data sheet
-				ws = excel.get_sheet_by_name(excel.sheet_names[-1])
+				ws = wb.get_sheet_by_name(wb.sheet_names[-1])
 
-				for ws_name in excel.sheet_names:
+				for ws_name in wb.sheet_names:
 					if 'FULFILLMENTREPORT' in ws_name.upper():
 						# If the tab's name contains 'Fulfillmentreport', treat the last sheet meet this condition as data sheet
-						ws = excel.get_sheet_by_name(ws_name)
+						ws = wb.get_sheet_by_name(ws_name)
 						file_obj.setdefault('dataSheet', {}).update(dict(title=ws.title, state=ws.sheet_state, minRow=ws.min_row, maxRow=ws.max_row, minColumn=ws.min_column, maxColumn=ws.max_column))
 			result.setdefault('rows', []).append(file_obj)
 			result['timestamp'] = datetime.datetime.now()

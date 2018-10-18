@@ -97,7 +97,9 @@ cte_payments as (
     , [COURTESYCALL1_DATE] = [DATEOFCOMMUNICATION]
     , ROW_NUMBER() OVER(PARTITION BY SERIALNUMBER ORDER BY CREATED DESC) AS [ROW]
     FROM TBL_COMMUNICATION
-    WHERE [CATEGORY] = 'Merch Onboarding' AND ( [SUBJECT] LIKE '%Court%sy%call%1%' OR [SUBJECT] LIKE '%Court%sy%e%mail%1%' )
+    WHERE
+      [CATEGORY] = 'Merch Onboarding'
+      AND ([SUBJECT] LIKE '%Court%sy%1%')
   ) tmp
   WHERE ROW =1
 )
@@ -206,6 +208,8 @@ select
   ,[RECORD_TO_REVIEW] = ISNULL(MAX(mp1.[Record to Review]), 0)
 
   --> Contact Information
+  ,[FIRSTNAME] = MIN(c1.FIRSTNAME)
+  ,[LASTNAME] = MIN(c1.KEYNAME)
   ,[CONTACTTYPE] = MIN(c1.CONTACTTYPE)
   ,[PRIMARYCATEGORY] = MIN(c1.PRIMARYCATEGORY)
   ,[SOURCE] = MIN(c1.SOURCE)

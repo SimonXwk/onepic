@@ -1,8 +1,8 @@
 <div class="container-fluid">
-
+	{% set allCustomerCount = data.rows|length %}
 	<div class="row">
 		<div class="col-md-12">
-			<h5 class="card-title text-primary"><strong>FY{{ cfy }} ON BOARDING JOURNEY</strong> for Merchandise New Customer (Priority 2.1)</h5>
+			<h5 class="text-primary"><strong>FY{{ cfy }} ON BOARDING JOURNEY</strong> for Merchandise New Customer (Priority 2.1)</h5>
 		</div>
 	</div>
 
@@ -10,24 +10,53 @@
 
 		<div class="col-md-4 col-xl-3">
 			<div class="card border-primary mb-3">
-				<h5 class="card-header">Listing <strong>{{ '{:,}'.format(data.rows|length) }}</strong> customers found</h5>
+				<h5 class="card-header">Listing <strong>{{ '{:,}'.format(allCustomerCount) }}</strong> customers found</h5>
 				<div class="card-body">
 					<h6 class="card-title"><mark><span class="text-info">Searching Time Frame</span></mark></h6>
 					<p>{{ dates[0]|dAU }} &#8644 {{ dates[1]|dAU }}</p>
 					<h6 class="card-title"><span class="text-info">Searching Criteria 1</span></h6>
-					<p class="card-text">Contact that financially engaged with us for the first time within the <mark>Searching Time Frame</mark>
-					</p>
+					<p class="card-text">Contact that financially engaged with us for the first time within the <mark>Searching Time Frame</mark></p>
 					<h6 class="card-title"><span class="text-info">Searching Criteria 2</span></h6>
-					<p class="card-text">On their first date of financial engagement, more than zero(&#8807;0) of the total value was given via merchandise platform
-					</p>
+					<p class="card-text">On their first date of financial engagement, more than zero(>0) of the total value was given via merchandise platform</p>
+					<h6 class="card-title"><span class="text-primary">Journey Status (ThankQ Record)</span></h6>
+					<div class="table-responsive-lg">
+						<table class="table table-sm table-borderless text-muted text-left m-0">
+							<thead>
+							<tr>
+								<th scope="col">{{ allCustomerCount|number }} Customers</th>
+								<th scope="col">Total</th>
+								<th scope="col">Active</th>
+								<th scope="col">Cancel</th>
+							</tr>
+							</thead>
+							<tr>
+								<td>Journey Profile</td>
+								<td class="{% if data.rows|selectattr('JOURNEY_BY', '!=', None)|list|length == allCustomerCount %}text-success{% else %}text-danger{% endif %}">{{ data.rows|selectattr('JOURNEY_BY', '!=', None)|list|length|number }}</td>
+								<td>{{ data.rows|selectattr('JOURNEY_BY', '!=', None)|selectattr('BOARDED', '==', -1)|list|length|number }}</td>
+								<td>{{ data.rows|selectattr('JOURNEY_BY', '!=', None)|selectattr('BOARDED', '==', -2)|list|length|number }}</td>
+							</tr>
+							<tr>
+								<td>Courtesy Call</td>
+								<td>{{ data.rows|selectattr('COURTESYCALL1_BY', '!=', None)|list|length|number }}</td>
+								<td>{{ data.rows|selectattr('COURTESYCALL1_BY', '!=', None)|selectattr('BOARDED', '==', -1)|list|length|number }}</td>
+								<td>{{ data.rows|selectattr('COURTESYCALL1_BY', '!=', None)|selectattr('BOARDED', '==', -2)|list|length|number }}</td>
+							</tr>
+							<tr>
+								<td>Welcome Pack</td>
+								<td>{{ data.rows|selectattr('WELCOMEPACK_BY', '!=', None)|list|length|number }}</td>
+								<td>{{ data.rows|selectattr('WELCOMEPACK_BY', '!=', None)|selectattr('BOARDED', '==', -1)|list|length|number }}</td>
+								<td>{{ data.rows|selectattr('WELCOMEPACK_BY', '!=', None)|selectattr('BOARDED', '==', -2)|list|length|number }}</td>
+							</tr>
+						</table>
+					</div>
 				</div>
 			</div>
 
 			<div class="card border-info mb-3">
-				<div class="card-body">
-					<h5 class="card-title text-center">Tags</h5>
+				<div class="card-body p-1">
+					<h5 class="card-title text-center">Tags Definition</h5>
 					<div class="table-responsive-lg">
-						<table class="table table-sm table-hover table-bordered" id="vue-table">
+						<table class="table table-sm table-hover table-bordered p-0">
 							<tbody>
 								<tr>
 									<td>
@@ -36,7 +65,7 @@
 											<span class="sr-only">Has Non-Merchandise on First Day</span>
 										</span>
 									</td>
-									<td scope="row">Has Non-Merchandise on First Day</td>
+									<td scope="row">Non-Merch on First Day</td>
 								</tr>
 
 								<tr>
@@ -66,7 +95,7 @@
 											<span class="sr-only">Merchandise Sponsorship Involved</span>
 										</span>
 									</td>
-									<td scope="row">Merchandise Sponsorship Involved</td>
+									<td scope="row">Merch Sponsorship Involved</td>
 								</tr>
 
 								<tr>
@@ -183,33 +212,29 @@
 			<div class="table-responsive-lg">
 				<table class="table table-sm table-hover table-bordered" id="{{ table_name }}">
 				 <caption><strong>Data Captured : </strong>{{ data.timestamp|dtAU }}, result will be cached for {{ '{:,}'.format(data.cached_timeout) }} seconds</caption>
-				 <thead>
-					<tr class="table-bordered bg-info text-light">
-					 <th scope="col">CUSTOMER</th>
-					 <th scope="col">FIRST DATE</th>
-					 <th scope="col">FIRST ORDER</th>
-					 <th scope="col">FIRST DATE M TOTAL</th>
-					 <th scope="col">TAGS</th>
-					 <th scope="col">MERCH ONBOARDING STATUS</th>
-					 <th scope="col">COURTESY CALL</th>
-					 <th scope="col">WELCOME PACK</th>
-					</tr>
+					<thead>
+						<tr class="table-bordered bg-info text-light">
+							<th scope="col">SN</th><th scope="col">REXID</th>
+							<th scope="col">FIRST DATE</th>
+							<th scope="col">FIRST ORDER</th>
+							<th scope="col">FIRST DATE M TOTAL</th>
+							<th scope="col">TAGS</th>
+							<th scope="col">PROFILES</th>
+							<th scope="col">COURTESY CALL1</th>
+							<th scope="col">WELCOME PACK</th>
+						</tr>
 				 </thead>
 				 <tbody>
 					{% for row in data.rows %}
 					<tr {% if not row[2] %}class=""{% endif %}>
-					 <th scope="row">
-						 {{ row.SERIALNUMBER }}
-						 {% if row.SORTKEYREF1 %}
-								<small class="text-primary" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0" title="{{ row.SORTKEYREFREL1 }} : {{ row.SORTKEYREF1 }}">
-									(is {{ row.SORTKEYREFREL2 }})
-								</small>
-						 {% endif %}
-						 {% if row.LAST_REXID %}<br /><small class="text-info">{{ row.LAST_REXID }}<small> [{{ row.REXIDS }}]{% if row.LAST_REXID_POOL > 1 %}<span class="text-danger"> [shared {{ row.LAST_REXID_POOL }}]{% endif %}</span></small></small>{% else %}<small><s>REXID</s></small>{% endif %}
-						 <br />
-						 <small class="text-muted">{{ row.FULLNAME }}</small>
-					 </th>
+					 <th scope="row">{{ row.SERIALNUMBER }}<br/><small class="text-success">{{ row.SOURCE }}</small></th>
 
+						<td>
+							{% if row.LAST_REXID %}<small class="text-info">{{ row.LAST_REXID }}</small>
+								{% if row.REXIDS > 1 %}<br /><small class="text-danger">{{ row.REXIDS - 1 }} more id</small>{% endif %}
+								{% if row.LAST_REXID_POOL > 1 %}<br /><small class="text-danger">[{{ row.LAST_REXID_POOL }} share]{% endif %}</small>
+							{% else %}<small class="text-danger"><s>MISSING</s></small>{% endif %}
+						</td>
 
 						<td class="text-muted">{{ row.FIRSTDATE|dSort }}</td>
 					 <td><!--First Order ID-->
@@ -275,27 +300,38 @@
 					 </td>
 
 					 <td class="align-middle"><!--ON BOARDING STATUS-->
+					 	<small class="text-muted font-italic"><span class="text-primary">{{ row.STATE }}</span> | {{ row.FULLNAME }}</small>
+					 	{% if row.SORTKEYREF1 %}
+							<small class="text-primary" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0" title="{{ row.SORTKEYREFREL1 }} : {{ row.SORTKEYREF1 }}">
+								(is {{ row.SORTKEYREFREL2 }})
+							</small>
+					 	{% endif %}
+						 <br />
 						{% if row.JOURNEY_NAME %}
 								 {% if row.JOURNEY_FROM != row.JOURNEY_TO %}
 								 <span class="text-success" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0" title='{{ row.JOURNEY_NOTE or '' }}'>
-										<span class="badge badge-success">Boarded by {{ row.JOURNEY_BY }} &#10084; <span class="text-warning">{{ row.JOURNEY_VALUE }}</span>/{{ row.JOURNEY_FROM|dAU }}</span>
+										<span class="badge badge-success" data-toggle="tooltip" data-html="true" data-placement="top" tabindex="0"
+								 		title="{{ row.JOURNEY_VALUE }}<br>{{ row.JOURNEY_FROM|dAU }}">
+											Boarded by {{ row.JOURNEY_BY }} &#128536;</span>
 									</span>
 								 {% else %}
 									<span class="text-secondary" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
 										 title='{{ row.JOURNEY_NOTE }}'>
-									 <span class="badge badge-secondary">Cancelled by {{ row.JOURNEY_BY }} &#9785;</span>
+									 <span class="badge badge-warning">Cancelled by {{ row.JOURNEY_BY }} &#9785;</span>
 									</span>
 								 {% endif %}
 						{% else %}
-								<span class="badge badge-light">&#10067; Waiting to be boarded</span>
+								<span class="badge badge-secondary">Waiting to be boarded &#9992;</span>
 						{% endif %}
 						<br />
-						{% if row.CATALOGUE_ALL > 0 %}<span class="badge badge-success">cALL</span> {% endif %}
-						{% if row.ECATALOGUE_ALL > 0 %}<span class="badge badge-success">eALL</span> {% endif %}
-					 	{% if row.EMONTHLY_PROMO > 0 %}<span class="badge badge-success">ePMO</span> {% endif %}
-						{% if row.ANNUAL_TAX > 0 %}<span class="badge badge-success">TAX</span> {% endif %}
-						{% if row.NO_EXTRA_MAIL > 0 %}<span class="badge badge-success">!EXTRA</span> {% endif %}
-					 	{% if row.RECORD_TO_REVIEW > 0 %}<span class="badge badge-success">R2R</span> {% endif %}
+					 	<span class="badge badge-light p-0">
+							<span class="badge {% if row.CATALOGUE_ALL > 0 %}badge-success{% else %}badge-secondary{% endif %}">cALL</span>
+							<span class="badge {% if row.ECATALOGUE_ALL > 0 %}badge-success{% else %}badge-secondary{% endif %}">eALL</span>
+							<span class="badge {% if row.EMONTHLY_PROMO > 0 %}badge-success{% else %}badge-secondary{% endif %}">ePMO</span>
+							<span class="badge {% if row.ANNUAL_TAX > 0 %}badge-success{% else %}badge-secondary{% endif %}">TAX</span>
+							<span class="badge {% if row.NO_EXTRA_MAIL > 0 %}badge-success{% else %}badge-secondary{% endif %}">!EXTRA</span>
+							<span class="badge {% if row.RECORD_TO_REVIEW > 0 %}badge-success{% else %}badge-secondary{% endif %}">R2R</span>
+						</span>
 					 </td>
 
 						<td><!--Courtesy Call-->
@@ -308,7 +344,7 @@
 
 						<td><!--Courtesy Call-->
 							{% if row.WELCOMEPACK_BY %}
-								<span class="text-info" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
+								<span class="text-info " data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
 								title="{{ row.WELCOMEPACK_SUBJECT }}<hr>{{ row.WELCOMEPACK_NOTES }}">
 								<span class="font-weight-bold">{{ row.WELCOMEPACK_BY }}</span> created a <span class="text-danger">{{ row.WELCOMEPACK_TYPE }}</span> on <span class="text-success">{{ row.WELCOMEPACK_DATE|dAU }}</span></span>
 							{% endif %}

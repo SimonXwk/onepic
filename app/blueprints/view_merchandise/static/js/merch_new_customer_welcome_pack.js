@@ -72,7 +72,7 @@ let vueRow = Vue.component('vue-row', {
 
 		<td style="width: 10%" class="align-middle">
 			<span class="text-muted">
-			<span class="text-success" v-bind:class="{'text-danger': this.row.FIRSTORDERS>1}">[<< row.FIRSTORDERS >>]<< row.FIRSTORDER >></span>
+			<span v-bind:class="{'text-success': this.row.FIRSTORDERS===1, 'text-primary': this.row.FIRSTORDERS>1, 'text-danger': this.row.FIRSTORDERS<1}">[<< row.FIRSTORDERS >>]<< row.FIRSTORDER >></span>
 			<br>
 			<small>(payment << row.FIRSTDATE|dAU >>)</small>
 			</span>
@@ -180,7 +180,7 @@ let rootVue = new Vue({
 		fulfilmentFileNames: function(){
 			let files = [];
 			if (this.fulfilment.ready){
-				files = this.fulfilment.rows.map(d => d['workbook'] + ' [' + d['dataSheet']['title'] + '] , row: ' + d['dataSheet']['minRow'] + ' - ' + d['dataSheet']['maxRow'] + ' , column: '+ d['dataSheet']['minColumn'] + ' - ' + d['dataSheet']['maxColumn'] + '' )
+				files = this.fulfilment.rows.map(d => d.creator + '_' + d.workbook + ' [' + d['dataSheet']['title'] + '] , row: ' + d['dataSheet']['minRow'] + ' - ' + d['dataSheet']['maxRow'] + ' , column: '+ d['dataSheet']['minColumn'] + ' - ' + d['dataSheet']['maxColumn'] + '' )
 			}
 			return files
 		},
@@ -211,10 +211,17 @@ let rootVue = new Vue({
 		customerWelcomePackChecked : function (newVal, oldVal) {
 			if (newVal === this.raw.rows.length) {
 				let csvArr = [];
-				csvArr.push(("data:text/csv;charset=utf-8," + ['SERIALNUMBER', 'REXID', 'FULLNAME', 'FIRSTORDER', 'DATEOFCOMMUNICATION', 'COMMUNICATIONTYPE', 'CATEGORY', 'SUBJECT', 'NOTE'].join(",")));
+				csvArr.push(("data:text/csv;charset=utf-8," + ['SERIALNUMBER', 'TIMEOFCOMMUNICATION', 'DATEOFCOMMUNICATION', 'COMMUNICATIONTYPE', 'CATEGORY', 'SUBJECT', 'NOTE'].join(",")));
 				this.raw.rows
 					.filter(d => this.customers[d.SERIALNUMBER].foundWelcomePack && this.customers[d.SERIALNUMBER].sublist == 'todo' )  //this.customers[d.SERIALNUMBER].foundWelcomePack && this.customers[d.SERIALNUMBER].sublist == 'todo'
-					.map(d => ["=\"" + d.SERIALNUMBER + "\"" , d.LAST_REXID, d.FULLNAME, d.FIRSTORDER, this.customers[d.SERIALNUMBER].pickingSlipCreated, 'Note', 'Merch Onboarding', 'Welcome Pack sent with ' + d.FIRSTORDER, 'Evidenced by PickingSlip : ' + this.customers[d.SERIALNUMBER].excels.toString()])
+					.map(d => ["=\"" + d.SERIALNUMBER + "\"" ,
+						String(new Date(this.customers[d.SERIALNUMBER].pickingSlipCreated.getHours())).padStart(2, '0') + ':' + String(this.customers[d.SERIALNUMBER].pickingSlipCreated.getMinutes()).padStart(2, '0'),
+						this.customers[d.SERIALNUMBER].pickingSlipCreated.setHours(0,0,0,0),
+						'Note',
+						'Merch Onboarding',
+						'Welcome Pack sent with ',
+						'Evidenced by PickingSlip : ' + this.customers[d.SERIALNUMBER].excels.toString()]
+					)
 					.forEach(arr => {
 						csvArr.push(arr.join(","));
 					});
@@ -242,7 +249,7 @@ let rootVue = new Vue({
 		},
 		getData: function(){
 			fetchJSON(endpoint(this.customerDataAPI), (json) => {
-				this.raw.rows = json.rows.sort((a, b) => new Date(a.FIRSTDATE) <  new Date(b.FIRSTDATE) );
+				this.raw.rows = json.rows.sort((a, b) => a.FIRSTORDER <  b.FIRSTORDER);  //Sort by Order Desc
 				this.raw.timestamp = new Date(json.timestamp);
 				this.raw.ready = true;
 				this.customers = this.raw.rows
@@ -251,19 +258,19 @@ let rootVue = new Vue({
 						acc[cur.SERIALNUMBER] = acc[cur.SERIALNUMBER] ? acc[cur.SERIALNUMBER] : { sublist: cur.SUBLIST, pickingSlipChecked: false, foundWelcomePack: false, pickingSlipCreated:null, excels:[] };
 						return acc
 					}, {});
-					fetchJSON(endpoint(this.slipsAPI), (json) => {
-						this.fulfilment.rows = json.rows;
-						this.fulfilment.timestamp = new Date(json.timestamp);
+					fetchJSON(endpoint(this.slipsAPI), (listJSON) => {
+						this.fulfilment.rows = listJSON.rows.sort((a, b) => new Date(a.created) <  new Date(b.created));
+						this.fulfilment.timestamp = new Date(listJSON.timestamp);
 						this.fulfilment.ready = true;
-						for (let i=0; i<json.rows.length; i++) {
-							fetchJSON(endpoint(rootVue.slipAPI + '?filename=' + json.rows[i].workbook + '&tab=' + json.rows[i].dataSheet.title), (slipJSON) => {
-								this.pickingSlip.rows = this.pickingSlip.rows.concat(slipJSON.rows.map(obj => Object.assign(obj, {workbook: slipJSON.workbook, created:slipJSON.created}) ));
+						for (let i=0; i<listJSON.rows.length; i++) {
+							fetchJSON(endpoint(rootVue.slipAPI + '?filename=' + listJSON.rows[i].workbook + '&tab=' + listJSON.rows[i].dataSheet.title), (slipJSON) => {
+								this.pickingSlip.rows = this.pickingSlip.rows.concat(slipJSON.rows.map(obj => Object.assign(obj, {workbook: listJSON.rows[i].workbook, created:listJSON.rows[i].created}) ));
 								this.pickingSlipRead += 1;
-								if (i===json.rows.length-1){
+								if (i===listJSON.rows.length-1){
 									this.$eventBus.$emit('startProcessCustomer', this.pickingSlip.rows.filter(d => d.Manufacturer_Code === 'WP'));
 									console.log('Start Checking Customers against PickingSlips now ....');
 								}
-							}, i===json.rows.length -1 ? false : true);
+							}, i===listJSON.rows.length -1 ? false : true);
 						}
 					});
 			});
@@ -371,11 +378,11 @@ let rootVue = new Vue({
 				<div v-if="raw.rows.length === customerWelcomePackChecked && customerWelcomePackChecked !== 0">
 					<label class="switch align-middle">
 						<input type="checkbox" class="switch-success" v-model="showFound">
-						<span class="switch-slider "></span>
+						<span class="switch-slider"></span>
 					</label>
 					<label class="switch align-middle">
 						<input type="checkbox" class="switch-warning" v-model="showNotFound" >
-						<span class="switch-slider "></span>
+						<span class="switch-slider"></span>
 					</label>
 
 				</div>

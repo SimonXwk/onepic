@@ -180,11 +180,12 @@ let vueRow = Vue.component('vue-row', {
 		</td>
 
 		<td style="width: 35%" class="align-middle">
-			<span class="text-muted"><< row.FIRSTORDER >><small> payment: << row.FIRSTDATE|dAU >></small> <a target="blank" class="text-muted" v-bind:href="linkTrack + row.FIRSTORDER"> &#128073;<small>starshipit</small></a></span>
+			<span class="text-muted"><< row.FIRSTORDER >><small> payment: << row.FIRSTDATE|dAU >></small> </span>
 			<br>
 			<span v-bind:class="statusTextClassObject"><< resultDisplay >></span>
 			<span v-if="statusDetail!==status" calss="text-danger"><small>, << statusDetail >></small></span>
-			<a v-if="isDelivered" target="blank" class="text-secondary" v-bind:href="ausLink"> &#128073; <small>AusPost</small></a>
+			<a target="blank" class="text-secondary" v-bind:href="ausLink" v-if="isDelivered"><small> &#128666;AusPost</small></a>
+			<a target="blank" class="text-muted" v-bind:href="linkTrack + row.FIRSTORDER"><small> &#128667;starshipit</small></a>
 		</td>
 
 		<td style="width: 15%" class="align-middle">
@@ -229,7 +230,7 @@ let vueRow = Vue.component('vue-row', {
 		<td style="width: 20%" class="text-left align-middle">
 			<span v-if=" row.JOURNEY_BY !== null ">
 				<span class="text-success" v-if=" row.JOURNEY_CANCALLED === 0 ">
-					<mark class="text-success">&#128526; << row.JOURNEY_BY >> Created Journey Profile</mark>
+					<mark class="text-success">&#128526; << row.JOURNEY_BY >>: <small><span class="badge badge-primary">Journey Profile</span></small></mark>
 				</span>
 				<span class="text-secondary" v-else-if="row.JOURNEY_CANCALLED === -1 ">
 					<mark class="text-danger">&#129300; << row.JOURNEY_BY >> Cancelled Journey</mark>
@@ -238,11 +239,12 @@ let vueRow = Vue.component('vue-row', {
 			</span>
 			<span v-if=" row.COURTESYCALL1_BY !== null ">
 				<br>
-				<mark>&#128512; << row.COURTESYCALL1_BY >>
-					<span class="text-success"><small> finalized
+				<mark>&#128512; << row.COURTESYCALL1_BY >>:
+					<span class="text-success"><small>
 					<span class="badge badge-success" v-if="row.COURTESYCALL1_SUBJECT.toUpperCase().indexOf('CALL')!==-1"><< row.COURTESYCALL1_SUBJECT >></span>
 					<span class="badge badge-info" v-else-if="row.COURTESYCALL1_SUBJECT.toUpperCase().indexOf('MAIL')!==-1"><< row.COURTESYCALL1_SUBJECT >></span>
-					<span class="badge badge-warning" v-else><< row.COURTESYCALL1_SUBJECT >></span>
+					<span class="badge badge-warning" v-else-if="row.COURTESYCALL1_SUBJECT.toUpperCase().indexOf('TEXT')!==-1"><< row.COURTESYCALL1_SUBJECT >></span>
+					<span class="badge badge-secondary" v-else><< row.COURTESYCALL1_SUBJECT >></span>
 					</small></span>
 				</mark>
 			</span>
@@ -322,6 +324,8 @@ let rootVue = new Vue({
 		showWaiting: false,
 		showMissing: false,
 		csvEncodedURI: null,
+		csvEncodedURIMobile: null,
+		csvEncodedURIEmail: null,
 	},
 	computed: {
 		dataAPI: function() {
@@ -392,6 +396,8 @@ let rootVue = new Vue({
 				processed:0
 			};
 			this.csvEncodedURI = null;
+			this.csvEncodedURIMobile = null;
+			this.csvEncodedURIEmail = null;
 			this.todoCount = 0;
 			this.customers = {};
 			this.getData();
@@ -399,16 +405,65 @@ let rootVue = new Vue({
 		progress: function (val) {
 			if (val == 100) {
 				let csvArr = [];
+				let csvContent;
 				csvArr.push(("data:text/csv;charset=utf-8," + ['SERIALNUMBER', 'REXID', 'FULLNAME', 'FIRSTORDER', 'MOBILENUMBER', 'DAYTELEPHONE', 'EVENINGTELEPHONE', 'FAXNUMBER', 'EMAILADDRESS', 'STATE','DONATION&GOL_ONLY', 'DELIVERYDATE', 'COMMENT'].join(",")));
 				this.raw.rows
 					.filter(d => this.customers[d.SERIALNUMBER].todo)  //&& !this.customers[d.SERIALNUMBER].isDonor && d.EMAILADDRESS
-					.map(d => ["=\"" + d.SERIALNUMBER + "\"" , d.LAST_REXID, d.FULLNAME, d.FIRSTORDER, d.MOBILENUMBER, d.DAYTELEPHONE, d.EVENINGTELEPHONE, d.FAXNUMBER, d.EMAILADDRESS, d.STATE, this.customers[d.SERIALNUMBER].isDonor, this.customers[d.SERIALNUMBER].deliveryDate, ''])
+					.map(d => ["=\"" + d.SERIALNUMBER + "\"" ,
+						d.LAST_REXID,
+						d.FULLNAME,
+						d.FIRSTORDER,
+						d.MOBILENUMBER,
+						d.DAYTELEPHONE,
+						d.EVENINGTELEPHONE,
+						d.FAXNUMBER,
+						d.EMAILADDRESS,
+						d.STATE,
+						this.customers[d.SERIALNUMBER].isDonor,
+						this.customers[d.SERIALNUMBER].deliveryDate,
+						''])
 					.forEach(arr => {
 						csvArr.push(arr.join(","));
 					});
-					// d.SERIALNUMBER + "'" to make sure encodeURI() won't remove the leading zeros
-				let csvContent = csvArr.join("\n");
+				csvContent = csvArr.join("\n");
 				this.csvEncodedURI = encodeURI(csvContent);
+
+				csvArr = [];
+				csvArr.push(("data:text/csv;charset=utf-8," + ['firstName', 'lastName', 'mobile', 'contactId', 'custom1', 'custom2', 'custom3', 'custom4'].join(",")));
+				this.raw.rows
+					.filter(d => this.customers[d.SERIALNUMBER].todo && d.MOBILENUMBER)  //&& !this.customers[d.SERIALNUMBER].isDonor && d.EMAILADDRESS
+					.map(d => [
+						d.FIRSTNAME,
+						d.LASTNAME,
+						d.MOBILENUMBER,
+						"=\"" + d.SERIALNUMBER + "\"",
+						'Note',
+						'Merch Onboarding',
+						'Courtesy Text 1',
+						''])
+					.forEach(arr => {
+						csvArr.push(arr.join(","));
+					});
+					csvContent = csvArr.join("\n");
+					this.csvEncodedURIMobile = encodeURI(csvContent);
+
+					csvArr = [];
+					csvArr.push(("data:text/csv;charset=utf-8," + ['SERIALNUMBER','SERIALNUMBER', 'COMMUNICATIONTYPE', 'CATEGORY', 'SUBJECT', 'NOTE'].join(",")));
+					this.raw.rows
+						.filter(d => this.customers[d.SERIALNUMBER].todo && !this.customers[d.SERIALNUMBER].isDonor && d.EMAILADDRESS)
+						.map(d => [
+							"=\"" + d.SERIALNUMBER + "\"",
+							d.EMAILADDRESS,
+							'Mailing',
+							'Merch Onboarding',
+							'Courtesy Email 1',
+							''])
+						.forEach(arr => {
+							csvArr.push(arr.join(","));
+						});
+					csvContent = csvArr.join("\n");
+					this.csvEncodedURIEmail = encodeURI(csvContent);
+
 			}
 		}
 	},
@@ -488,23 +543,50 @@ let rootVue = new Vue({
 		<div class="row">
 			<div class="col-12">
 
-				<div class="card shadow-type7">
-					<div class="card-body">
+				<div class="card shadow-type7 mt-0">
+					<div class="card-body mb-0 pb-0">
 
 						<div class="row">
-							<div class="col">
+
+							<div class="col-md-8">
 								<blockquote class="blockquote">
 									<p class="mb-0"><span class="text-primary font-weight-bold"><< raw.rows.length >></span> Total New Merchandise Customers <span class="text-muted">(<span class="text-success font-weight-bold"><< todoCount >></span> to be called)</span> Found in <span v-if="fy===null">Current Financial Year</span><span v-else>FY<< fy >></span></p>
 									<footer class="blockquote-footer" v-on:dblclick="showFYSelection=!showFYSelection"> from thankQ <small><< raw.timestamp|dtAU >>, << raw.processed >>/<< raw.rows.length >> </small></footer>
 								</blockquote>
 
-								<div v-if="showFYSelection">
-									<select class="custom-select" id="fySelect" v-model="fy" >
-										<option v-for="f in fys"  v-bind:value="f" >FY<< f >></option>
-									</select>
+								<select class="custom-select" id="fySelect" v-model="fy" v-if="showFYSelection">
+									<option v-for="f in fys" v-bind:value="f" >FY<< f >></option>
+								</select>
+
+								<transition name="slide-fade">
+								<div class="p-0 m-0" v-if="progress === 100">
+									<label class="switch m-lg-3 m-md-2">
+										<input type="checkbox" class="switch-success" v-model="showSuccess" v-bind:disabled="progress !== 100" >
+										<span class="switch-slider round"></span>
+									</label>
+									<label class="switch m-lg-3 m-md-2">
+										<input type="checkbox" class="switch-info" v-model="showWaiting" v-bind:disabled="progress !== 100">
+										<span class="switch-slider round"></span>
+									</label>
+									<label class="switch m-lg-3 m-md-2">
+										<input type="checkbox" class="switch-danger" v-model="showMissing" v-bind:disabled="progress !== 100">
+										<span class="switch-slider round"></span>
+									</label>
 								</div>
+								</transition>
 
 							</div>
+
+							<div class="col-md-4">
+								<transition name="bounce">
+								<div class="alert  m-0 p-1 align-middle shadow-lg" v-if="csvEncodedURI || csvEncodedURIMobile || csvEncodedURIEmail">
+									<a v-if="csvEncodedURI!==null"  v-bind:href="csvEncodedURI" class="btn btn-block btn-sm btn-outline-success align-middle text-left shadow" role="button" aria-pressed="true" download="courtesy_call_data_todo.csv">CSV : TODO ALL</a>
+									<a v-if="csvEncodedURIMobile!==null"  v-bind:href="csvEncodedURIMobile" class="btn btn-block btn-sm btn-outline-success align-middle text-left shadow" role="button" aria-pressed="true" download="courtesy_call_data_todo_mobile.csv">CSV : TODO MOBILE</a>
+									<a v-if="csvEncodedURIEmail!==null" v-bind:href="csvEncodedURIEmail" class="btn btn-block btn-sm btn-outline-success align-middle text-left shadow" role="button" aria-pressed="true" download="courtesy_call_data_todo_email_exc_pure_donor.csv">CSV : TODO EMAIL EXC PURE DONOR</a>
+								</div>
+								</transition>
+							</div>
+
 						</div>
 
 					</div>
@@ -517,42 +599,17 @@ let rootVue = new Vue({
 			<div class="col-12">
 
 				<div class="card shadow-type6">
-
-					<transition name="slide-fade">
-					<div class="card-header bg-transparent" >
-						<div v-if="progress === 100">
-							<span class="lead text-info align-top">&#10024; Views : </span>
-
-							<label class="switch align-middle">
-								<input type="checkbox" class="switch-success" v-model="showSuccess" v-bind:disabled="progress !== 100" >
-								<span class="switch-slider round"></span>
-							</label>
-
-							<label class="switch align-middle">
-								<input type="checkbox" class="switch-info" v-model="showWaiting" v-bind:disabled="progress !== 100">
-								<span class="switch-slider round"></span>
-							</label>
-
-							<label class="switch align-middle">
-								<input type="checkbox" class="switch-danger" v-model="showMissing" v-bind:disabled="progress !== 100">
-								<span class="switch-slider round"></span>
-							</label>
-
-							<a v-if="csvEncodedURI!==null"  v-bind:href="csvEncodedURI" class="btn btn-outline-success align-middle" role="button" aria-pressed="true" download="courtesy_call_data.csv">CSV</a>
-						</div>
-
-						<div class="progress" v-else>
+					<transition name="bounce">
+					<div class="card-header bg-transparent" v-if="!(progress === 100)">
 							<div class="progress-bar" role="progressbar"
 								v-bind:aria-valuenow="progress" aria-valuemin="0" v-bind:aria-valuemax="raw.rows.length" v-bind:style="{ width: progress + '%' }"
 								v-bind:class="progressClassObj"
-							><< progress >> %</div>
-						</div>
-
+							><< progress >> %
+							</div>
 					</div>
 					</transition>
 
-  				<div class="card-body">
-
+  				<div class="card-body p-0">
 						<ul class="nav nav-tabs mb-3 nav-fill nav-justified" id="pills-tab" role="tablist">
 							<li class="nav-item ">
 								<a class="nav-link active" id="include-tab" data-toggle="pill" href="#include" role="tab" aria-controls="include" aria-selected="true">
@@ -561,7 +618,7 @@ let rootVue = new Vue({
 							</li>
 							<li class="nav-item ">
 								<a class="nav-link" id="finished-tab" data-toggle="pill" href="#finished" role="tab" aria-controls="finished" aria-selected="false">
-								 &#128515; Called <span class="badge badge-pill badge-success"> << countVisible('finished') >>/<< finishedRows.length >></span>
+								 &#128515; Cared <span class="badge badge-pill badge-success"> << countVisible('finished') >>/<< finishedRows.length >></span>
 								</a>
 							</li>
 							<li class="nav-item ">
