@@ -15,16 +15,9 @@ def general_new():
 	return dict(title='New DonorJourney')
 
 
-@templatified('cureone_acquisition')
+@templatified('cureone_acquisition', title='Cure One Acquisition')
 def cure_one_acquisition():
-	arg_name = 'CampaignCode'
-	campaign_code = '19AC.Cure One Acquisition'
-	campaign_code = '19DV.August Appeal'
-
-	# if not request.view_args[arg_name]:
-	# 	campaign_code = request.view_args[arg_name]
-
-	return dict(title='Cure One Acquisition')
+	pass
 
 
 @templatified('merch_new_customer')

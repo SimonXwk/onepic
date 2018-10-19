@@ -229,10 +229,10 @@ let vueRow = Vue.component('vue-row', {
 
 		<td style="width: 20%" class="text-left align-middle">
 			<span v-if=" row.JOURNEY_BY !== null ">
-				<span class="text-success" v-if=" row.JOURNEY_CANCALLED === 0 ">
+				<span class="text-success" v-if=" row.BOARDED === -1 ">
 					<mark class="text-success">&#128526; << row.JOURNEY_BY >>: <small><span class="badge badge-primary">Journey Profile</span></small></mark>
 				</span>
-				<span class="text-secondary" v-else-if="row.JOURNEY_CANCALLED === -1 ">
+				<span class="text-secondary" v-else-if="row.BOARDED === -2 ">
 					<mark class="text-danger">&#129300; << row.JOURNEY_BY >> Cancelled Journey</mark>
 					<p class="lead"><small><< row.JOURNEY_NOTE >></small></p>
 				</span>
@@ -243,7 +243,7 @@ let vueRow = Vue.component('vue-row', {
 					<span class="text-success"><small>
 					<span class="badge badge-success" v-if="row.COURTESYCALL1_SUBJECT.toUpperCase().indexOf('CALL')!==-1"><< row.COURTESYCALL1_SUBJECT >></span>
 					<span class="badge badge-info" v-else-if="row.COURTESYCALL1_SUBJECT.toUpperCase().indexOf('MAIL')!==-1"><< row.COURTESYCALL1_SUBJECT >></span>
-					<span class="badge badge-warning" v-else-if="row.COURTESYCALL1_SUBJECT.toUpperCase().indexOf('TEXT')!==-1"><< row.COURTESYCALL1_SUBJECT >></span>
+					<span class="badge badge-warning" v-else-if="row.COURTESYCALL1_SUBJECT.toUpperCase().indexOf('SMS')!==-1"><< row.COURTESYCALL1_SUBJECT >></span>
 					<span class="badge badge-secondary" v-else><< row.COURTESYCALL1_SUBJECT >></span>
 					</small></span>
 				</mark>
@@ -406,11 +406,17 @@ let rootVue = new Vue({
 			if (val == 100) {
 				let csvArr = [];
 				let csvContent;
-				csvArr.push(("data:text/csv;charset=utf-8," + ['SERIALNUMBER', 'REXID', 'FULLNAME', 'FIRSTORDER', 'MOBILENUMBER', 'DAYTELEPHONE', 'EVENINGTELEPHONE', 'FAXNUMBER', 'EMAILADDRESS', 'STATE','DONATION&GOL_ONLY', 'DELIVERYDATE', 'COMMENT'].join(",")));
+				csvArr.push(("data:text/csv;charset=utf-8," + ['SERIALNUMBER', 'REXID', 'STATE', 'GENDER','FULLNAME', 'FIRSTORDER'
+					, 'MOBILENUMBER', 'DAYTELEPHONE', 'EVENINGTELEPHONE', 'FAXNUMBER', 'EMAILADDRESS','PUREDONOR', 'DELIVERYDATE', 'COMMENT'
+					, 'RESULT: LEFT A MESSAGE', 'RESULT: INVALID NUMBER', 'RESULT: NO VOICE MAIL'
+					, 'FEEDBACK: POSITIVE', 'FEEDBACK: NEUTRAL', 'FEEDBACK: NEGATIVE'
+				].join(",")));
 				this.raw.rows
-					.filter(d => this.customers[d.SERIALNUMBER].todo)  //&& !this.customers[d.SERIALNUMBER].isDonor && d.EMAILADDRESS
+					.filter(d => this.customers[d.SERIALNUMBER].todo && !this.customers[d.SERIALNUMBER].isDonor)  // && !this.customers[d.SERIALNUMBER].isDonor && d.EMAILADDRESS
 					.map(d => ["=\"" + d.SERIALNUMBER + "\"" ,
 						d.LAST_REXID,
+						d.STATE,
+						d.GENDER,
 						d.FULLNAME,
 						d.FIRSTORDER,
 						d.MOBILENUMBER,
@@ -418,10 +424,9 @@ let rootVue = new Vue({
 						d.EVENINGTELEPHONE,
 						d.FAXNUMBER,
 						d.EMAILADDRESS,
-						d.STATE,
 						this.customers[d.SERIALNUMBER].isDonor,
-						this.customers[d.SERIALNUMBER].deliveryDate,
-						''])
+						this.customers[d.SERIALNUMBER].isDonor ? null : this.customers[d.SERIALNUMBER].deliveryDate,
+						null, null, null, null, null, null, null])
 					.forEach(arr => {
 						csvArr.push(arr.join(","));
 					});
@@ -431,15 +436,15 @@ let rootVue = new Vue({
 				csvArr = [];
 				csvArr.push(("data:text/csv;charset=utf-8," + ['firstName', 'lastName', 'mobile', 'contactId', 'custom1', 'custom2', 'custom3', 'custom4'].join(",")));
 				this.raw.rows
-					.filter(d => this.customers[d.SERIALNUMBER].todo && d.MOBILENUMBER)  //&& !this.customers[d.SERIALNUMBER].isDonor && d.EMAILADDRESS
+					.filter(d => this.customers[d.SERIALNUMBER].todo && d.MOBILENUMBER && !this.customers[d.SERIALNUMBER].isDonor)  //&& !this.customers[d.SERIALNUMBER].isDonor && d.EMAILADDRESS
 					.map(d => [
 						d.FIRSTNAME,
 						d.LASTNAME,
 						d.MOBILENUMBER,
 						"=\"" + d.SERIALNUMBER + "\"",
-						'Note',
+						'SMS',
 						'Merch Onboarding',
-						'Courtesy Text 1',
+						'Courtesy SMS 1',
 						''])
 					.forEach(arr => {
 						csvArr.push(arr.join(","));
@@ -450,7 +455,7 @@ let rootVue = new Vue({
 					csvArr = [];
 					csvArr.push(("data:text/csv;charset=utf-8," + ['SERIALNUMBER','SERIALNUMBER', 'COMMUNICATIONTYPE', 'CATEGORY', 'SUBJECT', 'NOTE'].join(",")));
 					this.raw.rows
-						.filter(d => this.customers[d.SERIALNUMBER].todo && !this.customers[d.SERIALNUMBER].isDonor && d.EMAILADDRESS)
+						.filter(d => this.customers[d.SERIALNUMBER].todo && d.EMAILADDRESS && !this.customers[d.SERIALNUMBER].isDonor)
 						.map(d => [
 							"=\"" + d.SERIALNUMBER + "\"",
 							d.EMAILADDRESS,
@@ -504,7 +509,7 @@ let rootVue = new Vue({
 					|| (row['FIRSTDATE_MERCHANDISE_PLEDGE'] !== 0)
 					|| (row['DECD'] === -1)
 					|| (row['PRIMARYCATEGORY'] === 'ESTATE')
-					|| (row['JOURNEY_CANCALLED'] === -1)
+					|| (row['BOARDED'] === -2)
 				) {
 				return 'exclude'
 			}else {
@@ -580,9 +585,9 @@ let rootVue = new Vue({
 							<div class="col-md-4">
 								<transition name="bounce">
 								<div class="alert  m-0 p-1 align-middle shadow-lg" v-if="csvEncodedURI || csvEncodedURIMobile || csvEncodedURIEmail">
-									<a v-if="csvEncodedURI!==null"  v-bind:href="csvEncodedURI" class="btn btn-block btn-sm btn-outline-success align-middle text-left shadow" role="button" aria-pressed="true" download="courtesy_call_data_todo.csv">CSV : TODO ALL</a>
-									<a v-if="csvEncodedURIMobile!==null"  v-bind:href="csvEncodedURIMobile" class="btn btn-block btn-sm btn-outline-success align-middle text-left shadow" role="button" aria-pressed="true" download="courtesy_call_data_todo_mobile.csv">CSV : TODO MOBILE</a>
-									<a v-if="csvEncodedURIEmail!==null" v-bind:href="csvEncodedURIEmail" class="btn btn-block btn-sm btn-outline-success align-middle text-left shadow" role="button" aria-pressed="true" download="courtesy_call_data_todo_email_exc_pure_donor.csv">CSV : TODO EMAIL EXC PURE DONOR</a>
+									<a v-if="csvEncodedURI!==null"  v-bind:href="csvEncodedURI" class="btn btn-block btn-sm btn-outline-success align-middle text-left shadow" role="button" aria-pressed="true" download="courtesy_call_data_todo.csv"><small>CSV : TODO <span class="text-primary">ALL</span> <span class="text-danger">EXC PURE DON</span></small></a>
+									<a v-if="csvEncodedURIMobile!==null"  v-bind:href="csvEncodedURIMobile" class="btn btn-block btn-sm btn-outline-success align-middle text-left shadow" role="button" aria-pressed="true" download="courtesy_call_data_todo_mobile.csv"><small>CSV : TODO <span class="text-primary">MOBILE</span> <span class="text-danger">EXC PURE DON</span></small></a>
+									<a v-if="csvEncodedURIEmail!==null" v-bind:href="csvEncodedURIEmail" class="btn btn-block btn-sm btn-outline-success align-middle text-left shadow" role="button" aria-pressed="true" download="courtesy_call_data_todo_email_exc_pure_donor.csv"><small>CSV : TODO <span class="text-primary">EMAIL</span> <span class="text-danger">EXC PURE DON</span></small></a>
 								</div>
 								</transition>
 							</div>

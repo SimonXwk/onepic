@@ -43,18 +43,24 @@ gulp.task('vendor-general', function() {
       'node_modules/jquery/dist/jquery.min.js',
       'node_modules/popper.js/dist/umd/popper.min.js',
       'node_modules/popper.js/dist/umd/popper.min.js.map',
+      'node_modules/vue/dist/vue.min.js',
       'node_modules/echarts/dist/echarts-en.min.js',
-      'node_modules/sketch-js/js/sketch.min.js',
-      'node_modules/chart.js/dist/Chart.bundle.min.js',
-      'node_modules/d3/dist/d3.min.js',
+      'node_modules/crossfilter/crossfilter.min.js',
       'node_modules/lodash/lodash.min.js',
       'node_modules/moment/min/moment.min.js',
-      'node_modules/crossfilter/crossfilter.min.js',
-      'node_modules/vue/dist/vue.min.js',
+      'node_modules/d3/dist/d3.min.js',
+      'node_modules/chart.js/dist/Chart.bundle.min.js',
+
+      'node_modules/tabulator-tables/dist/js/tabulator.min.js',
+      'node_modules/tabulator-tables/dist/css/tabulator.min.css',
+
       'node_modules/datatables.net/js/jquery.dataTables.min.js',
       'node_modules/datatables.net-dt/css/jquery.dataTables.min.css',
       'node_modules/datatables.net-bs4/css/dataTables.bootstrap4.min.css',
       'node_modules/datatables.net-bs4/js/dataTables.bootstrap4.min.js',
+      'node_modules/datatables.net-buttons-dt/js/buttons.dataTables.min.js',
+
+      'node_modules/sketch-js/js/sketch.min.js',
     ])
     .pipe(plumber())
     .pipe(gulp.dest(config.vendorDir))

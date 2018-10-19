@@ -13,7 +13,7 @@
 				<h5 class="card-header">Listing <strong>{{ '{:,}'.format(allCustomerCount) }}</strong> customers found</h5>
 				<div class="card-body">
 					<h6 class="card-title"><mark><span class="text-info">Searching Time Frame</span></mark></h6>
-					<p>{{ dates[0]|dAU }} &#8644 {{ dates[1]|dAU }}</p>
+					<p>{{ dates[0]|dAU }} &#8644; {{ dates[1]|dAU }}</p>
 					<h6 class="card-title"><span class="text-info">Searching Criteria 1</span></h6>
 					<p class="card-text">Contact that financially engaged with us for the first time within the <mark>Searching Time Frame</mark></p>
 					<h6 class="card-title"><span class="text-info">Searching Criteria 2</span></h6>
@@ -192,7 +192,7 @@
 								<tr>
 									<td>
 										<span class="badge badge-success">
-											!EXTRA <span class="badge badge-light">{{ data.rows|selectattr('NO_EXTRA_MAIL', '>', 0)|list|length }}</span>
+											!Ext <span class="badge badge-light">{{ data.rows|selectattr('NO_EXTRA_MAIL', '>', 0)|list|length }}</span>
 											<span class="sr-only">Mail Profile: No Extra Mail</span>
 										</span>
 									</td>
@@ -208,9 +208,8 @@
 		</div>
 
 		<div class="col-md-8 col-xl-9">
-		{% set table_name = 'merchandise-new-customer'  %}
 			<div class="table-responsive-lg">
-				<table class="table table-sm table-hover table-bordered" id="{{ table_name }}">
+				<table class="table table-sm table-hover table-bordered" id="merchandise-new-customer">
 				 <caption><strong>Data Captured : </strong>{{ data.timestamp|dtAU }}, result will be cached for {{ '{:,}'.format(data.cached_timeout) }} seconds</caption>
 					<thead>
 						<tr class="table-bordered bg-info text-light">
@@ -325,12 +324,12 @@
 						{% endif %}
 						<br />
 					 	<span class="badge badge-light p-0">
-							<span class="badge {% if row.CATALOGUE_ALL > 0 %}badge-success{% else %}badge-secondary{% endif %}">cALL</span>
-							<span class="badge {% if row.ECATALOGUE_ALL > 0 %}badge-success{% else %}badge-secondary{% endif %}">eALL</span>
-							<span class="badge {% if row.EMONTHLY_PROMO > 0 %}badge-success{% else %}badge-secondary{% endif %}">ePMO</span>
-							<span class="badge {% if row.ANNUAL_TAX > 0 %}badge-success{% else %}badge-secondary{% endif %}">TAX</span>
-							<span class="badge {% if row.NO_EXTRA_MAIL > 0 %}badge-success{% else %}badge-secondary{% endif %}">!EXTRA</span>
-							<span class="badge {% if row.RECORD_TO_REVIEW > 0 %}badge-success{% else %}badge-secondary{% endif %}">R2R</span>
+							{% if row.CATALOGUE_ALL > 0 %}<span class="badge badge-success mr-1">cALL.</span>{% else %}<span class="badge badge-secondary mr-1">cALL,</span>{% endif %}
+							{% if row.ECATALOGUE_ALL > 0 %}<span class="badge badge-success mr-1">eALL.</span>{% else %}<span class="badge badge-secondary mr-1">eALL,</span>{% endif %}
+							{% if row.EMONTHLY_PROMO > 0 %}<span class="badge badge-success mr-1">ePMO.</span>{% else %}<span class="badge badge-secondary mr-1">ePMO,</span>{% endif %}
+							{% if row.ANNUAL_TAX > 0 %}<span class="badge badge-success mr-1">TAX.</span>{% else %}<span class="badge badge-secondary mr-1">TAX,</span>{% endif %}
+							{% if row.NO_EXTRA_MAIL > 0 %}<span class="badge badge-success mr-1 ">!Ext.</span>{% else %}<span class="badge badge-secondary mr-1">!Ext,</span>{% endif %}
+							{% if row.RECORD_TO_REVIEW > 0 %}<span class="badge badge-success mr-1 ">R2R.</span>{% else %}<span class="badge badge-secondary mr-1">R2R,</span>{% endif %}
 						</span>
 					 </td>
 
@@ -363,7 +362,3 @@
 
 
 </div>
-
-<script>
-let tblSelector = '{{ table_name }}';
-</script>

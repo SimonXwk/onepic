@@ -47,58 +47,6 @@ const fetchJSON = (endpoint, func, silent=false) => {
 };
 
 
-// Table Filters
-function filterTable(tableID, col, value="", element) {
-  let filter, table, tbody, trs, td, i;
-  // IF no filter value provided use calling element's value instead
-	if(value === ""){
-		filter = document.getElementById(element.id).value.toUpperCase().trim();
-	}else{
-		filter = value.toUpperCase().trim();
-	}
-	// Locate the Table objects
-  table = document.getElementById(tableID);
-	tbody = table.getElementsByTagName("tbody").item(0);
-  trs = tbody.getElementsByTagName("tr");
-  console.log(filter, trs.length, 'rows, searching in column', col);
-	// Only show <tr> that has the value in its <td>
-  for (i = 0; i < trs.length; i++) {
-  	//console.log(trs[i]);
-    td = trs[i].cells[col-1];
-    if (td) {
-      if (td.innerText.toUpperCase().indexOf(filter) > -1) {
-      	// DO nothing
-        //trs[i].style.display = "";
-      } else {
-        trs[i].style.display = "none";
-      }
-    }
-  }
-}
-// Table Show All
-function showTableAll(tableID){
- 	let table, tbody, trs, td, i, j;
-	// Locate the Table objects
-  table = document.getElementById(tableID);
-	tbody = table.getElementsByTagName("tbody").item(0);
-  trs = tbody.getElementsByTagName("tr");
-	// Show All <td> in <tr>
-  for (i = 0; i < trs.length; i++) {
-		trs[i].style.display = "";
-  }
-}
-
-
-// Table Show All
-function applyDataTable(id) {
-	$(document).ready( function () {
-		$('#' + id).DataTable({
-				stateSave: true,
-				"lengthMenu": [[-1, 3, 5, 7, 10, 15, 20, 25, 50, 100 ], [ "All", 3, 5, 7, 10, 15, 20, 25, 50, 100 ]],
-		});
-	});
-}
-
 
 // simple cumulative sum in javascript
 function cumsum(v) {
@@ -123,8 +71,6 @@ function currency(val) {
                   .replace(/(\d{3}\B)/g, "$1,")
                   .split("").reverse().join("");
 }
-
-
 </script>
 {% endblock %}
 
@@ -202,7 +148,6 @@ function currency(val) {
 	{% elif vendor == 'd3' %}
 	<script src="{{ url_for('vendor', filename='d3.min.js') }}"></script>
 
-
 {# -------------------- vue.js -------------------- #}
 	{% elif vendor == 'vue' %}
 	<script src="{{ url_for('vendor', filename='vue.min.js') }}"></script>
@@ -248,7 +193,6 @@ function currency(val) {
 						</div>
 				</div></div>`
 			});
-
 	</script>
 
 {# -------------------- crossfilter.js -------------------- #}
@@ -268,15 +212,64 @@ function currency(val) {
 	{% elif vendor == 'datatables' %}
 	<script src="{{ url_for('vendor', filename='jquery.dataTables.min.js') }}"></script>
 		{% if vendor_optionals %}
-			{% if vendor_optionals[0] == 'bs4' %}
-			<script src="{{ url_for('vendor', filename='dataTables.bootstrap4.min.js') }}"></script>
-			<link rel="stylesheet" type="text/css" href="{{ url_for('vendor', filename='dataTables.bootstrap4.min.css') }}">
-			{% endif %}
+			{% for opt in vendor_optionals %}
+				{% if opt == 'bs4' %}
+				<script src="{{ url_for('vendor', filename='dataTables.bootstrap4.min.js') }}"></script>
+				<link rel="stylesheet" type="text/css" href="{{ url_for('vendor', filename='dataTables.bootstrap4.min.css') }}">
+				{% elif opt == 'buttons' %}
+				<script src="{{ url_for('vendor', filename='buttons.dataTables.min.js') }}"></script>
+				{% endif %}
+			{% endfor %}
+	<script>
+	function applyDataTable(id, options, filter=true, page=true) {
+		$(document).ready( function () {
+			let tblID = '#' + id;
+			// Using Data Table API
+			let table = $(tblID).DataTable(
+				Object.assign({
+					stateSave: true,
+					info: true,
+					paging: page,
+					lengthMenu: [[-1, 3, 5, 7, 10, 15, 20, 25, 50, 100 ], [ "All", 3, 5, 7, 10, 15, 20, 25, 50, 100 ]],
+				}, options)
+			);
+			// Vanilla JavaScript
+			if (filter){
+				let header = document.querySelector(tblID + ' thead');
+				let clone, input;
+				if (header.children.length === 1){
+
+					clone = document.querySelector(tblID + ' thead tr').cloneNode(true);
+					header.appendChild(clone);
+				 	for (let i=0; i<clone.children.length; i++ ) {
+						let th = clone.children[i];
+						let title = th.innerHTML.trim();
+						th.classList.remove('sorting', 'sorting_asc', 'sorting_desc');
+						th.innerHTML = '<input type="text" placeholder="' + "&#128269;" + title + '"/>';
+						input = th.children[0];
+						console.log(tblID, i, th.style.width);
+						input.style.width = th.style.width;
+						input.style.height = '1.5rem';
+						th.children[0].addEventListener('keyup', function(){
+							// Using Data Table API
+							if ( table.column(i).search() !== this.value ){
+								table.column(i).search(this.value).draw();
+							}
+						});
+					}
+				}
+			}
+		});
+	}
+	</script>
 		{% else %}
 			<link rel="stylesheet" type="text/css" href="{{ url_for('vendor', filename='jquery.dataTables.min.css') }}">
 		{% endif %}
 
-
+	{# -------------------- tabulator.js -------------------- #}
+	{% elif vendor == 'tabulator' %}
+	<script src="{{ url_for('vendor', filename='tabulator.min.js') }}"></script>
+	<link rel="stylesheet" type="text/css" href="{{ url_for('vendor', filename='tabulator.min.css') }}">
 
 	{% else %}
 		{# Do Nothing	#}

@@ -75,13 +75,26 @@ cte_payments as (
   ) P
 )
 -- --------------------------------------------------------------
+,cte_journey_profile_last as (
+  -- The reason of not using aggregating function is all values from the same record are needed not individual aggreation
+  SELECT * FROM
+  (
+    SELECT [SERIALNUMBER],[PARAMETERNAME],[PARAMETERVALUE],[EFFECTIVEFROM],[EFFECTIVETO],[PARAMETERNOTE]
+    , [JOURNEY_BY] = [CREATEDBY]
+    , ROW_NUMBER() OVER(PARTITION BY SERIALNUMBER ORDER BY CREATED DESC) AS [ROW]
+    FROM TBL_CONTACTPARAMETER
+    WHERE PARAMETERNAME = 'Cure One Acquisition'
+  ) tmp
+  WHERE ROW =1
+)
+-- --------------------------------------------------------------
 -- Null Value Will be eliminated from aggregation functions
 -- --------------------------------------------------------------
 select
   t1.SERIALNUMBER
   --> FIRST DATE
-  ,[FIRSTDATE] = MIN(t3.FIRSTDATE)
-  ,[FIRSTFY] = YEAR(MIN(t3.FIRSTDATE)) + CASE WHEN MONTH(MIN(t3.FIRSTDATE)) < 7 THEN 0 ELSE 1 END
+  ,[FIRSTDATE] = MIN(t4.FIRSTDATE)
+  ,[FIRSTFY] = YEAR(MIN(t4.FIRSTDATE)) + CASE WHEN MONTH(MIN(t4.FIRSTDATE)) < 7 THEN 0 ELSE 1 END
   ,[CFY] = YEAR(CURRENT_TIMESTAMP ) + CASE WHEN MONTH(CURRENT_TIMESTAMP ) < 7 THEN 0 ELSE 1 END
   --> PAYMENT INFORMATION
   ,[FIRST_PLEDGEID] = MIN(t2.PLEDGEID)
@@ -92,12 +105,28 @@ select
   ,[LTD_MERCHANDISE_TOTAL] = SUM(CASE WHEN t2.SOURCETYPE like 'Merch%' THEN t2.PAYMENTAMOUNT ELSE 0 END)
   ,[LTD_FISET_MERCHANDISE_DATE] = MIN(t2.MERCHANDISE_DATEOFPAYMENT)
 
+  --> Journey Profile
+  ,[JOURNEY_NAME] = MIN(t3.PARAMETERNAME)
+  ,[JOURNEY_VALUE] = MIN(t3.PARAMETERVALUE)
+  ,[JOURNEY_FROM] = MIN(t3.EFFECTIVEFROM)
+  ,[JOURNEY_TO] = MIN(t3.EFFECTIVETO)
+  ,[JOURNEY_NOTE] = MIN(t3.PARAMETERNOTE)
+  , CASE WHEN MIN(t3.PARAMETERNAME) IS NULL OR RTRIM(MIN(t3.PARAMETERNAME)) = ''
+    THEN 0 -- Has no profile
+    ELSE
+      CASE WHEN CAST(MIN(t3.EFFECTIVEFROM) AS DATE) = CAST(MIN(t3.EFFECTIVETO) AS DATE)
+      THEN -2  -- Has profile but cancelled
+      ELSE -1  -- Has profile && it's not cancelled
+      END
+    END AS [BOARDED]
+  ,[JOURNEY_BY] = MIN(t3.JOURNEY_BY)
+
   --> Conversion Call
-  ,[CONVERSIONCALL_BY] = MIN(t4.CONVERSIONCALL_BY)
-  ,[CONVERSIONCALL_DATE] = MIN(t4.CONVERSIONCALL_DATE)
-  ,[CONVERSIONCALL_TYPE]  = MIN(t4.CONVERSIONCALL_TYPE)
-  ,[CONVERSIONCALL_SUBJECT]  = MIN(t4.CONVERSIONCALL_SUBJECT)
-  ,[CONVERSIONCALL_NOTES]  = MIN(t4.CONVERSIONCALL_NOTES)
+  ,[CONVERSIONCALL_BY] = MIN(t5.CONVERSIONCALL_BY)
+  ,[CONVERSIONCALL_DATE] = MIN(t5.CONVERSIONCALL_DATE)
+  ,[CONVERSIONCALL_TYPE]  = MIN(t5.CONVERSIONCALL_TYPE)
+  ,[CONVERSIONCALL_SUBJECT]  = MIN(t5.CONVERSIONCALL_SUBJECT)
+  ,[CONVERSIONCALL_NOTES]  = MIN(t5.CONVERSIONCALL_NOTES)
 
   --> Mailing Profile
   ,[ACTION_B_UPDATE] = ISNULL(MAX(mp1.[Action Update B]), 0)
@@ -144,8 +173,10 @@ select
 from
   cte_target_contacts t1
   left join cte_payments t2 on (t1.SERIALNUMBER = t2.SERIALNUMBER)
-  left join cte_first_date t3 on (t1.SERIALNUMBER = t3.SERIALNUMBER)
-  left join cte_conversion_call_last t4 on (t1.SERIALNUMBER = t4.SERIALNUMBER)
+  left join cte_journey_profile_last t3 on (t1.SERIALNUMBER = t3.SERIALNUMBER)
+  left join cte_first_date t4 on (t1.SERIALNUMBER = t4.SERIALNUMBER)
+  left join cte_conversion_call_last t5 on (t1.SERIALNUMBER = t5.SERIALNUMBER)
+
   left join TBL_CONTACT c1 on (t1.SERIALNUMBER = c1.SERIALNUMBER)
   left join TBL_CONTACTATTRIBUTE c2 on (t1.SERIALNUMBER = c2.SERIALNUMBER)
   left join cte_mail_porfile mp1 on (t1.SERIALNUMBER = mp1.SERIALNUMBER)

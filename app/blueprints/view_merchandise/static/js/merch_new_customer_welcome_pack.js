@@ -89,10 +89,10 @@ let vueRow = Vue.component('vue-row', {
 
 		<td style="width: 20%" class="align-middle text-left">
 			<span v-if=" row.JOURNEY_BY !== null ">
-				<span class="text-secondary" v-if=" row.JOURNEY_CANCALLED === 0 ">
+				<span class="text-secondary" v-if=" row.BOARDED === -1 ">
 					<mark class="text-success">&#128526; << row.JOURNEY_BY >> Created Journey Profile</mark>
 				</span>
-				<span class="text-secondary" v-else-if="row.JOURNEY_CANCALLED === -1 ">
+				<span class="text-secondary" v-else-if="row.BOARDED === -2 ">
 					<mark class="text-danger">&#129300; << row.JOURNEY_BY >> Cancelled Journey</mark>
 					<p class="lead"><small><< row.JOURNEY_NOTE >></small></p>
 				</span>
@@ -236,7 +236,7 @@ let rootVue = new Vue({
 					|| (row['FIRSTDATE_MERCHANDISE_PLEDGE'] !== 0)
 					|| (row['DECD'] === -1)
 					|| (row['PRIMARYCATEGORY'] === 'ESTATE')
-					|| (row['JOURNEY_CANCALLED'] === -1)
+					|| (row['BOARDED'] === -2)
 				) {
 				return 'exlcude'
 			}else {

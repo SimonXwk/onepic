@@ -37,7 +37,7 @@
 
 	<h4>It's {{ now|dAU }}, <strong><span class="text-primary">FY{{ cfy }}</span></strong>
 		<small>
-			, <span class="text-primary">{{ progress|round(4) * 100 }}%</span> of the year has passed.
+			, <span class="text-primary">{{ progress|pct(1) }}</span> of the year has passed.
 			<em><small><span class="text-secondary">{{ data.bytes|number }} bytes data captured on {{ data.timestamp|dtAU }} caching for {{ data.cached_timeout|number }} seconds</span></small></em>
 		</small>
 	</h4>
