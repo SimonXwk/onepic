@@ -45,13 +45,18 @@ def pending():
 	return dict(results=result, has_pending=has_pending)
 
 
-@templatified('sourcecode1', title='New Sourcecode')
-def sourcecode1():
+@templatified('sourcecode1_created', title='New Sourcecode 1')
+def sourcecode1_created():
 	# Prepare for SQL parameters
 	d1, d2 = TLMA.ccy_date(TLMA.fy12m, 1), TLMA.cfy_end_date
 	params = Tq.format_date((d1, d2))
 	data = Tq.query('SOURCECODE_CREATED', *params, cached_timeout=10)
 	return dict(data=data, d1=d1, d2=d2)
+
+
+@templatified('sourcecode1_active', title='Active Sourcecode 1')
+def sourcecode1_active():
+	return {'data': Tq.query('SOURCECODE_ACTIVE', cached_timeout=10)}
 
 
 @templatified('revenue_streams', title='Revenue Streams')

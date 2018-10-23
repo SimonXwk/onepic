@@ -23,10 +23,21 @@ def odbc_json_api(_func=None, *, orient='records', dump=False):
 
 @odbc_json_api
 def payments():
-	d1 = request_arg('fy', Tq.format_date(TLMA.fy_range(TLMA.cfy)[0]), lambda x: tests.is_valid_string(x, max_length=10))
-	d2 = request_arg('fy', Tq.format_date(TLMA.fy_range(TLMA.cfy)[1]), lambda x: tests.is_valid_string(x, max_length=10))
+	fy = int(request_arg('fy', TLMA.cfy, tests.is_year))
+	d1, d2 = Tq.format_date(TLMA.fy_range(fy))
+	# d1 = request_arg('fy', Tq.format_date(TLMA.fy_range(TLMA.cfy)[0]), lambda x: tests.is_valid_string(x, max_length=10))
+	# d2 = request_arg('fy', Tq.format_date(TLMA.fy_range(TLMA.cfy)[1]), lambda x: tests.is_valid_string(x, max_length=10))
 	updates = [('PAYMENT_DATE1', d1, '\''), ('PAYMENT_DATE2', d2, '\'')]
+	print(d1, d2)
 	return Tq.query('PAYMENTS', cached_timeout=120, updates=updates)
+
+
+@odbc_json_api
+def source_code1_summary():
+	s1 = request_arg('s1', '', lambda x: tests.is_valid_string(x, nosql=True, max_length=30))
+	updates = [('SOURCECODE1', s1, '\'')]
+	return Tq.query('_SINGLE_SOURCECODE_SUMMAY', cached_timeout=30, updates=updates)
+
 
 
 @odbc_json_api(orient='columns')

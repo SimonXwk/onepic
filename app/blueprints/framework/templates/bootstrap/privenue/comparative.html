@@ -1,9 +1,9 @@
 <div class="container-fluid">
 
 	{% set totalCFY =  data.rows|selectattr('FY','equalto',cfy)|sum(attribute='PAYMENTAMOUNT')  %}
-	{% set donorsCFY =  data.rows|selectattr('FY','equalto',cfy)|groupby(attribute='SERIALNUMBER')|length  %}
+	{% set donorsCFY =  data.rows|selectattr('FY','equalto',cfy)|unique(attribute='SERIALNUMBER')|list|length  %}
 	{% set trxsCFY =  data.rows|selectattr('FY','equalto',cfy)|map(attribute='TRXID')|unique|reject('equalto', 0)|list|length  %}
-	{% set pledgesCFY =  data.rows|selectattr('FY','equalto',cfy)|map(attribute='PLEDGEID')|unique|reject('none')|list|length %}
+	{% set pledgesCFY =  data.rows|selectattr('FY','equalto',cfy)|rejectattr('PLEDGEID', 'none')|unique(attribute='PLEDGEID')|list|length %}
 	{% set pledgeTotalCFY =  data.rows|selectattr('FY','equalto',cfy)|rejectattr('PLEDGEID','none')|sum(attribute='PAYMENTAMOUNT') %}
 
 	{% set totalLFY =  data.rows|selectattr('FY','equalto',cfy-1) |sum(attribute='PAYMENTAMOUNT')  %}

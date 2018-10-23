@@ -32,6 +32,9 @@ let vueRow = Vue.component('vue-row', {
 			fetchJSON(endpoint(api), json => v.nextCodes = json.rows[0]['FIRSTDATE_SOURCECODES']);
 		}
 	},
+	mounted(){
+		this.$eventBus.$emit('mountOneRow', this.sublist)
+	},
 	template: `
 	<tr class="text-left"  v-on:dblclick="toggleColor=!toggleColor" v-bind:class="{'table-warning': toggleColor}">
 
@@ -47,17 +50,15 @@ let vueRow = Vue.component('vue-row', {
 		</td>
 
 		<td style="width: 20%" class="text-muted align-middle">
-			&#128236;
-			<span class="badge badge-success shadow-type8" v-if="row.ACTION_B_UPDATE===1">B UPDATE</span><span class="badge badge-light text-muted" v-else>B UPDATE</span>
-			<span class="badge badge-success shadow-type8" v-if="row.ACTION_A_UPDATE===1">A UPDATE</span><span class="badge badge-light text-muted" v-else>A UPDATE</span>
-			<span class="badge badge-success shadow-type8" v-if="row.ACTION_A===1">ACTION A</span><span class="badge badge-light text-muted" v-else>ACTION A</span>
-			<span class="badge badge-success shadow-type8" v-if="row.ACTION_B===1">ACTION B</span><span class="badge badge-light text-muted" v-else>ACTION B</span>
+			<span class="badge badge-success shadow-type8" v-if="row.ACTION_B_UPDATE===1">mUpdateB.</span><span class="badge badge-light text-muted" v-else>mUpdateB,</span>
+			<span class="badge badge-success shadow-type8" v-if="row.ACTION_A_UPDATE===1">mUpdateA.</span><span class="badge badge-light text-muted" v-else>mUpdateA,</span>
+			<span class="badge badge-success shadow-type8" v-if="row.ACTION_A===1">mActionA.</span><span class="badge badge-light text-muted" v-else>mActionA,</span>
+			<span class="badge badge-success shadow-type8" v-if="row.ACTION_B===1">mActionB.</span><span class="badge badge-light text-muted" v-else>mActionB</span>
 			<br />
-			&#128231;
-			<span class="badge badge-success shadow-type8" v-if="row.EACTION_B_UPDATE===1">B UPDATE</span><span class="badge badge-light text-muted" v-else>B UPDATE</span>
-			<span class="badge badge-success shadow-type8" v-if="row.EACTION_A_UPDATE===1">A UPDATE</span><span class="badge badge-light text-muted" v-else>A UPDATE</span>
-			<span class="badge badge-success shadow-type8" v-if="row.EACTION_A===1">ACTION A</span><span class="badge badge-light text-muted" v-else>ACTION A</span>
-			<span class="badge badge-success shadow-type8" v-if="row.EACTION_B===1">ACTION B</span><span class="badge badge-light text-muted" v-else>ACTION B</span>
+			<span class="badge badge-success shadow-type8" v-if="row.EACTION_B_UPDATE===1">eUpdateB.</span><span class="badge badge-light text-muted" v-else>eUpdateB,</span>
+			<span class="badge badge-success shadow-type8" v-if="row.EACTION_A_UPDATE===1">eUpdateA.</span><span class="badge badge-light text-muted" v-else>eUpdateA,</span>
+			<span class="badge badge-success shadow-type8" v-if="row.EACTION_A===1">eActionA.</span><span class="badge badge-light text-muted" v-else>eActionA,</span>
+			<span class="badge badge-success shadow-type8" v-if="row.EACTION_B===1">eActionB.</span><span class="badge badge-light text-muted" v-else>eActionB,</span>
 		</td>
 
 		<td style="width: 23%" class="text-muted align-middle">
@@ -128,20 +129,20 @@ let vueRow = Vue.component('vue-row', {
 					<mark class="text-success">&#128526; << row.JOURNEY_BY >>: <small><span class="badge badge-primary">Journey Profile</span></small></mark>
 				</span>
 				<span class="text-secondary" v-else-if="row.BOARDED === -2 ">
-					<mark class="text-danger">&#129300; << row.JOURNEY_BY >> Cancelled Journey</mark>
-					<p class="lead"><small><< row.JOURNEY_NOTE >></small></p>
+					<mark class="text-danger">&#129300; << row.JOURNEY_MODIFIED_BY >> Cancelled Journey</mark>
+					<br><small><p><< row.JOURNEY_NOTE >></p></small>
 				</span>
 			</span>
+
 			<span v-if="row.CONVERSIONCALL_BY !== null">
-				<mark>&#128521;
+				<br><mark>&#128521;
 				<span class="font-weight-bold"><< row.CONVERSIONCALL_TYPE >></span> by <span class="font-weight-bold"><< row.CONVERSIONCALL_BY >></span> <small class="text-success"> << row.CONVERSIONCALL_DATE|dAU >></small>
 				</mark>
 				<small class="text-muted"><< row.CONVERSIONCALL_NOTES >></small>
 			</span>
-			<span v-else-if="sublist==='excluded'" class="text-muted">
-				&#128549; Excluded from the Journey
-			</span>
+			<span v-else-if="sublist==='excluded'" class="text-muted"></span>
 			<span v-else>
+				<br>
 				<span v-if="conversionCallDueDate <= new Date()" class="text-danger">&#128562;
 					Overdue : <span class="text-muted"><< conversionCallDueDate|dAU >>, << weekdays[conversionCallDueDate.getDay()] >></span>
 				</span>
@@ -157,6 +158,11 @@ let vueRow = Vue.component('vue-row', {
 // ******************************************************************************
 let vueTable = Vue.component('vue-table', {
 	props: ['rows', 'sublist'],
+	data: function(){
+		return {
+			mountedRows: 0
+		}
+	},
 	computed:{
 		tableID: function(){
 			return this.sublist + '-donor-list'
@@ -169,8 +175,15 @@ let vueTable = Vue.component('vue-table', {
 			}
 		},
 	},
-	mounted(){
-		applyDataTable(this.tableID, {}, true, false);
+	created(){
+		this.$eventBus.$on('mountOneRow', sublist => {
+			if (this.sublist === sublist){
+				this.mountedRows += 1;
+				if (this.mountedRows === this.rows.length){
+						applyDataTable(this.tableID, "sit");
+				}
+			}
+		})
 	},
 	template: `
 	<div class="table-responsive-lg">
@@ -204,6 +217,11 @@ let rootVue = new Vue({
 			timestamp: null,
 		},
 		acqusitionCost: 24610.308,
+		acqusitionMailout: 17000,
+		lybuntCost: 3234.9975,
+		lybuntCostMailout: 3000,
+		lybuntCode: '19SEPAQ',
+		lybuntNewContacts: 0,
 		campaignCode: '19AC.Cure One Acquisition'
 
 	},
@@ -247,11 +265,15 @@ let rootVue = new Vue({
 	},
 	methods:{
 		getData: function(){
+			fetchJSON(endpoint('/api/tq/source_code1_summary' + '?s1=' + this.lybuntCode), function(json2){
+				rootVue.lybuntNewContacts = json2.rows[0].NEW_CONTACTS;
+			});
 			fetchJSON(endpoint(this.defaultAPI), function(json){
 				rootVue.raw.rows = json.rows;
 				rootVue.raw.ready = true;
 				rootVue.raw.timestamp = new Date(json.timestamp);
 			});
+
 		},
 		calcSubLists: function(row){
 			if (row.ANONYMOUS === -1 || row.DECD === -1 || row.PRIMARYCATEGORY === 'Estate' || row.PLEDGES > 0 || row.DONOTCALL === -1 || row.BOARDED === -2){
@@ -286,10 +308,17 @@ let rootVue = new Vue({
 							</span>
 							<small class="text-muted">as at << raw.timestamp|dtAU >> from thankQ</small>
 						</p>
+
 						<p>
-							<span class="text-danger"><< acqusitionCost|currency >></span> Spent on <span class="text-success"><< cfyNewCount|number >> New Donors</span>
-							with an acqusition cost per name : <mark><span class="text-danger font-weight-bold"><< (acqusitionCost/cfyNewCount)|currency >></span></mark>
+							<span class="text-danger"><< acqusitionCost|currency >></span> was spent on <span class="text-danger"><< acqusitionMailout|number >></span> names to acquire <span class="text-success"><< cfyNewCount|number >> New Donors</span>.
+							cost per name : <mark><span class="text-danger font-weight-bold"><< (acqusitionCost/cfyNewCount)|currency >></span></mark>, response rate : <mark><span class="text-danger font-weight-bold"><< (cfyNewCount/acqusitionMailout)|pct(2) >></span></mark>
 						</p>
+
+						<p>
+							<span class="text-danger"><< lybuntCost|currency >></span> was spent on <span class="text-danger"><< lybuntCostMailout|number >></span> names to acquire <span class="text-success"><< lybuntNewContacts|number >> New Donors</span>.
+							cost per name : <mark><span class="text-danger font-weight-bold"><< (lybuntCost/lybuntNewContacts)|currency >></span></mark>, response rate : <mark><span class="text-danger font-weight-bold"><< (lybuntNewContacts/lybuntCostMailout)|pct(2) >></span></mark>
+						</p>
+
 					</div>
 
   				<div class="card-bod p-0">

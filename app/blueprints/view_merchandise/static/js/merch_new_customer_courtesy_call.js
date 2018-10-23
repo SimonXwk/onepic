@@ -271,6 +271,9 @@ let vueTable = Vue.component('vue-table', {
 		}
 	},
 	computed:{
+		tableID: function(){
+			return this.theme + '-donor-list'
+		},
 		trClassObject: function(){
 			return {
 				'table-primary': this.theme === 'primary',
@@ -284,12 +287,15 @@ let vueTable = Vue.component('vue-table', {
 			}
 		},
 	},
+	mounted(){
+		applyDataTable(this.tableID);
+	},
 	components:{
 		'result-row': vueRow
 	},
 	template: `
 	<div class="table-responsive-lg">
-		<table class="table table-sm table-hover table-bordered">
+		<table class="table table-sm table-hover table-bordered" v-bind:id="tableID">
 			<thead>
 				<tr class="table-bordered " v-bind:class="trClassObject">
 					 <th scope="col" style="width: 30%">CUSTOMER NAME</th>

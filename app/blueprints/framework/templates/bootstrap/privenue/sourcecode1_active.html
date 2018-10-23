@@ -1,0 +1,123 @@
+<div class="container-fluid">
+{% if not data %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+	<strong>Unsuccessful!</strong> No result can be found.
+	<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+		<span aria-hidden="true">&times;</span>
+	</button>
+</div>
+{% else %}
+	{% set table_name = 'sourcecodes' %}
+<!-- Banner -->
+<div class="alert alert-light" role="alert">
+	<h3 class="alert-heading">
+		<span class="font-weight-bold text-primary">{{ data.rows|length|number }}</span> Source Code is Active
+	</h3>
+
+	<p>
+	{% for group in data.rows|groupby('DEP')%}
+		{% if group.grouper|string == '20' %}
+		<button type="button" class="btn btn-outline-dark mb-1" disabled>
+			Fundraising <span class="badge badge-light">{{ group.list|length }}</span>
+			<span class="sr-only">Number of Sourcecodes</span>
+		</button>
+		{% elif group.grouper|string == '18' %}
+		<button type="button" class="btn btn-warning mb-1" disabled>
+			Engagement <span class="badge badge-light">{{ group.list|length }}</span>
+			<span class="sr-only">Number of Sourcecodes</span>
+		</button>
+		{% elif group.grouper|string  == '15' %}
+		<button type="button" class="btn btn-info mb-1" disabled>
+			Merchandise <span class="badge badge-light">{{ group.list|length }}</span>
+			<span class="sr-only">Number of Sourcecodes</span>
+		</button>
+		{% else %}
+		<button type="button" class="btn btn-danger mb-1" disabled>
+			Wrong Code <span class="badge badge-light">{{ group.list|length }}</span>
+			<span class="sr-only">Number of Sourcecodes</span>
+		</button>
+		{% endif %}
+	{% endfor %}
+	</p>
+
+<!-- Table -->
+<div class="table-responsive-lg">
+	<table class="table table-sm table-bordered table-hover" id="{{ table_name }}">
+		<caption><strong>Data Captured : </strong>{{ data.timestamp|dtAU }}, result will be cached for {{ '{:,}'.format(data.cached_timeout) }} seconds</caption>
+		<thead>
+			<tr class="bg-dark text-light">
+				<th scope="col">SOURCECODE</th>
+				<th scope="col">SOURCETYPE</th>
+				<th scope="col">ACCNT</th>
+				<th scope="col">CLASS</th>
+				<th scope="col">CAMPAIGN CODE</th>
+				<th scope="col" tabindex="0" data-toggle="popover" data-placement="top" data-trigger="focus"
+						title ='This Life to Date Total Includes: (literally everything from batch item split)'
+						data-content='
+							<ul>
+								<li>normal payments(approved)</li>
+								<li>fully reversed payments(approved)</li>
+								<li>partially reversed payments(approved)</li>
+								<li>re-entered payments</li>
+								<li>payments still being processed</li>
+							</ul>
+							'>LTD TOTAL
+				</th>
+				<th scope="col">START DATE</th>
+				<th scope="col">END DATE</th>
+				<th scope="col">CREATED</th>
+				<th scope="col">STATUS</th>
+			</tr>
+		</thead>
+		<tbody>{% for row in data.rows %}
+			{% set isSponsorship = row.SOURCETYPE[-11:]|upper == 'SPONSORSHIP' %}
+			<tr class="{% if ((not row.CAMPAIGNCODE) and not (isSponsorship)) or (not row.ACCOUNT ) or (not row.CLASS ) or (not row.SOURCESTARTDATE ) %}table-danger
+								{% elif row.DEP|string == '15' %}table-info
+								{% elif row.DEP|string == '18' %}table-warning
+								{% elif row.DEP|string == '20' %}table-light
+								{% else %}table-secondary{% endif %}
+			">
+				<th scope="row"
+				tabindex="0" data-toggle="popover" data-placement="top" data-trigger="focus"
+						title='<strong >{{ row.SOURCEDESCRIPTION }}</strong>'
+						data-content='{{ row.SOURCENOTES }}<br />
+						<span class="text-primary"><small>Default Destinations: </small><u>{{ row.DDES1 }}/{{ row.DDES2 }}</u></span><br />
+						<span class=" text-success"><em><small>Created by </small>{{ row.CREATEDBY }}@<small>{{ row.CREATED|dtAU|string }}</small><em></span><br />
+						{% if row.CREATED == row.MODIFIED %}<span class="text-info"><em>No Modification Afterwards<em></span><br />
+						{% else %}<span class="text-info"><em><small>Modified by </small>{{ row.MODIFIEDBY }}@<small>{{ row.MODIFIED|dtAU|string }}</small><em></span><br />
+						{% endif %}
+						'
+				>{{row.SOURCECODE}}</th>
+				<td>{{row.SOURCETYPE}}</td>
+				<td>{{row.ACCOUNT}}</td>
+				<td>{{row.CLASS}}</td>
+				<td>
+
+						{% if (not row.CAMPAIGNCODE) and isSponsorship %}<span class="text-black-50"><em><del>[Not Applicable]</del></em></span>
+						{% elif (not row.CAMPAIGNCODE) and not (isSponsorship) %}<span class="font-weight-bold">&#10067; Not Found</span>
+						{% elif row.CAMPAIGNCODE and isSponsorship %}<span class="text-danger">{{row.CAMPAIGNCODE}}</span>
+						{% else %}{{row.CAMPAIGNCODE}}{% endif %}
+				</td>
+				<td>{% if row.TOTAL %}<span class="font-weight-bold text-{% if row.TOTAL > 5000 %}danger{% elif row.TOTAL > 2000 %}primary{% elif row.TOTAL > 500 %}info{% else %}success{% endif %}">{{row.TOTAL|currency}}</span>{% endif %}</td>
+				<td>{% if row.SOURCESTARTDATE %}{{row.SOURCESTARTDATE|dAU}}{% else %}&#10067; Not Found{% endif %}</td>
+				<td>{% if row.SOURCEENDDATE %}{{row.SOURCEENDDATE|dAU}}{% else %}&#10067; Not Found{% endif %}</td>
+				<td>{{row.CREATED|dtSort}}</td>
+				<td>
+					{% if row.ARCHIVE==-1 %}<span class="badge badge-pill badge-secondary">Archived</span>{% endif %}
+					{% if row.EXCLUDEFROMDROPDOWN==-1 %}<span class="badge badge-pill badge-warning">Invisible</span>{% endif %}
+					{% if row.TAXDEDUCTIBLE!=-1 %}<span class="badge badge-pill badge-danger">!Deduct</span>{% endif %}
+					{% if row.GOODSTAXAPPLICABLE==-1 %}<span class="badge badge-pill badge-info">GST</span>{% endif %}
+				</td>
+
+			</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% endif %}
+</div>
+
+
+<script>
+let tblSelector =  '{{ table_name }}';
+</script>
