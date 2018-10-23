@@ -41,8 +41,9 @@ let vueRow = Vue.component('vue-row', {
 		<td scope="row" style="width: 25%" class="align-middle">
 			<mark class="text-dark"><< row.FULLNAME >> <small class="text-primary" v-if="row.SORTKEYREF1">(is << row.SORTKEYREFREL2 >>)</small> <small>(<span class="text-success"><< row.SOURCE >></span>, <span class="text-primary"><< row.STATE >></span>)</small></mark>
 			<br>
-			<span v-if="row.FIRSTFY===row.CFY" class="badge badge-success">NEW</span><span v-else class="badge badge-warning">OLD</span>
+			<span v-if="row.IS_ACQUISITION===-1" class="badge badge-success">ACQ</span><span v-else-if="row.FIRSTFY===row.CFY" class="badge badge-info">NEW</span><span v-else class="badge badge-warning">OLD</span>
 			<span class="badge badge-secondary"><< row.SERIALNUMBER >></span>
+			<span class="badge badge-success"><< row.STATE >></span>
 			<span class="badge badge-danger" v-if=" row.CONTACTTYPE === 'Organisation' "><< row.PRIMARYCATEGORY >></span>
 			<span class="badge badge-danger" v-if="row.DECD === -1">DECEASED</span>
 			<span class="badge badge-danger" v-if="row.ESTATE === -1">ESTATE</span>
@@ -50,15 +51,20 @@ let vueRow = Vue.component('vue-row', {
 		</td>
 
 		<td style="width: 20%" class="text-muted align-middle">
-			<span class="badge badge-success shadow-type8" v-if="row.ACTION_B_UPDATE===1">mUpdateB.</span><span class="badge badge-light text-muted" v-else>mUpdateB,</span>
-			<span class="badge badge-success shadow-type8" v-if="row.ACTION_A_UPDATE===1">mUpdateA.</span><span class="badge badge-light text-muted" v-else>mUpdateA,</span>
-			<span class="badge badge-success shadow-type8" v-if="row.ACTION_A===1">mActionA.</span><span class="badge badge-light text-muted" v-else>mActionA,</span>
-			<span class="badge badge-success shadow-type8" v-if="row.ACTION_B===1">mActionB.</span><span class="badge badge-light text-muted" v-else>mActionB</span>
+			<span class="badge badge-success shadow-lg" v-if="row.ACTION_B_UPDATE===1">mUpdateB.</span><span class="badge badge-light text-muted" v-else>mUpdateB,</span>
+			<span class="badge badge-success shadow-lg" v-if="row.ACTION_A_UPDATE===1">mUpdateA.</span><span class="badge badge-light text-muted" v-else>mUpdateA,</span>
+			<span class="badge badge-success shadow-lg" v-if="row.ACTION_A===1">mActionA.</span><span class="badge badge-light text-muted" v-else>mActionA,</span>
+			<span class="badge badge-success shadow-lg" v-if="row.ACTION_B===1">mActionB.</span><span class="badge badge-light text-muted" v-else>mActionB</span>
 			<br />
-			<span class="badge badge-success shadow-type8" v-if="row.EACTION_B_UPDATE===1">eUpdateB.</span><span class="badge badge-light text-muted" v-else>eUpdateB,</span>
-			<span class="badge badge-success shadow-type8" v-if="row.EACTION_A_UPDATE===1">eUpdateA.</span><span class="badge badge-light text-muted" v-else>eUpdateA,</span>
-			<span class="badge badge-success shadow-type8" v-if="row.EACTION_A===1">eActionA.</span><span class="badge badge-light text-muted" v-else>eActionA,</span>
-			<span class="badge badge-success shadow-type8" v-if="row.EACTION_B===1">eActionB.</span><span class="badge badge-light text-muted" v-else>eActionB,</span>
+			<span class="badge badge-success shadow-lg" v-if="row.EACTION_B_UPDATE===1">eUpdateB.</span><span class="badge badge-light text-muted" v-else>eUpdateB,</span>
+			<span class="badge badge-success shadow-lg" v-if="row.EACTION_A_UPDATE===1">eUpdateA.</span><span class="badge badge-light text-muted" v-else>eUpdateA,</span>
+			<span class="badge badge-success shadow-lg" v-if="row.EACTION_A===1">eActionA.</span><span class="badge badge-light text-muted" v-else>eActionA,</span>
+			<span class="badge badge-success shadow-lg" v-if="row.EACTION_B===1">eActionB.</span><span class="badge badge-light text-muted" v-else>eActionB,</span>
+			<br />
+			<span class="badge badge-danger shadow-lg" v-if="row.NO_EXTRA_MAIL===1">!ExMail.</span><span class="badge badge-light text-muted" v-else>!ExMail,</span>
+			<span class="badge badge-danger shadow-lg" v-if="row.NO_APPEALS===1">!Appeal.</span><span class="badge badge-light text-muted" v-else>!Appeal,</span>
+			<span class="badge badge-danger shadow-lg" v-if="row.NO_EXTRA_APPEALS===1">!ExAppeal.</span><span class="badge badge-light text-muted" v-else>!ExAppeal,</span>
+			<span class="badge badge-danger shadow-lg" v-if="row.NO_CATALOGUE===1">!Cat.</span><span class="badge badge-light text-muted" v-else>!Cat,</span>
 		</td>
 
 		<td style="width: 23%" class="text-muted align-middle">
@@ -249,7 +255,7 @@ let rootVue = new Vue({
 		},
 		cfyNewCount:function(){
 			return this.raw.rows.reduce((acc, cur) => {
-				acc += (cur.FIRSTFY === cur.CFY && cur.FIRSTFY ) ? 1 : 0;
+				acc += (cur.IS_ACQUISITION === -1 ) ? 1 : 0;
 				return acc
 			}, 0)
 		},
@@ -299,7 +305,7 @@ let rootVue = new Vue({
 					<div class="card-header bg-transparent shadow-type8">
 						<p class="text-danger font-weight-bold mb-0"><span class="text-primary"><< totalValue|currency >></span> from <span class="text-primary"><< raw.rows.length|number >></span> Cure One Acquisition (campaign) Donors
 							<span class="badge badge-success">
-							  NEW <span class="badge badge-light"><< cfyNewCount >></span>
+							  ACQ <span class="badge badge-light"><< cfyNewCount >></span>
 							  <span class="sr-only">new in current financial year</span>
 							</span>
 							<span class="badge badge-warning">
@@ -309,11 +315,10 @@ let rootVue = new Vue({
 							<small class="text-muted">as at << raw.timestamp|dtAU >> from thankQ</small>
 						</p>
 
-						<p>
+						<p class="mb-0">
 							<span class="text-danger"><< acqusitionCost|currency >></span> was spent on <span class="text-danger"><< acqusitionMailout|number >></span> names to acquire <span class="text-success"><< cfyNewCount|number >> New Donors</span>.
 							cost per name : <mark><span class="text-danger font-weight-bold"><< (acqusitionCost/cfyNewCount)|currency >></span></mark>, response rate : <mark><span class="text-danger font-weight-bold"><< (cfyNewCount/acqusitionMailout)|pct(2) >></span></mark>
 						</p>
-
 						<p>
 							<span class="text-danger"><< lybuntCost|currency >></span> was spent on <span class="text-danger"><< lybuntCostMailout|number >></span> names to acquire <span class="text-success"><< lybuntNewContacts|number >> New Donors</span>.
 							cost per name : <mark><span class="text-danger font-weight-bold"><< (lybuntCost/lybuntNewContacts)|currency >></span></mark>, response rate : <mark><span class="text-danger font-weight-bold"><< (lybuntNewContacts/lybuntCostMailout)|pct(2) >></span></mark>

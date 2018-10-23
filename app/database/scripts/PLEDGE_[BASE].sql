@@ -193,6 +193,6 @@ cte_pledge_types as (
     ,TBL_SOURCECODE.SOURCETYPE
 )
 -- --------------------------------------------------------------
-select * from cte_legit_pledge
+-- select * from cte_legit_pledge
 --------------------------------------------------------------
 -- OPTION(RECOMPILE)

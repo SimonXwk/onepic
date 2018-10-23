@@ -66,21 +66,21 @@ let vueRow = Vue.component('vue-row', {
 		},
 		resultDisplay : function () {
 			if(this.isDonor) {
-				return '💗' + ' ' + 'Pure Donation/GOL'
+				return '💖' + ' ' + 'Pure Donation and/or GOL'
 			}else if (!this.ask){
-				return '👌' + ' ' + 'No Further Checking Needed'
+				return '📢' + ' ' + 'No Further Checking Needed'
 			}else if ( !this.hasOrderNumber ) {
-				return '❌' + ' Order Number Not In ThankQ '
+				return '❌' + ' Order Number not Found in ThankQ '
 			}else if ( this.called1 === false ) {
-				return '☕' + ' searching(1) ... '
+				return '☕' + ' Searching(step 1) ... '
 			}else if ( this.trackingNumber === null ) {
-				return '😭' + ' No Response From Starshipit'
+				return '🚫' + ' No Response From Starshipit'
 			}else if ( this.called2 === false ) {
-				return '☕' + ' searching(2) ... '
+				return '☕' + ' Searching(step 2) ... '
 			}else if ( this.status !== null && this.status.toUpperCase().indexOf('DELIVERED') !== -1 ) {
-				return '✔️' + ' ['+ this.orders + '] ' + this.status + ' ➠ ' + new Date(this.statusDate).toLocaleDateString("en-AU", { year: 'numeric', month: 'long', day: 'numeric' , hour:'numeric', minute:'numeric' }) + ''
+				return '✔️' + ' ['+ this.orders + '] ' + this.status
 			}else {
-				return '❌' + ' ['+ this.orders + '] ' + this.status
+				return '⏳' + ' ['+ this.orders + '] ' + this.status
 			}
 		},
 		subTodoFlag: function() {
@@ -171,6 +171,7 @@ let vueRow = Vue.component('vue-row', {
 		<td scope="row" style="width: 30%" class="align-middle">
 			<mark class="text-dark"><< subTodoFlag >><< row.FULLNAME >> <small class="text-primary" v-if="row.SORTKEYREF1">(is << row.SORTKEYREFREL2 >>)</small> <small>(<span class="text-success"><< row.SOURCE >></span>)</small></mark>
 			<br>
+			<span class="badge badge-success"><< row.STATE >></span>
 			<span class="badge badge-secondary"><< row.SERIALNUMBER >></span>
 			<span class="badge badge-secondary" v-if="row.LAST_REXID "><< row.LAST_REXID >></span>
 			<span class="badge badge-danger" v-if=" row.CONTACTTYPE === 'Organisation' "><< row.PRIMARYCATEGORY >></span>
@@ -180,12 +181,14 @@ let vueRow = Vue.component('vue-row', {
 		</td>
 
 		<td style="width: 35%" class="align-middle">
-			<span class="text-muted"><< row.FIRSTORDER >><small> payment: << row.FIRSTDATE|dAU >></small> </span>
+			<span class="text-muted"><< row.FIRSTORDER >><small v-if="row.FIRSTORDERS > 1">[+<< row.FIRSTORDERS - 1 >>]</small> | <span v-bind:class="statusTextClassObject"><< resultDisplay >></span></span>
+			<small><em>
+				<a target="blank" class="text-secondary" v-bind:href="ausLink" v-if="isDelivered">[AusPost]</a>
+				<a target="blank" class="text-muted" v-bind:href="linkTrack + row.FIRSTORDER">[starshipit]</a>
+			</em></small>
 			<br>
-			<span v-bind:class="statusTextClassObject"><< resultDisplay >></span>
-			<span v-if="statusDetail!==status" calss="text-danger"><small>, << statusDetail >></small></span>
-			<a target="blank" class="text-secondary" v-bind:href="ausLink" v-if="isDelivered"><small> &#128666;AusPost</small></a>
-			<a target="blank" class="text-muted" v-bind:href="linkTrack + row.FIRSTORDER"><small> &#128667;starshipit</small></a>
+			<span class="text-muted">Status Date:</span> <span class="text-muted" v-if="statusDate===null"><del>Not Applicable</del></span><span class="text-primary" v-else><< this.statusDate|dtAU >></span>
+			<span v-if="statusDetail!==status" class="text-danger"><small><br><< statusDetail >></small></span>
 		</td>
 
 		<td style="width: 15%" class="align-middle">
@@ -259,7 +262,7 @@ let vueTable = Vue.component('vue-table', {
 	props: {
 		'rows': {
 		},
-		'theme': {
+		'sublist': {
 			type: String
 		},
 		'ask' : {
@@ -272,7 +275,7 @@ let vueTable = Vue.component('vue-table', {
 	},
 	computed:{
 		tableID: function(){
-			return this.theme + '-donor-list'
+			return this.sublist + '-donor-list'
 		},
 		trClassObject: function(){
 			return {
@@ -287,8 +290,8 @@ let vueTable = Vue.component('vue-table', {
 			}
 		},
 	},
-	mounted(){
-		applyDataTable(this.tableID);
+	created(){
+		this.$eventBus.$on('finalizeView', () => 	applyDataTable(this.tableID, 'st'));
 	},
 	components:{
 		'result-row': vueRow
@@ -410,6 +413,8 @@ let rootVue = new Vue({
 		},
 		progress: function (val) {
 			if (val == 100) {
+				this.$eventBus.$emit('finalizeView');
+
 				let csvArr = [];
 				let csvContent;
 				csvArr.push(("data:text/csv;charset=utf-8," + ['SERIALNUMBER', 'REXID', 'STATE', 'GENDER','FULLNAME', 'FIRSTORDER'
@@ -620,33 +625,33 @@ let rootVue = new Vue({
 					</div>
 					</transition>
 
-  				<div class="card-body p-0">
-						<ul class="nav nav-tabs mb-3 nav-fill nav-justified" id="pills-tab" role="tablist">
+  				<div class="card-body p-0 shadow-lg">
+						<ul class="nav nav-tabs nav-fill nav-justified mb-1" id="pills-tab" role="tablist">
 							<li class="nav-item ">
 								<a class="nav-link active" id="include-tab" data-toggle="pill" href="#include" role="tab" aria-controls="include" aria-selected="true">
-								 &#128222; ToCall <span class="badge badge-pill badge-info"> << countVisible('todo') >>/<< todoRows.length >></span>
+								 &#128222; ToCall<span class="badge badge-pill badge-info"> << countVisible('todo') >>/<< todoRows.length >></span>
 								</a>
 							</li>
 							<li class="nav-item ">
 								<a class="nav-link" id="finished-tab" data-toggle="pill" href="#finished" role="tab" aria-controls="finished" aria-selected="false">
-								 &#128515; Cared <span class="badge badge-pill badge-success"> << countVisible('finished') >>/<< finishedRows.length >></span>
+								 &#128515; Cared<span class="badge badge-pill badge-success"> << countVisible('finished') >>/<< finishedRows.length >></span>
 								</a>
 							</li>
 							<li class="nav-item ">
 								<a class="nav-link" id="exclude-tab" data-toggle="pill" href="#exclude" role="tab" aria-controls="exclude" aria-selected="false">
-								 &#128683; Cancel <span class="badge badge-pill badge-warning"> << countVisible('exclude') >>/<< excludeRows.length >></span>
+								 &#9975; Skipped<span class="badge badge-pill badge-warning"> << countVisible('exclude') >>/<< excludeRows.length >></span>
 								</a>
 							</li>
 						</ul>
 						<div class="tab-content" id="pills-tabContent">
 							<div class="tab-pane fade show active" id="include" role="tabpanel" aria-labelledby="include-tab">
-								<vue-table v-bind:rows="todoRows" theme="primary" v-bind:ask="true" ></vue-table>
+								<vue-table v-bind:rows="todoRows" sublist="primary" v-bind:ask="true" ></vue-table>
 							</div>
 							<div class="tab-pane fade" id="exclude" role="tabpanel" aria-labelledby="exclude-tab">
-								<vue-table v-bind:rows="excludeRows" theme="warning" v-bind:ask="false" ></vue-table>
+								<vue-table v-bind:rows="excludeRows" sublist="warning" v-bind:ask="false" ></vue-table>
 							</div>
 							<div class="tab-pane fade" id="finished" role="tabpanel" aria-labelledby="finished-tab">
-								<vue-table v-bind:rows="finishedRows" theme="success" v-bind:ask="false" ></vue-table>
+								<vue-table v-bind:rows="finishedRows" sublist="success" v-bind:ask="false" ></vue-table>
 							</div>
 						</div>
 

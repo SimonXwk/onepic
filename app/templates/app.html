@@ -176,9 +176,9 @@ function currency(val) {
 					}
 				}
 	  	});
-			Vue.filter('dAU', val => new Date(val).toLocaleDateString("en-AU", { year: 'numeric', month: 'short', day: 'numeric' }));
-			Vue.filter('tAU', val => new Date(val).toLocaleTimeString("en-AU", { hour:'numeric', minute:'numeric', second:'numeric' }));
-			Vue.filter('dtAU', val => new Date(val).toLocaleDateString("en-AU", { year: 'numeric', month: 'long', day: 'numeric', hour:'numeric', minute:'numeric', second:'numeric'}));
+			Vue.filter('dAU', val => !val? null : new Date(val).toLocaleDateString("en-AU", { year: 'numeric', month: 'short', day: 'numeric' }));
+			Vue.filter('tAU', val => !val? null : new Date(val).toLocaleTimeString("en-AU", { hour:'numeric', minute:'numeric', second:'numeric' }));
+			Vue.filter('dtAU', val => !val? null : new Date(val).toLocaleDateString("en-AU", { year: 'numeric', month: 'long', day: 'numeric', hour:'numeric', minute:'numeric', second:'numeric'}));
 			let vueLoader = Vue.component('vueLoader', {
 				props: ['msg'],
 				template: `
@@ -236,8 +236,9 @@ function currency(val) {
 			if (domString.indexOf('s')!==-1){
 				let clone, input;
 				let header = document.querySelector(tblID + ' thead');
+				let tr = document.querySelector(tblID + ' thead tr');
 				if (header.children.length === 1){
-					clone = document.querySelector(tblID + ' thead tr').cloneNode(true);
+					clone = tr.cloneNode(true);
 					header.appendChild(clone);
 				 	for (let i=0; i<clone.children.length; i++ ) {
 						let th = clone.children[i];
@@ -245,7 +246,7 @@ function currency(val) {
 						th.classList.remove('sorting', 'sorting_asc', 'sorting_desc');
 						th.innerHTML = '<input type="text" placeholder="' + "&#128269;" + "" + '"/>';
 						input = th.children[0];
-						input.style.width = th.style.width === '0px' ? '2rem' : th.style.width;
+						input.style.width = th.style.width === '0px' ? tr.style.width : th.style.width;
 						input.style.height = '1.5rem';
 						th.children[0].addEventListener('keyup', function(){
 							// Using Data Table API

@@ -11,7 +11,7 @@ cte_payments as (
     , CASE WHEN S1.SOURCETYPE LIKE '%SPONSORSHIP%' THEN B3.PLEDGEID ELSE NULL END AS [PLEDGEID]
     , CASE WHEN S1.SOURCETYPE LIKE 'Merch%' THEN B2.DATEOFPAYMENT ELSE NULL END AS [MERCHANDISE_DATEOFPAYMENT]
     , CASE WHEN S1.ADDITIONALCODE3 LIKE @CAMPAIGNCODE THEN B1.PAYMENTAMOUNT ELSE 0 END AS [CAMPAIGN_PAYMENTAMOUNT]
-    , CASE WHEN S1.ADDITIONALCODE3 LIKE @CAMPAIGNCODE THEN B2.DATEOFPAYMENT ELSE NULL END AS [CAMPAIGN_DATEOFPAYMENT]
+    , CASE WHEN S1.ADDITIONALCODE3 LIKE @CAMPAIGNCODE AND (B2.REVERSED IS NULL OR NOT (B2.REVERSED IN (1, -1, 2))) THEN B2.DATEOFPAYMENT ELSE NULL END AS [CAMPAIGN_DATEOFPAYMENT]
   FROM
     TBL_BATCHITEMSPLIT        B1
     LEFT JOIN TBL_BATCHITEM   B2 ON (B1.SERIALNUMBER = B2.SERIALNUMBER) AND (B1.RECEIPTNO = B2.RECEIPTNO) AND (B1.ADMITNAME = B2.ADMITNAME)
@@ -65,13 +65,18 @@ cte_payments as (
     SELECT [SERIALNUMBER], [SERIALNUMBER] AS [SN], [PARAMETERNAME], [PARAMETERVALUE]
     FROM TBL_CONTACTPARAMETER
     WHERE
-      [PARAMETERVALUE] IN ('Action Update B', 'Action Update B Email' , 'Action Update A', 'Action Update A Email', 'Action A', 'Action A Email', 'Action B', 'Action B Email')
-      AND [PARAMETERNAME] = 'Magazine'
+      ([PARAMETERNAME] = 'Magazine' AND [PARAMETERVALUE] IN ('Action Update B', 'Action Update B Email' , 'Action Update A', 'Action Update A Email', 'Action A', 'Action A Email', 'Action B', 'Action B Email'))
+      OR ([PARAMETERNAME] = 'Mailings' AND [PARAMETERVALUE] = 'No Extra Mail')
+      OR ([PARAMETERNAME] = 'Appeals' AND [PARAMETERVALUE] IN ('No Extra Appeals', 'No Appeals'))
+      OR ([PARAMETERNAME] = 'Catalogue' AND [PARAMETERVALUE] = 'No Catalogue')
   ) D
   PIVOT
   (
     COUNT([SN])
-    FOR [PARAMETERVALUE] IN ([Action Update B], [Action Update B Email] , [Action Update A], [Action Update A Email], [Action A], [Action A Email], [Action B], [Action B Email])
+    FOR [PARAMETERVALUE] IN (
+      [Action Update B], [Action Update B Email] , [Action Update A], [Action Update A Email], [Action A], [Action A Email], [Action B], [Action B Email]
+      ,[No Extra Mail], [No Appeals], [No Extra Appeals], [No Catalogue]
+    )
   ) P
 )
 -- --------------------------------------------------------------
@@ -98,6 +103,7 @@ select
   ,[FIRSTFY] = YEAR(MIN(t4.FIRSTDATE)) + CASE WHEN MONTH(MIN(t4.FIRSTDATE)) < 7 THEN 0 ELSE 1 END
   ,[CFY] = YEAR(CURRENT_TIMESTAMP ) + CASE WHEN MONTH(CURRENT_TIMESTAMP ) < 7 THEN 0 ELSE 1 END
   --> PAYMENT INFORMATION
+  ,[IS_ACQUISITION] = CASE WHEN MIN(t4.FIRSTDATE) = MIN(t2.CAMPAIGN_DATEOFPAYMENT) THEN -1 ELSE 0 END
   ,[FIRST_PLEDGEID] = MIN(t2.PLEDGEID)
   ,[PLEDGES] = COUNT(DISTINCT t2.PLEDGEID)
   ,[CAMPAIGN_FIRSTDATE] = MIN(t2.CAMPAIGN_DATEOFPAYMENT)
@@ -140,6 +146,11 @@ select
   ,[EACTION_A_UPDATE] = ISNULL(MAX(mp1.[Action Update A Email]), 0)
   ,[EACTION_A] = ISNULL(MAX(mp1.[Action A Email]), 0)
   ,[EACTION_B] = ISNULL(MAX(mp1.[Action B Email]), 0)
+
+  ,[NO_EXTRA_MAIL] = ISNULL(MAX(mp1.[No Extra Mail]), 0)
+  ,[NO_APPEALS] = ISNULL(MAX(mp1.[No Appeals]), 0)
+  ,[NO_EXTRA_APPEALS] = ISNULL(MAX(mp1.[No Extra Appeals]), 0)
+  ,[NO_CATALOGUE] = ISNULL(MAX(mp1.[No Catalogue]), 0)
 
   --> Contact Information
   , CONCAT(
