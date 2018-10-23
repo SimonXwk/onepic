@@ -62,7 +62,7 @@ cte_payments as (
   SELECT *
   FROM
   (
-    SELECT [SERIALNUMBER], [SERIALNUMBER] AS [SN], [PARAMETERNAME], [PARAMETERVALUE]
+    SELECT [SERIALNUMBER], [SERIALNUMBER] AS [SN], [PARAMETERVALUE]
     FROM TBL_CONTACTPARAMETER
     WHERE
       ([PARAMETERNAME] = 'Magazine' AND [PARAMETERVALUE] IN ('Action Update B', 'Action Update B Email' , 'Action Update A', 'Action Update A Email', 'Action A', 'Action A Email', 'Action B', 'Action B Email'))
@@ -189,7 +189,6 @@ from
   left join cte_journey_profile_last t3 on (t1.SERIALNUMBER = t3.SERIALNUMBER)
   left join cte_first_date t4 on (t1.SERIALNUMBER = t4.SERIALNUMBER)
   left join cte_conversion_call_last t5 on (t1.SERIALNUMBER = t5.SERIALNUMBER)
-
   left join TBL_CONTACT c1 on (t1.SERIALNUMBER = c1.SERIALNUMBER)
   left join TBL_CONTACTATTRIBUTE c2 on (t1.SERIALNUMBER = c2.SERIALNUMBER)
   left join cte_mail_porfile mp1 on (t1.SERIALNUMBER = mp1.SERIALNUMBER)

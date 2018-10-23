@@ -125,7 +125,7 @@ cte_payments as (
   SELECT *
   FROM
   (
-    SELECT [SERIALNUMBER], [SERIALNUMBER] AS [SN], [PARAMETERNAME]
+    SELECT [SERIALNUMBER], [SERIALNUMBER] AS [SN]
     , CASE WHEN [PARAMETERNAME] = 'Record to Review'
       THEN 'Record to Review'
       ELSE [PARAMETERVALUE]
