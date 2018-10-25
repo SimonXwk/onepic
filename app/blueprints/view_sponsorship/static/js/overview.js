@@ -194,10 +194,7 @@ let rootVue = new Vue({
 	<div class="container-fluid" v-else>
 		<div class="row">
 			<div class="col-12">
-				<p class="lead">
-					<span class="text-dark font-weight-bold"><< rawData.rows.length|number >> Legitimate Pledges<span class="text-info"> (created on or before FY<< thisFY >>)</span> Found
-					<small class="text-secondary font-italic">data captured : << rawData.timestamp|dtAU >>, cached for << rawData.cached_timeout|number >> seconds</small>
-				</p>
+
 			</div>
 		</div>
 

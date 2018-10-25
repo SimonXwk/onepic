@@ -59,6 +59,8 @@ $hamberger-height: 3px;
 
 			// Navlink is the level1 narbar item that show directly one the bar, this class applies to <a> tag
 			.nav-link {
+				font-family: 'Roboto', sans-serif;
+				text-transform: uppercase;
 				color: rgba(255,255,255,0.45);
 
 				&.active {

@@ -113,32 +113,37 @@ let vueRow = Vue.component('vue-row', {
 				if (orders && orders.length > 0) {
 					vCol.orders = orders.length;
 					vCol.trackingNumber = orders[0]['tracking_number'];
-					orders.forEach(order => {
-						fetchJSON(endpoint(vCol.fetch2 + vCol.trackingNumber), function (json2) {
-							vCol.called2 = true;
-							if (json2.success === true ) {
-								let events = json2['results']['tracking_events'];
+					if (!vCol.trackingNumber) {
+						console.log('No Tracking Avaliable', vCol.row['SERIALNUMBER'], vCol.row['FIRSTORDER'], vCol.trackingNumber);
+						vCol.emitProcessed();
+					} else {
+						orders.forEach(order => {
+							fetchJSON(endpoint(vCol.fetch2 + vCol.trackingNumber), function (json2) {
+								vCol.called2 = true;
+								if (json2.success === true ) {
+									let events = json2['results']['tracking_events'];
 
-								if( !events ){
-									vCol.status = json2['results']['tracking_status'];
-									vCol.statusDate = json2['results']['last_updated_date'];
-									vCol.statusDetail = json2['results']['order_status'];
+									if( !events ){
+										vCol.status = json2['results']['tracking_status'];
+										vCol.statusDate = json2['results']['last_updated_date'];
+										vCol.statusDetail = json2['results']['order_status'];
+									} else {
+										let lastEvent = events[events.length - 1];
+										vCol.status = lastEvent['status'];
+										vCol.statusDate = lastEvent['event_datetime'];
+										vCol.statusDetail = lastEvent['details'];
+									}
+									vCol.show = vCol.isDelivered;
+									if (vCol.isDelivered) {
+										vCol.emitTodoCount(false, vCol.statusDate);
+									}
+									vCol.emitProcessed();
 								} else {
-									let lastEvent = events[events.length - 1];
-									vCol.status = lastEvent['status'];
-									vCol.statusDate = lastEvent['event_datetime'];
-									vCol.statusDetail = lastEvent['details'];
+									vCol.emitProcessed();
 								}
-								vCol.show = vCol.isDelivered;
-								if (vCol.isDelivered) {
-									vCol.emitTodoCount(false, vCol.statusDate);
-								}
-								vCol.emitProcessed();
-							} else {
-								vCol.emitProcessed();
-							}
-						}, true);
-					});
+							}, true);
+						});
+					}
 				} else {
 					vCol.emitProcessed();
 				}
@@ -181,7 +186,7 @@ let vueRow = Vue.component('vue-row', {
 		</td>
 
 		<td style="width: 35%" class="align-middle">
-			<span class="text-muted"><< row.FIRSTORDER >><small v-if="row.FIRSTORDERS > 1">[+<< row.FIRSTORDERS - 1 >>]</small> | <span v-bind:class="statusTextClassObject"><< resultDisplay >></span></span>
+			<span class="text-muted"><< row.FIRSTORDER >><small v-if="row.FIRSTORDERS > 1">[<span class="text-danger">+<< row.FIRSTORDERS - 1 >><span>]</small> | <span v-bind:class="statusTextClassObject"><< resultDisplay >></span></span>
 			<small><em>
 				<a target="blank" class="text-secondary" v-bind:href="ausLink" v-if="isDelivered">[AusPost]</a>
 				<a target="blank" class="text-muted" v-bind:href="linkTrack + row.FIRSTORDER">[starshipit]</a>
@@ -335,6 +340,7 @@ let rootVue = new Vue({
 		csvEncodedURI: null,
 		csvEncodedURIMobile: null,
 		csvEncodedURIEmail: null,
+		svEncodedURIPureDonor: null,
 	},
 	computed: {
 		dataAPI: function() {
@@ -480,6 +486,31 @@ let rootVue = new Vue({
 					csvContent = csvArr.join("\n");
 					this.csvEncodedURIEmail = encodeURI(csvContent);
 
+					csvArr = [];
+					csvArr.push(("data:text/csv;charset=utf-8," + ['SERIALNUMBER', 'REXID', 'STATE', 'GENDER','FULLNAME', 'FIRSTORDER'
+						, 'MOBILENUMBER', 'DAYTELEPHONE', 'EVENINGTELEPHONE', 'FAXNUMBER', 'EMAILADDRESS', 'COMMENT'
+						, 'RESULT: LEFT A MESSAGE', 'RESULT: INVALID NUMBER', 'RESULT: NO VOICE MAIL'
+						, 'FEEDBACK: POSITIVE', 'FEEDBACK: NEUTRAL', 'FEEDBACK: NEGATIVE'
+					].join(",")));
+					this.raw.rows
+						.filter(d => this.customers[d.SERIALNUMBER].todo && this.customers[d.SERIALNUMBER].isDonor)  // && !this.customers[d.SERIALNUMBER].isDonor && d.EMAILADDRESS
+						.map(d => ["=\"" + d.SERIALNUMBER + "\"" ,
+							d.LAST_REXID,
+							d.STATE,
+							d.GENDER,
+							d.FULLNAME,
+							d.FIRSTORDER,
+							d.MOBILENUMBER,
+							d.DAYTELEPHONE,
+							d.EVENINGTELEPHONE,
+							d.FAXNUMBER,
+							d.EMAILADDRESS,
+							null, null, null, null, null, null, null])
+						.forEach(arr => {
+							csvArr.push(arr.join(","));
+						});
+					csvContent = csvArr.join("\n");
+					this.svEncodedURIPureDonor = encodeURI(csvContent);
 			}
 		}
 	},
@@ -595,10 +626,17 @@ let rootVue = new Vue({
 
 							<div class="col-md-4">
 								<transition name="bounce">
-								<div class="alert  m-0 p-1 align-middle shadow-lg" v-if="csvEncodedURI || csvEncodedURIMobile || csvEncodedURIEmail">
-									<a v-if="csvEncodedURI!==null"  v-bind:href="csvEncodedURI" class="btn btn-block btn-sm btn-outline-success align-middle text-left shadow" role="button" aria-pressed="true" download="courtesy_call_data_todo.csv"><small>CSV : TODO <span class="text-primary">ALL</span> <span class="text-danger">EXC PURE DON</span></small></a>
-									<a v-if="csvEncodedURIMobile!==null"  v-bind:href="csvEncodedURIMobile" class="btn btn-block btn-sm btn-outline-success align-middle text-left shadow" role="button" aria-pressed="true" download="courtesy_call_data_todo_mobile.csv"><small>CSV : TODO <span class="text-primary">MOBILE</span> <span class="text-danger">EXC PURE DON</span></small></a>
-									<a v-if="csvEncodedURIEmail!==null" v-bind:href="csvEncodedURIEmail" class="btn btn-block btn-sm btn-outline-success align-middle text-left shadow" role="button" aria-pressed="true" download="courtesy_call_data_todo_email_exc_pure_donor.csv"><small>CSV : TODO <span class="text-primary">EMAIL</span> <span class="text-danger">EXC PURE DON</span></small></a>
+								<div class="alert  m-0 p-1 align-middle shadow-lg" v-if="csvEncodedURI || csvEncodedURIMobile || csvEncodedURIEmail || svEncodedURIPureDonor">
+									<div class="row">
+										<div class="col-6">
+											<a v-if="svEncodedURIPureDonor!==null"  v-bind:href="svEncodedURIPureDonor" class="btn btn-block btn-sm btn-outline-success align-middle text-left shadow" role="button" aria-pressed="true" download="courtesy_pure_donor_data_todo.csv"><small>CSV: <span class="text-danger">PURE DONONRS</span></small></a>
+											<a v-if="csvEncodedURI!==null"  v-bind:href="csvEncodedURI" class="btn btn-block btn-sm btn-outline-success align-middle text-left shadow" role="button" aria-pressed="true" download="courtesy_call_data_todo.csv"><small>CSV: <span class="text-primary">ALL</span> <span class="text-danger">EXC PURE DON</span></small></a>
+										</div>
+										<div class="col-6">
+											<a v-if="csvEncodedURIMobile!==null"  v-bind:href="csvEncodedURIMobile" class="btn btn-block btn-sm btn-outline-success align-middle text-left shadow" role="button" aria-pressed="true" download="courtesy_call_data_todo_mobile.csv"><small>CSV: <span class="text-primary">MOBILE</span> <span class="text-danger">EXC PURE DON</span></small></a>
+											<a v-if="csvEncodedURIEmail!==null" v-bind:href="csvEncodedURIEmail" class="btn btn-block btn-sm btn-outline-success align-middle text-left shadow" role="button" aria-pressed="true" download="courtesy_call_data_todo_email_exc_pure_donor.csv"><small>CSV: <span class="text-primary">EMAIL</span> <span class="text-danger">EXC PURE DON</span></small></a>
+										</div>
+									</div>
 								</div>
 								</transition>
 							</div>
@@ -629,17 +667,17 @@ let rootVue = new Vue({
 						<ul class="nav nav-tabs nav-fill nav-justified mb-1" id="pills-tab" role="tablist">
 							<li class="nav-item ">
 								<a class="nav-link active" id="include-tab" data-toggle="pill" href="#include" role="tab" aria-controls="include" aria-selected="true">
-								 &#128222; ToCall<span class="badge badge-pill badge-info"> << countVisible('todo') >>/<< todoRows.length >></span>
+								 &#128222; ToCall <span class="badge badge-pill badge-info"> << countVisible('todo') >>/<< todoRows.length >></span>
 								</a>
 							</li>
 							<li class="nav-item ">
 								<a class="nav-link" id="finished-tab" data-toggle="pill" href="#finished" role="tab" aria-controls="finished" aria-selected="false">
-								 &#128515; Cared<span class="badge badge-pill badge-success"> << countVisible('finished') >>/<< finishedRows.length >></span>
+								 &#128515; Cared <span class="badge badge-pill badge-success"> << countVisible('finished') >>/<< finishedRows.length >></span>
 								</a>
 							</li>
 							<li class="nav-item ">
 								<a class="nav-link" id="exclude-tab" data-toggle="pill" href="#exclude" role="tab" aria-controls="exclude" aria-selected="false">
-								 &#9975; Skipped<span class="badge badge-pill badge-warning"> << countVisible('exclude') >>/<< excludeRows.length >></span>
+								 &#9975; Skipped <span class="badge badge-pill badge-warning"> << countVisible('exclude') >>/<< excludeRows.length >></span>
 								</a>
 							</li>
 						</ul>

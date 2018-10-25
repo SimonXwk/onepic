@@ -7,9 +7,11 @@
 <script type=text/javascript>
 //Sets a global variable to the prefix to the root of the application
 const $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+const $FY_MONTH_LIST = {number: {{ fymths }}, short: {{ fymths|map("mthname", abbr=True)|list|safe }}, long: {{ fymths|map("mthname", abbr=false)|list|safe }}};
+const $CFY = {{ cfy }};
 const $FY_MONTH_LIST_NUMBER = {{ fymths }};
 const $FY_MONTH_LIST_NAME = {{ fymths|map("mthname", abbr=True)|list|safe }};
-const $CFY = {{ cfy }};
+
 
 // Build endpoint String
 const endpoint = (url, parameter) => $SCRIPT_ROOT + url + (parameter ? parameter : '');
@@ -43,7 +45,7 @@ const fetchJSON = (endpoint, func, silent=false) => {
 			func(jsonData);
 			// ---------------------------------------------------------------------------------
 			if (!silent){ console.log('✓ JSON data processed for endpoint: ' + endpoint); }
-		}).catch((error) => { console.log('✘ Request Failed', error); });
+		}).catch((error) => { console.log('✘ Request Failed', endpoint, error); });
 };
 
 
@@ -162,7 +164,7 @@ function currency(val) {
 				}
 			});
 			Vue.filter('currency', (val, dec=2, sign='$') => isNaN(val) ? val : sign + String(val.toFixed(dec)).split("").reverse().join("").replace(/(\d{3}\B)/g, "$1,").split("").reverse().join(""));
-			Vue.filter('number', (val, dec=0) => isNaN(val) ? val : String((val).toFixed(dec)).split("").reverse().join("").replace(/(\d{3}\B)/g, "$1,").split("").reverse().join("")) ;
+			Vue.filter('number', (val, showZero=true,dec=0) => isNaN(val) ? val : (!showZero && val===0) ? null : (String((val).toFixed(dec)).split("").reverse().join("").replace(/(\d{3}\B)/g, "$1,").split("").reverse().join(""))) ;
 			Vue.filter('pct', (val, dec=1) => {
 				if (isNaN(val) ){
 					return val

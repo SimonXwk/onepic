@@ -39,7 +39,6 @@ def source_code1_summary():
 	return Tq.query('_SINGLE_SOURCECODE_SUMMAY', cached_timeout=30, updates=updates)
 
 
-
 @odbc_json_api(orient='columns')
 def contact_created_fy():
 	return Tq.query('STATS_CONTACTS_CREATED_FY', cached_timeout=60)
@@ -70,7 +69,7 @@ def get_first_date_source1_by_contacts_since():
 
 # Pledge Related
 @odbc_json_api
-def list_pledges():
+def pledge_headers():
 	fy = int(request_arg('fy', TLMA.cfy, tests.is_year))
 	updates = (('FY', fy),)
 	return Tq.query(('PLEDGE_[BASE]', 'PLEDGE_OVERVIEW'), cached_timeout=30, updates=updates)

@@ -1,5 +1,6 @@
 <div class="container-fluid">
 	{% set dataSet = data.rows|selectattr('CREATED_FY','<=', thisfy)|list %}
+	<p class="lead">FY{{ thisfy }}</p>
 	<div class="row"><!-- ROW -->
 		<div class="col-lg-6">
 			<div class="table-responsive-lg">
@@ -23,15 +24,17 @@
 						{% set calc5 = typeList|selectattr('PLEDGESTATUS','==','Written Down')|selectattr('WRITTENDOWN_FY','==',thisfy)|list|length %}
 						{% set calc6 = typeList|selectattr('PLEDGESTATUS','==','Closed')|selectattr('CLOSED_FY','==',thisfy)|list|length %}
 						{% set calc7 = typeList|selectattr('PLEDGESTATUS','==','Closed')|selectattr('FINISHED_FY','==',thisfy)|list|length %}
-						<tr>
-							<th scope="row" style="color:{{ typeList[0].SPONSORSHIP1_COLOR }}">{{ type }}</th>
-							<td>{{ calc1|number or '' }}</td>
-							<td>{{ calc2|number or '' }}</td>
-							<td>{{ calc4|number or '' }}</td>
-							<td>{{ calc5|number or '' }}</td>
-							<td>{{ calc6|number or '' }}</td>
-							<td>{{ calc7|number or '' }}</td>
-						</tr>
+							{% if not (calc1 == 0 and calc2 == 0 and calc4 == 0 and calc5 == 0 and calc6 == 0 and calc7 == 0) %}
+							<tr>
+								<th scope="row" style="color:{{ typeList[0].SPONSORSHIP1_COLOR }}">{{ type }}</th>
+								<td>{{ calc1|number or '' }}</td>
+								<td>{{ calc2|number or '' }}</td>
+								<td>{{ calc4|number or '' }}</td>
+								<td>{{ calc5|number or '' }}</td>
+								<td>{{ calc6|number or '' }}</td>
+								<td>{{ calc7|number or '' }}</td>
+							</tr>
+							{% endif %}
 						{% endfor %}
 					</tbody><!-- End of Table Body -->
 					<tfoot>
@@ -71,15 +74,17 @@
 						{% set calc5 = typeList|selectattr('PLEDGESTATUS','==','Written Down')|selectattr('WRITTENDOWN_FY','==',thisfy)|list|length %}
 						{% set calc6 = typeList|selectattr('PLEDGESTATUS','==','Closed')|selectattr('CLOSED_FY','==',thisfy)|list|length %}
 						{% set calc7 = typeList|selectattr('PLEDGESTATUS','==','Closed')|selectattr('FINISHED_FY','==',thisfy)|list|length %}
-						<tr>
-							<th scope="row" style="color:{{ typeList[0].SPONSORSHIP1_COLOR }}"><small class="font-weight-bold">{{ type }}</small></th>
-							<td>{{ calc1|number or '' }}</td>
-							<td>{{ calc2|number or '' }}</td>
-							<td>{{ calc4|number or '' }}</td>
-							<td>{{ calc5|number or '' }}</td>
-							<td>{{ calc6|number or '' }}</td>
-							<td>{{ calc7|number or '' }}</td>
-						</tr>
+							{% if not (calc1 == 0 and calc2 == 0 and calc4 == 0 and calc5 == 0 and calc6 == 0 and calc7 == 0) %}
+							<tr>
+								<th scope="row" style="color:{{ typeList[0].SPONSORSHIP1_COLOR }}"><small class="font-weight-bold">{{ type }}</small></th>
+								<td>{{ calc1|number or '' }}</td>
+								<td>{{ calc2|number or '' }}</td>
+								<td>{{ calc4|number or '' }}</td>
+								<td>{{ calc5|number or '' }}</td>
+								<td>{{ calc6|number or '' }}</td>
+								<td>{{ calc7|number or '' }}</td>
+							</tr>
+							{% endif %}
 						{% endfor %}
 					</tbody><!-- End of Table Body -->
 					<tfoot>

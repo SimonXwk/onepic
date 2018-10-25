@@ -27,6 +27,11 @@ def overview():
 	return dict(data=Tq.query(('PLEDGE_[BASE]', 'PLEDGE_OVERVIEW'),  cached_timeout=30, updates=updates), thisfy=fy)
 
 
+@templatified('monthly', title='Monthly')
+def fy_monthly():
+	pass
+
+
 @templatified(title='Delinquency Check')
 def delinquency():
 	data = dict()
