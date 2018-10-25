@@ -14,17 +14,17 @@
 	<div class="row"><!-- ROW -->
 		<div class="col-12">
 			<div class="card shadow-type6">
-				<div class="card-body">
+				<div class="card-body pb-0">
 
-					<p class="card-text text-secondary">
+					<p class="card-text text-secondary mb-1 mt-1">
 					 	Pledges (<span class="text-danger">General</span>) that have lapsed for more than <span class="text-danger">{{ general_warning_days|number }} days</span> :
 						{% if general_warning != 0 %}<span class="text-danger">found {{  general_warning|number }}</span>{% else %}<span class="text-success">None &#10003</span>{% endif %}
 					</p>
-					<p class="card-text text-secondary">
+					<p class="card-text text-secondary mb-1">
 					 	Pledges (<span class="text-danger">Direct Debit</span>) that have lapsed for more than <span class="text-danger">{{ dd_warning_days|number }} days</span>  :
 						{% if dd_warning != 0 %}<span class="text-danger">found {{  dd_warning|number }}</span>{% else %}<span class="text-success">None &#10003</span>{% endif %}
 					</p>
-					<p class="card-text text-secondary">
+					<p class="card-text text-secondary mb-1">
 					 	Pledges (<span class="text-danger">Credit Card</span>) that have lapsed for more than <span class="text-danger">{{ cc_warning_days|number }} days</span>  :
 						{% if cc_warning != 0 %}<span class="text-danger">found {{  cc_warning|number }}</span>{% else %}<span class="text-success">None &#10003</span>{% endif %}
 					</p>
@@ -37,13 +37,12 @@
 
 							<thead>
 								<tr class="bg-secondary text-light">
-									<th scope="col">PLEDGE ID</th>
-									<th scope="col">PLEDGE CREATED</th>
-									<th scope="col">CONTACT</th>
+									<th scope="col">PLEDGE</th>
+									<th scope="col">CREATED</th>
+									<th scope="col">CONTACT NAME</th>
 									<th scope="col">PAYMENT INFO</th>
 									<th scope="col">CC EXPIRY</th>
 									<th scope="col">1ST OVERDUE</th>
-									<th scope="col">1ST OVERDUE (DAYS)</th>
 									<th scope="col">OVERDUES</th>
 									<th scope="col">SOURCECODE</th>
 									<th scope="col">SPONSORSHIP</th>
@@ -58,8 +57,12 @@
 											or (row.PAYMENTTYPE == 'Direct Debit' and row.FIRSTOVERDUE_LAPSED_DAYS > dd_warning_days)
 										%}table-danger{% endif %}">
 									<td scope="row" class="text-dark">{{ row.PLEDGEID }}</td>
-									<td>{{ row.CREATED|dtSort }}&#10;<small class="text-secondary">{{ row.CREATEDBY }}</small></td>
-									<td>{{ row.FULLNAME }} <small class="text-secondary">({{ row.SERIALNUMBER }})</small></td>
+									<td>{{ row.CREATED|dtSort }}&#10;<small class="text-secondary font-italic">{{ row.CREATEDBY }}</small></td>
+									<td>
+										<mark><span class="badge badge-light text-dark">{{ row.FULLNAME }}</span></mark>
+										<br />
+										<mark><small class="text-secondary">SN : {{ row.SERIALNUMBER }}</small></mark>
+									</td>
 
 									<td>
 										<span class="badge badge-dark text-{% if row.PAYMENTTYPE|trim|upper == 'CREDIT CARD' %}warning{% else %}light{% endif %}">{{ row.PAYMENTTYPE }}</span>
@@ -70,15 +73,17 @@
 										{% if row.SPONSORSHIP1 == 'CURE ONE' %}<span class="badge badge-warning">End {{ row.ENDDATE|dAU }}</span>{% endif %}
 									</td>
 
-									<td>{{ row.CREDITCARDEXPIRY }}</td>
-									<td>{{ row.FIRSTOVERDUE|dSort }}</td>
-
+									<td>{{ row.CREDITCARDEXPIRY or "" }}</td>
 									<td>
+										{{ row.FIRSTOVERDUE|dSort }}
+										<br />
+										<small>	
 										{% if row.FIRSTOVERDUE_LAPSED_DAYS > 31 %}
-										<span class="text-danger"><strong>{{ row.FIRSTOVERDUE_LAPSED_DAYS|number }}</strong></span>
+										<span class="text-danger"><strong>{{ row.FIRSTOVERDUE_LAPSED_DAYS|number }}_day(s)</strong></span>
 										{% else %}
-										<span class="text-dark">{{ row.FIRSTOVERDUE_LAPSED_DAYS|number }}</span>
+										<span class="text-info">{{ row.FIRSTOVERDUE_LAPSED_DAYS|number }}</span>_day(s)
 										{% endif %}
+										</small>	
 									</td>
 
 									<td>
@@ -89,7 +94,7 @@
 										{% endif %}
 									</td>
 
-									<td>{{ row.FIRST_SOURCECODE1 }}&#10;<small class="text-secondary">({% if row.SOURCECODES ==1 %}unique{% else %}{{ row.SOURCECODES }} codes{% endif %})</small></td>
+									<td>{{ row.FIRST_SOURCECODE1 }}<small class="text-secondary"><br />({% if row.SOURCECODES ==1 %}unique{% else %}{{ row.SOURCECODES }} codes{% endif %})</small></td>
 									<td>{{ row.SPONSORSHIP2 }}</td>
 								</tr>
 								{% endfor %}

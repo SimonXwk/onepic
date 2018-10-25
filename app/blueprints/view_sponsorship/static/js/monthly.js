@@ -181,15 +181,17 @@ let vueMthMovementTable = Vue.component('vue-table', {
 		calcFY: function(d) {
 			return (d.getFullYear()) + (d.getMonth() < 6 ? 0 : 1)
 		},
-		filterRows: function(dateDim, cate){
+		filterRows: function(dateDim, status, cate){
+			console.log(dateDim, status, cate);
 			let rows = this.rows.filter(r =>
-				(cate ? r[this.category.key] === cate : true)
-				&& r[dateDim] !== null
+				(r[dateDim] !== null)
+				&& (status ? (r.PLEDGESTATUS === status) : true)
+				&& (cate ? (r[this.category.key] === cate) : true)
 				&& this.calcFY(new Date(r[dateDim])) === this.fy
 			);
-			if (cate === 'CURE ONE') {
-				console.log(rows.length, this.category.key, dateDim, cate,  this.fyMth);
-			}
+			// if (cate === 'CURE ONE') {
+			// 	console.log(rows.length, this.category.key, dateDim, cate,  this.fyMth);
+			// }
 			if (this.isLtd) {
 				return rows.filter(r => this.calcFYMth(new Date(r[dateDim])) <= this.fyMth )
 			}else {
@@ -211,14 +213,14 @@ let vueMthMovementTable = Vue.component('vue-table', {
 			</tr>
 		</thead>
 		<tbody>
-			<tr v-for="tp in category.values">
-				<td><< tp >></td>
-				<td><< filterRows('CREATED', tp).length|number(false) >></td>
-				<td><< filterRows('STARTDATE', tp).length|number(false) >></td>
-				<td><< filterRows('ONHOLDDATETIME', tp).length|number(false) >></td>
-				<td><< filterRows('WRITTENDOWN', tp).length|number(false) >></td>
-				<td><< filterRows('CLOSED', tp).length|number(false) >></td>
-				<td><< filterRows('FINISHED', tp).length|number(false) >></td>
+			<tr v-for="cat in category.values">
+				<td><< cat >></td>
+				<td><< filterRows('CREATED', null, cat).length|number(false) >></td>
+				<td><< filterRows('STARTDATE', null, cat).length|number(false) >></td>
+				<td><< filterRows('ONHOLDDATETIME', 'On Hold', cat).length|number(false) >></td>
+				<td><< filterRows('WRITTENDOWN', 'Written Down', cat).length|number(false) >></td>
+				<td><< filterRows('CLOSED', 'Closed', cat).length|number(false) >></td>
+				<td><< filterRows('FINISHED', 'Closed', cat).length|number(false) >></td>
 			</tr>
 		</tbody>
 		<tfoot>
@@ -226,10 +228,10 @@ let vueMthMovementTable = Vue.component('vue-table', {
 				<th>TOTAL</th>
 				<td><< filterRows('CREATED').length|number(false) >></td>
 				<td><< filterRows('STARTDATE').length|number(false) >></td>
-				<td><< filterRows('ONHOLDDATETIME').length|number(false) >></td>
-				<td><< filterRows('WRITTENDOWN').length|number(false) >></td>
-				<td><< filterRows('CLOSED').length|number(false) >></td>
-				<td><< filterRows('FINISHED').length|number(false) >></td>
+				<td><< filterRows('ONHOLDDATETIME', 'On Hold').length|number(false) >></td>
+				<td><< filterRows('WRITTENDOWN', 'Written Down).length|number(false) >></td>
+				<td><< filterRows('CLOSED', 'Closed').length|number(false) >></td>
+				<td><< filterRows('FINISHED', 'Closed').length|number(false) >></td>
 			</tr>
 		</tfoot>
 	</table>
@@ -245,14 +247,14 @@ let rootVue = new Vue({
 		rawHeaderData: null,
 		now: new Date(),
 		reportRowDim: 'SPONSORSHIP1',
-		reportRowDims: ['SPONSORSHIP1', 'SPONSORSHIP2', 'PLEDGESTATUS', 'PLEDGEPLAN', 'LIFESPAN',  'PAYMENTFREQUENCY', 'CAMPAIGNCODE', 'CAMPAIGNDETAIL', 'FIRST_SOURCECODE1', 'CREATED_FY', 'START_FY', 'ONHOLD_FY', 'WRITTENDOWN_FY', 'CLOSED_FY', 'FINISHED_FY'],
+		reportRowDims: ['SPONSORSHIP1', 'SPONSORSHIP2', 'PLEDGESTATUS', 'PLEDGETYPE', 'PLEDGEPLAN', 'LIFESPAN',  'PAYMENTFREQUENCY', 'CAMPAIGNCODE', 'CAMPAIGNDETAIL', 'FIRST_SOURCECODE1', 'CREATED_FY', 'START_FY', 'ONHOLD_FY', 'WRITTENDOWN_FY', 'CLOSED_FY', 'FINISHED_FY'],
 		mthDataLtd: false,
 	},
 	computed: {
 		thisFYMth: function() {
 			return (this.now.getMonth() + 1)  +  (this.now.getMonth() < 6 ? 6 : -6)
 		},
-		reportRows: function(){
+		reportDimRows: function(){
 			return {key:this.reportRowDim, values:Array.from(new Set(this.rawHeaderData.rows.map(r => r[this.reportRowDim]))).sort((a, b) => a < b )}
 		},
 	},
@@ -317,10 +319,9 @@ let rootVue = new Vue({
 			</div>
 		</div>
 
-
 		<div class="row">
 			<div class="col-xl-8">
-				<ltd-table-static v-bind:fy="thisFY" v-bind:fyMth="thisFYMth" v-bind:rows="rawHeaderData.rows" v-bind:category="reportRows" calc="count" dim="PLEDGEID"></ltd-table-static>
+				<ltd-table-static v-bind:fy="thisFY" v-bind:fyMth="thisFYMth" v-bind:rows="rawHeaderData.rows" v-bind:category="reportDimRows" calc="count" dim="PLEDGEID"></ltd-table-static>
 			</div>
 			<div class="col-xl-4">
 			</div>
@@ -328,26 +329,19 @@ let rootVue = new Vue({
 
 		<div class="row">
 			<div class="col-xl-8">
-				<ltd-table-static v-bind:fy="thisFY" v-bind:fyMth="thisFYMth" v-bind:rows="rawHeaderData.rows" v-bind:category="reportRows" calc="sum" dim="INSTALMENTVALUE_PER_DAY"></ltd-table-static>
+				<ltd-table-static v-bind:fy="thisFY" v-bind:fyMth="thisFYMth" v-bind:rows="rawHeaderData.rows" v-bind:category="reportDimRows" calc="sum" dim="INSTALMENTVALUE_PER_DAY"></ltd-table-static>
 			</div>
 			<div class="col-xl-4">
 			</div>
 		</div>
-
 
 		<div class="row" v-for="fym in thisFYMth">
 			<div class="col-xl-6">
-				<mth-table-flow v-bind:isLtd="mthDataLtd" v-bind:fy="thisFY" v-bind:fyMth="thisFYMth-fym+1" v-bind:rows="filterDataByFyMonth(thisFYMth-fym+1)" v-bind:category="reportRows"></mth-table-flow>
+				<mth-table-flow v-bind:isLtd="mthDataLtd" v-bind:fy="thisFY" v-bind:fyMth="thisFYMth-fym+1" v-bind:rows="filterDataByFyMonth(thisFYMth-fym+1)" v-bind:category="reportDimRows"></mth-table-flow>
 			</div>
 			<div class="col-xl-6">
 			</div>
 		</div>
-
-
-		<div class="chart " id="chart1" ></div>
-		<div class="chart " id="chart2" ></div>
-
-
 
 	</div>`
 });

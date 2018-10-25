@@ -2,12 +2,12 @@
 	{% set dataSet = data.rows|selectattr('CREATED_FY','<=', thisfy)|list %}
 	<p class="lead">FY{{ thisfy }}</p>
 	<div class="row"><!-- ROW -->
-		<div class="col-lg-6">
-			<div class="table-responsive-lg">
+		<div class="col-xl-6">
+			<div class="table-responsive-md">
 				<table class="table table-sm table-hover table-bordered text-right">
 					<thead>
 						<tr class="bg-secondary text-light">
-							<th scope="col" style="width: 28%">SPONSORSHIP CATEGORY</th>
+							<th scope="col" style="width: 28%">CATEGORY</th>
 							<th scope="col" style="width: 12%">CREATED</th>
 							<th scope="col" style="width: 12%" class="text-warning">STARTED</th>
 							<th scope="col" style="width: 12%">ONHOLDED</th>
@@ -52,12 +52,12 @@
 			</div><!-- End of Table Responsive -->
 		</div><!-- END OF ROW -->
 
-		<div class="col-lg-6">
-			<div class="table-responsive-lg">
+		<div class="col-xl-6">
+			<div class="table-responsive-md">
 				<table class="table table-sm table-hover table-bordered text-right">
 					<thead>
 						<tr class="bg-secondary text-light">
-							<th scope="col" style="width: 28%">SPONSORSHIP SUBCATEGORY</th>
+							<th scope="col" style="width: 28%">SUBCATEGORY</th>
 							<th scope="col" style="width: 12%">CREATED</th>
 							<th scope="col" style="width: 12%" class="text-warning">STARTED</th>
 							<th scope="col" style="width: 12%">ONHOLDED</th>
@@ -111,7 +111,7 @@
 </div>
 
 
-{{ div('root') }}
+{{ div('root', 'container-fluid') }}
 
 {#<script>#}
 {#let data = JSON.parse({{ data.to_json()|tojson }});#}
