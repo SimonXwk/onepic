@@ -68,6 +68,7 @@ let vueNowStaticTable = Vue.component('vue-table', {
 		</thead>
 		<tbody>
 			<tr v-for="tp in category.values">
+				<template v-if="aggregate([{dim:category.key, value:tp}]) !==0 ">
 				<td><< tp >></td>
 				<td><< formatAgg(aggregate([{dim:category.key, value:tp}, {dim:'PLEDGESTATUS', value:'Active'}])) >></td>
 				<td><< formatAgg(aggregate([{dim:category.key, value:tp}, {dim:'PLEDGESTATUS', value:'On Hold'}])) >></td>
@@ -83,11 +84,12 @@ let vueNowStaticTable = Vue.component('vue-table', {
 				<td><< formatAgg(aggregate([{dim:category.key, value:tp}, {dim:'PLEDGESTATUS', value:'Closed'}, {dim:'FINISHED', value:new Date(), by:'>', type:'date'}])) >></td>
 				<td><< formatAgg(aggregate([{dim:category.key, value:tp}, {dim:'PLEDGESTATUS', value:'Closed'}, {dim:'FINISHED', value:null}])) >></td>
 				<td><< formatAgg(aggregate([{dim:category.key, value:tp}, {dim:'PLEDGESTATUS', value:'Active'}])+aggregate([{dim:category.key, value:tp}, {dim:'PLEDGESTATUS', value:'Closed'}, {dim:'FINISHED', value:new Date(), by:'>', type:'date'}])) >></td>
+				</template>
 			</tr>
 		</tbody>
 		<tfoot>
 			<tr class="bg-light text-dark font-weight-bold">
-				<th>TOTAL</th>
+				<th class="font-italic">TOTAL</th>
 				<td><< formatAgg(aggregate([{dim:'PLEDGESTATUS', value:'Active'}])) >></td>
 				<td><< formatAgg(aggregate([{dim:'PLEDGESTATUS', value:'On Hold'}])) >></td>
 				<td><< formatAgg(aggregate([{dim:'PLEDGESTATUS', value:'Written Down'}])) >></td>
@@ -154,6 +156,14 @@ let vueMthMixTable = Vue.component('vue-table', {
 		</thead>
 		<tbody>
 			<tr v-for="cat in category.values">
+				<template v-if="filterRows('WRITTENDOWN', 'Written Down', cat).length !==0
+				|| filterRows('ONHOLDDATETIME', 'On Hold', cat).length !==0
+				|| filterRows('CLOSED', 'Closed', cat).length !==0
+				|| filterRows('FINISHED', 'Closed', cat).length !==0
+				|| (filterRows(false, 'Active', cat).length -  filterRows('STARTDATE', 'Active', cat).length) !==0
+				|| filterRows('STARTDATE', 'Active', cat).length !==0
+				|| filterRows(false, 'Active', cat).length !==0
+				">
 				<td><< cat >></td>
 				<td><< filterRows('WRITTENDOWN', 'Written Down', cat).length|number(false) >></td>
 				<td><< filterRows('ONHOLDDATETIME', 'On Hold', cat).length|number(false) >></td>
@@ -162,11 +172,12 @@ let vueMthMixTable = Vue.component('vue-table', {
 				<td><< (filterRows(false, 'Active', cat).length -  filterRows('STARTDATE', 'Active', cat).length)|number(false) >></td>
 				<td><< filterRows('STARTDATE', 'Active', cat).length|number(false) >></td>
 				<td><< filterRows(false, 'Active', cat).length|number(false) >></td>
+				</template>
 			</tr>
 		</tbody>
 		<tfoot>
 			<tr class="bg-light text-dark font-weight-bold">
-				<th>TOTAL</th>
+				<th class="font-italic">TOTAL</th>
 				<td><< filterRows('WRITTENDOWN', 'Written Down', false).length|number(false) >></td>
 				<td><< filterRows('ONHOLDDATETIME', 'On Hold', false).length|number(false) >></td>
 				<td><< filterRows('CLOSED', 'Closed', false).length|number(false) >></td>
@@ -226,6 +237,13 @@ let vueMthMovementTable = Vue.component('vue-table', {
 		</thead>
 		<tbody>
 			<tr v-for="cat in category.values">
+			<template v-if="filterRows('CREATED', false, cat).length !==0
+			|| filterRows('STARTDATE', false, cat).length !==0
+			|| filterRows('ONHOLDDATETIME', 'On Hold', cat).length !==0
+			|| filterRows('WRITTENDOWN', 'Written Down', cat).length !==0
+			|| filterRows('CLOSED', 'Closed', cat).length !==0
+			|| filterRows('FINISHED', 'Closed', cat).length !==0
+			">
 				<td><< cat >></td>
 				<td><< filterRows('CREATED', false, cat).length|number(false) >></td>
 				<td><< filterRows('STARTDATE', false, cat).length|number(false) >></td>
@@ -233,11 +251,12 @@ let vueMthMovementTable = Vue.component('vue-table', {
 				<td><< filterRows('WRITTENDOWN', 'Written Down', cat).length|number(false) >></td>
 				<td><< filterRows('CLOSED', 'Closed', cat).length|number(false) >></td>
 				<td><< filterRows('FINISHED', 'Closed', cat).length|number(false) >></td>
+			</template>
 			</tr>
 		</tbody>
 		<tfoot>
 			<tr class="bg-light text-dark font-weight-bold">
-				<th>TOTAL</th>
+				<th class="font-italic">TOTAL</th>
 				<td><< filterRows('CREATED', false, false).length|number(false) >></td>
 				<td><< filterRows('STARTDATE', false, false).length|number(false) >></td>
 				<td><< filterRows('ONHOLDDATETIME', 'On Hold', false).length|number(false) >></td>
@@ -255,6 +274,7 @@ let rootVue = new Vue({
 	data: {
 		defaultHeaderAPI: '/api/tq/pledges',
 		fyMonths: $FY_MONTH_LIST,
+		cfy: $CFY,
 		thisFY: $CFY,
 		rawHeaderData: null,
 		now: new Date(),
@@ -263,8 +283,12 @@ let rootVue = new Vue({
 		mthDataLtd: false,
 		colFilter1: 'SPONSORSHIP1',
 		colFilter1Value: 'All',
-		colFilter2: 'ACQUISITION_CAMPAIGNCODE',
+		colFilter2: 'SPONSORSHIP2',
 		colFilter2Value: 'All',
+		colFilter3: 'ACQUISITION_CAMPAIGNCODE',
+		colFilter3Value: 'All',
+		colFilter4: 'ACQUISITION_DETAIL',
+		colFilter4Value: 'All',
 	},
 	computed: {
 		thisFYMth: function() {
@@ -274,6 +298,7 @@ let rootVue = new Vue({
 			return this.rawHeaderData.rows.filter(r => {
 				 return (this.colFilter1Value === 'All' ? true : r[this.colFilter1] === this.colFilter1Value)
 				 	&& (this.colFilter2Value === 'All' ? true : r[this.colFilter2] === this.colFilter2Value)
+					&& (this.colFilter3Value === 'All' ? true : r[this.colFilter3] === this.colFilter3Value)
 			});
 		},
 		reportDimRows: function(){
@@ -290,7 +315,9 @@ let rootVue = new Vue({
 			this.rawHeaderData = null;
 			fetchJSON(endpoint(this.defaultHeaderAPI) + '?fy=' + (this.thisFY), (json) => {
 				this.rawHeaderData = json;
-				this.rawHeaderData.rows = this.rawHeaderData.rows.filter(r => new Date(r.CREATED) <= this.now)
+				this.rawHeaderData.rows = this.rawHeaderData.rows.filter(r => {
+					return new Date(r.CREATED) <= this.now
+				})
 			});
 		},
 		filterDataByFyMonth: function(fyMonth) {
@@ -318,23 +345,31 @@ let rootVue = new Vue({
 		<div class="row">
 			<div class="col-12">
 				<p class="lead mb-0">
-					<span class="text-dark font-weight-bold"><< rawHeaderData.rows.length|number >> Pledges<span class="text-info"> created &le; << now|dtAU >></span></span>
+					<span class="text-dark font-weight-bold"><< rawHeaderData.rows.length|number >> Pledges<span class="text-info"> created &le; <span v-if="thisFY===cfy"><< now|dtAU >></span><span v-else>FY<< thisFY >></span></span></span>
 					<br><small class="text-secondary font-italic">data captured : << rawHeaderData.timestamp|dtAU >>, cached for << rawHeaderData.cached_timeout|number >> seconds</small>
 				</p>
-				<P class="font-italic mt-0">Current Focal Month is <span class="text-danger"><< fyMonths.long[thisFYMth-1] >>, FY<< thisFY >></span></P>
+				<P class="font-italic mt-0">Current Focal Month is
+					<span class="text-danger" v-if="thisFY===cfy"><< fyMonths.long[thisFYMth-1] >>, FY<< thisFY >></span>
+					<span class="text-danger" v-else>FY<< thisFY >> (no focal month)</span>
+				</P>
 			</div>
 		</div>
 
 		<div class="row mb-1 mt-1">
-			<div class="col-md-2 mr-0">
-				<select class="custom-select" v-model="reportRowDim" >
-					<option v-for="d in reportRowDims"  v-bind:value="d" >Rows: << d >></option>
+			<div class="col-md-1 mr-0">
+				<select class="custom-select" v-model="thisFY" >
+					<option v-for="y in 6"  v-bind:value="cfy-y+1" >FY<< cfy-y+1 >></option>
+				</select>
+			</div>
+			<div class="col-md-1 mr-0">
+				<select class="custom-select" v-model="mthDataLtd" >
+					<option v-bind:value="false">MoM</option>
+					<option v-bind:value="true">CUMUL</option>
 				</select>
 			</div>
 			<div class="col-md-2 mr-0">
-				<select class="custom-select" v-model="mthDataLtd" >
-					<option v-bind:value="false">Month on Month</option>
-					<option v-bind:value="true">Month Cumulative within FY<< thisFY >></option>
+				<select class="custom-select" v-model="reportRowDim" >
+					<option v-for="d in reportRowDims"  v-bind:value="d" >Rows: << d >></option>
 				</select>
 			</div>
 			<div class="col-md-2 mr-0">
@@ -347,13 +382,21 @@ let rootVue = new Vue({
 					<option v-for="f in getFilterValueList(colFilter2)"  v-bind:value="f" >Filter << colFilter2 >>: << f >></option>
 				</select>
 			</div>
+			<div class="col-md-2 mr-0">
+				<select class="custom-select" v-model="colFilter3Value" >
+					<option v-for="f in getFilterValueList(colFilter3)"  v-bind:value="f" >Filter << colFilter3 >>: << f >></option>
+				</select>
+			</div>
+			<div class="col-md-2 mr-0">
+				<select class="custom-select" v-model="colFilter4Value" >
+					<option v-for="f in getFilterValueList(colFilter4)"  v-bind:value="f" >Filter << colFilter4 >>: << f >></option>
+				</select>
+			</div>
 		</div>
 
 		<div class="row">
-			<div class="col-xl-10">
+			<div class="col-xl-12">
 				<ltd-table-static v-bind:fy="thisFY" v-bind:fyMth="thisFYMth" v-bind:rows="filteredHeaderDataRows" v-bind:category="reportDimRows" calc="count" dim="PLEDGEID"></ltd-table-static>
-			</div>
-			<div class="col-xl-2">
 			</div>
 		</div>
 
@@ -367,14 +410,26 @@ let rootVue = new Vue({
 		</div>
 		-->
 
-		<div class="row" v-for="fym in thisFYMth">
-			<div class="col-xl-6">
-				<mth-table-flow v-bind:isLtd="mthDataLtd" v-bind:fy="thisFY" v-bind:fyMth="thisFYMth-fym+1" v-bind:rows="filterDataByFyMonth(thisFYMth-fym+1)" v-bind:category="reportDimRows"></mth-table-flow>
+		<template v-if="thisFY===cfy">
+			<div class="row" v-for="fym in thisFYMth">
+				<div class="col-xl-6">
+					<mth-table-flow v-bind:isLtd="mthDataLtd" v-bind:fy="thisFY" v-bind:fyMth="thisFYMth-fym+1" v-bind:rows="filterDataByFyMonth(thisFYMth-fym+1)" v-bind:category="reportDimRows"></mth-table-flow>
+				</div>
+				<div class="col-xl-6">
+					<mth-table-mix v-bind:isLtd="mthDataLtd" v-bind:fy="thisFY" v-bind:fyMth="thisFYMth-fym+1" v-bind:rows="filterDataByFyMonth(thisFYMth-fym+1)" v-bind:category="reportDimRows"></mth-table-mix>
+				</div>
 			</div>
-			<div class="col-xl-6">
-				<mth-table-mix v-bind:isLtd="mthDataLtd" v-bind:fy="thisFY" v-bind:fyMth="thisFYMth-fym+1" v-bind:rows="filterDataByFyMonth(thisFYMth-fym+1)" v-bind:category="reportDimRows"></mth-table-mix>
+		</template>
+		<template v-else>
+			<div class="row" v-for="fym in 12">
+				<div class="col-xl-6">
+					<mth-table-flow v-bind:isLtd="mthDataLtd" v-bind:fy="thisFY" v-bind:fyMth="12-fym+1" v-bind:rows="filterDataByFyMonth(12-fym+1)" v-bind:category="reportDimRows"></mth-table-flow>
+				</div>
+				<div class="col-xl-6">
+					<mth-table-mix v-bind:isLtd="mthDataLtd" v-bind:fy="thisFY" v-bind:fyMth="12-fym+1" v-bind:rows="filterDataByFyMonth(12-fym+1)" v-bind:category="reportDimRows"></mth-table-mix>
+				</div>
 			</div>
-		</div>
+		</template>
 
 	</div>`
 });
