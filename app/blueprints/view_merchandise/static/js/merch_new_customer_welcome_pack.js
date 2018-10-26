@@ -199,7 +199,6 @@ let rootVue = new Vue({
 	},
 	watch: {
 		fy: function(){
-			this.resetData();
 			this.getData();
 		},
 		showNotFound: function(newVal, oldVal){
@@ -215,11 +214,11 @@ let rootVue = new Vue({
 				this.raw.rows
 					.filter(d => this.customers[d.SERIALNUMBER].foundWelcomePack && this.customers[d.SERIALNUMBER].sublist == 'todo' )  //this.customers[d.SERIALNUMBER].foundWelcomePack && this.customers[d.SERIALNUMBER].sublist == 'todo'
 					.map(d => ["=\"" + d.SERIALNUMBER + "\"" ,
-						String(new Date(this.customers[d.SERIALNUMBER].pickingSlipCreated.getHours())).padStart(2, '0') + ':' + String(this.customers[d.SERIALNUMBER].pickingSlipCreated.getMinutes()).padStart(2, '0'),
-						this.customers[d.SERIALNUMBER].pickingSlipCreated.setHours(0,0,0,0),
+						String(new Date(this.customers[d.SERIALNUMBER].pickingSlipCreated).getHours()).padStart(2, '0') + ':' + String(new Date(this.customers[d.SERIALNUMBER].pickingSlipCreated).getMinutes()).padStart(2, '0'),
+						new Date(this.customers[d.SERIALNUMBER].pickingSlipCreated).getDate() + '/' + (new Date(this.customers[d.SERIALNUMBER].pickingSlipCreated).getMonth() + 1) + '/' + new Date(this.customers[d.SERIALNUMBER].pickingSlipCreated).getFullYear(),
 						'Note',
 						'Merch Onboarding',
-						'Welcome Pack sent with ',
+						'Welcome Pack sent with ' + d.FIRSTORDER ,
 						'Evidenced by PickingSlip : ' + this.customers[d.SERIALNUMBER].excels.toString()]
 					)
 					.forEach(arr => {
@@ -248,6 +247,28 @@ let rootVue = new Vue({
 			}
 		},
 		getData: function(){
+			this.raw.rows = [];
+			this.raw.ready = false;
+			this.raw.timestamp = null;
+
+			this.fulfilment.rows = [];
+			this.fulfilment.ready = false;
+			this.fulfilment.timestamp = null;
+
+			this.pickingSlip.rows = [];
+			this.customers = null;
+			this.pickingSlipRead = 0;
+			this.customerWelcomePackChecked =0;
+
+			this.showFYSelection = false;
+			this.showFulfilmentFiles = false;
+			this.showNotFound = false;
+			this.showFound = true;
+			this.todoRowsCount = 0;
+			this.finishedRowsCount = 0;
+			this.excludedRowsCount = 0;
+			this.csvEncodedURIWelcomepack = null;
+
 			fetchJSON(endpoint(this.customerDataAPI), (json) => {
 				this.raw.rows = json.rows.sort((a, b) => a.FIRSTORDER <  b.FIRSTORDER);  //Sort by Order Desc
 				this.raw.timestamp = new Date(json.timestamp);
@@ -284,38 +305,18 @@ let rootVue = new Vue({
 				this.excludedRowsCount += cnt;
 			}
 		},
-		resetData: function() {
-			this.raw.rows = [];
-			this.raw.ready = false;
-			this.raw.timestamp = null;
-
-			this.fulfilment.rows = [];
-			this.fulfilment.ready = false;
-			this.fulfilment.timestamp = null;
-
-			this.pickingSlip.rows = [];
-			this.customers = null;
-			this.pickingSlipRead = 0;
-			this.customerWelcomePackChecked =0;
-
-			this.showFYSelection = false;
-			this.showFulfilmentFiles = false;
-			this.showNotFound = false;
-			this.showFound = true;
-			this.todoRowsCount = 0;
-			this.finishedRowsCount = 0;
-			this.excludedRowsCount = 0;
-			this.csvEncodedURIWelcomepack = null;
-		}
 	},
 	created(){
 		this.getData();
 		this.$eventBus.$on('checkedWelcomePack', (sublist, sn, found, created, excekNames) => {
 			this.customerWelcomePackChecked += 1;
-			this.customers[sn].pickingSlipChecked = true;
-			this.customers[sn].foundWelcomePack = found;
-			this.customers[sn].pickingSlipCreated = created;
-			this.customers[sn].excels = excekNames;
+			if (this.customers[sn]){
+				this.customers[sn].pickingSlipChecked = true;
+				this.customers[sn].foundWelcomePack = found;
+				this.customers[sn].pickingSlipCreated = created;
+				this.customers[sn].excels = excekNames;
+			}
+
 			if (found) {
 				this.updateSublistShowCount(1, sublist)
 			}

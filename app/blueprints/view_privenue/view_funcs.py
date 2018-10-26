@@ -29,7 +29,8 @@ def comparative():
 	# Run Query By including 2 financial years
 	d1 = TLMA.fy_range(fy-1)[0]
 	params = Tq.format_date((d1, d2))
-	data = Tq.query('PRIVENUE__BASE', *params, cached_timeout=180)
+	# updates = [('PAYMENT_DATE1', d1, '\''), ('PAYMENT_DATE2', d2, '\'')]
+	data = Tq.query('PRIVENUE__BASE', *params, cached_timeout=180 )
 	# Get Budget
 	budget = TLMA.budget()
 	return dict(cfy=fy, data=data, progress=progress, budget=budget)

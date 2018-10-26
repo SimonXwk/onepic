@@ -47,7 +47,9 @@ let vueNowStaticTable = Vue.component('vue-table', {
 			}
 		},
 	},
-	created(){},
+	created(){
+		this.category.values = this.category.values.sort((a, b) => a < b );
+	},
 	template: '<div class="table-responsive-lg">' +
 	`<table class="table table-sm table-hover table-bordered text-right" >
 		<thead>
@@ -182,22 +184,24 @@ let vueMthMovementTable = Vue.component('vue-table', {
 			return (d.getFullYear()) + (d.getMonth() < 6 ? 0 : 1)
 		},
 		filterRows: function(dateDim, status, cate){
-			console.log(dateDim, status, cate);
 			let rows = this.rows.filter(r =>
 				(r[dateDim] !== null)
 				&& (status ? (r.PLEDGESTATUS === status) : true)
 				&& (cate ? (r[this.category.key] === cate) : true)
 				&& this.calcFY(new Date(r[dateDim])) === this.fy
 			);
-			// if (cate === 'CURE ONE') {
-			// 	console.log(rows.length, this.category.key, dateDim, cate,  this.fyMth);
-			// }
+			if (cate === 'CURE ONE' && dateDim == 'FINISHED') {
+				console.log(rows.length, this.category.key, dateDim, cate,  this.fyMth);
+			}
 			if (this.isLtd) {
 				return rows.filter(r => this.calcFYMth(new Date(r[dateDim])) <= this.fyMth )
 			}else {
 				return rows.filter(r => this.calcFYMth(new Date(r[dateDim])) === this.fyMth )
 			}
 		},
+	},
+	created(){
+		this.category.values = this.category.values.sort((a, b) => a < b );
 	},
 	template: '<div class="table-responsive-lg">' +
 	`<table class="table table-sm table-hover table-bordered text-right" >
@@ -215,8 +219,8 @@ let vueMthMovementTable = Vue.component('vue-table', {
 		<tbody>
 			<tr v-for="cat in category.values">
 				<td><< cat >></td>
-				<td><< filterRows('CREATED', null, cat).length|number(false) >></td>
-				<td><< filterRows('STARTDATE', null, cat).length|number(false) >></td>
+				<td><< filterRows('CREATED', false, cat).length|number(false) >></td>
+				<td><< filterRows('STARTDATE', false, cat).length|number(false) >></td>
 				<td><< filterRows('ONHOLDDATETIME', 'On Hold', cat).length|number(false) >></td>
 				<td><< filterRows('WRITTENDOWN', 'Written Down', cat).length|number(false) >></td>
 				<td><< filterRows('CLOSED', 'Closed', cat).length|number(false) >></td>
@@ -226,12 +230,12 @@ let vueMthMovementTable = Vue.component('vue-table', {
 		<tfoot>
 			<tr class="bg-light text-dark font-weight-bold">
 				<th>TOTAL</th>
-				<td><< filterRows('CREATED').length|number(false) >></td>
-				<td><< filterRows('STARTDATE').length|number(false) >></td>
-				<td><< filterRows('ONHOLDDATETIME', 'On Hold').length|number(false) >></td>
-				<td><< filterRows('WRITTENDOWN', 'Written Down).length|number(false) >></td>
-				<td><< filterRows('CLOSED', 'Closed').length|number(false) >></td>
-				<td><< filterRows('FINISHED', 'Closed').length|number(false) >></td>
+				<td><< filterRows('CREATED', false, false).length|number(false) >></td>
+				<td><< filterRows('STARTDATE', false, false).length|number(false) >></td>
+				<td><< filterRows('ONHOLDDATETIME', 'On Hold', false).length|number(false) >></td>
+				<td><< filterRows('WRITTENDOWN', 'Written Down', false).length|number(false) >></td>
+				<td><< filterRows('CLOSED', 'Closed', false).length|number(false) >></td>
+				<td><< filterRows('FINISHED', 'Closed', false).length|number(false) >></td>
 			</tr>
 		</tfoot>
 	</table>
@@ -255,7 +259,7 @@ let rootVue = new Vue({
 			return (this.now.getMonth() + 1)  +  (this.now.getMonth() < 6 ? 6 : -6)
 		},
 		reportDimRows: function(){
-			return {key:this.reportRowDim, values:Array.from(new Set(this.rawHeaderData.rows.map(r => r[this.reportRowDim]))).sort((a, b) => a < b )}
+			return {key:this.reportRowDim, values:Array.from(new Set(this.rawHeaderData.rows.map(r => r[this.reportRowDim])))}
 		},
 	},
 	watch: {

@@ -41,6 +41,7 @@ def percentage(value, denominator, digits=2):
 		return nan
 
 
+
 def format_datetime_au(value, fmt='%A %d %B %Y %H:%M:%S'):
 	return value.strftime(fmt) if value else None
 

@@ -1,5 +1,4 @@
 <div class="container-fluid">
-
 	{% set totalCFY =  data.rows|selectattr('FY','equalto',cfy)|sum(attribute='PAYMENTAMOUNT')  %}
 	{% set donorsCFY =  data.rows|selectattr('FY','equalto',cfy)|unique(attribute='SERIALNUMBER')|list|length  %}
 	{% set trxsCFY =  data.rows|selectattr('FY','equalto',cfy)|map(attribute='TRXID')|unique|reject('equalto', 0)|list|length  %}
