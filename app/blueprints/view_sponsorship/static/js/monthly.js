@@ -54,15 +54,16 @@ let vueNowStaticTable = Vue.component('vue-table', {
 	`<table class="table table-sm table-hover table-bordered text-right" >
 		<thead>
 			<tr class="table-bordered text-light">
-				 <th scope="col" style="width: 20%" class="bg-dark"><span class="text-warning text-uppercase"><small class="text-light"><< dim >></small> Static Picture</span></th>
-				 <th scope="col" style="width: 10%" class="bg-success">STRICT ACTIVE</th>
-				 <th scope="col" style="width: 10%" class="bg-warning text-dark">ONHOLD</th>
-				 <th scope="col" style="width: 10%" class="bg-danger">CANCELLED</th>
-				 <th scope="col" style="width: 10%" class="bg-primary">CLOSED</th>
-				 <th scope="col" style="width: 10%" class="bg-secondary">CLOSED: FINISHED</th>
-				 <th scope="col" style="width: 10%" class="bg-info">CLOSED: ACTIVE</th>
-				 <th scope="col" style="width: 10%" class="bg-secondary">CLOSED: UNDEFINED</th>
-				 <th scope="col" style="width: 10%" class="bg-success">GENERAL ACTIVE</th>
+				 <th scope="col" style="width: 19%" class="bg-dark"><span class="text-warning text-uppercase"><small class="text-light"><< dim >></small> Static Picture</span></th>
+				 <th scope="col" style="width: 9%" class="bg-success">STRICT ACTIVE</th>
+				 <th scope="col" style="width: 9%" class="bg-warning text-dark">ONHOLD</th>
+				 <th scope="col" style="width: 9%" class="bg-danger">CANCELLED</th>
+				 <th scope="col" style="width: 9%" class="bg-primary">CLOSED</th>
+				 <th scope="col" style="width: 9%" class="bg-dark">TOAL</th>
+				 <th scope="col" style="width: 9%" class="bg-secondary">CLOSED: FINISHED</th>
+				 <th scope="col" style="width: 9%" class="bg-info">CLOSED: ACTIVE</th>
+				 <th scope="col" style="width: 9%" class="bg-secondary">CLOSED: UNDEFINED</th>
+				 <th scope="col" style="width: 9%" class="bg-success">GENERAL ACTIVE</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -72,6 +73,12 @@ let vueNowStaticTable = Vue.component('vue-table', {
 				<td><< formatAgg(aggregate([{dim:category.key, value:tp}, {dim:'PLEDGESTATUS', value:'On Hold'}])) >></td>
 				<td><< formatAgg(aggregate([{dim:category.key, value:tp}, {dim:'PLEDGESTATUS', value:'Written Down'}])) >></td>
 				<td><< formatAgg(aggregate([{dim:category.key, value:tp}, {dim:'PLEDGESTATUS', value:'Closed'}])) >></td>
+				<td class="bg-light text-primary font-weight-bold"><< formatAgg(
+					aggregate([{dim:category.key, value:tp}, {dim:'PLEDGESTATUS', value:'Active'}]) +
+					aggregate([{dim:category.key, value:tp}, {dim:'PLEDGESTATUS', value:'On Hold'}]) +
+					aggregate([{dim:category.key, value:tp}, {dim:'PLEDGESTATUS', value:'Written Down'}]) +
+					aggregate([{dim:category.key, value:tp}, {dim:'PLEDGESTATUS', value:'Closed'}])
+				) >></td>
 				<td><< formatAgg(aggregate([{dim:category.key, value:tp}, {dim:'PLEDGESTATUS', value:'Closed'}, {dim:'FINISHED', value:new Date(), by:'<=', type:'date'}])) >></td>
 				<td><< formatAgg(aggregate([{dim:category.key, value:tp}, {dim:'PLEDGESTATUS', value:'Closed'}, {dim:'FINISHED', value:new Date(), by:'>', type:'date'}])) >></td>
 				<td><< formatAgg(aggregate([{dim:category.key, value:tp}, {dim:'PLEDGESTATUS', value:'Closed'}, {dim:'FINISHED', value:null}])) >></td>
@@ -85,6 +92,12 @@ let vueNowStaticTable = Vue.component('vue-table', {
 				<td><< formatAgg(aggregate([{dim:'PLEDGESTATUS', value:'On Hold'}])) >></td>
 				<td><< formatAgg(aggregate([{dim:'PLEDGESTATUS', value:'Written Down'}])) >></td>
 				<td><< formatAgg(aggregate([{dim:'PLEDGESTATUS', value:'Closed'}])) >></td>
+				<td><< formatAgg(
+					aggregate([{dim:'PLEDGESTATUS', value:'Active'}]) +
+					aggregate([{dim:'PLEDGESTATUS', value:'On Hold'}]) +
+					aggregate([{dim:'PLEDGESTATUS', value:'Written Down'}]) +
+					aggregate([{dim:'PLEDGESTATUS', value:'Closed'}])
+				) >></td>
 				<td><< formatAgg(aggregate([{dim:'PLEDGESTATUS', value:'Closed'}, {dim:'FINISHED', value:new Date(), by:'<=', type:'date'}])) >></td>
 				<td><< formatAgg(aggregate([{dim:'PLEDGESTATUS', value:'Closed'}, {dim:'FINISHED', value:new Date(), by:'>', type:'date'}])) >></td>
 				<td><< formatAgg(aggregate([{dim:'PLEDGESTATUS', value:'Closed'}, {dim:'FINISHED', value:null}])) >></td>
@@ -134,8 +147,8 @@ let vueMthMixTable = Vue.component('vue-table', {
 			 <th scope="col" style="width: 11%" class="bg-warning text-dark">ONHOLDED</th>
 			 <th scope="col" style="width: 11%" class="bg-info">CLOSED</th>
 			 <th scope="col" style="width: 11%" class="bg-info">FINISHED</th>
-			 <th scope="col" style="width: 11%" class="bg-success">ACTIVE: PAID</th>
-			 <th scope="col" style="width: 11%" class="bg-success">ACTIVE: NEW</th>
+			 <th scope="col" style="width: 11%" class="bg-success">PAID</th>
+			 <th scope="col" style="width: 11%" class="bg-success">NEW</th>
 			 <th scope="col" style="width: 11%" class="bg-success">ACTIVE</th>
 		</tr>
 		</thead>
@@ -334,18 +347,18 @@ let rootVue = new Vue({
 		</div>
 
 		<div class="row">
-			<div class="col-xl-8">
+			<div class="col-xl-10">
 				<ltd-table-static v-bind:fy="thisFY" v-bind:fyMth="thisFYMth" v-bind:rows="filteredHeaderDataRows" v-bind:category="reportDimRows" calc="count" dim="PLEDGEID"></ltd-table-static>
 			</div>
-			<div class="col-xl-4">
+			<div class="col-xl-2">
 			</div>
 		</div>
 
 		<div class="row">
-			<div class="col-xl-8">
+			<div class="col-xl-10">
 				<ltd-table-static v-bind:fy="thisFY" v-bind:fyMth="thisFYMth" v-bind:rows="filteredHeaderDataRows" v-bind:category="reportDimRows" calc="sum" dim="INSTALMENTVALUE_PER_DAY"></ltd-table-static>
 			</div>
-			<div class="col-xl-4">
+			<div class="col-xl-2">
 			</div>
 		</div>
 
