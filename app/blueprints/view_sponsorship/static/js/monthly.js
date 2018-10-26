@@ -59,7 +59,7 @@ let vueNowStaticTable = Vue.component('vue-table', {
 				 <th scope="col" style="width: 9%" class="bg-warning text-dark">ONHOLD</th>
 				 <th scope="col" style="width: 9%" class="bg-danger">CANCELLED</th>
 				 <th scope="col" style="width: 9%" class="bg-primary">CLOSED</th>
-				 <th scope="col" style="width: 9%" class="bg-dark">TOAL</th>
+				 <th scope="col" style="width: 9%" class="bg-dark">TOTAL</th>
 				 <th scope="col" style="width: 9%" class="bg-secondary">CLOSED: FINISHED</th>
 				 <th scope="col" style="width: 9%" class="bg-info">CLOSED: ACTIVE</th>
 				 <th scope="col" style="width: 9%" class="bg-secondary">CLOSED: UNDEFINED</th>
@@ -215,7 +215,7 @@ let vueMthMovementTable = Vue.component('vue-table', {
 	`<table class="table table-sm table-hover table-bordered text-right" >
 		<thead>
 			<tr class="table-bordered bg-secondary text-light">
-				 <th scope="col" style="width: 28%" class="bg-secondary"><span class="text-warning text-uppercase"><< fyMonths.short[fyMth-1] >> FLOW &#128197;</span> PLEDGE</th>
+				 <th scope="col" style="width: 28%" class="bg-secondary"><span class="text-warning text-uppercase"><< fyMonths.short[fyMth-1] >> FLOW </span></th>
 				 <th scope="col" style="width: 12%" class="bg-success">CREATED</th>
 				 <th scope="col" style="width: 12%" class="bg-success">STARTED</th>
 				 <th scope="col" style="width: 12%" class="bg-warning text-dark">ONHOLDED</th>
@@ -263,6 +263,8 @@ let rootVue = new Vue({
 		mthDataLtd: false,
 		colFilter1: 'SPONSORSHIP1',
 		colFilter1Value: 'All',
+		colFilter2: 'ACQUISITION_CAMPAIGNCODE',
+		colFilter2Value: 'All',
 	},
 	computed: {
 		thisFYMth: function() {
@@ -271,15 +273,12 @@ let rootVue = new Vue({
 		filteredHeaderDataRows: function() {
 			return this.rawHeaderData.rows.filter(r => {
 				 return (this.colFilter1Value === 'All' ? true : r[this.colFilter1] === this.colFilter1Value)
+				 	&& (this.colFilter2Value === 'All' ? true : r[this.colFilter2] === this.colFilter2Value)
 			});
 		},
 		reportDimRows: function(){
 			return {key:this.reportRowDim, values:Array.from(new Set(this.rawHeaderData.rows.map(r => r[this.reportRowDim])))}
 		},
-		reportFilter1: function(){
-			return {key:this.colFilter1, values:  ['All'].concat(Array.from(new Set(this.rawHeaderData.rows.map(r => r[this.colFilter1])))) }
-		},
-
 	},
 	watch: {
 		thisFY : function(newVal, oldVal) {
@@ -301,9 +300,9 @@ let rootVue = new Vue({
 				return (fym <= fyMonth && r.CREATED_FY === this.thisFY) || (r.CREATED_FY < this.thisFY)
 			})
 		},
-
-
-
+		getFilterValueList: function(filterDim) {
+			return ['All'].concat(Array.from(new Set(this.rawHeaderData.rows.map(r => r[filterDim]))))
+		}
 	},
 	created() {
 		this.getPledgeHeaderData();
@@ -327,22 +326,26 @@ let rootVue = new Vue({
 		</div>
 
 		<div class="row mb-1 mt-1">
-			<div class="col-md-2 mr-1">
+			<div class="col-md-2 mr-0">
 				<select class="custom-select" v-model="reportRowDim" >
 					<option v-for="d in reportRowDims"  v-bind:value="d" >Rows: << d >></option>
 				</select>
 			</div>
-			<div class="col-md-2">
+			<div class="col-md-2 mr-0">
 				<select class="custom-select" v-model="mthDataLtd" >
 					<option v-bind:value="false">Month on Month</option>
 					<option v-bind:value="true">Month Cumulative within FY<< thisFY >></option>
 				</select>
 			</div>
-			<div class="col-md-2">
+			<div class="col-md-2 mr-0">
 				<select class="custom-select" v-model="colFilter1Value" >
-					<option v-for="f in reportFilter1.values"  v-bind:value="f" >Filter1: << f >></option>
+					<option v-for="f in getFilterValueList(colFilter1)"  v-bind:value="f" >Filter << colFilter1 >>: << f >></option>
 				</select>
-
+			</div>
+			<div class="col-md-2 mr-0">
+				<select class="custom-select" v-model="colFilter2Value" >
+					<option v-for="f in getFilterValueList(colFilter2)"  v-bind:value="f" >Filter << colFilter2 >>: << f >></option>
+				</select>
 			</div>
 		</div>
 
@@ -354,6 +357,7 @@ let rootVue = new Vue({
 			</div>
 		</div>
 
+		<!--
 		<div class="row">
 			<div class="col-xl-10">
 				<ltd-table-static v-bind:fy="thisFY" v-bind:fyMth="thisFYMth" v-bind:rows="filteredHeaderDataRows" v-bind:category="reportDimRows" calc="sum" dim="INSTALMENTVALUE_PER_DAY"></ltd-table-static>
@@ -361,6 +365,7 @@ let rootVue = new Vue({
 			<div class="col-xl-2">
 			</div>
 		</div>
+		-->
 
 		<div class="row" v-for="fym in thisFYMth">
 			<div class="col-xl-6">
