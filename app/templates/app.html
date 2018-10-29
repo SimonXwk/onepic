@@ -178,9 +178,9 @@ function currency(val) {
 					}
 				}
 	  	});
-			Vue.filter('dAU', val => !val? null : new Date(val).toLocaleDateString("en-AU", { year: 'numeric', month: 'short', day: 'numeric' }));
-			Vue.filter('tAU', val => !val? null : new Date(val).toLocaleTimeString("en-AU", { hour:'numeric', minute:'numeric', second:'numeric' }));
-			Vue.filter('dtAU', val => !val? null : new Date(val).toLocaleDateString("en-AU", { year: 'numeric', month: 'long', day: 'numeric', hour:'numeric', minute:'numeric', second:'numeric'}));
+			Vue.filter('dAU', val => !val? null : new Date(val).toLocaleDateString("en-AU", {timeZone: "UTC", year: 'numeric', month: 'short', day: 'numeric' }));
+			Vue.filter('tAU', val => !val? null : new Date(val).toLocaleTimeString("en-AU", {timeZone: "UTC", hour:'numeric', minute:'numeric', second:'numeric' }));
+			Vue.filter('dtAU', val => !val? null : new Date(val).toLocaleDateString("en-AU", {timeZone: "UTC", year: 'numeric', month: 'long', day: 'numeric', hour:'numeric', minute:'numeric', second:'numeric'}));
 			let vueLoader = Vue.component('vueLoader', {
 				props: ['msg'],
 				template: `

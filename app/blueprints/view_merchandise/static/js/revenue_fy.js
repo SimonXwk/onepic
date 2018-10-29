@@ -24,8 +24,13 @@ function setOptionCompareBarChart(config) {
 			shadow: false
 		},
 		tooltip: {
-			shared: true
-		},
+			headerFormat: '<span style="font-size:16px">{point.key}</span><table>',
+			pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+					'<td style="padding:0;text-align: right;"><b>{point.y:,.2f}</b></td></tr>',
+			footerFormat: '</table>',
+			shared: true,
+			useHTML: true
+	 },
 		plotOptions: {
 			column: {
 				stacking: 'normal',
