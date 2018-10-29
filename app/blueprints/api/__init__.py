@@ -11,8 +11,12 @@ ld.url('data_excel_mail.date', ['/mailbox/ymd', '/mailbox/ymd/<string:str_date>'
 ld.url('data_excel_mail.year_month', ['/mailbox/ym/<string:str_yearmonth>'])
 
 ld.url('data_thankq.payments', ['/tq/payments'])
-ld.url('data_thankq.source_code1_summary', ['/tq/source_code1_summary'])
 
+ld.url('data_thankq.fys_total_full', ['/tq/fys_total_full'])
+ld.url('data_thankq.fys_total_ltd', ['/tq/fys_total_ltd'])
+
+
+ld.url('data_thankq.source_code1_summary', ['/tq/source_code1_summary'])
 ld.url('data_thankq.contact_created_fy', ['/tq/contact_created_fy'])
 ld.url('data_thankq.new_customer_list', ['/merch/new_customers'])
 ld.url('data_thankq.journey_cureone_acquisiton_donors', ['/campaign/journey_cureone_acquisition'])
@@ -23,8 +27,7 @@ ld.url('data_thankq.pledge_headers', ['/tq/pledges'])
 
 ld.url('data_budget.budget', ['/budget'])
 
-ld.url('data_privenue.fy_total_all', ['/cash/fys'])
-ld.url('data_privenue.fy_total_all_ltd', ['/cash/fysltd'])
+
 ld.url('data_privenue.cfy_platform_type_revenue', ['/cash/cfy/stream'])
 
 # Merchandise related APIs

@@ -55,10 +55,10 @@ let vueNowStaticTable = Vue.component('vue-table', {
 		<thead>
 			<tr class="table-bordered text-light">
 				 <th scope="col" style="width: 19%" class="bg-dark"><span class="text-warning text-uppercase"><small class="text-light"><< dim >></small> Static Picture</span></th>
-				 <th scope="col" style="width: 9%" class="bg-success">STRICT ACTIVE</th>
+				 <th scope="col" style="width: 9%" class="bg-success">ACTIVE</th>
 				 <th scope="col" style="width: 9%" class="bg-warning text-dark">ONHOLD</th>
 				 <th scope="col" style="width: 9%" class="bg-danger">CANCELLED</th>
-				 <th scope="col" style="width: 9%" class="bg-primary">CLOSED</th>
+				 <th scope="col" style="width: 9%" class="bg-info">CLOSED</th>
 				 <th scope="col" style="width: 9%" class="bg-dark">TOTAL</th>
 				 <th scope="col" style="width: 9%" class="bg-secondary">CLOSED: FINISHED</th>
 				 <th scope="col" style="width: 9%" class="bg-info">CLOSED: ACTIVE</th>

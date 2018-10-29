@@ -13,7 +13,7 @@ function setOptionCompareBarChart(config) {
 			text: config.title
 		},
 		xAxis: {
-			categories: $FY_MONTH_LIST_NAME
+			categories: $FY_MONTH_LIST.short
 		},
 		yAxis: {
 			title: {
@@ -33,6 +33,7 @@ function setOptionCompareBarChart(config) {
 	 },
 		plotOptions: {
 			column: {
+				grouping: false,
 				stacking: 'normal',
 				shadow: false,
 				borderWidth: 0
@@ -42,22 +43,30 @@ function setOptionCompareBarChart(config) {
 			{
 				name: 'Budget GST',
 				stack: 'Budget',
-				color: '#bb1e10',
+				color: 'rgba(248,161,63,0.9)',
+				pointPadding: 0.1,
+				pointPlacement: 0,
 				data: []
 			}	,{
 				name: 'Budget Net',
 				stack: 'Budget',
-				color: '#fd9f3e',
+				color: 'rgba(165,170,217,0.9)',
+				pointPadding: 0.1,
+				pointPlacement: 0,
 				data: []
 			}, {
 				name: 'Actual GST',
 				stack: 'Actual',
-				color: '#832561',
+				color: 'rgba(186,60,61,1)',
+				pointPadding: 0.3,
+				pointPlacement: 0,
 				data: []
 			}, {
 				name: 'Actual Net',
 				stack: 'Actual',
-				color: '#8e43e7',
+				color: 'rgba(126,86,134,1)',
+				pointPadding: 0.3,
+				pointPlacement: 0,
 				data: []
 			}
 		]
@@ -70,7 +79,7 @@ let rootVue = new Vue({
 	data: {
 		paymentAPI: '/api/tq/payments',
 		budgetAPI: '/api/budget',
-		selectedFY: null,
+		focalFY: $CFY,
 		paymentDataReady: false,
 		budgetDataReady: false,
 		payments: null,
@@ -78,14 +87,6 @@ let rootVue = new Vue({
 		spinner: '<div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>'
 	},
 	computed: {
-		thisFY: function () {
-			if (!this.selectedFY){
-				let today = new Date();
-				return today.getFullYear() + (today.getMonth() < 6 ? 0 : 1)
-			} else {
-				return this.selectedFY
-			}
-		},
 		merchRows: function(){
 			if (this.paymentDataReady) {
 				let mr = this.payments.rows.filter(p => p.SOURCETYPE.indexOf('Merch') !== -1 );
@@ -104,7 +105,7 @@ let rootVue = new Vue({
 		},
 		budgetObj: function(){
 			if (this.budgetDataReady) {
-				return this.budget.FY[this.thisFY]
+				return this.budget.FY[this.focalFY]
 			} else {
 				return null
 			}
@@ -171,7 +172,7 @@ let rootVue = new Vue({
 		},
 	},
 	created() {
-		fetchJSON(endpoint(this.paymentAPI), (pmtJSON) => {
+		fetchJSON(endpoint(this.paymentAPI + '?fy=' + this.focalFY), (pmtJSON) => {
 			this.payments = pmtJSON;
 			this.paymentDataReady = true;
 		});

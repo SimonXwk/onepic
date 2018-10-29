@@ -12,6 +12,8 @@ $hamberger-height: 3px;
 
 	.navbar-brand{
 		color: $navbrand-color;
+		padding-top: 0;
+		padding-bottom: 0;
 		font-family: Impact, Charcoal, sans-serif;
 	}
 
@@ -54,7 +56,7 @@ $hamberger-height: 3px;
 
 			// Hide the dropdown on mouse not hovering(preventing it from showing if the nav-item was clicked instead of hovered)
 			&.dropdown:not(:hover) > .dropdown-menu {
-			  // display: none;
+				// display: none;
 			}
 
 			// Navlink is the level1 narbar item that show directly one the bar, this class applies to <a> tag

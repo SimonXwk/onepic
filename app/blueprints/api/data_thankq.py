@@ -32,6 +32,18 @@ def payments():
 
 
 @odbc_json_api
+def fys_total_full():
+	params = (TLMA.cfy, 1)
+	return Tq.query('FY_TOTAL', *params, cached_timeout=20)
+
+
+@odbc_json_api
+def fys_total_ltd():
+	params = (TLMA.cfy, -1)
+	return Tq.query('FY_TOTAL', *params, cached_timeout=20)
+
+
+@odbc_json_api
 def source_code1_summary():
 	s1 = request_arg('s1', '', lambda x: tests.is_valid_string(x, nosql=True, max_length=30))
 	updates = [('SOURCECODE1', s1, '\'')]
@@ -70,5 +82,5 @@ def get_first_date_source1_by_contacts_since():
 @odbc_json_api
 def pledge_headers():
 	fy = int(request_arg('fy', TLMA.cfy, tests.is_year))
-	updates = (('FY', fy),)
+	updates = (('FY', fy), ('BASE_QUERY', ''))
 	return Tq.query(('PLEDGE_[BASE]', 'PLEDGE_OVERVIEW'), cached_timeout=30, updates=updates)

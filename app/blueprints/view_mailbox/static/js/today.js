@@ -1,153 +1,114 @@
+function PieChart3D(chartID, json, isTotal, title, subtitle) {
+	// Customize Pie Chart Color
+	Highcharts.setOptions({
+     colors: isTotal ? ['#BA3C3D', '#7E5686', '#3498db ', '#839192'] : [' #F8A13F ', '#A5AAD9', '#00CCFF', '#CCCCFF']
+	});
 
-
-
-// Radialize the colors
-Highcharts.setOptions({
-	lang: {
-        thousandsSep: ','
-    },
-    colors: Highcharts.map(Highcharts.getOptions().colors, function (color) {
-        return {
-            radialGradient: {
-                cx: 0.5,
-                cy: 0.3,
-                r: 0.7
-            },
-            stops: [
-                [0, color],
-                [1, Highcharts.Color(color).brighten(-0.3).get('rgb')] // darken
-            ]
-        };
-    })
-});
-
-// Create options object
-function renderTodayMailOption(id) {
-	return {
+	Highcharts.chart(chartID, {
 		chart: {
-			renderTo: id,
-			type: 'pie'
-		},
-		credits: {
-			text: 'ⒸTLMA',
-			href: '#',
-			enabled: true
+			type: 'pie',
+			plotBackgroundColor: null,
+			options3d: {
+				enabled: true,
+				alpha: 45,
+				beta: 0
+			},
+			animation: false  // Disable chart.animation, while keeping the default drilldown.animation, otherwise drilldown doesn't work properly with 3d chart
 		},
 		title: {
-			text: 'Mail Opening'
+			text: title
 		},
-		subtitle: {
-			text: ''
+		 subtitle: {
+			text: subtitle
+    },
+		tooltip: {
+			headerFormat: '<b>{series.name}</b><br>',
+			pointFormat: isTotal? '{point.name}: {point.y:,.2f} ({point.percentage:.1f}%)' : '{point.name}: <b>{point.y:,.0f} ({point.percentage:.1f}%)</b>'
 		},
-		legend: {
-	        layout: 'vertical',
-	        align: 'right',
-	        verticalAlign: 'middle'
-        },
-		"series": [{}],
-		"drilldown": {
-			"series": []
-		}
-	};
-}
-
-
-
-function updateChart(chart, endpoint){
-  fetch(endpoint).then(function(response){
-    // console.log(response);
-    response.json().then(function (json) {
-        // console.log(json);
-		chart.update({
-			title: {
-				text:  (json.Recorder == null ? ' : No Mail Opened' : '' +  currency(json.Total) + ' opened by ' + json.Recorder + ' on ' + dAU(new Date(json.Date)))
-			},
-			subtitle: {
-				text: (json.Cash == null ? 'No Cash Record' :'Cash Received: $' + json.Cash)
-			},
-			tooltip: {
-				headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-				pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f}%</b> of total<br/>'
-			},
-			plotOptions: {
-				series: {
-					dataLabels: {
-						enabled: true,
-						format: '{point.name} Total: {point.y:,.2f} ( {point.percentage:.1f}% )',
-                        connectorColor: 'silver'
-					}
-				}
-			},
-			"series": [{
-				"name": "Daily Cash",
-				"colorByPoint": true,
-				"data": [
-					{
-						"name": "Donation",
-						"y": json.TotalDCaCh + json.TotalDCC,
-						"drilldown": "Donation"
-					},
-					{
-						"name": "Merchandise",
-						"y": json.TotalMCaCh + json.TotalMCC,
-						"drilldown": "Merchandise"
-					},
-					{
-						"name": "Other",
-						"y": json.TotalOther == 0 ? null : json.TotalOther,
-						"drilldown": null
-					},
-					{
-						"name": "List",
-						"y": json.TotalList == 0 ? null : json.TotalList,
-						"drilldown": null
-					}
-					],
-				showInLegend: true
+		plotOptions: {
+			pie: {
+				allowPointSelect: true,
+				cursor: 'pointer',
+				innerSize: 50,
+				depth: 35,
+				dataLabels: {
+					enabled: true,
+					distance: -35,
+					color: 'black',
+					format: isTotal? '<span style="font-size:1rem;color:blue">${point.y:,.2f}</span>':'<span style="font-size:1rem">{point.y:,.0f}</span>'
+				},
+				showInLegend: true,
 			}
-			],
-			"drilldown": {
-				"series": [
-				{
-					"name": "Donation Payment Type",
-					"id": "Donation",
-					"data": [
-						[
-							"Cash and Cheque",
-							json.TotalDCaCh
-						],
-						[
-							"Credit Card",
-							json.TotalDCC
-						]
-					]
-				},
-				{
-					"name": "Merchandise Payment Type",
-					"id": "Merchandise",
-					"data": [
-						[
-							"Cash and Cheque",
-							json.TotalMCaCh
-						],
-						[
-							"Credit Card",
-							json.TotalMCC
-						]
-					]
-				},
-
+		},
+		series: [{
+				name: isTotal ? "Daily Mail Total" : "Daily Mail Count",
+				colorByPoint: true,
+				data: [
+					{
+						name: "Donation",
+						y: isTotal ? ((json.TotalDCaCh+json.TotalDCC)===0?null:(json.TotalDCaCh+json.TotalDCC)) : ((json.NoDCaCh+json.NoDCC)===0?null:(json.NoDCaCh + json.NoDCC)) ,
+						drilldown: "Donation"
+					},
+					{
+						name: "Merchandise",
+						y: isTotal ? ((json.TotalMCaCh+json.TotalMCC)===0?null:(json.TotalMCaCh+json.TotalMCC)) : ((json.NoMCaCh+json.NoMCC)===0?null:(json.NoMCaCh+json.NoMCC)),
+						drilldown: "Merchandise"
+					},
+					{
+						name: "List",
+						y: isTotal ? (json.TotalList === 0 ? null : json.TotalList) : (json.NoList === 0 ? null : json.NoList),
+						drilldown: null
+					},
+					{
+						name: "Other",
+						y: isTotal ? (json.TotalOther === 0 ? null : json.TotalOther) : (json.NoOther === 0 ? null : json.NoOther),
+						drilldown: null
+					}
 				]
-			}
-		}); // End of Update
-    })
-  });
+		}],
+		drilldown: {
+			series: [{
+				name: "Payment Type(Donation)",
+				id: "Donation",
+				colorByPoint: true,
+				data: [{
+					name: "Cash and Cheque",
+					color: '#c1d82f',
+					y: isTotal ? json.TotalDCaCh : json.NoDCaCh
+				}, {
+					name: "Credit Card",
+					color: '#30c39e',
+					y: isTotal ? json.TotalDCC : json.NoDCC
+				}]
+			},{
+				name: "Payment Type(Merchandise)",
+				id: "Merchandise",
+				colorByPoint: true,
+				data: [{
+					name: "Cash and Cheque",
+					color: '#c1d82f',
+					y: isTotal ? json.TotalMCaCh : json.NoMCaCh
+				}, {
+					name: "Credit Card",
+					color: '#30c39e',
+					y: isTotal ? json.TotalMCC : json.NoMCC
+				}]
+			}]
+		}
+	});
 }
 
-let cht1 = Highcharts.chart(renderTodayMailOption('today0'));
-let cht2 = Highcharts.chart(renderTodayMailOption('today1'));
-let cht3 = Highcharts.chart(renderTodayMailOption('today3'));
+let cht = [{vChtID: 'today11', nChtID: 'today21'}, {vChtID: 'today12', nChtID: 'today22'}, {vChtID: 'today13', nChtID: 'today23'}]
+for (let i=0; i<cht.length; i++) {
+	fetchJSON(endpoint('/api/mailbox/today/', i+''), function(json){
+		let title, subtitle;
+		// Today 1 Value and Count
+		title = (json.Recorder == null ? 'No Opener found on '+dAU(new Date(json.Date)): '' + currency(json.Total) + ' from ' + dAU(new Date(json.Date)));
+		subtitle =  json.Recorder == null ? 'No Opener found' : 'Opened by ' + json.Recorder + (json.Cash == null || json.Cash === 0 ? ', no cash found' :', cash received: ' + currency(json.Cash)) ;
+		PieChart3D(cht[i].vChtID, json, true, title, subtitle);
 
-updateChart(cht1, endpoint('/api/mailbox/today/','0'));
-updateChart(cht2, endpoint('/api/mailbox/today/','1'));
-updateChart(cht3, endpoint('/api/mailbox/today/','2'));
+		title = (json.Recorder == null ? 'No Opener found on '+dAU(new Date(json.Date)) : '' + json.No + ' items from ' + dAU(new Date(json.Date)));
+		subtitle =  json.Recorder == null ? 'No Opener found' : 'Opened by ' + json.Recorder ;
+		PieChart3D(cht[i].nChtID, json, false, title, subtitle);
+	});
+}

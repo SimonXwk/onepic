@@ -11,10 +11,10 @@ def date_of_payments_fy():
 	return data.rows
 
 
-@templatified('homepage', title='Private Revenue Overview')
-def homepage():
+@templatified('overview', title='Private Revenue Overview')
+def overview():
 	today = datetime.date.today()
-	d1, d2 = TLMA.cfy_start_date, TLMA.cfy_end_date
+	d1, d2 = TLMA.fy_range(TLMA.cfy)
 	progress = (today-d1).days/(d2-d1).days
 	return dict(date_progress=progress*100)
 

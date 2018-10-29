@@ -10,24 +10,6 @@ class FyTotalSchema(Schema):
 
 
 @jsonified
-def fy_total_all():
-	schema = FyTotalSchema()
-	result = tq.query('FY_TOTAL', datetime.datetime.today().year+1)
-	rows = result.rows
-	data = dict(timestamp=result.timestamp, fy=[int(row.FY) if row.FY else 0 for row in rows], total=[float(row.TOTAL) if row.TOTAL else float(0) for row in rows])
-	# data = schema.dump(data).data
-	return data
-
-
-@jsonified
-def fy_total_all_ltd():
-	result = tq.query('FY_TOTAL_LTD', datetime.datetime.today().year+1)
-	rows = result.rows
-	data = dict(timestamp=result.timestamp, fy=[int(row.FY) if row.FY else 0 for row in rows], total=[float(row.TOTAL) if row.TOTAL else float(0) for row in rows])
-	return data
-
-
-@jsonified
 def cfy_platform_type_revenue():
 	result = tq.query('PLATFORM_TO_TQTYPE_TOTAL')
 	rows = result.rows
