@@ -307,7 +307,7 @@ let ssi = new Vue({
 					<div class="tracking-list">
 						<div class="tracking-item" v-for="event in result.tracking_events">
 							<div class="tracking-icon" v-bind:class="[deliveryStatusClass(event.status, 'status-').class]" v-html="deliveryStatusClass(event.status, 'status-').icon" ></div>
-							<div class="tracking-date"><< event.event_datetime|dAU >><span><< event.event_datetime|tAU >></span></div>
+							<div class="tracking-date"><< event.event_datetime|dAU("UTC") >><span><< event.event_datetime|tAU("UTC") >></span></div>
 							<div class="tracking-content"><< event.status >><span><< event.details >></span></div>
 						</div>
 				 	</div>

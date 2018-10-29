@@ -192,7 +192,7 @@ let vueRow = Vue.component('vue-row', {
 				<a target="blank" class="text-muted" v-bind:href="linkTrack + row.FIRSTORDER">[starshipit]</a>
 			</em></small>
 			<br>
-			<span class="text-muted">Status Date:</span> <span class="text-muted" v-if="statusDate===null"><del>Not Applicable</del></span><span class="text-primary" v-else><< this.statusDate|dtAU >></span>
+			<span class="text-muted">Status Date:</span> <span class="text-muted" v-if="statusDate===null"><del>Not Applicable</del></span><span class="text-primary" v-else><< this.statusDate|dtAU("UTC") >></span>
 			<span v-if="statusDetail!==status" class="text-danger"><small><br><< statusDetail >></small></span>
 		</td>
 
