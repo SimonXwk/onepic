@@ -72,11 +72,11 @@ let vueRow = Vue.component('vue-row', {
 			}else if ( !this.hasOrderNumber ) {
 				return '❌' + ' Order Number not Found in ThankQ '
 			}else if ( this.called1 === false ) {
-				return '☕' + ' Searching(step 1) ... '
+				return '🔍' + ' Searching for Invoice Number ...'
 			}else if ( this.trackingNumber === null ) {
 				return '🚫' + ' No Response From Starshipit'
 			}else if ( this.called2 === false ) {
-				return '☕' + ' Searching(step 2) ... '
+				return '🔎' + ' Searching for Consignment Number ...'
 			}else if ( this.status !== null && this.status.toUpperCase().indexOf('DELIVERED') !== -1 ) {
 				return '✔️' + ' ['+ this.orders + '] ' + this.status
 			}else {
@@ -340,7 +340,8 @@ let rootVue = new Vue({
 		csvEncodedURI: null,
 		csvEncodedURIMobile: null,
 		csvEncodedURIEmail: null,
-		svEncodedURIPureDonor: null,
+		csvEncodedURIPureDonor: null,
+		csvEncodedURINotExist: null,
 	},
 	computed: {
 		dataAPI: function() {
@@ -510,7 +511,20 @@ let rootVue = new Vue({
 							csvArr.push(arr.join(","));
 						});
 					csvContent = csvArr.join("\n");
-					this.svEncodedURIPureDonor = encodeURI(csvContent);
+					this.csvEncodedURIPureDonor = encodeURI(csvContent);
+
+					csvArr = [];
+					csvArr.push(("data:text/csv;charset=utf-8," + ['SERIALNUMBER', 'REXID', 'FIRSTORDER'].join(",")));
+					this.raw.rows
+						.filter(d => this.customers[d.SERIALNUMBER].displayType === 'missing')
+						.map(d => ["=\"" + d.SERIALNUMBER + "\"" , d.LAST_REXID, d.FIRSTORDER])
+						.forEach(arr => {
+							csvArr.push(arr.join(","));
+						});
+					csvContent = csvArr.join("\n");
+					this.csvEncodedURINotExist = encodeURI(csvContent);
+
+
 			}
 		}
 	},
@@ -626,11 +640,12 @@ let rootVue = new Vue({
 
 							<div class="col-md-4">
 								<transition name="bounce">
-								<div class="alert  m-0 p-1 align-middle shadow-lg" v-if="csvEncodedURI || csvEncodedURIMobile || csvEncodedURIEmail || svEncodedURIPureDonor">
+								<div class="alert  m-0 p-1 align-middle shadow-lg" v-if="csvEncodedURI || csvEncodedURIMobile || csvEncodedURIEmail || csvEncodedURIPureDonor">
 									<div class="row">
 										<div class="col-6">
-											<a v-if="svEncodedURIPureDonor!==null"  v-bind:href="svEncodedURIPureDonor" class="btn btn-block btn-sm btn-outline-success align-middle text-left shadow" role="button" aria-pressed="true" download="courtesy_pure_donor_data_todo.csv"><small>CSV: <span class="text-danger">PURE DONONRS</span></small></a>
+											<a v-if="csvEncodedURIPureDonor!==null"  v-bind:href="csvEncodedURIPureDonor" class="btn btn-block btn-sm btn-outline-success align-middle text-left shadow" role="button" aria-pressed="true" download="courtesy_pure_donor_data_todo.csv"><small>CSV: <span class="text-danger">PURE DONONRS</span></small></a>
 											<a v-if="csvEncodedURI!==null"  v-bind:href="csvEncodedURI" class="btn btn-block btn-sm btn-outline-success align-middle text-left shadow" role="button" aria-pressed="true" download="courtesy_call_data_todo.csv"><small>CSV: <span class="text-primary">ALL</span> <span class="text-danger">EXC PURE DON</span></small></a>
+											<a v-if="csvEncodedURINotExist!==null"  v-bind:href="csvEncodedURINotExist" class="btn btn-block btn-sm btn-outline-success align-middle text-left shadow" role="button" aria-pressed="true" download="courtesy_call_data_not_exist.csv"><small>CSV: <span class="text-muted">NOT EXIST</span></small></a>
 										</div>
 										<div class="col-6">
 											<a v-if="csvEncodedURIMobile!==null"  v-bind:href="csvEncodedURIMobile" class="btn btn-block btn-sm btn-outline-success align-middle text-left shadow" role="button" aria-pressed="true" download="courtesy_call_data_todo_mobile.csv"><small>CSV: <span class="text-primary">MOBILE</span> <span class="text-danger">EXC PURE DON</span></small></a>

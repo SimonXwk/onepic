@@ -78,6 +78,11 @@ def get_first_date_source1_by_contacts_since():
 	return Tq.query('CONTACTS_FIRSTDAY_SOURCECODES_SINCE', sn, since, cached_timeout=120)
 
 
+@odbc_json_api
+def christmas_appeal_donors():
+	return Tq.query('JOURNEY_CHRISTMAS_APPEAL_DONORS', cached_timeout=20)
+
+
 # Pledge Related
 @odbc_json_api
 def pledge_headers():

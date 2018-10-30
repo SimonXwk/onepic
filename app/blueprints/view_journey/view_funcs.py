@@ -28,3 +28,8 @@ def merchandise_new():
 	updates = [('DATE_START', Tq.format_date(d1), '\''), ('DATE_END',  Tq.format_date(d2), '\'')]
 	data = Tq.query('JOURNEY_NEW_MERCHANDISE_CUSTOMER', cached_timeout=30, updates=updates)
 	return dict(title='Merchandise New Customer Journey', data=data, dates=(d1, d2))
+
+
+@templatified('todo_christmas_appeal', title='Christmas Appeal')
+def touch_point_christmas_appeal():
+	pass

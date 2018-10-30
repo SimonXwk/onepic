@@ -254,7 +254,7 @@ let rootVue = new Vue({
 			<div class="card-counter success">
 				<span class="count-icon">&#128181;</span>
 				<span class="count-numbers"><< sumTotal("PAYMENTAMOUNT")|currency >></span>
-				<span class="count-name">Total Revenue</span>
+				<span class="count-name">Total Cash Inflow</span>
 			</div>
 		</div>
 		<div class="col-xs-12 col-sm-6 col-md-6 col-lg-3">

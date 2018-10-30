@@ -3,7 +3,7 @@ let basciOptions = {
 		type: 'spline',
 	},
 	xAxis: {
-		gridLineWidth: 0.8,
+		gridLineWidth: 0.3,
 		categories: []
 	},
 	yAxis: [{
@@ -162,11 +162,11 @@ fetchJSON(endpoint('/api/tq/fys_total_ltd'), function(json){
 		yAxis: 0,
 		type: 'column',
 		data: fyTotals.map((v, i, self) => {
-			if (v === Math.max(...self)) {
+			if (v === orderedTotalUniques[0]) {
 				return {y: v, color: 'rgb(201,81,12,0.7)'}
-			}else if (v === orderedTotalUniques[1] ){
+			}else if (v === orderedTotalUniques[1]){
 				return {y: v, color: 'rgb(255,120,0,0.7)'}
-			}else if (v === orderedTotalUniques[2] ){
+			}else if (v === orderedTotalUniques[2]){
 				return {y: v, color: 'rgb(255,205,0,0.7)'}
 			}else{
 				return v
