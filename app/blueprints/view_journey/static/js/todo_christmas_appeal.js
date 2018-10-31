@@ -6,61 +6,87 @@ let vueRow = Vue.component('vue-row', {
 			show: true,
 		}
 	},
-	computed: {
-	},
+
 	created(){
 	},
 	methods: {
 
 	},
 	template: `<tr v-if="show">
-		<td style="width: 25%" class="align-middle">
-			<span class="text-primary"><< row.SERIALNUMBER >></span> << row.FULLNAME >>
-			<small class="text-success" v-if="row.SOURCE">(<< row.SOURCE >>)</small>
-			<small class="text-dark" v-if="row.STATE"><< row.STATE >></small>
-		</td>
+	<td style="width: 25%" class="align-middle">
+		<mark class="font-weight-bold"><< row.FULLNAME >></mark>
+		<small class="text-success font-italic" v-if="row.SOURCE">(<< row.SOURCE >>)</small>
+		<small class=d-block>
+				 <span class="badge badge-dark"><< row.SERIALNUMBER >></span>
+				 <span class="badge badge-success" v-if="row.IS_ACQUISITION===-1">[ACQ]</span>
+				 <span class="badge badge-success" v-if="row.FIRSTFY===row.CFY">[NEW]</span>
+				 <span class="badge badge-info" v-if="row.SORTKEYREF1">[is << row.SORTKEYREFREL2 >>]</span>
+				 <span class="badge badge-warning" v-if="row.DONOTMAIL===-1">[DNM]</span>
+				 <span class="badge badge-danger" v-if="row.CONTACTTYPE==='Organisation'">[ORG]</span>
+				 <span class="badge badge-danger" v-if="row.PRIMARYCATEGORY==='ESTATE'">[ESTATE]</span>
+				 <span class="badge badge-danger" v-if="row.DECD===-1">[DECD]</span>
+				 <span class="badge badge-danger" v-if="row.ANONYMOUS===-1">[ANON]</span>
+				 <span class="badge badge-danger" v-if="row.DONOTCALL===-1">[DNC]</span>
+				 <span class="badge badge-danger" v-if="row.CAMPAIGN_MIN>=300||row.CAMPAIGN_MAX>=300">[$300]</span>
+				 <span class="badge badge-danger text-warning" v-if="!row.MOBILENUMBER && !row.DAYTELEPHONE && !row.EVENINGTELEPHONE && !row.FAXNUMBER">[!PHONE]</span>
+		<small>
+	</td>
 
-		<td style="width: 20%" class="align-middle">
-			<< row.CAMPAIGN_FIRSTDATE|dAU >>
-		</td>
+	<td style="width: 5%" class="align-middle">
+		<< row.STATE >>
+	</td>
 
-		<td style="width: 20%" class="align-middle">
-			<span class="badge badge-success" v-if="row.IS_ACQUISITION===-1">ACQ</span>
-			<span class="badge badge-success" v-if="row.CAMPAIGN_LIFESPAN>0">COMBO</span>
-			<span class="badge badge-info" v-if="row.SORTKEYREF1">is << row.SORTKEYREFREL2 >></span>
-			<span class="badge badge-danger" v-if="row.CONTACTTYPE==='Organisation'">ORG</span>
-			<span class="badge badge-danger" v-if="row.PRIMARYCATEGORY==='ESTATE'">ESTATE</span>
-			<span class="badge badge-danger" v-if="row.DECD===-1">DECD</span>
-			<span class="badge badge-danger" v-if="row.ANONYMOUS===-1">ANON</span>
-			<span class="badge badge-danger" v-if="row.DONOTCALL===-1">DNC</span>
-		</td>
+	<td style="width: 35%" class="align-middle">
+		Engaging Period : <span class="text-success"><< row.CAMPAIGN_FIRSTDATE|dAU >><span class="text-primary" v-if="row.CAMPAIGN_FIRSTDATE!==row.CAMPAIGN_LASTDATE"> - << row.CAMPAIGN_LASTDATE|dAU >></span></span>
+		<small class="d-block">
+			<span class="badge badge-light" v-if="row.CAMPAIGN_PAYMENTS===1">1 Gift</span><span class="badge badge-primary" v-else><< row.CAMPAIGN_PAYMENTS >> Gifts</span>
+			<span class="badge badge-light">All Gifts Total: << row.CAMPAIGN_TOAL|currency >></span>
+			<span class="badge badge-light" v-if="row.CAMPAIGN_MIN<300">Min Gift: << row.CAMPAIGN_MIN|currency >></span><span class="badge badge-primary" v-else>Min Gift: << row.CAMPAIGN_MIN|currency >></span>
+			<span class="badge badge-light" v-if="row.CAMPAIGN_MAX<300">Max Gift: << row.CAMPAIGN_MAX|currency >></span><span class="badge badge-primary" v-else>Max Gift: << row.CAMPAIGN_MAX|currency >></span>
+		<small>
+	</td>
 
-		<td style="width: 10%" class="align-middle">
-			<span class="text-secondary" v-if="row.EMAILADDRESS"><small><< row.EMAILADDRESS >></small></span>
-		</td>
 
-		<td style="width: 25%" class="align-middle">
-			<small v-if="row.THANKYOUCALL_BY !== null"><mark>&#10004; << row.THANKYOUCALL_BY >>: <span class="text-success"><< row.THANKYOUCALL_SUBJECT >></span></mark></small>
-			<small v-else>&#9201; <span class="font-italic text-danger">waiting to be thanked</span></small>
-		</td>
+	<td style="width: 15%" class="align-middle">
+		<small class="d-block">
+			<span class="badge badge-success" v-if="row.MOBILENUMBER">MOB.</span><span class="badge badge-light" v-else>MOB,</span>
+			<span class="badge badge-success" v-if="row.DAYTELEPHONE">DAY.</span><span class="badge badge-light" v-else>DAY,</span>
+			<span class="badge badge-success" v-if="row.EVENINGTELEPHONE">EVE.</span><span class="badge badge-light" v-else>EVE,</span>
+			<span class="badge badge-success" v-if="row.FAXNUMBER">FAX.</span><span class="badge badge-light" v-else>FAX,</span>
+			<span class="badge badge-success" v-if="row.EMAILADDRESS">EMAIL.</span><span class="badge badge-light" v-else>EMAIL,</span>
+		</small>
+	</td>
+
+	<td style="width: 25%" class="align-middle">
+		<small v-if="row.THANKYOUCALL_BY !== null"><mark>&#10004; << row.THANKYOUCALL_BY >>: <span class="text-success"><< row.THANKYOUCALL_SUBJECT >></span></mark></small>
+		<small v-else>&#9201; <span class="font-italic text-danger">waiting to be thanked</span></small>
+	</td>
 
 	</tr>`,
 });
 // ******************************************************************************
 let vueTable = Vue.component('vue-table', {
 	props: ['rows', 'sublist'],
+	computed:{
+		tableID: function(){
+			return this.sublist + '-donor-list'
+		},
+	},
+	mounted(){
+		applyDataTable(this.tableID, "sit");
+	},
 	components:{
 		'result-row': vueRow
 	},
 	template: '<div class="table-responsive-lg">' +
-	`<table class="table table-sm table-hover table-bordered" >
+	`<table class="table table-sm table-hover table-bordered" v-bind:id="tableID">
 		<thead>
 			<tr class="table-bordered bg-primary text-light">
-				 <th scope="col" style="width: 25%">DONOR</th>
-				 <th scope="col" style="width: 20%">FIRST DATE ENGAGEMENT</th>
-				 <th scope="col" style="width: 20%">TAGS</th>
-				 <th scope="col" style="width: 10%">EMAIL</th>
-				 <th scope="col" style="width: 25%">THANKQ COMMUNICATION</th>
+				 <th scope="col" style="width: 20%">DONOR</th>
+				 <th scope="col" style="width: 5%">STATE</th>
+				 <th scope="col" style="width: 20%">FINANCIAL ENGAGEMENT</th>
+				 <th scope="col" style="width: 15%">CONTACT METHODS</th>
+				 <th scope="col" style="width: 25%">THANK YOU CALL</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -75,7 +101,43 @@ let rootVue = new Vue({
 	data: {
 		rawAPI: '/api/campaign/christmas_appeal',
 		rawData: null,
-		todoCsvEncodedURI: null,
+		csvContentHeader: "data:text/csv;charset=utf-8,",
+		xlsContentHeader: "data:application/vnd.ms-excel;base64,"
+	},
+	computed:{
+		fullData: function(){
+			if (!this.rawData) {
+				return null
+			} else {
+				return {
+					header: ['SERIALNUMBER', 'GENDER','STATE','TITLE','FIRSTNAME','OTHERINITIAL','LASTNAME'
+						, 'MOBILENUMBER', 'DAYTELEPHONE', 'EVENINGTELEPHONE', 'FAXNUMBER', 'EMAILADDRESS'
+						, 'COMMENTS', 'ISNUMBERVAILD'],
+					data: this.rawData.rows
+								.map(d => ["=\"" + d.SERIALNUMBER + "\"" ,
+								d.GENDER,d.STATE,d.TITLE,d.FIRSTNAME,d.OTHERINITIAL,d.KEYNAME,d.MOBILENUMBER,d.DAYTELEPHONE,d.EVENINGTELEPHONE,d.FAXNUMBER,d.EMAILADDRESS,null,null])
+				}
+			}
+		},
+		todoData: function(){
+			if (!this.rawData) {
+				return null
+			} else {
+				return {
+					header: ['SERIALNUMBER', 'GENDER','STATE','TITLE','FIRSTNAME','OTHERINITIAL','LASTNAME'
+						,'GIFTS','TOTAL'
+						,'MOBILENUMBER','DAYTELEPHONE','EVENINGTELEPHONE','FAXNUMBER','EMAILADDRESS'
+						,'COMMENTS','ISNUMBERVAILD'],
+					data: this.rawData.rows
+								.filter(row => this.calcSubListType(row) === 'todo')
+								.map(d => ["=\"" + d.SERIALNUMBER + "\"" ,
+								d.GENDER,d.STATE,d.TITLE,d.FIRSTNAME,d.OTHERINITIAL,d.KEYNAME,
+								d.CAMPAIGN_PAYMENTS,d.CAMPAIGN_TOAL,
+								d.MOBILENUMBER,d.DAYTELEPHONE,d.EVENINGTELEPHONE,d.FAXNUMBER,d.EMAILADDRESS,null,null])
+
+				}
+			}
+		},
 	},
 	methods: {
 		calcSubListType: function(row){
@@ -84,6 +146,9 @@ let rootVue = new Vue({
 					|| (row['DONOTCALL'] === -1)
 					|| (row['ANONYMOUS'] === -1)
 					|| (row['PRIMARYCATEGORY'] === 'ESTATE')
+					|| (row['CAMPAIGN_MIN'] >= 300)
+					|| (row['CAMPAIGN_MAX'] >= 300)
+					|| (!row['MOBILENUMBER']&&!row['DAYTELEPHONE']&&!row['EVENINGTELEPHONE']&&!row['FAXNUMBER'])
 				) {
 				return 'skip'
 			}else {
@@ -101,31 +166,60 @@ let rootVue = new Vue({
 			this.rawData = null;
 			fetchJSON(endpoint(this.rawAPI), (json) => {
 				this.rawData = json;
-
-				let csvArr = [];
-				let csvContent;
-				csvArr.push(("data:text/csv;charset=utf-8," + ['SERIALNUMBER', 'STATE'
-					, 'MOBILENUMBER', 'DAYTELEPHONE', 'EVENINGTELEPHONE', 'FAXNUMBER', 'EMAILADDRESS'
-					, 'COMMENTS'
-				].join(",")));
-				json.rows
-					.filter(row => this.calcSubListType(row) === 'todo')
-					.map(d => ["=\"" + d.SERIALNUMBER + "\"" ,
-						d.STATE,
-						d.MOBILENUMBER,
-						d.DAYTELEPHONE,
-						d.EVENINGTELEPHONE,
-						d.FAXNUMBER,
-						d.EMAILADDRESS,
-						null])
-					.forEach(arr => {
-						csvArr.push(arr.join(","));
-					});
-				csvContent = csvArr.join("\n");
-				this.todoCsvEncodedURI = encodeURI(csvContent);
-
 			});
-		}
+		},
+		convertToCsvEncodedURI: function(dataSet) {
+			if (!dataSet) {
+				return null
+			} else {
+				let csvArr = [this.csvContentHeader + dataSet.header.join(",")];
+				dataSet.data.forEach(r => csvArr.push(r.join(",")));
+				return encodeURI(csvArr.join("\n"))
+			}
+		},
+		convertToExcelEncodedURI: function(dataSet) {
+			if (!dataSet) {
+				return null
+			} else {
+				tableTemplate = '<table><tr>';
+				dataSet.header.forEach(col => {
+					tableTemplate += '<th>' + col + '</th>'
+				});
+				tableTemplate += '</tr>'
+				dataSet.data.forEach(r => {
+						tableTemplate += '<tr>';
+						r.forEach(col => {
+							tableTemplate += '<td>' + (col ? col : '') + '</td>';
+						});
+						tableTemplate += '</tr>';
+					});
+					tableTemplate += '</table>'
+				return this.xlsContentHeader + window.btoa(unescape(encodeURIComponent(this.createXMLTemplate(tableTemplate))))
+			}
+		},
+		createXMLTemplate: function(tableHTML){
+			return `
+			<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+				<head><!--[if gte mso 9]>
+					<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+						<x:ExcelWorkbook>
+							<x:ExcelWorksheets>
+								<x:ExcelWorksheet>
+									<x:Name></x:Name>
+									<x:WorksheetOptions>
+										<x:DisplayGridlines/>
+									</x:WorksheetOptions>
+								</x:ExcelWorksheet>
+							</x:ExcelWorksheets>
+						</x:ExcelWorkbook>
+					</xml><![endif]-->
+				</head>
+					<body>
+					` + tableHTML +
+				`
+					</body>
+				</html>`
+		},
 	},
 	created(){
 		this.getData();
@@ -136,14 +230,33 @@ let rootVue = new Vue({
 	},
 	template: '<vue-loader msg="Finding Christmas Appeal Donor in ThankQ ..." v-if="rawData===null"></vue-loader>' + '<div class="container-fluid" v-else>' +
 	`
-	<div class="row mb-1">
-		<div class="col text-center">
-			<p class="lead mb-0"><span class="text-primary font-weight-bold"><< rawData.rows.length | number >></span> Donors Responded to Christmas Campaign (Appeal, Chaser and 19ACTIONUB)</p>
-			<small class="text-muted font-italic">Data from thankQ : << rawData.timestamp | dtAU >></small>
-		</div>
-	</div>
+	<div class="row mb-1 mt-0">
 
-	<a v-bind:href="todoCsvEncodedURI" v-bind:class="{'disabled': todoCsvEncodedURI===null}" class="btn btn-outline-success btn-sm btn-block" role="button" aria-pressed="true" download="christmas_appeal_thank_you_call.csv">TODO CSV</a>
+		<div class="col-md-6 align-middle">
+			<p class="lead my-0"><span class="text-primary font-weight-bold"><< rawData.rows.length | number >></span> Donors Responded to Christmas Campaign Financially</p>
+			<p class="lead my-0"><small>(<span class="text-danger">19DV.Christmas Appeal</span>, <span class="text-danger">19DV.Christmas Chaser</span> and <span class="text-danger">19ACTIONUB</span>)<small></p>
+			<small class="d-block text-muted font-italic mt-1">Data from thankQ : << rawData.timestamp | dtAU >></small>
+		</div>
+
+		<div class="col-md-6">
+			<div class="card-group m-0">
+				<div class="card">
+					<div class="card-body">
+						<h5 class="card-title d-inline-block">Exporting Full Data : </h5>
+						<a class="btn btn-outline-success btn-sm d-inline-block" role="button" aria-pressed="true" v-bind:class="{'disabled': fullData===null}" v-bind:href="convertToCsvEncodedURI(fullData)" download="christmas_appeal_full_data.csv">CSV</a>
+					</div>
+				</div>
+				<div class="card">
+					<div class="card-body">
+						<h5 class="card-title d-inline-block">Exporting Todo Data : </h5>
+						<a class="btn btn-outline-success btn-sm d-inline-block" role="button" aria-pressed="true" v-bind:class="{'disabled': todoData===null}" v-bind:href="convertToCsvEncodedURI(todoData)" download="christmas_appeal_thank_you_call.csv">CSV</a>
+						<a class="btn btn-outline-success btn-sm d-inline-block" role="button" aria-pressed="true" v-bind:class="{'disabled': todoData===null}" v-bind:href="convertToExcelEncodedURI(todoData)" download="christmas_appeal_thank_you_call.xls">XLS</a>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
 
 	<div class="row mb-2">
 		<div class="col">

@@ -278,7 +278,8 @@ function currency(val) {
 						th.classList.remove('sorting', 'sorting_asc', 'sorting_desc');
 						th.innerHTML = '<input type="text" placeholder="' + "&#128269;" + "" + '"/>';
 						input = th.children[0];
-						input.style.width = th.style.width === '0px' ? tr.style.width : th.style.width;
+						//input.style.width = th.style.width === '0px' ? tr.style.width : th.style.width;  //Absolute width will ruin responsiveness
+						input.style.width = '100%';
 						input.style.height = '1.5rem';
 						th.children[0].addEventListener('keyup', function(){
 							// Using Data Table API

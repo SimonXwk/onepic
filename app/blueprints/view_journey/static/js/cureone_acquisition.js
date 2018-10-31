@@ -295,74 +295,68 @@ let rootVue = new Vue({
 		'vue-loader': vueLoader,
 		'vue-table': vueTable,
 	},
-	template:`<vue-loader msg="Finding Donors Responded to Cure One Acqusition Campaign in ThankQ ..." v-if="!raw.ready"></vue-loader>
-	<div class="container-fluid" v-else>
+	template:`<vue-loader msg="Finding Donors Responded to Cure One Acqusition Campaign in ThankQ ..." v-if="!raw.ready"></vue-loader><div class="container-fluid" v-else>
 
-		<div  class="row">
-			<div class="col-12 text-center">
+	<div class="card shadow-type7">
+		<div class="card-header bg-transparent text-center shadow-type8">
+			<p class="text-danger font-weight-bold mb-0"><span class="text-primary"><< totalValue|currency >></span> from <span class="text-primary"><< raw.rows.length|number >></span> Cure One Acquisition (campaign) Donors
+				<span class="badge badge-success">
+				  ACQ <span class="badge badge-light"><< cfyNewCount >></span>
+				  <span class="sr-only">new in current financial year</span>
+				</span>
+				<span class="badge badge-warning">
+				  DNM <span class="badge badge-light"><< doNotMailCount >></span>
+				  <span class="sr-only">do not mails</span>
+				</span>
+				<small class="text-muted">as at << raw.timestamp|dtAU >> from thankQ</small>
+			</p>
 
-				<div class="card shadow-type7">
-					<div class="card-header bg-transparent shadow-type8">
-						<p class="text-danger font-weight-bold mb-0"><span class="text-primary"><< totalValue|currency >></span> from <span class="text-primary"><< raw.rows.length|number >></span> Cure One Acquisition (campaign) Donors
-							<span class="badge badge-success">
-							  ACQ <span class="badge badge-light"><< cfyNewCount >></span>
-							  <span class="sr-only">new in current financial year</span>
-							</span>
-							<span class="badge badge-warning">
-							  DNM <span class="badge badge-light"><< doNotMailCount >></span>
-							  <span class="sr-only">do not mails</span>
-							</span>
-							<small class="text-muted">as at << raw.timestamp|dtAU >> from thankQ</small>
-						</p>
+			<p class="mb-0">
+				<span class="text-danger"><< acqusitionCost|currency >></span> was spent on <span class="text-danger"><< acqusitionMailout|number >></span> names to acquire <span class="text-success"><< cfyNewCount|number >> New Donors</span>.
+				cost per name : <mark><span class="text-danger font-weight-bold"><< (acqusitionCost/cfyNewCount)|currency >></span></mark>, response rate : <mark><span class="text-danger font-weight-bold"><< (cfyNewCount/acqusitionMailout)|pct(2) >></span></mark>
+			</p>
+			<p>
+				<span class="text-danger"><< lybuntCost|currency >></span> was spent on <span class="text-danger"><< lybuntCostMailout|number >></span> names to acquire <span class="text-success"><< lybuntNewContacts|number >> New Donors</span>.
+				cost per name : <mark><span class="text-danger font-weight-bold"><< (lybuntCost/lybuntNewContacts)|currency >></span></mark>, response rate : <mark><span class="text-danger font-weight-bold"><< (lybuntNewContacts/lybuntCostMailout)|pct(2) >></span></mark>
+			</p>
 
-						<p class="mb-0">
-							<span class="text-danger"><< acqusitionCost|currency >></span> was spent on <span class="text-danger"><< acqusitionMailout|number >></span> names to acquire <span class="text-success"><< cfyNewCount|number >> New Donors</span>.
-							cost per name : <mark><span class="text-danger font-weight-bold"><< (acqusitionCost/cfyNewCount)|currency >></span></mark>, response rate : <mark><span class="text-danger font-weight-bold"><< (cfyNewCount/acqusitionMailout)|pct(2) >></span></mark>
-						</p>
-						<p>
-							<span class="text-danger"><< lybuntCost|currency >></span> was spent on <span class="text-danger"><< lybuntCostMailout|number >></span> names to acquire <span class="text-success"><< lybuntNewContacts|number >> New Donors</span>.
-							cost per name : <mark><span class="text-danger font-weight-bold"><< (lybuntCost/lybuntNewContacts)|currency >></span></mark>, response rate : <mark><span class="text-danger font-weight-bold"><< (lybuntNewContacts/lybuntCostMailout)|pct(2) >></span></mark>
-						</p>
+		</div>
 
-					</div>
+		<div class="card-body">
 
-  				<div class="card-bod p-0">
+			<ul class="nav nav-tabs mb-3 nav-fill nav-justified" id="pills-tab" role="tablist">
+				<li class="nav-item ">
+					<a class="nav-link active" id="todo-tab" data-toggle="pill" href="#todo" role="tab" aria-controls="todo" aria-selected="true">
+					 &#9742; Todo <span class="badge badge-pill badge-info"> << callingRows.length >></span>
+					</a>
+				</li>
+				<li class="nav-item ">
+					<a class="nav-link" id="called-tab" data-toggle="pill" href="#called" role="tab" aria-controls="called" aria-selected="false">
+					 &#128515; Called <span class="badge badge-pill badge-success"> << calledRows.length >></span>
+					</a>
+				</li>
+				<li class="nav-item ">
+					<a class="nav-link" id="excluded-tab" data-toggle="pill" href="#excluded" role="tab" aria-controls="excluded" aria-selected="false">
+					 &#128164; Skipped <span class="badge badge-pill badge-warning"> << excludedRows.length >></span>
+					</a>
+				</li>
+			</ul>
 
-  					<ul class="nav nav-tabs mb-3 nav-fill nav-justified" id="pills-tab" role="tablist">
-							<li class="nav-item ">
-								<a class="nav-link active" id="calling-tab" data-toggle="pill" href="#calling" role="tab" aria-controls="calling" aria-selected="true">
-								 &#9742; Todo <span class="badge badge-pill badge-info"> << callingRows.length >></span>
-								</a>
-							</li>
-							<li class="nav-item ">
-								<a class="nav-link" id="called-tab" data-toggle="pill" href="#called" role="tab" aria-controls="called" aria-selected="false">
-								 &#128515; Called <span class="badge badge-pill badge-success"> << calledRows.length >></span>
-								</a>
-							</li>
-							<li class="nav-item ">
-								<a class="nav-link" id="excluded-tab" data-toggle="pill" href="#excluded" role="tab" aria-controls="excluded" aria-selected="false">
-								 &#128164; Skipped <span class="badge badge-pill badge-warning"> << excludedRows.length >></span>
-								</a>
-							</li>
-						</ul>
-						<div class="tab-content" id="pills-tabContent">
-							<div class="tab-pane fade show active" id="calling" role="tabpanel" aria-labelledby="calling-tab">
-								<vue-table v-bind:rows="callingRows" sublist="todo"  ></vue-table>
-							</div>
-							<div class="tab-pane fade" id="called" role="tabpanel" aria-labelledby="called-tab">
-								<vue-table v-bind:rows="calledRows" sublist="called" ></vue-table>
-							</div>
-							<div class="tab-pane fade" id="excluded" role="tabpanel" aria-labelledby="excluded-tab">
-								<vue-table v-bind:rows="excludedRows" sublist="excluded" ></vue-table>
-							</div>
-
-						</div>
-
-  				</div>
-
+			<div class="tab-content" id="pills-tabContent">
+				<div class="tab-pane fade show active" id="todo" role="tabpanel" aria-labelledby="todo-tab">
+					<vue-table v-bind:rows="callingRows" sublist="todo"></vue-table>
+				</div>
+				<div class="tab-pane fade" id="called" role="tabpanel" aria-labelledby="called-tab">
+					<vue-table v-bind:rows="calledRows" sublist="called"></vue-table>
+				</div>
+				<div class="tab-pane fade" id="excluded" role="tabpanel" aria-labelledby="excluded-tab">
+					<vue-table v-bind:rows="excludedRows" sublist="excluded"></vue-table>
 				</div>
 			</div>
+
 		</div>
+
 	</div>
-	`
+
+	` + '</div>'
 });
