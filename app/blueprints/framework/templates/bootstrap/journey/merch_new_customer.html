@@ -53,7 +53,7 @@
 
 			<div class="card border-success mb-3">
 				<div class="card-body p-0">
-					<h5 class="card-title text-center">FY{{ thisfy }} Acquisition</h5>
+					<h5 class="card-title text-center my-1">FY{{ thisfy }} Acquisition</h5>
 					<div class="table-responsive-sm">
 						<table class="table table-sm table-hover table-bordered p-0">
 							<thead>
@@ -77,7 +77,6 @@
 								{% endfor %}
 						</table>
 					</div>
-{#					{{ cost['FY'].2018 }}#}
 				</div>
 			</div>
 
@@ -242,7 +241,7 @@
 				 <caption><strong>Data Captured : </strong>{{ data.timestamp|dtAU }}, result will be cached for {{ '{:,}'.format(data.cached_timeout) }} seconds</caption>
 					<thead>
 						<tr class="table-bordered bg-info text-light">
-							<th scope="col">SN</th><th scope="col">REXID</th>
+							<th scope="col">SN</th><th scope="col">ACQ</th>
 							<th scope="col">1ST DATE</th>
 							<th scope="col">1ST ORDER</th>
 							<th scope="col">1ST DATE$M</th>
@@ -255,14 +254,18 @@
 				 <tbody>
 					{% for row in data.rows %}
 					<tr {% if not row[2] %}class=""{% endif %}>
-					 <th scope="row">{{ row.SERIALNUMBER }}<br/><small class="text-success">{{ row.SOURCE }}</small></th>
+					 <th scope="row">{{ row.SERIALNUMBER }}
+						 {% if row.LAST_REXID %}<small class="text-info">{{ row.LAST_REXID }}</small>
+								{% if row.REXIDS > 1 %}<small class="text-danger"> {{ row.REXIDS - 1 }} more id</small>{% endif %}
+								{% if row.LAST_REXID_POOL > 1 %}<small class="text-danger"> [{{ row.LAST_REXID_POOL }} share]{% endif %}</small>
+							{% else %}<small class="text-danger"><s>MISSING</s></small>
+							{% endif %}
+						 <br/><small class="text-success">{{ row.SOURCE }}</small>
+					 </th>
 
-						<td>
-							{% if row.LAST_REXID %}<small class="text-info">{{ row.LAST_REXID }}</small>
-								{% if row.REXIDS > 1 %}<br /><small class="text-danger">{{ row.REXIDS - 1 }} more id</small>{% endif %}
-								{% if row.LAST_REXID_POOL > 1 %}<br /><small class="text-danger">[{{ row.LAST_REXID_POOL }} share]{% endif %}</small>
-							{% else %}<small class="text-danger"><s>MISSING</s></small>{% endif %}
-						</td>
+					<td>
+						<small>{{ row.FIRST_CAMPAIGN }}<span class="text-danger">{% if row.FIRST_CAMPAIGNS != 1 %} [+{{ row.FIRST_CAMPAIGNS - 1 }}]{% endif %}</span></small>
+					</td>
 
 						<td class="text-muted">{{ row.FIRSTDATE|dSort }}</td>
 					 <td><!--First Order ID-->
