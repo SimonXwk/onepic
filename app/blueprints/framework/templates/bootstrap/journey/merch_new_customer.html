@@ -65,15 +65,14 @@
 									<th>PER</th>
 								</tr>
 							</thead>
-								{% set mcosts = cost['FY'][thisfy]['Merchandise'] %}
-
-								{% for camp, campList in data.rows|groupby('FIRST_CAMPAIGN') %}
+								{% set fycost = cost['FY'] %}
+								{% for camp, campList in data.rows|rejectattr('FIRST_CAMPAIGN', 'equalto', None)|groupby('FIRST_CAMPAIGN') %}
 									<tr>
 										<td><small>{{ camp }}</small></td>
-										<td><small>{% if mcosts[camp] %}{{ mcosts[camp]['PRINTED']|number }}{% else %}{% endif %}</small></td>
+										<td><small>{% if fycost[thisfy] %}{% if fycost[thisfy]['Merchandise'][camp] %}{{ fycost[thisfy]['Merchandise'][camp]['PRINTED']|number }}{% endif %}{% endif %}</small></td>
 										<td><small>{{ campList|length|number }}</small></td>
-										<td><small>{% if mcosts[camp] %}{{ (mcosts[camp]['PRODUCTION_COST'] + mcosts[camp]['PRINTING_COST'])|currency }}{% else %}{% endif %}</small></td>
-										<td><small>{% if mcosts[camp] %}{{ ((mcosts[camp]['PRODUCTION_COST'] + mcosts[camp]['PRINTING_COST'])/(campList|length))|currency }}{% else %}{% endif %}</small></td>
+										<td><small>{% if fycost[thisfy] %}{% if fycost[thisfy]['Merchandise'][camp] %}{{ (fycost[thisfy]['Merchandise'][camp]['PRODUCTION_COST'] + fycost[thisfy]['Merchandise'][camp]['PRINTING_COST'])|currency }}{% endif %}{% endif %}</small></td>
+										<td><small>{% if fycost[thisfy] %}{% if fycost[thisfy]['Merchandise'][camp] %}{{ ((fycost[thisfy]['Merchandise'][camp]['PRODUCTION_COST'] + fycost[thisfy]['Merchandise'][camp]['PRINTING_COST'])/(campList|length))|currency }}{% endif %}{% endif %}</small></td>
 									</tr>
 								{% endfor %}
 						</table>
