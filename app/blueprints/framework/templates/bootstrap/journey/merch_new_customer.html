@@ -2,7 +2,7 @@
 	{% set allCustomerCount = data.rows|length %}
 	<div class="row">
 		<div class="col-md-12">
-			<h5 class="text-primary"><strong>FY{{ cfy }} ON BOARDING JOURNEY</strong> for Merchandise New Customer (Priority 2.1)</h5>
+			<h5 class="text-primary"><strong>FY{{ thisfy }} ON BOARDING JOURNEY</strong> for Merchandise New Customer (Priority 2.1)</h5>
 		</div>
 	</div>
 
@@ -12,13 +12,12 @@
 			<div class="card border-primary mb-3">
 				<h5 class="card-header">Listing <strong>{{ '{:,}'.format(allCustomerCount) }}</strong> customers found</h5>
 				<div class="card-body">
-					<h6 class="card-title"><mark><span class="text-info">Searching Time Frame</span></mark></h6>
-					<p>{{ dates[0]|dAU }} &#8644; {{ dates[1]|dAU }}</p>
-					<h6 class="card-title"><span class="text-info">Searching Criteria 1</span></h6>
-					<p class="card-text">Contact that financially engaged with us for the first time within the <mark>Searching Time Frame</mark></p>
-					<h6 class="card-title"><span class="text-info">Searching Criteria 2</span></h6>
+					<h6 class="card-title"><mark><span class="text-info">Time Frame</span></mark> {{ dates[0]|dAU }} &#8644; {{ dates[1]|dAU }}</h6>
+					<h6 class="card-title mb-1"><span class="text-info">Searching Criteria 1</span></h6>
+					<p class="card-text">Contact that financially engaged with us for the first time within the <mark> Time Frame</mark></p>
+					<h6 class="card-title mb-1"><span class="text-info">Searching Criteria 2</span></h6>
 					<p class="card-text">On their first date of financial engagement, more than zero(>0) of the total value was given via merchandise platform</p>
-					<h6 class="card-title"><span class="text-primary">Journey Status (ThankQ Record)</span></h6>
+					<h6 class="card-title mb-1"><span class="text-primary">Journey Status (ThankQ Record)</span></h6>
 					<div class="table-responsive-lg">
 						<table class="table table-sm table-borderless text-muted text-left m-0">
 							<thead>
@@ -29,19 +28,19 @@
 								<th scope="col">Cancel</th>
 							</tr>
 							</thead>
-							<tr>
+							<tr class="my-0">
 								<td>Journey Profile</td>
 								<td class="{% if data.rows|selectattr('JOURNEY_BY', '!=', None)|list|length == allCustomerCount %}text-success{% else %}text-danger{% endif %}">{{ data.rows|selectattr('JOURNEY_BY', '!=', None)|list|length|number }}</td>
 								<td>{{ data.rows|selectattr('JOURNEY_BY', '!=', None)|selectattr('BOARDED', '==', -1)|list|length|number }}</td>
 								<td>{{ data.rows|selectattr('JOURNEY_BY', '!=', None)|selectattr('BOARDED', '==', -2)|list|length|number }}</td>
 							</tr>
-							<tr>
+							<tr class="my-0">
 								<td>Courtesy Call</td>
 								<td>{{ data.rows|selectattr('COURTESYCALL1_BY', '!=', None)|list|length|number }}</td>
 								<td>{{ data.rows|selectattr('COURTESYCALL1_BY', '!=', None)|selectattr('BOARDED', '==', -1)|list|length|number }}</td>
 								<td>{{ data.rows|selectattr('COURTESYCALL1_BY', '!=', None)|selectattr('BOARDED', '==', -2)|list|length|number }}</td>
 							</tr>
-							<tr>
+							<tr class="my-0">
 								<td>Welcome Pack</td>
 								<td>{{ data.rows|selectattr('WELCOMEPACK_BY', '!=', None)|list|length|number }}</td>
 								<td>{{ data.rows|selectattr('WELCOMEPACK_BY', '!=', None)|selectattr('BOARDED', '==', -1)|list|length|number }}</td>
@@ -49,6 +48,37 @@
 							</tr>
 						</table>
 					</div>
+				</div>
+			</div>
+
+			<div class="card border-success mb-3">
+				<div class="card-body p-0">
+					<h5 class="card-title text-center">FY{{ thisfy }} Acquisition</h5>
+					<div class="table-responsive-sm">
+						<table class="table table-sm table-hover table-bordered p-0">
+							<thead>
+								<tr>
+									<th>CAMPAIGN</th>
+									<th>OUT</th>
+									<th>ACQ</th>
+									<th>COST</th>
+									<th>PER</th>
+								</tr>
+							</thead>
+								{% set mcosts = cost['FY'][thisfy]['Merchandise'] %}
+
+								{% for camp, campList in data.rows|groupby('FIRST_CAMPAIGN') %}
+									<tr>
+										<td><small>{{ camp }}</small></td>
+										<td><small>{% if mcosts[camp] %}{{ mcosts[camp]['PRINTED']|number }}{% else %}{% endif %}</small></td>
+										<td><small>{{ campList|length|number }}</small></td>
+										<td><small>{% if mcosts[camp] %}{{ (mcosts[camp]['PRODUCTION_COST'] + mcosts[camp]['PRINTING_COST'])|currency }}{% else %}{% endif %}</small></td>
+										<td><small>{% if mcosts[camp] %}{{ ((mcosts[camp]['PRODUCTION_COST'] + mcosts[camp]['PRINTING_COST'])/(campList|length))|currency }}{% else %}{% endif %}</small></td>
+									</tr>
+								{% endfor %}
+						</table>
+					</div>
+{#					{{ cost['FY'].2018 }}#}
 				</div>
 			</div>
 

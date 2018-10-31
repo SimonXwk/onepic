@@ -27,7 +27,7 @@ def merchandise_new():
 	# params = (Tq.format_date(d1), Tq.format_date(d2))
 	updates = [('DATE_START', Tq.format_date(d1), '\''), ('DATE_END',  Tq.format_date(d2), '\'')]
 	data = Tq.query('JOURNEY_NEW_MERCHANDISE_CUSTOMER', cached_timeout=30, updates=updates)
-	return dict(title='Merchandise New Customer Journey', data=data, dates=(d1, d2))
+	return dict(title='Merchandise New Customer Journey', data=data, dates=(d1, d2), thisfy=fy, cost=TLMA.acquisition_cost)
 
 
 @templatified('todo_christmas_appeal', title='Christmas Appeal')

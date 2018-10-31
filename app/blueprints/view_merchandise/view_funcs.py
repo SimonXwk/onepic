@@ -11,11 +11,6 @@ def rfm_upload_allowed_file(filename):
 	return '.' in filename and filename.rsplit('.', 1)[1].lower() in current_app.config.get('ALLOWED_EXTENSIONS')
 
 
-@templatified('homepage', title='Merchandise Overview')
-def homepage():
-	return None
-
-
 @templatified('rfm_upload', title='RFM DATA')
 def upload():
 	if request.method == 'POST':
@@ -74,7 +69,7 @@ def merchandise_new_welcome_pack():
 
 
 @templatified('revenue_fy', title='Merch Revenue')
-def merchandise_revenue_by_fy():
+def merchandise_revenue_overview():
 	fy = int(request_arg('fy', TLMA.cfy, tests.is_year))
 	# Prepare for SQL parameters
 	d1, d2 = TLMA.fy_range(fy)

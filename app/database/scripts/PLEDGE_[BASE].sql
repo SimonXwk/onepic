@@ -5,7 +5,6 @@ DECLARE @TLC AS VARCHAR(5) = 'TLC'
       , @PS AS VARCHAR(20) = 'PERSONAL SUPPORT'
       , @UNDEF AS VARCHAR(15) = 'UNCATEGORIZED'
       , @BLANK AS VARCHAR(7) =/*<BLANK_STR>*/NULL/*</BLANK_STR>*/;
-      ;
 WITH
 -- --------------------------------------------------------------
 cte_pledge_types as (

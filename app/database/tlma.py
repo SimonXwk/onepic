@@ -22,6 +22,18 @@ class TLMA:
 		{'code': 'RN', 'sequence': 8, 'name': 'Renewal', 'KPI': []},
 		{'code': 'RA', 'sequence': 9, 'name': 'Reactivation', 'KPI': ['No.Recovered']}
 	]
+	acquisition_cost = {
+		'FY': {
+			2019: {
+				'Merchandise': {
+					'19AC.M NRMA': {'PRODUCTION_COST': 61335, 'PRINTED': 1420000, 'PRINTING_COST': 69604.36},
+					'19AC.M WomensWeekly': {'PRODUCTION_COST': 200, 'PRINTED': 5000, 'PRINTING_COST': 246.82},
+					'19AC.M Probus': {'PRODUCTION_COST': 550, 'PRINTED': 5000, 'PRINTING_COST': 246.82}
+				}
+
+			}
+		}
+	}
 
 	@classmethod
 	def budget(cls):

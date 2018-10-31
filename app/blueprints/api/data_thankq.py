@@ -88,4 +88,4 @@ def christmas_appeal_donors():
 def pledge_headers():
 	fy = int(request_arg('fy', TLMA.cfy, tests.is_year))
 	updates = (('FY', fy), ('BASE_QUERY', ''))
-	return Tq.query(('PLEDGE_[BASE]', 'PLEDGE_OVERVIEW'), cached_timeout=30, updates=updates)
+	return Tq.query(('CTE', 'PLEDGE_OVERVIEW'), cached_timeout=30, updates=updates)

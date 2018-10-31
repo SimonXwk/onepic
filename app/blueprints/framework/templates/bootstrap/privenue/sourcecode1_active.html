@@ -92,11 +92,10 @@
 				<td>{{row.ACCOUNT}}</td>
 				<td>{{row.CLASS}}</td>
 				<td>
-
-						{% if (not row.CAMPAIGNCODE) and isSponsorship %}<span class="text-black-50"><em><del>[Not Applicable]</del></em></span>
-						{% elif (not row.CAMPAIGNCODE) and not (isSponsorship) %}<span class="font-weight-bold">&#10067; Not Found</span>
-						{% elif row.CAMPAIGNCODE and isSponsorship %}<span class="text-danger">{{row.CAMPAIGNCODE}}</span>
-						{% else %}{{row.CAMPAIGNCODE}}{% endif %}
+					{% if (not isSponsorship) and (not row.CAMPAIGNCODE) %}<span class="font-weight-bold">&#10067; Not Found</span>
+					{% elif isSponsorship and row.CAMPAIGNCODE %}<span class="text-primary">{{row.CAMPAIGNCODE}}<small class="text-info"> (default)</small></span>
+					{% elif isSponsorship and (not row.CAMPAIGNCODE) %}<span class="text-danger">&#10067; Not Found</span>
+					{% else %}{{row.CAMPAIGNCODE}}{% endif %}
 				</td>
 				<td>{% if row.TOTAL %}<span class="font-weight-bold text-{% if row.TOTAL > 5000 %}danger{% elif row.TOTAL > 2000 %}primary{% elif row.TOTAL > 500 %}info{% else %}success{% endif %}">{{row.TOTAL|currency}}</span>{% endif %}</td>
 				<td>{% if row.SOURCESTARTDATE %}{{row.SOURCESTARTDATE|dAU}}{% else %}&#10067; Not Found{% endif %}</td>
