@@ -6,7 +6,7 @@ ONES AS ( SELECT * FROM (VALUES (0), (1), (2), (3), (4),(5), (6), (7), (8), (9))
 ,CALENDAR_YEARS AS (
   SELECT fourdigits.num AS CY
   FROM (SELECT (1000*d1000.X + 100*d100.X + 10*d10.X + d1.X) AS num FROM ONES d1, ONES d10, ONES d100, ONES d1000 ) fourdigits
-  WHERE fourdigits.num BETWEEN 1000 AND YEAR(CURRENT_TIMESTAMP)+1
+  WHERE fourdigits.num BETWEEN 1800 AND YEAR(CURRENT_TIMESTAMP)+1
 )
 -- --------------------------------------------------------------
 ,TRX_FY_RNG AS (
@@ -18,17 +18,17 @@ ONES AS ( SELECT * FROM (VALUES (0), (1), (2), (3), (4),(5), (6), (7), (8), (9))
 -- --------------------------------------------------------------
 ,cte_payments AS (
   SELECT
-    B1.PAYMENTAMOUNT,
+    B1.PAYMENTAMOUNT, B1.SERIALNUMBER,
     YEAR(B2.DATEOFPAYMENT) + CASE WHEN MONTH(B2.DATEOFPAYMENT)<@FY1M OR @FY1M=1 THEN 0 ELSE 1 END AS [FY],
 
     CASE WHEN
       ((MONTH(B2.DATEOFPAYMENT) + CASE WHEN MONTH(B2.DATEOFPAYMENT) < 7 THEN 6 ELSE -6 END) * 100 + DAY(B2.DATEOFPAYMENT)) <=
       ((MONTH(CURRENT_TIMESTAMP) + CASE WHEN MONTH(CURRENT_TIMESTAMP) < 7 THEN 6 ELSE -6 END) * 100 + DAY(CURRENT_TIMESTAMP))
     THEN -1
-    ELSE 1
+    ELSE 0
     END AS [ISLTD],
 
-    CASE WHEN B2.REVERSED = 2
+    CASE WHEN B2.REVERSED IN (1, -1, 2)
     THEN NULL
     ELSE DENSE_RANK() OVER (PARTITION BY YEAR(B2.DATEOFPAYMENT) + CASE WHEN MONTH(B2.DATEOFPAYMENT)<@FY1M OR @FY1M=1 THEN 0 ELSE 1 END, CASE WHEN B2.REVERSED IN (1, -1, 2) THEN 0 ELSE -1 END ORDER BY CONCAT(CONVERT(VARCHAR(10), B2.DATEOFPAYMENT, 112), B2.SERIALNUMBER, B2.ADMITNAME, B2.RECEIPTNO) ASC)
     END AS [FY_TRXID]
@@ -43,16 +43,17 @@ ONES AS ( SELECT * FROM (VALUES (0), (1), (2), (3), (4),(5), (6), (7), (8), (9))
 -- --------------------------------------------------------------
 ,cte_fy_summary AS (
   SELECT
-    t1.FY,
-    SUM(t1.PAYMENTAMOUNT) AS [TOTAL],
-    MAX(t1.FY_TRXID) AS [TRXS]
+    t1.FY
+    , SUM(t1.PAYMENTAMOUNT) AS [TOTAL]
+    , MAX(t1.FY_TRXID) AS [TRXS]
+    , COUNT(DISTINCT t1.SERIALNUMBER) AS [SNS]
   FROM cte_payments t1
   WHERE t1.FY <= ? AND t1.ISLTD <= ?
   GROUP BY t1.FY
 )
 -- --------------------------------------------------------------
 select
-  T1.FY,T2.[TOTAL],T2.[TRXS]
+  T1.FY,T2.[TOTAL],T2.[TRXS] ,T2.[SNS]
 from
   TRX_FY_RNG T1 left join cte_fy_summary T2 on (T1.FY=T2.FY)
 order by FY

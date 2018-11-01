@@ -12,9 +12,7 @@ ld.url('data_excel_mail.year_month', ['/mailbox/ym/<string:str_yearmonth>'])
 
 ld.url('data_thankq.payments', ['/tq/payments'])
 
-ld.url('data_thankq.fys_total_full', ['/tq/fys_total_full'])
-ld.url('data_thankq.fys_total_ltd', ['/tq/fys_total_ltd'])
-
+ld.url('data_thankq.fys_summary', ['/tq/fys_summary'])
 
 ld.url('data_thankq.source_code1_summary', ['/tq/source_code1_summary'])
 ld.url('data_thankq.contact_created_fy', ['/tq/contact_created_fy'])

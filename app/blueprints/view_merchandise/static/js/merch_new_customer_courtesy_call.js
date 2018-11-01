@@ -6,11 +6,13 @@ let vueRow = Vue.component('vue-row', {
 			fetch1: '/api/ssi/orders/search/',
 			fetch2: '/api/ssi/track/',
 			fetch3: '/api/ssi/order/',
+
 			linkTrack: '/merch/track_order/',
 			linkAusPost: 'https://auspost.com.au/mypost/track/#/details/',
 			subTodo: -1,
 			trackingNumber: null,
 			called1: false,
+			isUnshipped: false,
 			orders: 0,
 			called2: false,
 			status: null,
@@ -73,8 +75,10 @@ let vueRow = Vue.component('vue-row', {
 				return '❌' + ' Order Number not Found in ThankQ '
 			}else if ( this.called1 === false ) {
 				return '🔍' + ' Searching for Invoice Number ...'
-			}else if ( this.trackingNumber === null ) {
+			}else if ( this.trackingNumber === null && !this.isUnshipped) {
 				return '🚫' + ' No Response From Starshipit'
+			}else if ( this.trackingNumber === null && this.isUnshipped ) {
+				return '❎' + ' Unshipped in Starshipit'
 			}else if ( this.called2 === false ) {
 				return '🔎' + ' Searching for Consignment Number ...'
 			}else if ( this.status !== null && this.status.toUpperCase().indexOf('DELIVERED') !== -1 ) {
@@ -99,6 +103,11 @@ let vueRow = Vue.component('vue-row', {
 	created(){
 		// Toggle Buttons
 		this.$eventBus.$on('toggleResultShowType', (showType, data) => this.toggleShowResults(showType, data));
+		this.$eventBus.$on('returnUnshipped', (orderID, find) => {
+			if (this.row['FIRSTORDER'] === orderID && find){
+				this.isUnshipped = true
+			}
+		});
 		this.$eventBus.$on('calcTodoSubList', (sn, res) => {
 			if (this.row.SERIALNUMBER === sn ) {
 				this.subTodo = res
@@ -145,6 +154,7 @@ let vueRow = Vue.component('vue-row', {
 						});
 					}
 				} else {
+					vCol.emitCheckUnshipped();
 					vCol.emitProcessed();
 				}
 			}, true);
@@ -168,6 +178,9 @@ let vueRow = Vue.component('vue-row', {
 		},
 		emitProcessed: function(){
 			this.$eventBus.$emit('processedCustomer', this.row['SERIALNUMBER'], this.showType);
+		},
+		emitCheckUnshipped: function(){
+			this.$eventBus.$emit('checkUnshipped', this.row['FIRSTORDER']);
 		},
 	},
 	template:`
@@ -329,6 +342,9 @@ let rootVue = new Vue({
 			timestamp: null,
 			processed:0
 		},
+		unshippedAPI: '/api/ssi/orders/unshipped/2018-07-01',
+		unshippedOrders: null,
+		unshippedReady: false,
 		customers: {},
 		todoCount: 0,
 		defaultAPI: '/api/merch/new_customers',
@@ -536,6 +552,14 @@ let rootVue = new Vue({
 			this.todoCount += 1;
 			this.$eventBus.$emit('calcTodoSubList', sn, this.todoCount%2);
 		});
+		this.$eventBus.$on('checkUnshipped', orderID => {
+
+			let find = false;
+			if (this.unshippedOrders) {
+				find = find || this.unshippedOrders.filter(o => o.order_number === orderID).length > 0
+			}
+			this.$eventBus.$emit('returnUnshipped', orderID, find);
+		});
 		this.$eventBus.$on('processedCustomer', (sn, type) => {
 			if (this.customers[sn].processed === false){
 				this.raw.processed += 1;
@@ -588,6 +612,23 @@ let rootVue = new Vue({
 						acc[cur.SERIALNUMBER] = acc[cur.SERIALNUMBER] ? acc[cur.SERIALNUMBER] : { sublist: cur.SUBLIST, processed:false, displayType:null, show:false, todo:false, isDonor:null, deliveryDate:null };
 						return acc
 					}, {});
+				fetchJSON(endpoint(rootVue.unshippedAPI+"?page=1"), function(ushpJson){
+						if (ushpJson.success === true) {
+							rootVue.unshippedOrders = ushpJson.orders;
+							for (let i=0; i< ushpJson.total_pages -1 ; i++){
+									fetchJSON(endpoint(rootVue.unshippedAPI+"?page="+ (i+2)), function(ushpJsonNext){
+										if (ushpJson.success === true) {
+											rootVue.unshippedOrders = rootVue.unshippedOrders.concat(ushpJson.orders);
+										}
+										if (i === ushpJson.total_pages -2) {
+											rootVue.unshippedReady = true
+										}
+									}, true);
+							}
+						} else {
+							rootVue.unshippedReady = true
+						}
+				});
 			});
 		},
 		countVisible: function(subListType){
@@ -598,7 +639,7 @@ let rootVue = new Vue({
 		'vue-loader': vueLoader,
 		'vue-table': vueTable,
 	},
-	template: `<vue-loader msg="Finding New Merchandise Customers in ThankQ ..." v-if="!raw.ready"></vue-loader>
+	template: `<vue-loader msg="Finding New Merchandise Customers in ThankQ ..." v-if="!raw.ready||!unshippedReady"></vue-loader>
 	<div class="container-fluid" v-else >
 
 		<div class="row">

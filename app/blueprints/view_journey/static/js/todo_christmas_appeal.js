@@ -17,18 +17,18 @@ let vueRow = Vue.component('vue-row', {
 		<mark class="font-weight-bold"><< row.FULLNAME >></mark>
 		<small class="text-success font-italic" v-if="row.SOURCE">(<< row.SOURCE >>)</small>
 		<small class=d-block>
-				 <span class="badge badge-dark"><< row.SERIALNUMBER >></span>
-				 <span class="badge badge-success" v-if="row.IS_ACQUISITION===-1">[ACQ]</span>
-				 <span class="badge badge-success" v-if="row.FIRSTFY===row.CFY">[NEW]</span>
-				 <span class="badge badge-info" v-if="row.SORTKEYREF1">[is << row.SORTKEYREFREL2 >>]</span>
-				 <span class="badge badge-warning" v-if="row.DONOTMAIL===-1">[DNM]</span>
-				 <span class="badge badge-danger" v-if="row.CONTACTTYPE==='Organisation'">[ORG]</span>
-				 <span class="badge badge-danger" v-if="row.PRIMARYCATEGORY==='ESTATE'">[ESTATE]</span>
-				 <span class="badge badge-danger" v-if="row.DECD===-1">[DECD]</span>
-				 <span class="badge badge-danger" v-if="row.ANONYMOUS===-1">[ANON]</span>
-				 <span class="badge badge-danger" v-if="row.DONOTCALL===-1">[DNC]</span>
-				 <span class="badge badge-danger" v-if="row.CAMPAIGN_MIN>=300||row.CAMPAIGN_MAX>=300">[$300]</span>
-				 <span class="badge badge-danger text-warning" v-if="!row.MOBILENUMBER && !row.DAYTELEPHONE && !row.EVENINGTELEPHONE && !row.FAXNUMBER">[!PHONE]</span>
+			<span class="badge badge-dark"><< row.SERIALNUMBER >></span>
+			<span class="badge badge-info" v-if="row.SORTKEYREF1">[is << row.SORTKEYREFREL2 >>]</span>
+			<span class="badge badge-success" v-if="row.IS_ACQUISITION===-1">[ACQ]</span>
+			<span class="badge badge-secondary" v-if="row.FIRSTFY===row.CFY">[NEW]</span>
+			<span class="badge badge-secondary" v-if="row.CAMPAIGN_MIN>=300||row.CAMPAIGN_MAX>=300">[$300]</span>
+			<span class="badge badge-danger" v-if="row.CONTACTTYPE==='Organisation'">[ORG]</span>
+			<span class="badge badge-danger" v-if="row.PRIMARYCATEGORY==='ESTATE'">[ESTATE]</span>
+			<span class="badge badge-danger" v-if="row.DECD===-1">[DECD]</span>
+			<span class="badge badge-danger" v-if="row.ANONYMOUS===-1">[ANON]</span>
+			<span class="badge badge-danger" v-if="row.DONOTCALL===-1">[DNC]</span>
+			<span class="badge badge-danger text-warning" v-if="!row.MOBILENUMBER && !row.DAYTELEPHONE && !row.EVENINGTELEPHONE">[!PHONE]</span>
+			<span class="badge badge-warning" v-if="row.DONOTMAIL===-1">[DNM]</span>
 		<small>
 	</td>
 
@@ -52,7 +52,6 @@ let vueRow = Vue.component('vue-row', {
 			<span class="badge badge-success" v-if="row.MOBILENUMBER">MOB.</span><span class="badge badge-light" v-else>MOB,</span>
 			<span class="badge badge-success" v-if="row.DAYTELEPHONE">DAY.</span><span class="badge badge-light" v-else>DAY,</span>
 			<span class="badge badge-success" v-if="row.EVENINGTELEPHONE">EVE.</span><span class="badge badge-light" v-else>EVE,</span>
-			<span class="badge badge-success" v-if="row.FAXNUMBER">FAX.</span><span class="badge badge-light" v-else>FAX,</span>
 			<span class="badge badge-success" v-if="row.EMAILADDRESS">EMAIL.</span><span class="badge badge-light" v-else>EMAIL,</span>
 		</small>
 	</td>
@@ -109,13 +108,21 @@ let rootVue = new Vue({
 			if (!this.rawData) {
 				return null
 			} else {
+				let dt = new Date();
 				return {
-					header: ['SERIALNUMBER', 'GENDER','STATE','TITLE','FIRSTNAME','OTHERINITIAL','LASTNAME'
-						, 'MOBILENUMBER', 'DAYTELEPHONE', 'EVENINGTELEPHONE', 'FAXNUMBER', 'EMAILADDRESS'
-						, 'COMMENTS', 'ISNUMBERVAILD'],
+					header: ['SERIALNUMBER'
+						, 'DATEOFCOMMUNICATION', 'CATEGORY', 'SUBJECT','COMMENTS'
+						,'GENDER','STATE','TITLE','FIRSTNAME','OTHERINITIAL','LASTNAME'
+						,'GIFTS','TOTAL'
+						,'MOBILENUMBER','DAYTELEPHONE','EVENINGTELEPHONE'
+						],
 					data: this.rawData.rows
 								.map(d => ["=\"" + d.SERIALNUMBER + "\"" ,
-								d.GENDER,d.STATE,d.TITLE,d.FIRSTNAME,d.OTHERINITIAL,d.KEYNAME,d.MOBILENUMBER,d.DAYTELEPHONE,d.EVENINGTELEPHONE,d.FAXNUMBER,d.EMAILADDRESS,null,null])
+								dt.getDate() +'/'+(dt.getMonth()+1)+'/'+dt.getFullYear(), 'Thank You', 'Dec 2018 Thank you (TF)',null,
+								d.GENDER,d.STATE,d.TITLE,d.FIRSTNAME,d.OTHERINITIAL,d.KEYNAME,
+								d.CAMPAIGN_PAYMENTS,d.CAMPAIGN_TOAL,
+								d.MOBILENUMBER,d.DAYTELEPHONE,d.EVENINGTELEPHONE
+							])
 				}
 			}
 		},
@@ -123,17 +130,22 @@ let rootVue = new Vue({
 			if (!this.rawData) {
 				return null
 			} else {
+				let dt = new Date();
 				return {
-					header: ['SERIALNUMBER', 'GENDER','STATE','TITLE','FIRSTNAME','OTHERINITIAL','LASTNAME'
+					header: ['SERIALNUMBER'
+						, 'DATEOFCOMMUNICATION', 'CATEGORY', 'SUBJECT','COMMENTS'
+						,'GENDER','STATE','TITLE','FIRSTNAME','OTHERINITIAL','LASTNAME'
 						,'GIFTS','TOTAL'
-						,'MOBILENUMBER','DAYTELEPHONE','EVENINGTELEPHONE','FAXNUMBER','EMAILADDRESS'
-						,'COMMENTS','ISNUMBERVAILD'],
+						,'MOBILENUMBER','DAYTELEPHONE','EVENINGTELEPHONE'
+						],
 					data: this.rawData.rows
 								.filter(row => this.calcSubListType(row) === 'todo')
 								.map(d => ["=\"" + d.SERIALNUMBER + "\"" ,
+								dt.getDate() +'/'+(dt.getMonth()+1)+'/'+dt.getFullYear(), 'Thank You', 'Dec 2018 Thank you (TF)',null,
 								d.GENDER,d.STATE,d.TITLE,d.FIRSTNAME,d.OTHERINITIAL,d.KEYNAME,
 								d.CAMPAIGN_PAYMENTS,d.CAMPAIGN_TOAL,
-								d.MOBILENUMBER,d.DAYTELEPHONE,d.EVENINGTELEPHONE,d.FAXNUMBER,d.EMAILADDRESS,null,null])
+								d.MOBILENUMBER,d.DAYTELEPHONE,d.EVENINGTELEPHONE
+							])
 
 				}
 			}
@@ -148,7 +160,8 @@ let rootVue = new Vue({
 					|| (row['PRIMARYCATEGORY'] === 'ESTATE')
 					|| (row['CAMPAIGN_MIN'] >= 300)
 					|| (row['CAMPAIGN_MAX'] >= 300)
-					|| (!row['MOBILENUMBER']&&!row['DAYTELEPHONE']&&!row['EVENINGTELEPHONE']&&!row['FAXNUMBER'])
+					|| (!row['MOBILENUMBER']&&!row['DAYTELEPHONE']&&!row['EVENINGTELEPHONE'])
+					|| (row.FIRSTFY===row.CFY)
 				) {
 				return 'skip'
 			}else {

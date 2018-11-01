@@ -208,6 +208,7 @@ let vueMthMovementTable = Vue.component('vue-table', {
 		filterRows: function(dateDim, status, cate){
 			let rows = this.rows.filter(r =>
 				(r[dateDim] !== null)
+				&& (new Date(r[dateDim]) <= new Date())
 				&& (status ? (r.PLEDGESTATUS === status) : true)
 				&& (cate ? (r[this.category.key] === cate) : true)
 				&& this.calcFY(new Date(r[dateDim])) === this.fy

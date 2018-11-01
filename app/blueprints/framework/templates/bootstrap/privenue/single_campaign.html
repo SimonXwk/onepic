@@ -144,7 +144,7 @@
 		<div class="tab-pane fade show active" id="showall" role="tabpanel" aria-labelledby="showall-tab">
 			<div class="card-group">
 			{% for campcode in campaigncodes.rows %}
-				<div class="card bg-{% if campcode[0][:4] == '____' %}danger
+				<div class="card bg-{% if campcode[0][:2] == '__' %}danger
 					{% elif campcode[0][:2]|int == (thisfy|string)[2:]|int or campcode[0][-2:]|int == (thisfy|string)[2:]|int %}primary
 					{% else %}secondary{% endif %}">
 					<a class="text-light" href="{{ url_for(request.endpoint, campaign_code=campcode[0]|string, fy=thisfy) }}">
@@ -164,7 +164,7 @@
 		<div class="tab-pane fade" id="Ongoing" role="tabpanel" aria-labelledby="Ongoing-tab">
 			<div class="card-group">
 			{% for campcode in campaigncodes.rows %}
-			{% if campcode[0][:4] == '____' %}
+			{% if campcode[0][:2] == '__' %}
 				<div class="card bg-danger">
 					<a class="text-light" href="{{ url_for(request.endpoint, campaign_code=campcode[0]|string, fy=thisfy) }}">
 						<div class="card-body">
@@ -183,7 +183,7 @@
 		<div class="tab-pane fade" id="CFY" role="tabpanel" aria-labelledby="CFY-tab">
 			<div class="card-group">
 			{% for campcode in campaigncodes.rows %}
-			{% if not campcode[0][:4] == '____' and (campcode[0][:2]|int == (thisfy|string)[2:]|int or campcode[0][-2:]|int == (thisfy|string)[2:]|int) %}
+			{% if not campcode[0][:2] == '__' and (campcode[0][:2]|int == (thisfy|string)[2:]|int or campcode[0][-2:]|int == (thisfy|string)[2:]|int) %}
 				<div class="card bg-primary">
 					<a class="text-light" href="{{ url_for(request.endpoint, campaign_code=campcode[0]|string, fy=thisfy) }}">
 						<div class="card-body">
@@ -202,7 +202,7 @@
 		<div class="tab-pane fade" id="PreviousFY" role="tabpanel" aria-labelledby="PreviousFY-tab">
 			<div class="card-group">
 			{% for campcode in campaigncodes.rows %}
-			{% if not campcode[0][:4] == '____' and not (campcode[0][:2]|int == (thisfy|string)[2:]|int or campcode[0][-2:]|int == (thisfy|string)[2:]|int) %}
+			{% if not campcode[0][:2] == '__' and not (campcode[0][:2]|int == (thisfy|string)[2:]|int or campcode[0][-2:]|int == (thisfy|string)[2:]|int) %}
 				<div class="card bg-secondary">
 					<a class="text-light" href="{{ url_for(request.endpoint, campaign_code=campcode[0]|string, fy=thisfy) }}">
 						<div class="card-body">

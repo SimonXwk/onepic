@@ -8,24 +8,26 @@ from functools import wraps
 import requests
 from flask import current_app
 
+from app.helper import request_arg
 from app.api import ApiResult, ApiException
 from app.cache import cached
+import app.tests as tests
 
 
 class StarShipItAPI(object):
 	# Configurations
-	__star_ship_it_api_host = 'api.starshipit.com'
-	__star_ship_it_api_url = 'https://api.starshipit.com'
-	api_key = current_app.config['STARSHIPIT_API_KEY']
-	subscription_development_key_primary = current_app.config['STARSHIPIT_OCP_APIM_SUBSCRIPTION_DEVELOPMENT_PRIMARY_KEY']
-	subscription_development_key_secondary = current_app.config['STARSHIPIT_OCP_APIM_SUBSCRIPTION_DEVELOPMENT_SECONDARY_KEY']
-	subscription_production_key_primary = current_app.config['STARSHIPIT_OCP_APIM_SUBSCRIPTION_PRODUCTION_PRIMARY_KEY']
-	subscription_production_key_secondary = current_app.config['STARSHIPIT_OCP_APIM_SUBSCRIPTION_PRODUCTION_SECONDARY_KEY']
+	_star_ship_it_api_host = 'api.starshipit.com'
+	_star_ship_it_api_url = 'https://api.starshipit.com'
+	_api_key = current_app.config['STARSHIPIT_API_KEY']
+	_subscription_development_key_primary = current_app.config['STARSHIPIT_OCP_APIM_SUBSCRIPTION_DEVELOPMENT_PRIMARY_KEY']
+	_subscription_development_key_secondary = current_app.config['STARSHIPIT_OCP_APIM_SUBSCRIPTION_DEVELOPMENT_SECONDARY_KEY']
+	_subscription_production_key_primary = current_app.config['STARSHIPIT_OCP_APIM_SUBSCRIPTION_PRODUCTION_PRIMARY_KEY']
+	_subscription_production_key_secondary = current_app.config['STARSHIPIT_OCP_APIM_SUBSCRIPTION_PRODUCTION_SECONDARY_KEY']
 
 	# Request Headers
 	headers = {
-		'StarShipIT-Api-Key': api_key,
-		'Ocp-Apim-Subscription-Key': subscription_production_key_primary,
+		'StarShipIT-Api-Key': _api_key,
+		'Ocp-Apim-Subscription-Key': _subscription_production_key_primary,
 	}
 
 	# Function that returns the API result
@@ -42,12 +44,12 @@ class StarShipItAPI(object):
 	@classmethod
 	@cached(900)
 	def use_request(cls, method, endpoint, params, decode):
-		if cls.__star_ship_it_api_url[-1] != '/' and endpoint[0] != '/':
-			url = '/'.join((cls.__star_ship_it_api_url, endpoint))
-		elif cls.__star_ship_it_api_url[-1] == '/' and endpoint[0] == '/':
-			url = cls.__star_ship_it_api_url + endpoint[1:]
+		if cls._star_ship_it_api_url[-1] != '/' and endpoint[0] != '/':
+			url = '/'.join((cls._star_ship_it_api_url, endpoint))
+		elif cls._star_ship_it_api_url[-1] == '/' and endpoint[0] == '/':
+			url = cls._star_ship_it_api_url + endpoint[1:]
 		else:
-			url = cls.__star_ship_it_api_url + endpoint
+			url = cls._star_ship_it_api_url + endpoint
 
 		if method.upper() == 'GET':
 			r = requests.get(url,  params=params, headers=cls.headers)
@@ -63,11 +65,11 @@ class StarShipItAPI(object):
 		if params:
 			endpoint = endpoint + '?' + urllib.parse.urlencode(params)
 
-		conn = http.client.HTTPConnection(cls.__star_ship_it_api_host)
+		conn = http.client.HTTPConnection(cls._star_ship_it_api_host)
 		conn.request(method, endpoint, "{body}", cls.headers)
 		response = conn.getresponse()
 		data = response.read()  # Read data as bytes
-		print(f'StarShip API Result:\n{data}')
+		# print(f'StarShip API Result:\n{data}')
 		data = data.decode(decode)
 		conn.close()
 		return data
@@ -86,12 +88,14 @@ class StarShipItAPI(object):
 
 
 @StarShipItAPI()
-def search_orders(phrase=None, limit=50, page=1):
+def search_orders(phrase=None):
 	api_call = {
 		'method': 'GET',
 		'endpoint': '/api/orders/search',
 		'params': {}
 	}
+	limit = int(request_arg('limit', 50, lambda x: tests.is_int(x, min_value=1)))
+	page = int(request_arg('page', 1, lambda x: tests.is_int(x, min_value=1, max_value=250)))
 	# Request parameters
 	if phrase:
 		api_call['params']['phrase'] = str(phrase)
@@ -123,16 +127,19 @@ def track_details(tracking_number=None):
 
 
 @StarShipItAPI()
-def get_unshipped_orders(since_order_date=None, limit=50, page=1):
+def get_unshipped_orders(since_order_date=None):
 	api_call = {
 		'method': 'GET',
 		'endpoint': '/api/orders/unshipped',
 		'params': {}
 	}
+	limit = int(request_arg('limit', 50, lambda x: tests.is_int(x, min_value=1)))
+	page = int(request_arg('page', 1, lambda x: tests.is_int(x, min_value=1, max_value=250)))
 	if since_order_date:
 		api_call['params']['since_order_date'] = str(since_order_date)   # date-time in RFC3339
 		api_call['params']['limit'] = limit
 		api_call['params']['page'] = page
+	print(api_call)
 	return api_call
 
 
@@ -144,4 +151,3 @@ def get_users_address_book():
 		'params': {}
 	}
 	return api_call
-

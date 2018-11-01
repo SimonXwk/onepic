@@ -214,7 +214,7 @@ let rootVue = new Vue({
 				this.raw.rows
 					.filter(d => this.customers[d.SERIALNUMBER].foundWelcomePack && this.customers[d.SERIALNUMBER].sublist == 'todo' )  //this.customers[d.SERIALNUMBER].foundWelcomePack && this.customers[d.SERIALNUMBER].sublist == 'todo'
 					.map(d => ["=\"" + d.SERIALNUMBER + "\"" ,
-						String(new Date(this.customers[d.SERIALNUMBER].pickingSlipCreated).getHours()).padStart(2, '0') + ':' + String(new Date(this.customers[d.SERIALNUMBER].pickingSlipCreated).getMinutes()).padStart(2, '0'),
+						"=\"" +String(new Date(this.customers[d.SERIALNUMBER].pickingSlipCreated).getHours()).padStart(2, '0') + ':' + String(new Date(this.customers[d.SERIALNUMBER].pickingSlipCreated).getMinutes()).padStart(2, '0') + "\"",
 						new Date(this.customers[d.SERIALNUMBER].pickingSlipCreated).getDate() + '/' + (new Date(this.customers[d.SERIALNUMBER].pickingSlipCreated).getMonth() + 1) + '/' + new Date(this.customers[d.SERIALNUMBER].pickingSlipCreated).getFullYear(),
 						'Note',
 						'Merch Onboarding',

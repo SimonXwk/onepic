@@ -10,6 +10,19 @@ def is_zero(val, strip=True):
 		return False
 
 
+def is_int(val, min_value=None, max_value=None, strip=True):
+	try:
+		int(str(val).strip()) if strip else int(str(val))
+		res = True
+		if not(min_value is None):
+			res = res and res >= min_value
+		if not (max_value is None):
+			res = res and res <= min_value
+		return res
+	except ValueError:
+		return False
+
+
 def is_year(val, min_year=1000, max_year=9999, strip=True):
 	try:
 		val = int(str(val).strip()) if strip else int(str(val))

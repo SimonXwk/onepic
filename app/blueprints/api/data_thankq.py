@@ -32,15 +32,10 @@ def payments():
 
 
 @odbc_json_api
-def fys_total_full():
-	params = (TLMA.cfy, 1)
-	return Tq.query('FY_TOTAL', *params, cached_timeout=20)
-
-
-@odbc_json_api
-def fys_total_ltd():
-	params = (TLMA.cfy, -1)
-	return Tq.query('FY_TOTAL', *params, cached_timeout=20)
+def fys_summary():
+	ltd = int(request_arg('ltd', 0, lambda x: tests.is_int(x) and (int(x) == 0 or int(x) == -1)))
+	params = (TLMA.cfy, ltd)
+	return Tq.query('FY_SUMMARY', *params, cached_timeout=30)
 
 
 @odbc_json_api
