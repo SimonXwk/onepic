@@ -247,7 +247,7 @@ let rootVue = new Vue({
 
 		<div class="col-md-6 align-middle">
 			<p class="lead my-0"><span class="text-primary font-weight-bold"><< rawData.rows.length | number >></span> Donors Responded to Christmas Campaign Financially</p>
-			<p class="lead my-0"><small>(<span class="text-danger">19DV.Christmas Appeal</span>, <span class="text-danger">19DV.Christmas Chaser</span> and <span class="text-danger">19ACTIONUB</span>)<small></p>
+			<p class="lead my-0"><small>(<span class="text-danger">19DV.Christmas Appeal</span>, <span class="text-danger">19DV.Christmas Chaser</span>, <span class="text-danger">19DEC2A, 19DEC3A</span> and <span class="text-danger">19ACTIONUB</span>)<small></p>
 			<small class="d-block text-muted font-italic mt-1">Data from thankQ : << rawData.timestamp | dtAU >></small>
 		</div>
 

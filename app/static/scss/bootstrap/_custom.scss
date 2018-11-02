@@ -2,6 +2,22 @@
 // Bootstrap CSS Overrides (AFTER calling boostrap.scss in SASS)
 // ***********************************************************************
 
+.card-columns {
+	@include media-breakpoint-only(sm) {
+		column-count: 2;
+	}
+	@include media-breakpoint-only(md) {
+		column-count: 3;
+	}
+	@include media-breakpoint-only(lg) {
+		column-count: 4;
+	}
+	@include media-breakpoint-only(xl) {
+		column-count: 5;
+	}
+}
+
+
 //$web-font-path: "https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700" !default;
 //@import url($web-font-path);
 

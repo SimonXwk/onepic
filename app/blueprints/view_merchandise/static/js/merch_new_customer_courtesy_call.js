@@ -622,6 +622,7 @@ let rootVue = new Vue({
 										}
 										if (i === ushpJson.total_pages -2) {
 											rootVue.unshippedReady = true
+											console.log(rootVue.unshippedOrders);
 										}
 									}, true);
 							}
@@ -639,7 +640,9 @@ let rootVue = new Vue({
 		'vue-loader': vueLoader,
 		'vue-table': vueTable,
 	},
-	template: `<vue-loader msg="Finding New Merchandise Customers in ThankQ ..." v-if="!raw.ready||!unshippedReady"></vue-loader>
+	template: `
+	<vue-loader msg="Finding New Merchandise Customers in ThankQ ..." v-if="!raw.ready"></vue-loader>
+	<vue-loader msg="Collecting Unshipped Orders in StarShipit ..." v-else-if="!unshippedReady"></vue-loader>
 	<div class="container-fluid" v-else >
 
 		<div class="row">
@@ -651,7 +654,7 @@ let rootVue = new Vue({
 						<div class="row">
 
 							<div class="col-md-8">
-								<blockquote class="blockquote">
+								<blockquote class="blockquote mb-1">
 									<p class="mb-0"><span class="text-primary font-weight-bold"><< raw.rows.length >></span> Total New Merchandise Customers <span class="text-muted">(<span class="text-success font-weight-bold"><< todoCount >></span> to be called)</span> Found in <span v-if="fy===null">Current Financial Year</span><span v-else>FY<< fy >></span></p>
 									<footer class="blockquote-footer" v-on:dblclick="showFYSelection=!showFYSelection"> from thankQ <small><< raw.timestamp|dtAU >>, << raw.processed >>/<< raw.rows.length >> </small></footer>
 								</blockquote>

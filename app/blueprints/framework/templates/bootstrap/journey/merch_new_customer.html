@@ -66,7 +66,7 @@
 								</tr>
 							</thead>
 								{% set fycost = cost['FY'] %}
-								{% for camp, campList in data.rows|rejectattr('FIRST_CAMPAIGN', 'equalto', None)|groupby('FIRST_CAMPAIGN') %}
+								{% for camp, campList in data.rows|rejectattr('FIRST_CAMPAIGN_MERCH', 'equalto', None)|groupby('FIRST_CAMPAIGN_MERCH') %}
 									<tr>
 										<td><small>{{ camp }}</small></td>
 										<td><small>{% if fycost[thisfy] %}{% if fycost[thisfy]['Merchandise'][camp] %}{{ fycost[thisfy]['Merchandise'][camp]['PRINTED']|number }}{% endif %}{% endif %}</small></td>
@@ -241,7 +241,7 @@
 				 <caption><strong>Data Captured : </strong>{{ data.timestamp|dtAU }}, result will be cached for {{ '{:,}'.format(data.cached_timeout) }} seconds</caption>
 					<thead>
 						<tr class="table-bordered bg-info text-light">
-							<th scope="col">SN</th><th scope="col">ACQ</th>
+							<th scope="col">SN</th><th scope="col">MERCH ACQ</th>
 							<th scope="col">1ST DATE</th>
 							<th scope="col">1ST ORDER</th>
 							<th scope="col">1ST DATE$M</th>
@@ -264,13 +264,13 @@
 					 </th>
 
 					<td>
-						<small>{{ row.FIRST_CAMPAIGN }}<span class="text-danger">{% if row.FIRST_CAMPAIGNS != 1 %} [+{{ row.FIRST_CAMPAIGNS - 1 }}]{% endif %}</span></small>
+						<small>{{ row.FIRST_CAMPAIGN_MERCH }}<span class="text-danger">{% if row.FIRST_CAMPAIGNS != 1 %} [+{{ row.FIRST_CAMPAIGNS - 1 }}]{% endif %}</span></small>
 					</td>
 
 						<td class="text-muted">{{ row.FIRSTDATE|dSort }}</td>
 					 <td><!--First Order ID-->
 						{% if row.FIRSTORDER %}
-								{% set trackingURL = url_for('merch.track_order', order_number = row.FIRSTORDER|string)  %}
+								{% set trackingURL = url_for('merch.track_shipped_order', order_number = row.FIRSTORDER|string)  %}
 								{% if row.FIRSTORDERS|int > 1 %}
 								 <span class="text-primary" data-toggle="tooltip" data-html="true" data-placement="right" tabindex="0"
 										title='

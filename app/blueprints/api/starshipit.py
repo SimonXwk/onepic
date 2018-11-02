@@ -139,7 +139,6 @@ def get_unshipped_orders(since_order_date=None):
 		api_call['params']['since_order_date'] = str(since_order_date)   # date-time in RFC3339
 		api_call['params']['limit'] = limit
 		api_call['params']['page'] = page
-	print(api_call)
 	return api_call
 
 

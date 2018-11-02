@@ -50,7 +50,12 @@
 {% macro div(id, class=None, preload=True) %}
 <div id="{{ id }}" {% if class %}class="{{ class }}"{% endif %}>
 {%- if preload -%}
-<p class="lead text-center">Initializing View</p><div class="container h-100"><div class="row h-100 justify-content-center align-items-center"><div class="lds-ripple"><div></div><div></div></div></div></div>
+<p class="lead text-center">Initializing View</p>
+<div class="container h-100">
+	<div class="row h-100 justify-content-center align-items-center">
+		<div class="lds-ripple"><div></div><div></div></div>
+	</div>
+</div>
 {%- endif -%}
 </div>
 {% endmacro %}

@@ -50,11 +50,17 @@ def rfm_result(filename):
 	return dict(filename=filename)
 
 
-@templatified('track_order')
-def track_order(order_number=None):
+@templatified('starshipit_shipped_orders')
+def track_shipped_order(order_number=None):
 	order_number = order_number.strip() if order_number else None
 	if not order_number or len(order_number) != 11:
 		return None
+	return dict(order_number=order_number)
+
+
+@templatified('starshipit_unshipped_orders')
+def list_unshipped_orders(order_number=None):
+
 	return dict(order_number=order_number)
 
 
