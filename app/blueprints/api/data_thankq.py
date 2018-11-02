@@ -27,8 +27,9 @@ def payments():
 	d1, d2 = Tq.format_date(TLMA.fy_range(fy))
 	# d1 = request_arg('fy', Tq.format_date(TLMA.fy_range(TLMA.cfy)[0]), lambda x: tests.is_valid_string(x, max_length=10))
 	# d2 = request_arg('fy', Tq.format_date(TLMA.fy_range(TLMA.cfy)[1]), lambda x: tests.is_valid_string(x, max_length=10))
-	updates = [('PAYMENT_DATE1', d1, '\''), ('PAYMENT_DATE2', d2, '\'')]
-	return Tq.query('PAYMENTS', cached_timeout=120, updates=updates)
+	updates = [('BASE_QUERY', ''), ('PAYMENT_DATE1', d1, '\''), ('PAYMENT_DATE2', d2, '\'')]
+	return Tq.query(('CTE', 'CTE_PAYMENTS'), cached_timeout=30, updates=updates)
+	# return Tq.query('PAYMENTS', cached_timeout=120, updates=updates)
 
 
 @odbc_json_api

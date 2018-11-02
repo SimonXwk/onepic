@@ -1,79 +1,84 @@
-let chart1, chart2;
-
-function setOptionCompareBarChart(config) {
-	return {
-		chart: {
-			renderTo: config.renderTo,
-			type: 'column'
-		},
-		credits: {
-			enabled: false,
-		},
-		title: {
-			text: config.title
-		},
-		xAxis: {
-			categories: $FY_MONTH_LIST.short
-		},
-		yAxis: {
-			title: {
-				text: null
-			}
-		},
-		legend: {
-			shadow: false
-		},
-		tooltip: {
-			headerFormat: '<span style="font-size:16px">{point.key}</span><table>',
-			pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-					'<td style="padding:0;text-align: right;"><b>{point.y:,.2f}</b></td></tr>',
-			footerFormat: '</table>',
-			shared: true,
-			useHTML: true
-	 },
-		plotOptions: {
-			column: {
-				grouping: false,
-				stacking: 'normal',
-				shadow: false,
-				borderWidth: 0
-			}
-		},
-		series: [
-			{
-				name: 'Budget GST',
-				stack: 'Budget',
-				color: 'rgba(248,161,63,0.9)',
-				pointPadding: 0.1,
-				pointPlacement: 0,
-				data: []
-			}	,{
-				name: 'Budget Net',
-				stack: 'Budget',
-				color: 'rgba(165,170,217,0.9)',
-				pointPadding: 0.1,
-				pointPlacement: 0,
-				data: []
-			}, {
-				name: 'Actual GST',
-				stack: 'Actual',
-				color: 'rgba(186,60,61,1)',
-				pointPadding: 0.3,
-				pointPlacement: 0,
-				data: []
-			}, {
-				name: 'Actual Net',
-				stack: 'Actual',
-				color: 'rgba(126,86,134,1)',
-				pointPadding: 0.3,
-				pointPlacement: 0,
-				data: []
-			}
-		]
-	}
-}
-
-
+// ############################################################################
+let compareBarChartVue = Vue.component('compare-chart', {
+	props: ['budget', 'payments', 'focalFY', 'meta'],
+	data: function(){
+		return {
+			baseOption: {
+				chart: { type: 'column' },
+				title: {text: null },
+				xAxis: { categories: $FY_MONTH_LIST.short },
+				yAxis: { title: {	text: null } },
+				legend: { shadow: false},
+				tooltip: {
+					headerFormat: '<span style="font-size:16px">{point.key}</span><table>',
+					pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+							'<td style="padding:0;text-align: right;"><b>{point.y:,.2f}</b></td></tr>',
+					footerFormat: '</table>',
+					shared: true,
+					useHTML: true
+			 },
+				plotOptions: {
+					column: {
+						grouping: false,
+						stacking: 'normal',
+						shadow: false,
+						borderWidth: 0
+					}
+				},
+				series: [
+					{
+						name: 'Budget GST',
+						stack: 'Budget',
+						color: 'rgba(248,161,63,0.9)',
+						pointPadding: 0.1,
+						pointPlacement: 0,
+						data: []
+					}	,{
+						name: 'Budget Net',
+						stack: 'Budget',
+						color: 'rgba(165,170,217,0.9)',
+						pointPadding: 0.1,
+						pointPlacement: 0,
+						data: []
+					}, {
+						name: 'Actual GST',
+						stack: 'Actual',
+						color: 'rgba(186,60,61,1)',
+						pointPadding: 0.3,
+						pointPlacement: 0,
+						data: []
+					}, {
+						name: 'Actual Net',
+						stack: 'Actual',
+						color: 'rgba(126,86,134,1)',
+						pointPadding: 0.3,
+						pointPlacement: 0,
+						data: []
+					}
+				]
+			},
+			chart: null,
+		}
+	},
+	mounted() {
+		let el = this.$el;
+		let title = 'Merchandise Monthly ' + this.meta.item + (this.meta.isCumulative ? ' Culmulative' : '');
+		this.chart = Highcharts.chart(Object.assign(this.baseOption, {
+			chart: { renderTo: el },
+			title: { text: title },
+			subtitle: { text: 'Data fetched : ' + new Date(this.payments.timestamp)}
+		}));
+		this.chart.series[0].update({
+				data: this.budget.FY[this.focalFY]['PRIVATE']['MerchandiseGST']
+		});
+		this.chart.series[1].update({
+				data: this.budget.FY[this.focalFY]['PRIVATE']['Merchandise'].map((v, i) => v - this.budget.FY[this.focalFY]['PRIVATE']['MerchandiseGST'][i])
+		});
+	},
+	template:`<div class="chart"></div>`
+});
+// #############################################################################
+// #############################################################################
 let rootVue = new Vue({
 	el: '#root',
 	data: {
@@ -170,84 +175,101 @@ let rootVue = new Vue({
           this.merchRows.filter(r => isCulmulative ? r.PAYMENT_FYMTH <= 12 : r.PAYMENT_FYMTH === 12 ).reduce((acc, cur) => acc + cur[dim], 0),
         ]
 		},
+		getData: function(){
+			this.payments = null;
+			this.paymentDataReady = false;
+			fetchJSON(endpoint(this.paymentAPI + '?fy=' + this.focalFY), (pmtJSON) => {
+				this.payments = pmtJSON;
+				this.paymentDataReady = true;
+			});
+			this.budget = null;
+			this.budgetDataReady = false;
+			fetchJSON(endpoint(this.budgetAPI), (bgtJSON) => {
+				this.budget = bgtJSON;
+				this.budgetDataReady = true;
+			});
+		},
 	},
 	created() {
-		fetchJSON(endpoint(this.paymentAPI + '?fy=' + this.focalFY), (pmtJSON) => {
-			this.payments = pmtJSON;
-			this.paymentDataReady = true;
-		});
-		fetchJSON(endpoint(this.budgetAPI), (bgtJSON) => {
-			this.budget = bgtJSON;
-			this.budgetDataReady = true;
-		});
+		this.getData()
 	},
 	mounted() {
-		chart1 =  new Highcharts.chart(setOptionCompareBarChart({renderTo: 'chart1', title:'Fetching ... '}));
-		chart2 =  new Highcharts.chart(setOptionCompareBarChart({renderTo: 'chart2', title:'Fetching ... '}));
+		// chart1 = Highcharts.chart(Object.assign(baseOptionBarCompare, {
+		// 	chart: { renderTo: 'chart1' },
+		// 	title: { text: 'Fetching ...' }
+		// }));
+		// chart2 = Highcharts.chart(Object.assign(baseOptionBarCompare, {
+		// 	chart: { renderTo: 'chart2' },
+		// 	title: { text: 'Fetching ...' }
+		// }));
 	},
 	beforeUpdate(){
-		if (this.budgetDataReady){
-			chart1.series[0].update({
-				data: this.budgetObj['PRIVATE']['MerchandiseGST']
-			});
-			chart1.series[1].update({
-				data: this.budgetObj['PRIVATE']['Merchandise'].map((v, i) => v - this.budgetObj['PRIVATE']['MerchandiseGST'][i])
-			});
-			chart2.series[0].update({
-				data: this.budgetObj['PRIVATE']['MerchandiseGST']
-					.map((v, i1, self) => i1===0 ? v : self.filter((v, i2) => i2 <= i1).reduce((acc, cur) => acc + cur ,0))
-			});
-			chart2.series[1].update({
-				data: this.budgetObj['PRIVATE']['Merchandise']
-					.map((v, i) => v - this.budgetObj['PRIVATE']['MerchandiseGST'][i])
-					.map((v, i1, self) => i1===0 ? v : self.filter((v, i2) => i2 <= i1).reduce((acc, cur) => acc + cur ,0))
-			});
-		}
-
-		if (this.paymentDataReady){
-			chart1.update({
-				credits: {
-					enabled: true,
-				},
-				title: {
-					text:'Merchandise Monthly Revenue'
-				},
-				subtitle: {
-					text: 'Data fetched : ' + new Date(this.payments.timestamp)
-				}
-			});
-			chart2.update({
-				credits: {
-					enabled: true,
-				},
-				title: {
-						text:'Merchandise Monthly Revenue Culmulative'
-				},
-				subtitle: {
-					text: 'Data fetched : ' + new Date(this.payments.timestamp)
-				}
-			});
-
-			chart1.series[2].update({
-				data: this.calcMonthlyTotal('GSTAMOUNT')
-			});
-			chart1.series[3].update({
-				data: this.calcMonthlyTotal('PAYMENTAMOUNTNETT')
-			});
-
-			chart2.series[2].update({
-				data: this.calcMonthlyTotal('GSTAMOUNT', true)
-			});
-			chart2.series[3].update({
-				data: this.calcMonthlyTotal('PAYMENTAMOUNTNETT', true)
-			});
-		}
+		// if (chart1 && chart2 && this.budgetDataReady){
+		// 	chart1.series[0].update({
+		// 		data: this.budgetObj['PRIVATE']['MerchandiseGST']
+		// 	});
+		// 	chart1.series[1].update({
+		// 		data: this.budgetObj['PRIVATE']['Merchandise'].map((v, i) => v - this.budgetObj['PRIVATE']['MerchandiseGST'][i])
+		// 	});
+		// 	chart2.series[0].update({
+		// 		data: this.budgetObj['PRIVATE']['MerchandiseGST']
+		// 			.map((v, i1, self) => i1===0 ? v : self.filter((v, i2) => i2 <= i1).reduce((acc, cur) => acc + cur ,0))
+		// 	});
+		// 	chart2.series[1].update({
+		// 		data: this.budgetObj['PRIVATE']['Merchandise']
+		// 			.map((v, i) => v - this.budgetObj['PRIVATE']['MerchandiseGST'][i])
+		// 			.map((v, i1, self) => i1===0 ? v : self.filter((v, i2) => i2 <= i1).reduce((acc, cur) => acc + cur ,0))
+		// 	});
+		// }
+		// if (chart1 && chart2 && this.paymentDataReady){
+		// 	chart1.update({
+		// 		credits: {
+		// 			enabled: true,
+		// 		},
+		// 		title: {
+		// 			text:'Merchandise Monthly Revenue'
+		// 		},
+		// 		subtitle: {
+		// 			text: 'Data fetched : ' + new Date(this.payments.timestamp)
+		// 		}
+		// 	});
+		// 	chart2.update({
+		// 		credits: {
+		// 			enabled: true,
+		// 		},
+		// 		title: {
+		// 				text:'Merchandise Monthly Revenue Culmulative'
+		// 		},
+		// 		subtitle: {
+		// 			text: 'Data fetched : ' + new Date(this.payments.timestamp)
+		// 		}
+		// 	});
+		//
+		// 	chart1.series[2].update({
+		// 		data: this.calcMonthlyTotal('GSTAMOUNT')
+		// 	});
+		// 	chart1.series[3].update({
+		// 		data: this.calcMonthlyTotal('PAYMENTAMOUNTNETT')
+		// 	});
+		//
+		// 	chart2.series[2].update({
+		// 		data: this.calcMonthlyTotal('GSTAMOUNT', true)
+		// 	});
+		// 	chart2.series[3].update({
+		// 		data: this.calcMonthlyTotal('PAYMENTAMOUNTNETT', true)
+		// 	});
+		// }
 
 	},
 	components:{
-		'vue-loader': vueLoader
+		'vue-loader': vueLoader,
+		'compare-chart': compareBarChartVue
 	},
-	template:`<div class="container-fluid">
+	template:`
+	<vue-loader msg="Retrieving Payment & Budget Data  ..." v-if="!paymentDataReady&&!budgetDataReady"></vue-loader>
+	<vue-loader msg="Retrieving Payment Data in ThankQ ..." v-else-if="!paymentDataReady&&budgetDataReady"></vue-loader>
+	<vue-loader msg="Retrieving Budget Information ..." v-else-if="!budgetDataReady&&paymentDataReady"></vue-loader>
+	<div class="container-fluid" v-else>
 	<p class="lead font-weight-bold">Merchandise Performance in current financial year</p>
 	<div class="row">
 		<div class="col-xs-12 col-sm-6 col-md-6 col-lg-3">
@@ -315,11 +337,22 @@ let rootVue = new Vue({
 	</div>
 
 	<div class="row">
+	<table class="table table-sm table-hover">
+		<tbody>
+			<tr>
+				<td></td>
+			</tr>
+		</tbody>
+	</table>
+
+	</div>
+
+	<div class="row">
 		<div class="col-lg-6">
-			<div class="chart" id="chart1" v-html="spinner"></div>
+			<compare-chart v-bind:budget="budget" v-bind:payments="payments" v-bind:focalFY="focalFY" v-bind:meta="{isCumulative: false, item: 'Revenue'}"></compare-chart>
 		</div>
 		<div class="col-lg-6">
-			<div class="chart" id="chart2" v-html="spinner"></div>
+			<compare-chart v-bind:budget="budget" v-bind:payments="payments" v-bind:focalFY="focalFY" v-bind:meta="{isCumulative: true, item: 'Revenue'}"></compare-chart>
 		</div>
 	</div>
 

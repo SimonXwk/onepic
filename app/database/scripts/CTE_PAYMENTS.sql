@@ -1,0 +1,2 @@
+select *
+from cte_payments_with_donor_type
