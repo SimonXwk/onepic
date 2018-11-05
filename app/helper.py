@@ -196,7 +196,7 @@ def timeit(f):
 		ts = time.time()
 		res = f(*args, **kwargs)
 		te = time.time()
-		print(f'::: execution time of [{f.__name__}] : {((te - ts) * 1000):,.2f} ms')
+		print(f'> execution time of [{f.__name__}] : {((te - ts) * 1000):,.2f} ms')
 		return res
 
 	return decorated_function

@@ -148,7 +148,7 @@ let rootVue = new Vue({
 	data: {
 		rawData: [],
 		rawDataReady: false,
-		sinceDate: new Date(Date.UTC(2018, 0, 1)),
+		sinceDate: new Date(Date.UTC(2000, 0, 1)),
 		currentPage: 1,
 		totalPages: 1,
 		search: {

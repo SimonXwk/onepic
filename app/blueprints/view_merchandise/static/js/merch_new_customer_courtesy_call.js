@@ -622,7 +622,7 @@ let rootVue = new Vue({
 										}
 										if (i === ushpJson.total_pages -2) {
 											rootVue.unshippedReady = true
-											console.log(rootVue.unshippedOrders);
+											// console.log(rootVue.unshippedOrders);
 										}
 									}, true);
 							}
