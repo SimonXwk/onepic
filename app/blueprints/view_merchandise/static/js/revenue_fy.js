@@ -1,15 +1,12 @@
 // ############################################################################
 let summaryTable = Vue.component('table-summary', {
-	props: ['payments', 'focalFY', 'clacType'],
+	props: ['merchRows', 'focalFY', 'sumDimension'],
 	data: function(){
 		return {
-			merchUnallocatedPostageCampaignCode: '____.M Postage'
+			merchUnallocatedPostageCampaignCode: '____.M Postage',
 		}
 	},
 	computed:{
-		merchRows: function(){
-			return this.payments.rows.filter(p => p.SOURCETYPE.indexOf('Merch') !== -1 );
-		},
 		merchCampaigns: function(){
 			return Array.from(new Set(this.merchRows.map(v => v.CAMPAIGNCODE))).sort()
 		},
@@ -17,22 +14,23 @@ let summaryTable = Vue.component('table-summary', {
 			return Array.from(new Set(this.merchRows.map(v => v.SOURCETYPE))).sort()
 		},
 		merchUnallocatedPostage: function(){
-			return this.merchRows.filter(v => v.CAMPAIGNCODE===this.merchUnallocatedPostageCampaignCode).map(v => v.PAYMENTAMOUNT).reduce((acc, cur) => acc+=cur,0)
+			return this.merchRows.filter(v => v.CAMPAIGNCODE===this.merchUnallocatedPostageCampaignCode).map(v => v[this.sumDimension]).reduce((acc, cur) => acc+=cur,0)
 		},
 		merchPurchase: function(){
-			return this.merchRows.filter(v => v.SOURCETYPE==='Merchandise Purchase').map(v => v.PAYMENTAMOUNT).reduce((acc, cur) => acc+=cur,0)
+			return this.merchRows.filter(v => v.SOURCETYPE==='Merchandise Purchase').map(v => v[this.sumDimension]).reduce((acc, cur) => acc+=cur,0)
 		}
 	},
 	methods:{
-		calc: function(filters){
+		calc: function(dim, clacType ,filters){
 			let result = 0;
 			let rows = !filters ? this.merchRows : this.merchRows.filter(r => {
 				return Object.keys(filters).reduce((acc, key) =>	acc && (r[key] === filters[key]), true);
 			});
-			if(this.clacType==='sum'){
-				result = rows.reduce((acc, cur) => acc += cur['PAYMENTAMOUNT'], 0);
+			if(clacType==='sum'){
+				result = rows.reduce((acc, cur) => acc += cur[dim], 0);
+			}else if(clacType==='unique'){
+				result = new Set(rows.map(r => r[dim])).size
 			}
-
 			return Number(result.toFixed(2))
 		},
 		allocatePostage: function(purchase){
@@ -40,34 +38,40 @@ let summaryTable = Vue.component('table-summary', {
 		}
 		// {SOURCETYPE: type, CAMPAIGNCODE: camp }
 	},
+	created(){
+		this.$eventBus.$on('changeSumDimension', sumDim => this.sumDimension = sumDim);
+	},
 	template:`
 	<table class="table table-sm table-hover">
 		<thead>
 			<tr>
 				<th scope="col">Campaigns</th>
+				<th scope="col">ACQ</th>
 				<th scope="col">Total</th>
-				<th scope="col" v-for="t in merchRevenueTypes"><< t >></th>
 				<th scope="col">Postage Allocation</th>
 				<th scope="col">Adjusted Total</th>
+				<th scope="col" v-for="t in merchRevenueTypes"><< t >></th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr v-for="camp in merchCampaigns">
 				<td><< camp >></td>
-				<td class="text-primary"><< calc({CAMPAIGNCODE:camp})|currency >></td>
-				<td v-for="type in merchRevenueTypes"><< calc({SOURCETYPE:type, CAMPAIGNCODE:camp})|currency >></td>
-				<td class="text-danger"><< allocatePostage(calc({SOURCETYPE:'Merchandise Purchase', CAMPAIGNCODE:camp}))|currency >></td>
-				<td class="text-danger" v-if="camp===merchUnallocatedPostageCampaignCode"><< (calc({CAMPAIGNCODE:camp})-merchUnallocatedPostage)|currency >></td>
-				<td class="text-primary" v-else><< (allocatePostage(calc({SOURCETYPE:'Merchandise Purchase', CAMPAIGNCODE:camp})) + calc({CAMPAIGNCODE:camp}))|currency >></td>
+				<td><< calc('SERIALNUMBER', 'unique', {CAMPAIGNCODE:camp, IS_ACQUISITION: -1})|number >></td>
+				<td class="text-info"><< calc(sumDimension, 'sum', {CAMPAIGNCODE:camp})|currency >></td>
+				<td class="text-danger"><< allocatePostage(calc(sumDimension, 'sum', {SOURCETYPE:'Merchandise Purchase', CAMPAIGNCODE:camp}))|currency >></td>
+				<td class="text-danger" v-if="camp===merchUnallocatedPostageCampaignCode"><< (calc(sumDimension, 'sum', {CAMPAIGNCODE:camp})-merchUnallocatedPostage)|currency >></td>
+				<td class="text-primary" v-else><< (allocatePostage(calc(sumDimension, 'sum', {SOURCETYPE:'Merchandise Purchase', CAMPAIGNCODE:camp})) + calc(sumDimension, 'sum', {CAMPAIGNCODE:camp}))|currency >></td>
+				<td v-for="type in merchRevenueTypes"><< calc(sumDimension, 'sum', {SOURCETYPE:type, CAMPAIGNCODE:camp})|currency >></td>
 			</tr>
 		</tbody>
 		<tfoot>
 			<tr class="bg-light text-dark font-weight-bold">
 				<th class="text-dark">TOTAL</th>
-				<td class="text-primary"><< calc({})|currency >></td>
-				<td v-for="type in merchRevenueTypes"><< calc({SOURCETYPE:type})|currency >></td>
+				<td><< calc('SERIALNUMBER', 'unique', {IS_ACQUISITION: -1})|number >></td>
+				<td class="text-info"><< calc(sumDimension, 'sum', {})|currency >></td>
 				<td class="text-danger"><< merchUnallocatedPostage|currency >></td>
-				<td class="text-primary"><< calc({})|currency >></td>
+				<td class="text-primary"><< calc(sumDimension, 'sum', {})|currency >></td>
+				<td v-for="type in merchRevenueTypes"><< calc(sumDimension, 'sum', {SOURCETYPE:type})|currency >></td>
 			</tr>
 		</tfoot>
 	</table>
@@ -186,6 +190,7 @@ let rootVue = new Vue({
 		budgetDataReady: false,
 		payments: null,
 		budget: null,
+		sumDimension: 'PAYMENTAMOUNTNETT'
 	},
 	computed: {
 		merchRows: function(){
@@ -203,6 +208,9 @@ let rootVue = new Vue({
 		},
 	},
 	watch: {
+		sumDimension: function(newVal, oldVal){
+			this.$eventBus.$emit('changeSumDimension', newVal);
+		}
 	},
 	methods: {
 		sumTotal: function (dim){
@@ -266,7 +274,7 @@ let rootVue = new Vue({
 		},
 	},
 	created() {
-		this.getData()
+		this.getData();
 	},
 	components:{
 		'summary-talbe': summaryTable,
@@ -354,7 +362,12 @@ let rootVue = new Vue({
 
 	<div class="row my-1">
 		<div class="col">
-			<summary-talbe v-bind:payments="payments" v-bind:focalFY="focalFY" clacType="sum"></summary-talbe>
+			<select v-model="sumDimension" >
+				<option value="PAYMENTAMOUNTNETT">Net</option>
+				<option value="PAYMENTAMOUNT">Total</option>
+				<option value="GSTAMOUNT">GST</option>
+			</select>
+			<summary-talbe v-bind:merchRows="merchRows" v-bind:focalFY="focalFY" :sumDimension="sumDimension"></summary-talbe>
 		</div>
 	</div>
 
