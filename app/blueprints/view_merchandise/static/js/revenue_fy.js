@@ -57,12 +57,14 @@ let summaryTable = Vue.component('table-summary', {
 			return Number((purchase*this.merchPostagePerPurchase).toFixed(2))
 		},
 		campaignSourceTypeBudget: function(camp, srcType){
-			if (this.budget.CAMPAIGN[camp]) {
-				if (srcType && this.budget.CAMPAIGN[camp][srcType]) {
-					return this.budget.CAMPAIGN[camp][srcType].reduce((acc, cur) => acc+cur ,0)
+			let camRows = this.budget.rows.filter(r => r.ACCOUNTTYPE === 'Income' && r.CAMPAIGN === camp);
+			let srcTypeRows;
+			if (camRows) {
+				srcTypeRows = srcType ? camRows.filter(r => r.SOURCETYPE === srcType) : undefined;
+				if (srcTypeRows) {
+					return srcTypeRows.reduce((acc, cur) => acc+cur.VALUES.reduce((a, b) => a+b, 0) ,0)
 				} else if (!srcType) {
-					let types = this.budget.CAMPAIGN[camp];
-					return Object.keys(types).reduce((acc, type) => acc + types[type].reduce((a, b) => a+b, 0) ,0)
+					return camRows.reduce((acc, cur) => acc+cur.VALUES.reduce((a, b) => a+b, 0) ,0)
 				}
 			}
 			return 0
@@ -97,12 +99,12 @@ let summaryTable = Vue.component('table-summary', {
 					<td class="text-info"><small><< calc(sumDimension, 'sum', {CAMPAIGNCODE:camp})|currency >></small></td>
 					<td v-for="type in merchRevenueTypes"><small><< calc(sumDimension, 'sum', {SOURCETYPE:type, CAMPAIGNCODE:camp})|currency >></small></td>
 				</tr>
-				<tr class="font-italic">
+				<tr class="font-italic bg-light">
 					<td class="text-secondary"><small>B</small></td>
 					<td class="text-secondary"><small>_</small></td>
 					<td class="text-secondary"><small>_</small></td>
 					<td class="text-secondary"><small><< campaignSourceTypeBudget(camp)|currency >></small></td>
-					<td class="text-secondary"><small></small></td>
+					<td class="text-secondary"><small><< campaignSourceTypeBudget(camp, 'Merchandise Postage')|currency >></small></td>
 					<td class="text-secondary"><small><< campaignSourceTypeBudget(camp)|currency >></small></td>
 					<td class="text-secondary" v-for="type in merchRevenueTypes"><small><< campaignSourceTypeBudget(camp, type)|currency >></small></td>
 				</tr>
@@ -497,7 +499,7 @@ let rootVue = new Vue({
 
 	<div class="row my-1">
 		<div class="col">
-			<summary-talbe v-bind:merchRows="merchRows" v-bind:budget="budgetObj"></summary-talbe>
+			<summary-talbe v-bind:merchRows="merchRows" v-bind:budget="budget"></summary-talbe>
 		</div>
 	</div>
 

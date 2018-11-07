@@ -38,7 +38,6 @@ class TLMA:
 	@classmethod
 	def budget(cls):
 		# todo: Change budget from dummy sample to real query
-		# Fake Budget Data By Random Numbers
 		budget_data = {
 			'FY': {
 				2017: {
@@ -65,47 +64,63 @@ class TLMA:
 						'Bequest': [10000, 10000, 10000, 10000, 10000, 50000, 50000, 50000, 50000, 50000, 100000, 150000],
 						'MerchandiseGST': [6296.13, 2865.61, 2251.69, 10514.21, 9545.05, 6038.96, 2568.37, 3040.79, 3556.01, 2094.48, 780.92, 1193.72]
 					},
-					'CAMPAIGN': {
-						'xxxxxxxxxxxxx': {
-							'Merchandise Purchase': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-							'Merchandise Postage': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-							'Merchandise Donation': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-							'Merchandise Gift of Love': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-							'Merchandise Sponsorship': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-						},
-						'19PP.M GOL': {
-							'Merchandise Purchase': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-							'Merchandise Postage': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-							'Merchandise Donation': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1500, 1500],
-							'Merchandise Gift of Love': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13500, 13500],
-							'Merchandise Sponsorship': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-						},
-						'19AC.M NRMA': {
-							'Merchandise Purchase': [0, 0, 0, 18900, 25200, 18900, 0, 0, 0, 0, 0, 0, 0],
-							'Merchandise Postage': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-							'Merchandise Donation': [0, 0, 0, 2100, 2800, 2100, 0, 0, 0, 0, 0, 0, 0],
-							'Merchandise Gift of Love': [0, 0, 0, 8400, 11200, 8400, 0, 0, 0, 0, 0, 0, 0],
-							'Merchandise Sponsorship': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-						},
-						'19PP.M WinterSpring': {
-							'Merchandise Purchase': [56138.54, 24493.39, 16624.94, 9446.00, 3054.94, 927.78, 67.59, 99.41, 21.21, 0, 0, 0],
-							'Merchandise Postage': [6315.59, 2755.51, 1870.31, 1062.68, 343.68, 104.37, 7.60, 11.18, 2.39, 0, 0, 0],
-							'Merchandise Donation': [12380.55, 5401.67, 3666.39, 2083.18, 673.72, 204.61, 14.91, 21.92, 4.68, 0, 0, 0],
-							'Merchandise Gift of Love': [27066.80, 11809.31, 8015.60, 4554.32, 1472.92, 447.32, 32.59, 47.93, 10.23, 0, 0, 0],
-							'Merchandise Sponsorship': [900.00, 934.92, 968.79, 965.65, 530.60, 527.64, 92.77, 89.99, 87.29, 84.67, 82.13, 79.67]
-						},
-						'19PP.M Christmas': {
-							'Merchandise Purchase': [0, 0, 100.69, 62206.64, 54790.71, 29728.72, 1733.87, 285.04, 194.32, 0, 0, 0],
-							'Merchandise Postage': [0, 0, 13.79, 8519.61, 7503.95, 4071.54, 237.47, 39.04, 26.61, 0, 0, 0],
-							'Merchandise Donation': [0, 0, 43.78, 27082.37, 23892.97, 13030.32, 855.51, 222.53, 180.13, 92.77, 89.99, 87.29],
-							'Merchandise Gift of Love': [0, 0, 80.99, 50035.78, 44070.79, 23912.23, 1394.64, 229.27, 156.30, 0, 0, 0],
-							'Merchandise Sponsorship': [108, 108, 108, 1404, 1836, 972, 108, 108, 108, 108, 108, 108]
-						},
-
-					}
 				}
-			}
+			},
+			'rows': [
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '200', 'CAMPAIGN': 'foo', 'SOURCETYPE': 'Merchandise Purchase', 'VALUES': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]},
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '1850', 'CAMPAIGN': 'foo', 'SOURCETYPE': 'Merchandise Postage', 'VALUES': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]},
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '1015', 'CAMPAIGN': 'foo', 'SOURCETYPE': 'Merchandise Gift of Love', 'VALUES': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]},
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '1015', 'CAMPAIGN': 'foo', 'SOURCETYPE': 'Merchandise Donation', 'VALUES': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]},
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '1150', 'CAMPAIGN': 'foo', 'SOURCETYPE': 'Merchandise Sponsorship', 'VALUES': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]},
+
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '1015', 'CAMPAIGN': '19PP.M GOL', 'SOURCETYPE': 'Merchandise Gift of Love', 'VALUES': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13500, 13500]},
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '1015', 'CAMPAIGN': '19PP.M GOL', 'SOURCETYPE': 'Merchandise Donation', 'VALUES': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1500, 1500]},
+
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '200', 'CAMPAIGN': '19AC.M NRMA', 'SOURCETYPE': 'Merchandise Purchase', 'VALUES': [0, 0, 0, 18900, 25200, 18900, 0, 0, 0, 0, 0, 0]},
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '1850', 'CAMPAIGN': '19AC.M NRMA', 'SOURCETYPE': 'Merchandise Postage', 'VALUES': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]},
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '1015', 'CAMPAIGN': '19AC.M NRMA', 'SOURCETYPE': 'Merchandise Gift of Love', 'VALUES': [0, 0, 0, 8400, 11200, 8400, 0, 0, 0, 0, 0, 0]},
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '1015', 'CAMPAIGN': '19AC.M NRMA', 'SOURCETYPE': 'Merchandise Donation', 'VALUES': [0, 0, 0, 2100, 2800, 2100, 0, 0, 0, 0, 0, 0]},
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '1150', 'CAMPAIGN': '19AC.M NRMA', 'SOURCETYPE': 'Merchandise Sponsorship', 'VALUES': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]},
+
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '200', 'CAMPAIGN': '19PP.M WinterSpring', 'SOURCETYPE': 'Merchandise Purchase', 'VALUES': [56138.54, 24493.39, 16624.94, 9446.00, 3054.94, 927.78, 67.59, 99.41, 21.21, 0, 0, 0]},
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '1850', 'CAMPAIGN': '19PP.M WinterSpring', 'SOURCETYPE': 'Merchandise Postage', 'VALUES': [6315.59, 2755.51, 1870.31, 1062.68, 343.68, 104.37, 7.60, 11.18, 2.39, 0, 0, 0]},
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '1015', 'CAMPAIGN': '19PP.M WinterSpring', 'SOURCETYPE': 'Merchandise Gift of Love', 'VALUES': [27066.80, 11809.31, 8015.60, 4554.32, 1472.92, 447.32, 32.59, 47.93, 10.23, 0, 0, 0]},
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '1015', 'CAMPAIGN': '19PP.M WinterSpring', 'SOURCETYPE': 'Merchandise Donation', 'VALUES': [12380.55, 5401.67, 3666.39, 2083.18, 673.72, 204.61, 14.91, 21.92, 4.68, 0, 0, 0]},
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '1150', 'CAMPAIGN': '19PP.M WinterSpring', 'SOURCETYPE': 'Merchandise Sponsorship', 'VALUES': [900.00, 934.92, 968.79, 965.65, 530.60, 527.64, 92.77, 89.99, 87.29, 84.67, 82.13, 79.67]},
+
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '200', 'CAMPAIGN': '19PP.M Christmas', 'SOURCETYPE': 'Merchandise Purchase', 'VALUES': [0, 0, 100.69, 62206.64, 54790.71, 29728.72, 1733.87, 285.04, 194.32, 0, 0, 0]},
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '1850', 'CAMPAIGN': '19PP.M Christmas', 'SOURCETYPE': 'Merchandise Postage', 'VALUES': [0, 0, 13.79, 8519.61, 7503.95, 4071.54, 237.47, 39.04, 26.61, 0, 0, 0]},
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '1015', 'CAMPAIGN': '19PP.M Christmas', 'SOURCETYPE': 'Merchandise Gift of Love', 'VALUES': [0, 0, 80.99, 50035.78, 44070.79, 23912.23, 1394.64, 229.27, 156.30, 0, 0, 0]},
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '1015', 'CAMPAIGN': '19PP.M Christmas', 'SOURCETYPE': 'Merchandise Donation', 'VALUES': [0, 0, 43.78, 27082.37, 23892.97, 13030.32, 855.51, 222.53, 180.13, 92.77, 89.99, 87.29]},
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '1150', 'CAMPAIGN': '19PP.M Christmas', 'SOURCETYPE': 'Merchandise Sponsorship', 'VALUES': [108, 108, 108, 1404, 1836, 972, 108, 108, 108, 108, 108, 108]},
+
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '200', 'CAMPAIGN': '19PP.M SummerAutumn', 'SOURCETYPE': 'Merchandise Purchase', 'VALUES': [0, 0, 0, 0, 0, 0, 20160.00, 24192.00, 9216.00, 1728.00, 1152.00, 1152.00]},
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '1850', 'CAMPAIGN': '19PP.M SummerAutumn', 'SOURCETYPE': 'Merchandise Postage', 'VALUES': [0, 0, 0, 0, 0, 0, 2520.00, 3024.00, 1152.00, 216.00, 144.00, 144.00]},
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '1015', 'CAMPAIGN': '19PP.M SummerAutumn', 'SOURCETYPE': 'Merchandise Gift of Love', 'VALUES': [0, 0, 0, 0, 0, 0, 8400.00, 10080.00, 3840.00, 720.00, 480.00, 480.00]},
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '1015', 'CAMPAIGN': '19PP.M SummerAutumn', 'SOURCETYPE': 'Merchandise Donation', 'VALUES': [0, 0, 0, 0, 0, 0, 5460.00, 6552.00, 2496.00, 468.00, 312.00, 312.00]},
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '1150', 'CAMPAIGN': '19PP.M SummerAutumn', 'SOURCETYPE': 'Merchandise Sponsorship', 'VALUES': [0, 0, 0, 0, 0, 0, 432.00, 468.00, 466.92, 33.87, 32.86, 31.87]},
+
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '200', 'CAMPAIGN': '19PP.M Easter', 'SOURCETYPE': 'Merchandise Purchase', 'VALUES': [0, 0, 0, 0, 0, 0, 0, 0, 20592.00, 13728.00, 0, 0]},
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '1850', 'CAMPAIGN': '19PP.M Easter', 'SOURCETYPE': 'Merchandise Postage', 'VALUES': [0, 0, 0, 0, 0, 0, 0, 0, 2948.40, 1965.60, 0, 0]},
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '1015', 'CAMPAIGN': '19PP.M Easter', 'SOURCETYPE': 'Merchandise Gift of Love', 'VALUES': [0, 0, 0, 0, 0, 0, 0, 0, 12636.00, 8424.00, 0, 0]},
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '1015', 'CAMPAIGN': '19PP.M Easter', 'SOURCETYPE': 'Merchandise Donation', 'VALUES': [0, 0, 0, 0, 0, 0, 0, 0, 4212.00, 2808.00, 0, 0]},
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '1150', 'CAMPAIGN': '19PP.M Easter', 'SOURCETYPE': 'Merchandise Sponsorship', 'VALUES': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 864.00, 864.00]},
+
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '200', 'CAMPAIGN': '19PP.M EOFY', 'SOURCETYPE': 'Merchandise Purchase', 'VALUES': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4800.00, 7200.00]},
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '1850', 'CAMPAIGN': '19PP.M EOFY', 'SOURCETYPE': 'Merchandise Postage', 'VALUES': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 756.00, 1134.00]},
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '1015', 'CAMPAIGN': '19PP.M EOFY', 'SOURCETYPE': 'Merchandise Gift of Love', 'VALUES': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1200.00, 1800.00]},
+
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '200', 'CAMPAIGN': '____.M Auxillary', 'SOURCETYPE': 'Merchandise Purchase', 'VALUES': [450.00, 1350.00, 1350.00, 4950.00, 2700.00, 3600.00, 900.00, 2700.00, 1350.00, 2250.00, 900.00, 2250.00]},
+
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '200', 'CAMPAIGN': '19AC.M Social Media', 'SOURCETYPE': 'Merchandise Purchase', 'VALUES': [50.00, 50.00, 50.00, 50.00, 50.00, 50.00, 50.00, 50.00, 50.00, 50.00, 50.00, 50.00]},
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '1850', 'CAMPAIGN': '19AC.M Social Media', 'SOURCETYPE': 'Merchandise Postage', 'VALUES': [7.20, 7.20, 7.20, 7.20, 7.20, 7.20, 7.20, 7.20, 7.20, 7.20, 7.20, 7.20]},
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '1015', 'CAMPAIGN': '19AC.M Social Media', 'SOURCETYPE': 'Merchandise Donation', 'VALUES': [2.00, 2.00, 2.00, 2.00, 2.00, 2.00, 2.00, 2.00, 2.00, 2.00, 2.00, 2.00]},
+
+				{'FY': 2019, 'CLASS': 15, 'ACCOUNTTYPE': 'Income', 'ACCOUNT': '200', 'CAMPAIGN': '19EG.M FairTradeStalls', 'SOURCETYPE': 'Merchandise Purchase', 'VALUES': [0, 0, 2500.00, 0, 1800.00, 3000.00, 0, 0, 0, 1000.00, 0, 0]},
+			]
+
 		}
+		# Fake Budget Data By Random Numbers
 		return budget_data
 
 	@classmethod
