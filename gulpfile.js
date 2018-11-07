@@ -7,27 +7,26 @@ const autoprefixer    = require('gulp-autoprefixer');
 
 
 const config = {
-    baseDir: '.',
-    vendorDir: 'app/static/vendor',
-    vendorHighChartDir: 'app/static/vendor/highcharts',
-    vendorLodashDir: 'app/static/vendor/lodash',
-    cssDir: 'app/static/css',
-    sassPattern: 'app/**/*.scss',
-    htmlPattern: 'app/**/*.html',
-    jsPattern: 'app/**/*.js',
-    sassBuildGlob: ['app/static/scss/*.scss', '!app/static/scss/_*.scss']
-
+	baseDir: '.',
+	vendorDir: 'app/static/vendor',
+	vendorHighChartDir: 'app/static/vendor/highcharts',
+	vendorLodashDir: 'app/static/vendor/lodash',
+	cssDir: 'app/static/css',
+	sassPattern: 'app/**/*.scss',
+	htmlPattern: 'app/**/*.html',
+	jsPattern: 'app/**/*.js',
+	sassBuildGlob: ['app/static/scss/*.scss', '!app/static/scss/_*.scss']
 };
 
 
 // Move HighChart Libraries into app/static/vendor/hc folder :
 gulp.task('vendor-highchart', function() {
   return gulp.src([
-      'node_modules/highcharts/*.js',
-      '!node_modules/highcharts/*.src.js',
-      'node_modules/highcharts/modules/*.js',
-      '!node_modules/highcharts/modules/*.src.js',
-    ])
+    'node_modules/highcharts/*.js',
+    '!node_modules/highcharts/*.src.js',
+    'node_modules/highcharts/modules/*.js',
+    '!node_modules/highcharts/modules/*.src.js',
+  ])
     .pipe(plumber())
     .pipe(gulp.dest(config.vendorHighChartDir))
 });
@@ -37,30 +36,31 @@ gulp.task('vendor-highchart', function() {
 // Move the Framework libraries(css and javascripts) into app/static/vendor folder :
 gulp.task('vendor-general', function() {
   return gulp.src([
-      'node_modules/bootstrap/dist/css/bootstrap.min.css',
-      'node_modules/bootstrap/dist/js/bootstrap.min.js',
-      'node_modules/bootstrap/dist/js/bootstrap.min.js.map',
-      'node_modules/jquery/dist/jquery.min.js',
-      'node_modules/popper.js/dist/umd/popper.min.js',
-      'node_modules/popper.js/dist/umd/popper.min.js.map',
-      'node_modules/vue/dist/vue.min.js',
-      'node_modules/echarts/dist/echarts-en.min.js',
-      'node_modules/crossfilter/crossfilter.min.js',
-      'node_modules/lodash/lodash.min.js',
-      'node_modules/moment/min/moment.min.js',
-      'node_modules/d3/dist/d3.min.js',
-      'node_modules/chart.js/dist/Chart.bundle.min.js',
+		'node_modules/bootstrap/dist/css/bootstrap.min.css',
+		'node_modules/bootstrap/dist/js/bootstrap.min.js',
+		'node_modules/bootstrap/dist/js/bootstrap.min.js.map',
+		'node_modules/jquery/dist/jquery.min.js',
+		'node_modules/popper.js/dist/umd/popper.min.js',
+		'node_modules/popper.js/dist/umd/popper.min.js.map',
+		'node_modules/vue/dist/vue.min.js',
+		'node_modules/vuex/dist/vuex.min.js',
+		'node_modules/echarts/dist/echarts-en.min.js',
+		'node_modules/crossfilter/crossfilter.min.js',
+		'node_modules/lodash/lodash.min.js',
+		'node_modules/moment/min/moment.min.js',
+		'node_modules/d3/dist/d3.min.js',
+		'node_modules/chart.js/dist/Chart.bundle.min.js',
 
-      'node_modules/tabulator-tables/dist/js/tabulator.min.js',
-      'node_modules/tabulator-tables/dist/css/tabulator.min.css',
+		'node_modules/tabulator-tables/dist/js/tabulator.min.js',
+		'node_modules/tabulator-tables/dist/css/tabulator.min.css',
 
-      'node_modules/datatables.net/js/jquery.dataTables.min.js',
-      'node_modules/datatables.net-dt/css/jquery.dataTables.min.css',
-      'node_modules/datatables.net-bs4/css/dataTables.bootstrap4.min.css',
-      'node_modules/datatables.net-bs4/js/dataTables.bootstrap4.min.js',
-      'node_modules/datatables.net-buttons-dt/js/buttons.dataTables.min.js',
+		'node_modules/datatables.net/js/jquery.dataTables.min.js',
+		'node_modules/datatables.net-dt/css/jquery.dataTables.min.css',
+		'node_modules/datatables.net-bs4/css/dataTables.bootstrap4.min.css',
+		'node_modules/datatables.net-bs4/js/dataTables.bootstrap4.min.js',
+		'node_modules/datatables.net-buttons-dt/js/buttons.dataTables.min.js',
 
-      'node_modules/sketch-js/js/sketch.min.js',
+		'node_modules/sketch-js/js/sketch.min.js',
     ])
     .pipe(plumber())
     .pipe(gulp.dest(config.vendorDir))

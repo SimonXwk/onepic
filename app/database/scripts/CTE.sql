@@ -376,7 +376,7 @@ WHERE
             END
           END
         END
-      ELSE 'N/A' END AS [LINE_FY_DONTYPE1]
+      ELSE 'N/A' END AS [LINE_FY_DONTYPE]
   FROM
     cte_payments t1
     LEFT JOIN cte_previous_date t2 ON (t1.SERIALNUMBER = t2.SERIALNUMBER)

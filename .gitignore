@@ -15,4 +15,4 @@ build/
 # App
 instance/*.*
 *.egg-info/
-app/static/vendor/*.*
+app/static/vendor/**/*.*

@@ -54,15 +54,15 @@ let vueNowStaticTable = Vue.component('vue-table', {
 	`<table class="table table-sm table-hover table-bordered text-right" >
 		<thead>
 			<tr class="table-bordered text-light">
-				 <th scope="col" style="width: 19%" class="bg-dark"><span class="text-warning text-uppercase"><small class="text-light"><< dim >></small> Static Picture</span></th>
+				 <th scope="col" style="width: 19%" class="bg-dark"><span class="text-warning text-uppercase"><small class="text-light"><< dim >></small> Static Status</span></th>
 				 <th scope="col" style="width: 9%" class="bg-success">ACTIVE</th>
 				 <th scope="col" style="width: 9%" class="bg-warning text-dark">ONHOLD</th>
 				 <th scope="col" style="width: 9%" class="bg-danger">CANCELLED</th>
 				 <th scope="col" style="width: 9%" class="bg-info">CLOSED</th>
 				 <th scope="col" style="width: 9%" class="bg-dark">TOTAL</th>
-				 <th scope="col" style="width: 9%" class="bg-secondary">CLOSED: FINISHED</th>
+				 <th scope="col" style="width: 9%" class="bg-info">CLOSED: FINISHED</th>
 				 <th scope="col" style="width: 9%" class="bg-info">CLOSED: ACTIVE</th>
-				 <th scope="col" style="width: 9%" class="bg-secondary">CLOSED: UNDEFINED</th>
+				 <th scope="col" style="width: 9%" class="bg-info">CLOSED: UNDEFINED</th>
 				 <th scope="col" style="width: 9%" class="bg-success">GENERAL ACTIVE</th>
 			</tr>
 		</thead>
@@ -144,7 +144,7 @@ let vueMthMixTable = Vue.component('vue-table', {
 	`<table class="table table-sm table-hover table-bordered text-right" >
 		<thead>
 		<tr class="table-bordered bg-secondary text-light">
-			 <th scope="col" style="width: 23%" class="bg-dark"><span class="text-warning text-uppercase"><< fyMonths.short[fyMth-1] >> MIX</span></th>
+			 <th scope="col" style="width: 23%" class="bg-dark"><span class="text-warning text-uppercase"><< fyMonths.short[fyMth-1] >> REPORT</span></th>
 			 <th scope="col" style="width: 11%" class="bg-danger">CANCELLED</th>
 			 <th scope="col" style="width: 11%" class="bg-warning text-dark">ONHOLDED</th>
 			 <th scope="col" style="width: 11%" class="bg-info">CLOSED</th>

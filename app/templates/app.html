@@ -19,9 +19,9 @@ const endpoint = (url, parameter) => $SCRIPT_ROOT + url + (parameter ? parameter
 // Using Fetch API to grab JSON Data
 const fetchJSON = (endpoint, func, silent=false) => {
 	function checkStstus(response) {
-		if (!silent){ console.log('✓ Response received', response); }
+		if (!silent){ console.log('✓ Response received ( endpoint: ' + endpoint + ')', response); }
 		if (response.status >= 200 && response.status < 300) {
-			if (!silent){ console.log('✓ Response status success (' + response.status + '), Promise.resolve response ... '); }
+			// if (!silent){ console.log('✓ Response status success (' + response.status + '), Promise.resolve response ... '); }
 			return Promise.resolve(response)
 		} else {
 			console.log('✘ Response Status Failed, Promise.reject response now ...');
@@ -33,12 +33,12 @@ const fetchJSON = (endpoint, func, silent=false) => {
 		return response.json()
 	}
 
-	if (!silent){ console.log('➠ Fetching Endpoint: ', endpoint); }
+	// if (!silent){ console.log('➠ Fetching Endpoint: ', endpoint); }
 	fetch(endpoint)
 		.then(checkStstus)
 		.then(toJSON)
 		.then(jsonData => {
-			if (!silent){ console.log('✓ JSON data converted'); }
+			// if (!silent){ console.log('✓ JSON data converted'); }
 			// console.log(jsonData);
 			// ---------------------------------------------------------------------------------
 			// Call Processing Function
@@ -153,6 +153,11 @@ function currency(val) {
 {# -------------------- vue.js -------------------- #}
 	{% elif vendor == 'vue' %}
 	<script src="{{ url_for('vendor', filename='vue.min.js') }}"></script>
+		{% if vendor_optionals != [] %}
+				{% for x in vendor_optionals %}
+					<script src="{{ url_for('vendor', filename= x + '.min.js') }}"></script>
+				{% endfor %}
+		{% endif %}
 	<script>
 			Vue.options.delimiters = ['<<', '>>'];
 			const vueBus = new Vue();
@@ -226,6 +231,10 @@ function currency(val) {
 				</div></div>`
 			});
 	</script>
+
+	{% elif vendor == 'vuex' %}
+		<script src="{{ url_for('vendor', filename='vuex.min.js') }}"></script>
+
 
 {# -------------------- crossfilter.js -------------------- #}
 	{% elif vendor == 'crossfilter' %}

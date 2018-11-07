@@ -1,6 +1,6 @@
 <footer class="footer">
 	<div class="">
-		<span class="text-muted">&copy; Copyright {{ now.strftime('%Y') }} TLMA</span>
+		<span class="text-muted">&copy;{{ now.strftime('%Y') }} TLMA. All rights reserved. </span>
 		|<span class="text-muted"> Root {{ request.script_root }} </span>
 		|<span class="text-muted"> {{ request.environ['HTTP_USER_AGENT'].split(' ')[1][1:] }} </span>
 		|<span class="text-muted"> {{ request.environ['HTTP_USER_AGENT'].split(' ')[-1] }} </span>
