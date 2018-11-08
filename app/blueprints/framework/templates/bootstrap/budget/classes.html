@@ -1,0 +1,51 @@
+<div class="container-fluid">
+{% set classes = data['rows'] %}
+{% if classes|length == 0 %}
+	<p class="lead text-center">No Classes Found</p>
+{% else %}
+	{% set maxLevel = (classes|max(attribute='LEVEL'))['LEVEL'] %}
+	<p class="lead text-center my-0">
+		<span class="text-primary font-weight-bold">{{ classes|length|number }}</span> Classes Found,
+		(
+		<span class="text-success">{{ classes|selectattr('ACTIVE', '==', -1)|list|length|number }}</span> Active,
+		<span class="text-danger">{{ classes|selectattr('ACTIVE', '==', 0)|list|length|number }}</span> Inactive.
+		<span class="text-info">Maximum Level of Nesting : <strong>{{ maxLevel }}</strong></span>
+		)
+	</p>
+	<small class="text-center text-muted font-italic d-block">Data Last Updated : {{ data['last_modified']|dtAU }}</small>
+
+	<div class="table-responsive-md">
+		<table class="table table-sm table-hover shadow-sm" id="classes">
+			<thead>
+				<tr class="bg-light text-dark">
+					<th scope="col"><small>ID</small></th>
+					<th scope="col">CREATED</th>
+					<th scope="col">LEVEL</th>
+					<th scope="col">LEVEL1#</th>
+					{% for i in range(1, maxLevel+1) %}
+					<th scope="col">CLASS{{ i }}</th>
+					{% endfor %}
+					<th scope="col">NAME</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for class in classes %}
+				{% if class['ACTIVE'] == -1 %}
+				<tr>
+					<td class="align-middle text-muted" ><small>{{ class['ID'] }}</small></td>
+					<td class="align-middle text-muted" >{{ class['TIMESTAMP']|dtSort }}</td>
+					<td class="align-middle text-primary font-weight-bold">{{ class['LEVEL'] }}</td>
+					<td class="align-middle">{{ class['LEVEL1NUM'] }}</td>
+					{% for i in range(maxLevel) %}
+					<td class="align-middle">{{ class['LEVELS'][i] }}</td>
+					{% endfor %}
+					<td class="align-middle text-primary">{{ class['NAME'] }}</td>
+				</tr>
+				{% endif %}
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+
+{% endif %}
+</div>

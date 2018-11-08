@@ -1,0 +1,60 @@
+<div class="container-fluid">
+{% set accounts = data['rows'] %}
+{% if accounts|length == 0 %}
+	<p class="lead text-center">No Classes Found</p>
+{% else %}
+	{% set maxLevel = (accounts|max(attribute='LEVEL'))['LEVEL'] %}
+	<p class="lead text-center my-0">
+		<span class="text-primary font-weight-bold">{{ accounts|length|number }}</span> Accounts Found,
+		(
+		<span class="text-success">{{ accounts|selectattr('ACTIVE', '==', -1)|list|length|number }}</span> Active,
+		<span class="text-danger">{{ accounts|selectattr('ACTIVE', '==', 0)|list|length|number }}</span> Inactive.
+		<span class="text-info">Maximum Level of Nesting : <strong>{{ maxLevel }}</strong></span>
+		)
+	</p>
+	<small class="text-center text-muted font-italic d-block">Data Last Updated : {{ data['last_modified']|dtAU }}</small>
+	<div class="text-center">
+	<span class="text-info font-italic">Active Types Summary : </span>
+	{% for type, typeList in accounts|selectattr('ACTIVE', '==', -1)|groupby('ACCOUNTTYPE') %}
+		<span class="badge badge-light">{{ type }} <span class="badge badge-light text-primary">{{ typeList|length }}</span></span>
+	{% endfor %}
+	</div>
+	<div class="table-responsive-md">
+		<table class="table table-sm table-hover shadow-sm" id="accounts">
+			<thead>
+				<tr class="bg-light text-dark">
+					<th scope="col"><small>ID</small></th>
+					<th scope="col">CREATED</th>
+					<th scope="col">LEVEL</th>
+					<th scope="col">ACCNTUM</th>
+					<th scope="col">ACCNTTYPE</th>
+					{% for i in range(1, maxLevel+1) %}
+					<th scope="col">ACCNT{{ i }}</th>
+					{% endfor %}
+					<th scope="col">NAME</th>
+					<th scope="col">DESC</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for accnt in accounts %}
+				{% if accnt['ACTIVE'] == -1 %}
+				<tr>
+					<td class="align-middle text-muted" ><small>{{ accnt['ID'] }}</small></td>
+					<td class="align-middle text-muted" >{{ accnt['TIMESTAMP']|dtSort }}</td>
+					<td class="align-middle text-primary font-weight-bold">{{ accnt['LEVEL'] }}</td>
+					<td class="align-middle text-primary">{{ accnt['ACCOUNTNUMEBR'] }}</td>
+					<td class="align-middle">{{ accnt['ACCOUNTTYPE'] }}</td>
+					{% for i in range(maxLevel) %}
+					<td class="align-middle">{{ accnt['LEVELS'][i] }}</td>
+					{% endfor %}
+					<td class="align-middle text-info">{{ accnt['NAME'] }}</td>
+					<td class="align-middle text-muted">{{ accnt['DESCRIPTION'] }}</td>
+				</tr>
+				{% endif %}
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+
+{% endif %}
+</div>

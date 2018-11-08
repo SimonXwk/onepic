@@ -6,24 +6,30 @@ const store = new Vuex.Store({
 		calcDimensionSum: 'PAYMENTAMOUNTNETT',
 		arbitraryMerchPostageCampaignCode: '____.M Postage',
 		focalDonorTypes: [],
+		focalCampaign: null
 	},
 	mutations: {
 		SET_FOCALFY: (state, payload) => state.focalFY = payload,
 		SET_CALC_DIMENSION_SUM: (state, payload) => state.calcDimensionSum = payload,
 		SET_FOCAL_DONORTYPES: (state, payload) => state.focalDonorTypes = payload,
+		SET_FOCAL_CAMPAIGN: (state, payload) => state.focalCampaign = payload,
 	}
 });
 // #############################################################################
 // #############################################################################
 let summaryTable = Vue.component('table-summary', {
-	props: ['merchRows', 'budget'],
+	props: ['merchRows', 'budgetRows'],
 	computed:{
 		focalFY: function(){return this.$store.state.focalFY},
 		sumDimension: function(){return this.$store.state.calcDimensionSum },
 		merchUnallocatedPostageCampaignCode: function(){return this.$store.state.arbitraryMerchPostageCampaignCode},
 		focalDonorTypes:function(){return this.$store.state.focalDonorTypes},
-		merchCampaigns: function(){return Array.from(new Set(this.merchRows.map(v => v.CAMPAIGNCODE))).sort()},
-		merchRevenueTypes: function(){return [...new Set(this.merchRows.map(v => v.SOURCETYPE))].sort()},
+		merchCampaigns: function(){
+			let actuals = new Set(this.merchRows.map(v => v.CAMPAIGNCODE));
+			let budgets =new Set(this.budgetRows.filter(r => r.CALC ==='REVENUE' && r.CLASS1 === 15).map(v => v.CAMPAIGNCODE));
+			return [...new Set([...actuals, ...budgets])].sort()
+		},
+		merchRevenueTypes: function(){return Array.from(new Set(this.merchRows.map(v => v.SOURCETYPE))).sort()},
 		merchUnallocatedPostageSum: function(){
 			return this.merchRows.filter(v => v.CAMPAIGNCODE===this.merchUnallocatedPostageCampaignCode).map(v => v[this.sumDimension]).reduce((acc, cur) => acc+=cur,0)
 		},
@@ -56,15 +62,33 @@ let summaryTable = Vue.component('table-summary', {
 		allocatePostage: function(purchase){
 			return Number((purchase*this.merchPostagePerPurchase).toFixed(2))
 		},
+		calcBudget: function(clacType ,filters) {
+			let result = 0;
+			let rows = !filters ? this.budgetRows.filter(r => r.CLASS1 === 15) : this.filteredRows.filter(r => {
+				return Object.keys(filters).reduce((acc, key) =>	acc &&  r.CLASS1 === 15 && (r[key] === filters[key]), true);
+			});
+			if(clacType==='sum'){
+				result = rows.reduce((acc, cur) => acc += cur[dim], 0);
+			}
+
+			return Number(result.toFixed(2))
+		},
 		campaignSourceTypeBudget: function(camp, srcType){
-			let camRows = this.budget.rows.filter(r => r.ACCOUNTTYPE === 'Income' && r.CAMPAIGN === camp);
-			let srcTypeRows;
-			if (camRows) {
-				srcTypeRows = srcType ? camRows.filter(r => r.SOURCETYPE === srcType) : undefined;
-				if (srcTypeRows) {
-					return srcTypeRows.reduce((acc, cur) => acc+cur.VALUES.reduce((a, b) => a+b, 0) ,0)
-				} else if (!srcType) {
-					return camRows.reduce((acc, cur) => acc+cur.VALUES.reduce((a, b) => a+b, 0) ,0)
+			let rows = this.budgetRows.filter(r => r.CALC === 'REVENUE' && r.CLASS1 === 15 );
+			let camRows, srcTypeRows;
+			if (!camp && !srcType) {
+				return rows.reduce((acc, cur) => acc+cur.VALUES.reduce((a, b) => a+b, 0) ,0)
+			} else if(!camp && srcType ) {
+				return rows.filter(r => r.SOURCETYPE === srcType).reduce((acc, cur) => acc+cur.VALUES.reduce((a, b) => a+b, 0) ,0)
+			} else {
+				camRows = rows.filter(r => r.CAMPAIGNCODE === camp);
+				if (camRows) {
+					srcTypeRows = srcType ? camRows.filter(r => r.SOURCETYPE === srcType) : undefined;
+					if (srcTypeRows) {
+						return srcTypeRows.reduce((acc, cur) => acc+cur.VALUES.reduce((a, b) => a+b, 0) ,0)
+					} else if (!srcType) {
+						return camRows.reduce((acc, cur) => acc+cur.VALUES.reduce((a, b) => a+b, 0) ,0)
+					}
 				}
 			}
 			return 0
@@ -112,14 +136,24 @@ let summaryTable = Vue.component('table-summary', {
 		</tbody>
 		<tfoot>
 			<tr class="bg-light text-dark font-weight-bold">
-				<th class="text-dark">TOTAL</th>
-				<td class="text-primary">A</td>
+				<th class="text-dark text-right font-italic">ACTUAL TOTAL</th>
+				<td class="text-primary"></td>
 				<td class="text-success"><< calc('SERIALNUMBER', 'unique', {IS_ACQUISITION: -1})|number >></td>
 				<td class="text-secondary"><< calc('TRXID', 'unique', {ISTRX: -1})|number >></td>
 				<td class="text-dark"><< calc(sumDimension, 'sum', {})|currency >></td>
 				<td class="text-danger"><< merchUnallocatedPostageSum|currency >></td>
 				<td class="text-info"><< calc(sumDimension, 'sum', {})|currency >></td>
 				<td v-for="type in merchRevenueTypes"><< calc(sumDimension, 'sum', {SOURCETYPE:type})|currency >></td>
+			</tr>
+			<tr class="bg-light text-dark">
+				<th class="text-dark text-right font-italic">BUDGET TOTAL</th>
+				<td class="text-primary"></td>
+				<td class="text-success">_</td>
+				<td class="text-secondary">_</td>
+				<td class="text-dark"><< campaignSourceTypeBudget()|currency >></td>
+				<td class="text-danger"><< campaignSourceTypeBudget(undefined, 'Merchandise Postage')|currency >></td>
+				<td class="text-info"><< campaignSourceTypeBudget()|currency >></td>
+				<td v-for="type in merchRevenueTypes"><< campaignSourceTypeBudget(undefined, type)|currency >></td>
 			</tr>
 		</tfoot>
 	</table>
@@ -499,7 +533,7 @@ let rootVue = new Vue({
 
 	<div class="row my-1">
 		<div class="col">
-			<summary-talbe v-bind:merchRows="merchRows" v-bind:budget="budget"></summary-talbe>
+			<summary-talbe v-bind:merchRows="merchRows" v-bind:budgetRows="budget.rows"></summary-talbe>
 		</div>
 	</div>
 
