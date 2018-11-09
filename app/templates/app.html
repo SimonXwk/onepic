@@ -278,6 +278,7 @@ function currency(val) {
 				let clone, input;
 				let header = document.querySelector(tblID + ' thead');
 				let tr = document.querySelector(tblID + ' thead tr');
+				// Only attempt to add search header when only one <tr> child exist
 				if (header.children.length === 1){
 					clone = tr.cloneNode(true);
 					header.appendChild(clone);
@@ -287,6 +288,7 @@ function currency(val) {
 						th.classList.remove('sorting', 'sorting_asc', 'sorting_desc');
 						th.innerHTML = '<input type="text" placeholder="' + "&#128269;" + "" + '"/>';
 						input = th.children[0];
+						input.classList.add('form-control'); // Bootstrap Class, can be removed
 						//input.style.width = th.style.width === '0px' ? tr.style.width : th.style.width;  //Absolute width will ruin responsiveness
 						input.style.width = '100%';
 						input.style.height = '1.5rem';

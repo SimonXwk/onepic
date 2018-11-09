@@ -67,15 +67,8 @@ class TLMA:
 				}
 			},
 			'rows': [
-				{'FY': 2019, 'CLASS1': 99, 'CALC': 'REVENUE', 'ACCOUNT': '200', 'CAMPAIGNCODE': 'foo', 'SOURCETYPE': 'Merchandise Purchase', 'VALUES': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]},
-				{'FY': 2019, 'CLASS1': 99, 'CALC': 'REVENUE', 'ACCOUNT': '1850', 'CAMPAIGNCODE': 'foo', 'SOURCETYPE': 'Merchandise Postage', 'VALUES': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]},
-				{'FY': 2019, 'CLASS1': 99, 'CALC': 'REVENUE', 'ACCOUNT': '1015', 'CAMPAIGNCODE': 'foo', 'SOURCETYPE': 'Merchandise Gift of Love', 'VALUES': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]},
-				{'FY': 2019, 'CLASS1': 99, 'CALC': 'REVENUE', 'ACCOUNT': '1015', 'CAMPAIGNCODE': 'foo', 'SOURCETYPE': 'Merchandise Donation', 'VALUES': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]},
-				{'FY': 2019, 'CLASS1': 99, 'CALC': 'REVENUE', 'ACCOUNT': '1150', 'CAMPAIGNCODE': 'foo', 'SOURCETYPE': 'Merchandise Sponsorship', 'VALUES': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]},
-
 				{'FY': 2019, 'CLASS1': 20, 'CALC': 'REVENUE', 'ACCOUNT': '1150', 'CAMPAIGNCODE': '__DV.Cure One Stew', 'SOURCETYPE': 'Sponsorship', 'VALUES': [4608.00, 4418.41, 4480.81, 4420.82, 4389.63, 4430.43, 4305.64, 4303.25, 4128.05, 4212.06, 4288.87, 4279.27]},
 				{'FY': 2019, 'CLASS1': 15, 'CALC': 'REVENUE', 'ACCOUNT': '1150', 'CAMPAIGNCODE': '__DV.Cure One Stew', 'SOURCETYPE': 'Merchandise Sponsorship', 'VALUES': [1080.00, 1041.10, 1066.99, 1064.09, 917.19, 1029.48, 990.58, 980.48, 1006.37, 967.47, 993.37, 990.46]},
-
 
 				{'FY': 2019, 'CLASS1': 15, 'CALC': 'REVENUE', 'ACCOUNT': '1015', 'CAMPAIGNCODE': '19PP.M GOL', 'SOURCETYPE': 'Merchandise Gift of Love', 'VALUES': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13500, 13500]},
 				{'FY': 2019, 'CLASS1': 15, 'CALC': 'REVENUE', 'ACCOUNT': '1015', 'CAMPAIGNCODE': '19PP.M GOL', 'SOURCETYPE': 'Merchandise Donation', 'VALUES': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1500, 1500]},
@@ -122,7 +115,7 @@ class TLMA:
 				{'FY': 2019, 'CLASS1': 15, 'CALC': 'TRANSACTION', 'CAMPAIGNCODE': '19PP.M EOFY', 'VALUES': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 120, 180]},
 
 				{'FY': 2019, 'CLASS1': 15, 'CALC': 'REVENUE', 'ACCOUNT': '200', 'CAMPAIGNCODE': '____.M Auxillary', 'SOURCETYPE': 'Merchandise Purchase', 'VALUES': [450.00, 1350.00, 1350.00, 4950.00, 2700.00, 3600.00, 900.00, 2700.00, 1350.00, 2250.00, 900.00, 2250.00]},
-				{'FY': 2019, 'CLASS1': 15, 'CALC': 'TRANSACTION', 'CAMPAIGNCODE': '____.M Auxillary', 'VALUES': [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]},
+				{'FY': 2019, 'CLASS1': 15, 'CALC': 'TRANSACTION', 'CAMPAIGNCODE': '____.M Auxillary', 'VALUES': [1, 3, 3, 11, 6, 8, 2, 6, 3, 5, 2, 5]},
 
 				{'FY': 2019, 'CLASS1': 15, 'CALC': 'REVENUE', 'ACCOUNT': '200', 'CAMPAIGNCODE': '19AC.M Social Media', 'SOURCETYPE': 'Merchandise Purchase', 'VALUES': [50.00, 50.00, 50.00, 50.00, 50.00, 50.00, 50.00, 50.00, 50.00, 50.00, 50.00, 50.00]},
 				{'FY': 2019, 'CLASS1': 15, 'CALC': 'REVENUE', 'ACCOUNT': '1850', 'CAMPAIGNCODE': '19AC.M Social Media', 'SOURCETYPE': 'Merchandise Postage', 'VALUES': [7.20, 7.20, 7.20, 7.20, 7.20, 7.20, 7.20, 7.20, 7.20, 7.20, 7.20, 7.20]},
