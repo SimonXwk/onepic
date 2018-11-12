@@ -1,16 +1,23 @@
 <footer class="footer">
 	<div class="">
-		<span class="text-muted">&copy;{{ now.strftime('%Y') }} TLMA. All rights reserved. </span>
-		|<span class="text-muted"> Root {{ request.script_root }} </span>
-		|<span class="text-muted"> {{ request.environ['HTTP_USER_AGENT'].split(' ')[1][1:] }} </span>
-		|<span class="text-muted"> {{ request.environ['HTTP_USER_AGENT'].split(' ')[-1] }} </span>
-		|<span class="text-muted"> Blueprint: {{ request.blueprint }} </span>
-		|<span class="text-muted"> Endpoint: {{ request.endpoint }} </span>
-
+		<span class="text-dark">&copy;{{ now.strftime('%Y') }} TLMA. All RIGHTS RESERVED.</span>
+		<br class="mb-1" />
+		<span class="text-muted">
+			{% if request.environ['HTTP_USER_AGENT'].split(' ')[1][1:][-1] == ';' %}
+			{{ request.environ['HTTP_USER_AGENT'].split(' ')[1][1:][:-1] }},
+			{% else %}
+			{{ request.environ['HTTP_USER_AGENT'].split(' ')[1][1:] }},
+			{% endif %}
+		</span>
+		<span class="text-muted"> {{ request.environ['HTTP_USER_AGENT'].split(' ')[-1] }}, </span>
 		{% if current_user.is_authenticated %}
-			|<span class="text-muted"> {{ current_user.email or 'anonymous' }} </span>
+			<span class="text-info text-capitalize"> {{ current_user.email or 'anonymous' }} </span>
 		{% else %}
-			|<span class="text-muted"> Not Authenticated </span>
+			<span class="text-danger text-capitalize"> Not Authenticated </span>
 		{% endif %}
+		<br class="mb-1" />
+		<span class="text-muted"> {{ request.script_root or 'localhost' }} |</span>
+		<span class="text-muted"> {{ request.blueprint }} |</span>
+		<span class="text-muted"> {{ request.endpoint }} </span>
 	</div>
 </footer>

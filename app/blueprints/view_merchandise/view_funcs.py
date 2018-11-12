@@ -74,7 +74,7 @@ def merchandise_new_welcome_pack():
 	return None
 
 
-@templatified('revenue_fy', title='Merch Revenue')
+@templatified('merch_revenue_overview', title='Merch Revenue')
 def merchandise_revenue_overview():
 	fy = int(request_arg('fy', TLMA.cfy, tests.is_year))
 	# Prepare for SQL parameters
