@@ -225,7 +225,7 @@ cte_decimal AS (SELECT * FROM (VALUES (0),(1),(2),(3),(4),(5),(6),(7),(8),(9)) A
     (8, 'RN', 'Renewal'),
     (9, 'RA', 'Reactivation'),
     (0, '__', 'TBD')
-  ) AS mc (SEQ, CODE, MARKETING_CYCLE)
+  ) AS mc (SEQ, CODE, NAME)
 )
 -- ----------------------------------------------------------------------------------------------------
 , cte_pledge_first_paid_instalment as (
@@ -387,7 +387,7 @@ WHERE
       THEN -1
       ELSE 0
       END AS [IS_ACQUISITION]
-    , t3.MARKETING_CYCLE
+    , t3.NAME AS [MARKETING_CYCLE]
     , CASE WHEN LEFT(t1.CAMPAIGN_ACTIVITY, 2) = '__' THEN -1 ELSE 0 END AS [IS_CAMPAIGN_ACTIVITY_ONGOING]
     , CASE WHEN SUBSTRING(t1.CAMPAIGN_ACTIVITY, 3, 2) = '__' THEN -1 ELSE 0 END AS [IS_CAMPAIGN_ACTIVITY_GENERAL]
     , t2.PREVIOUS_FIRST_DATE

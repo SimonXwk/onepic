@@ -22,7 +22,7 @@
 
 {% set compact = true %}
 <nav class="navbar navbar-expand-lg fixed-top {% if compact %}py-0 py-md-0{% endif %} shadow"  id="navbar-global">
-	<a class="navbar-brand align-middle py-0" href="/logged">ONEPIC</a>
+	<a class="navbar-brand align-middle py-0 {% if tq_use_live %}live{% else %}replicate{% endif %}" href="/logged">ONEPIC</a>
 	<button class="navbar-toggler custome-toggler collapsed {% if compact %}py-0{% endif %}" type="button" data-toggle="collapse" data-target="#onepic_nav_global" aria-controls="onepic_nav_global" aria-expanded="false" aria-label="Toggle navigation">
 		<span></span><span></span><span></span>
 	</button>
@@ -107,7 +107,6 @@
 			{% else %}
 			<a href="#" class="btn text-warning btn-sm {% if compact %}py-0{% endif %}" role="button" aria-pressed="true">&#128477;Login</a>
 			{% endif %}
-			<a href="#" class="btn text-warning btn-sm {% if compact %}py-0{% endif %} disabled">{% if tq_use_live %}&#127765;{% else %}&#127769;{% endif %}</a>
 		</form>
 
 	</div>

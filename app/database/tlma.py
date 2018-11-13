@@ -12,15 +12,15 @@ class TLMA:
 	cfy_start_date = datetime.date(datetime.date.today().year - 1 if datetime.date.today().month < 7 else datetime.date.today().year, fy1m, 1)
 	cfy_end_date = datetime.date(datetime.date.today().year if datetime.date.today().month < 7 else datetime.date.today().year + 1, fy1m, 1) - datetime.timedelta(days=1)
 	marketing_cycle = [
-		{'code': 'PP', 'sequence': 1, 'name': 'Prospecting', 'KPI': ['No.Reached']},
-		{'code': 'AC', 'sequence': 2, 'name': 'Acquisition', 'KPI': ['No.New Contact']},
-		{'code': 'DV', 'sequence': 3, 'name': 'Development', 'KPI': ['Strike Rate']},
-		{'code': 'PM', 'sequence': 4, 'name': 'Promotion', 'KPI': []},
-		{'code': 'DF', 'sequence': 5, 'name': 'Differentiation', 'KPI': []},
+		{'code': 'PP', 'sequence': 1, 'name': 'Prospecting', 'KPI': ['Cost per Name']},
+		{'code': 'AC', 'sequence': 2, 'name': 'Acquisition', 'KPI': ['Cost per Name']},
+		{'code': 'DV', 'sequence': 3, 'name': 'Development', 'KPI': ['ROI']},
+		{'code': 'PM', 'sequence': 4, 'name': 'Promotion', 'KPI': ['Reach']},
+		{'code': 'DF', 'sequence': 5, 'name': 'Differentiation', 'KPI': ['Reach']},
 		{'code': 'RT', 'sequence': 6, 'name': 'Retention', 'KPI': ['ROI']},
-		{'code': 'EG', 'sequence': 7, 'name': 'Engagement', 'KPI': []},
-		{'code': 'RN', 'sequence': 8, 'name': 'Renewal', 'KPI': []},
-		{'code': 'RA', 'sequence': 9, 'name': 'Reactivation', 'KPI': ['No.Recovered']}
+		{'code': 'EG', 'sequence': 7, 'name': 'Engagement', 'KPI': ['Reach']},
+		{'code': 'RN', 'sequence': 8, 'name': 'Renewal', 'KPI': ['Cost']},
+		{'code': 'RA', 'sequence': 9, 'name': 'Reactivation', 'KPI': ['Cost']}
 	]
 	acquisition_cost = {
 		'FY': {

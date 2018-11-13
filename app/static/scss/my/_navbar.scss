@@ -15,6 +15,14 @@ $hamberger-height: 3px;
 		padding-top: 0;
 		padding-bottom: 0;
 		font-family: Impact, Charcoal, sans-serif;
+
+		&.live{
+			color: rgba(194,255,0,0.9)
+		}
+
+		&.replicate{
+			color: rgba(255,220,128,0.9)
+		}
 	}
 
 	.navbar-nav {

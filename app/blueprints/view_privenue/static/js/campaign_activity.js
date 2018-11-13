@@ -7,7 +7,7 @@ const store = new Vuex.Store({
 		budget: null,
 		marketingCycle: null,
 		// Filters
-		focalCampaign: null,
+		focalCampaignActivity: null,
 
 	},
 	mutations: {
@@ -15,7 +15,7 @@ const store = new Vuex.Store({
 		SET_PAYMENTS:  (state, payload) => state.payments = payload,
 		SET_BUDGET:  (state, payload) => state.budget = payload,
 		SET_MARKET_CYCLE:  (state, payload) => state.marketingCycle = payload,
-		SET_FOCAL_CAMPAIGN:  (state, payload) => state.focalCampaign = payload,
+		SET_FOCAL_CAMPAIGN_ACTIVITY:  (state, payload) => state.focalCampaignActivity = payload,
 	},
 	actions: {
 		fetchPayments(ctx, fy){
@@ -47,7 +47,8 @@ const store = new Vuex.Store({
 	getters: {
 		paymentRows: (state, getters) => (state.payments.rows ? state.payments.rows : []),
 		marketingCycleRows: (state, getters) => (state.marketingCycle.rows ? state.marketingCycle.rows : []),
-		allCampaigns: (state, getters) => [...new Set(getters.paymentRows.map(v => v.CAMPAIGN_ACTIVITY))],
+		allCampaignActivities: (state, getters) => [...new Set(getters.paymentRows.map(v => v.CAMPAIGN_ACTIVITY))],
+		campaignActivityCount:  (state, getters) => getters.allCampaignActivities.length,
 		ongoingCampaigns: (state, getters) => [...new Set(getters.paymentRows.filter(r => r.IS_CAMPAIGN_ACTIVITY_ONGOING === -1).map(v => v.CAMPAIGN_ACTIVITY))],
 		periodicalCampaigns: (state, getters) => [...new Set(getters.paymentRows.filter(r => r.IS_CAMPAIGN_ACTIVITY_ONGOING !== -1).map(v => v.CAMPAIGN_ACTIVITY))],
 		isCampaignOngoing: (state, getters) => (camp) => camp.slice(0,2) === '__',
@@ -73,47 +74,38 @@ const store = new Vuex.Store({
 // ##########################################################################################################################################################
 Vue.component('tree', {
 	computed: {
-		...Vuex.mapState(['focalFY', 'payments', 'budget', 'marketingCycle', 'focalCampaign']),
-		...Vuex.mapGetters(['paymentRows', 'marketingCycleRows', 'allCampaigns', 'ongoingCampaigns', 'periodicalCampaigns', 'calcPayments', 'uniquesFromPaymentRows']),
+		...Vuex.mapState(['focalFY', 'payments', 'budget', 'marketingCycle', 'focalCampaignActivity']),
+		...Vuex.mapGetters(['paymentRows', 'marketingCycleRows', 'campaignActivityCount', 'calcPayments', 'uniquesFromPaymentRows']),
 	},
 	methods: {
+		...Vuex.mapMutations({
+			setFocalCampaignActivity: 'SET_FOCAL_CAMPAIGN_ACTIVITY'
+		}),
+
 	},
-	template: `<div class="tree ">
+	template: `<div class="tree">
 	<ul>
-		<li><span><a data-toggle="collapse" href="#Root" aria-expanded="true" aria-controls="Root">Campaign Activities <span class="text-primary"><< allCampaigns.length >></span></a></span>
+		<li><span><a data-toggle="collapse" href="#Root" aria-expanded="true" aria-controls="Root">Campaign Activities <span class="text-primary"><< campaignActivityCount >></span></a></span>
 		<div id="Root" class="collapse show">
 			<ul>
-
-				<li v-for="ca1 in uniquesFromPaymentRows('IS_CAMPAIGN_ACTIVITY_ONGOING')">
-					<span><a data-toggle="collapse" :href="'#L'+ca1" aria-expanded="false" :aria-controls="'L'+ca1"> Ongoing <span class="text-primary"><< ongoingCampaigns.length >></span></a></span>
+				<li v-for="(ca1, idx1) in uniquesFromPaymentRows('IS_CAMPAIGN_ACTIVITY_ONGOING')">
+					<span><a data-toggle="collapse" :href="'#'+(ca1===-1?'Ongoing':'Periodical')" aria-expanded="false" :aria-controls="(ca1===-1?'Ongoing':'Periodical')"> << (ca1===-1?'Ongoing':'Periodical') >> <span class="text-primary"><< uniquesFromPaymentRows('CAMPAIGN_ACTIVITY', {IS_CAMPAIGN_ACTIVITY_ONGOING: ca1}).length >></span></a></span>
 					<ul>
-						<div :id="'L'+ca1" class="collapse">
-							<li v-for="mc in marketingCycleRows"><span><a data-toggle="collapse" :href="'#'+ca1+mc.CODE" aria-expanded="false" :aria-controls="ca1+mc.CODE"><< mc.MARKETING_CYCLE >> << calcPayments('CAMPAIGN_ACTIVITY', 'unique', {IS_CAMPAIGN_ACTIVITY_ONGOING:-1, MARKETING_CYCLE:mc.MARKETING_CYCLE}) >></a></span>
-								<ul v-if="calcPayments('CAMPAIGN_ACTIVITY', 'unique', {IS_CAMPAIGN_ACTIVITY_ONGOING:-1, MARKETING_CYCLE:mc.MARKETING_CYCLE})>0">
-									<div :id="ca1+mc.CODE" class="collapse">
-										<li v-for="ca2 in uniquesFromPaymentRows('CAMPAIGN_ACTIVITY', {IS_CAMPAIGN_ACTIVITY_ONGOING:-1, MARKETING_CYCLE:mc.MARKETING_CYCLE})"><span><a href="#!"><< ca2 >></a></span></li>
+						<div :id="(ca1===-1?'Ongoing':'Periodical')" class="collapse">
+							<li v-for="mc in marketingCycleRows">
+								<span><a data-toggle="collapse" :href="'#'+(ca1===-1?'Ongoing':'Periodical')+mc.CODE" aria-expanded="false" :aria-controls="(ca1===-1?'Ongoing':'Periodical')+mc.CODE"><< mc.NAME >> <span class="text-success"><< calcPayments('CAMPAIGN_ACTIVITY', 'unique', {IS_CAMPAIGN_ACTIVITY_ONGOING:ca1, MARKETING_CYCLE:mc.NAME}) >></span></a></span>
+								<ul v-if="calcPayments('CAMPAIGN_ACTIVITY', 'unique', {IS_CAMPAIGN_ACTIVITY_ONGOING:ca1, MARKETING_CYCLE:mc.NAME})>0">
+									<div :id="(ca1===-1?'Ongoing':'Periodical')+mc.CODE" class="collapse">
+										<li v-for="ca2 in uniquesFromPaymentRows('CAMPAIGN_ACTIVITY', {IS_CAMPAIGN_ACTIVITY_ONGOING:ca1, MARKETING_CYCLE:mc.NAME})">
+											<span v-bind:class="{'bg-success': ca2===focalCampaignActivity, 'bg-light':ca2!==focalCampaignActivity }"><a href="#!" @click.prevent="setFocalCampaignActivity(ca2)"><< ca2 >></a></span>
+										</li>
 									</div>
 								</ul>
 							</li>
 						</div>
 					</ul>
 				</li>
-
-				<li><span><a data-toggle="collapse" href="#level2-2" aria-expanded="false" aria-controls="level2-2">Periodical <span class="text-primary"><< periodicalCampaigns.length >></span></a></span>
-					<ul>
-						<div id="level2-2" class="collapse">
-							<li v-for="mc in marketingCycleRows"><span><a data-toggle="collapse" :href="'#'+mc.CODE" aria-expanded="false" :aria-controls="mc.CODE"><< mc.MARKETING_CYCLE >> << calcPayments('CAMPAIGN_ACTIVITY', 'unique', {IS_CAMPAIGN_ACTIVITY_ONGOING:0, MARKETING_CYCLE:mc.MARKETING_CYCLE}) >></a></span>
-		 						<ul v-if="calcPayments('CAMPAIGN_ACTIVITY', 'unique', {IS_CAMPAIGN_ACTIVITY_ONGOING:0, MARKETING_CYCLE:mc.MARKETING_CYCLE})>0">
-									<div :id="mc.CODE" class="collapse">
-										<li v-for="ca in uniquesFromPaymentRows('CAMPAIGN_ACTIVITY', {IS_CAMPAIGN_ACTIVITY_ONGOING:0, MARKETING_CYCLE:mc.MARKETING_CYCLE})"><span><a href="#!"><< ca >></a></span></li>
-									</div>
-	 							</ul>
-							</li>
- 						</div>
-					</ul>
-				</li>
-
-				<li><span><a href="#!">TEST</a></span></li>
+				<!-- <li><span><a href="#!">LEVEL1 SAMPLE</a></span></li> -->
 			</ul>
 		</div>
 		</li>
@@ -131,8 +123,8 @@ let rootVue = new Vue({
 	},
 	store,
 	computed: {
-		...Vuex.mapState(['focalFY', 'payments', 'budget', 'focalCampaign']),
-		...Vuex.mapGetters(['paymentRows', 'allCampaigns', 'ongoingCampaigns', 'periodicalCampaigns']),
+		...Vuex.mapState(['focalFY', 'payments', 'budget', 'focalCampaignActivity']),
+		...Vuex.mapGetters(['campaignActivityCount']),
 	},
 	watch: {
 		focalFY: {
@@ -172,9 +164,9 @@ let rootVue = new Vue({
 	<div class="container-fluid" v-else>
 		<div class="row">
 			<div class="col text-center">
-				<p class="lead my-0">FY<< focalFY >> Campaign Activities</p>
+				<p class="lead my-0"><span class="text-primary"><< campaignActivityCount >></span> Campaign Activities Generated Revenue in <span class="text-primary">FY<< focalFY >></span></p>
 				<p class="mt-0 mb-1"><small class="text-muted font-italic">Data Captured : << payments.timestamp|dtAU >><small></p>
-				<span class="badge badge-pill badge-primary"><< focalCampaign >></span>
+				<p class="mt-0 mb-1 text-primary" v-if="focalCampaignActivity"><mark>Focal Campaign : << focalCampaignActivity >></mark></p>
 			</div>
 		</div>
 
