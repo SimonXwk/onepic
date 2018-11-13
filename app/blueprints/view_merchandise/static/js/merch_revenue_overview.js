@@ -12,7 +12,7 @@ const store = new Vuex.Store({
 		// Other Controllers
 		calcDimensionSum: 'PAYMENTAMOUNTNETT',
 		campaignActualBudget: [-1],
-		arbitraryMerchPostageCampaignCode: '____.M Postage',
+		arbitraryMerchPostageCampaignActivity: '____.M Postage',
 	},
 	mutations: {
 		SET_PAYMENTS:  (state, payload) => state.payments = payload,
@@ -49,17 +49,17 @@ const store = new Vuex.Store({
 		merchRows: (state, getters) => (state.payments.rows ? state.payments.rows.filter(p => p.SOURCETYPE.indexOf('Merch') !== -1 ) : []),
 		nonMerchRows:  (state, getters) => (state.payments.rows ? state.payments.rows.filter(p => p.SOURCETYPE.indexOf('Merch') === -1 ) : []),
 		merchBudgetRows: (state, getters) => (state.budget.rows ? state.budget.rows.filter(r => r.CLASS1 === 15 && r.FY === state.focalFY) : []),
-		merchTotalUnallocatedPostage: (state, getters) => (getters.merchRows.filter(v => v.CAMPAIGNCODE===state.arbitraryMerchPostageCampaignCode).reduce((acc, cur) => acc+cur[state.calcDimensionSum],0)),
+		merchTotalUnallocatedPostage: (state, getters) => (getters.merchRows.filter(v => v.CAMPAIGN_ACTIVITY===state.arbitraryMerchPostageCampaignActivity).reduce((acc, cur) => acc+cur[state.calcDimensionSum],0)),
 		filteredMerchRows: (state, getters) => {
 			return getters.merchRows.filter(r =>
-				( state.focalCampaigns.length!==0 ? state.focalCampaigns.indexOf(r.CAMPAIGNCODE) !==-1 : true)
+				( state.focalCampaigns.length!==0 ? state.focalCampaigns.indexOf(r.CAMPAIGN_ACTIVITY) !==-1 : true)
 				&& ( (state.focalSourceTypes.length===0) ? false : state.focalSourceTypes.reduce((acc, cur)=>  acc || r.SOURCETYPE === cur, false))
 				&& ( (state.focalDonorTypes.length===0) ? false : state.focalDonorTypes.reduce((acc, cur)=>  acc || r.LINE_FY_DONTYPE2 === cur, false))
 			)
 		},
 		filteredBudgetRows: (state, getters) => {
 			return getters.merchBudgetRows.filter(r =>
-				( ( state.focalCampaigns.length!==0)  ? state.focalCampaigns.indexOf(r.CAMPAIGNCODE) !==-1 : true ) // Budget Must Have Campaign Code for every row
+				( ( state.focalCampaigns.length!==0)  ? state.focalCampaigns.indexOf(r.CAMPAIGN_ACTIVITY) !==-1 : true ) // Budget Must Have Campaign Code for every row
 				&& ( !r.SOURCETYPE ? true :  ( state.focalSourceTypes.length===0 ? false : state.focalSourceTypes.reduce((acc, cur)=>  acc || r.SOURCETYPE  === cur, false)))  // Allow SOURCETYPE to be empty
 			)
 		},
@@ -70,11 +70,11 @@ const store = new Vuex.Store({
 let summaryTable = Vue.component('table-summary', {
 	computed:{
 		...Vuex.mapState([
-			'focalFY', 'calcDimensionSum', 'arbitraryMerchPostageCampaignCode', 'focalDonorTypes', 'focalSourceTypes', 'focalCampaigns', 'campaignActualBudget'
+			'focalFY', 'calcDimensionSum', 'arbitraryMerchPostageCampaignActivity', 'focalDonorTypes', 'focalSourceTypes', 'focalCampaigns', 'campaignActualBudget'
 		]),
 		...Vuex.mapGetters(['merchRows', 'merchBudgetRows', 'merchTotalUnallocatedPostage']),
-		actualCampaigns:function(){return new Set(this.merchRows.map(v => v.CAMPAIGNCODE))},
-		budgetCampaigns:function(){return new Set(this.merchBudgetRows.map(v => v.CAMPAIGNCODE))},
+		actualCampaigns:function(){return new Set(this.merchRows.map(v => v.CAMPAIGN_ACTIVITY))},
+		budgetCampaigns:function(){return new Set(this.merchBudgetRows.map(v => v.CAMPAIGN_ACTIVITY))},
 		merchCampaigns: function(){return [...new Set([...this.actualCampaigns, ...this.budgetCampaigns])].sort()},
 		merchRevenueTypes: function(){return Array.from(new Set(this.merchRows.map(v => v.SOURCETYPE))).sort()},
 		merchPostagePerPurchase: function(){
@@ -168,24 +168,24 @@ let summaryTable = Vue.component('table-summary', {
 						<small class="font-weight-bold"><< camp >></small>
 					</th>
 					<td class="text-primary"><small>A</small></td>
-					<td class="text-success"><small><< calc('SERIALNUMBER', 'unique', {CAMPAIGNCODE:camp, IS_ACQUISITION: -1})|number >></small></td>
-					<td class="text-primary"><small><< calc('SERIALNUMBER', 'unique', {CAMPAIGNCODE:camp})|number >></small></td>
-					<td class="text-secondary"><small class="font-weight-bold"><< calc('TRXID', 'unique', {CAMPAIGNCODE:camp, ISTRX: -1})|number >></small></td>
-					<td class="text-danger" v-if="camp===arbitraryMerchPostageCampaignCode"><small><< (calc(calcDimensionSum, 'sum', {CAMPAIGNCODE:camp})-merchTotalUnallocatedPostage)|currency >></small></td>
-					<td class="text-dark" v-else><small class="font-weight-bold"><< (allocatePostage(calc(calcDimensionSum, 'sum', {SOURCETYPE:'Merchandise Purchase', CAMPAIGNCODE:camp})) + calc(calcDimensionSum, 'sum', {CAMPAIGNCODE:camp}))|currency >></small></td>
-					<td class="text-danger"><small><< allocatePostage(calc(calcDimensionSum, 'sum', {SOURCETYPE:'Merchandise Purchase', CAMPAIGNCODE:camp}))|currency >></small></td>
-					<td class="text-info"><small><< calc(calcDimensionSum, 'sum', {CAMPAIGNCODE:camp})|currency >></small></td>
-					<td v-for="type in merchRevenueTypes"><small><< calc(calcDimensionSum, 'sum', {SOURCETYPE:type, CAMPAIGNCODE:camp})|currency >></small></td>
+					<td class="text-success"><small><< calc('SERIALNUMBER', 'unique', {CAMPAIGN_ACTIVITY:camp, IS_ACQUISITION: -1})|number >></small></td>
+					<td class="text-primary"><small><< calc('SERIALNUMBER', 'unique', {CAMPAIGN_ACTIVITY:camp})|number >></small></td>
+					<td class="text-secondary"><small class="font-weight-bold"><< calc('TRXID', 'unique', {CAMPAIGN_ACTIVITY:camp, ISTRX: -1})|number >></small></td>
+					<td class="text-danger" v-if="camp===arbitraryMerchPostageCampaignActivity"><small><< (calc(calcDimensionSum, 'sum', {CAMPAIGN_ACTIVITY:camp})-merchTotalUnallocatedPostage)|currency >></small></td>
+					<td class="text-dark" v-else><small class="font-weight-bold"><< (allocatePostage(calc(calcDimensionSum, 'sum', {SOURCETYPE:'Merchandise Purchase', CAMPAIGN_ACTIVITY:camp})) + calc(calcDimensionSum, 'sum', {CAMPAIGN_ACTIVITY:camp}))|currency >></small></td>
+					<td class="text-danger"><small><< allocatePostage(calc(calcDimensionSum, 'sum', {SOURCETYPE:'Merchandise Purchase', CAMPAIGN_ACTIVITY:camp}))|currency >></small></td>
+					<td class="text-info"><small><< calc(calcDimensionSum, 'sum', {CAMPAIGN_ACTIVITY:camp})|currency >></small></td>
+					<td v-for="type in merchRevenueTypes"><small><< calc(calcDimensionSum, 'sum', {SOURCETYPE:type, CAMPAIGN_ACTIVITY:camp})|currency >></small></td>
 				</tr>
 				<tr class="font-italic bg-light">
 					<td class="text-secondary"><small>B</small></td>
 					<td class="text-secondary"><small>-</small></td>
 					<td class="text-secondary"><small>-</small></td>
-					<td class="text-secondary"><small><< sumBudget('TRANSACTION', {CAMPAIGNCODE: camp})|number >></small></td>
-					<td class="text-secondary"><small><< sumBudget('REVENUE', {CAMPAIGNCODE: camp})|currency >></small></td>
-					<td class="text-secondary"><small><< sumBudget('REVENUE', {CAMPAIGNCODE: camp, SOURCETYPE: 'Merchandise Postage'})|currency >></small></td>
-					<td class="text-secondary"><small><< sumBudget('REVENUE', {CAMPAIGNCODE: camp})|currency >></small></td>
-					<td class="text-secondary" v-for="type in merchRevenueTypes"><small><< sumBudget('REVENUE', {CAMPAIGNCODE: camp, SOURCETYPE: type})|currency >></small></td>
+					<td class="text-secondary"><small><< sumBudget('TRANSACTION', {CAMPAIGN_ACTIVITY: camp})|number >></small></td>
+					<td class="text-secondary"><small><< sumBudget('REVENUE', {CAMPAIGN_ACTIVITY: camp})|currency >></small></td>
+					<td class="text-secondary"><small><< sumBudget('REVENUE', {CAMPAIGN_ACTIVITY: camp, SOURCETYPE: 'Merchandise Postage'})|currency >></small></td>
+					<td class="text-secondary"><small><< sumBudget('REVENUE', {CAMPAIGN_ACTIVITY: camp})|currency >></small></td>
+					<td class="text-secondary" v-for="type in merchRevenueTypes"><small><< sumBudget('REVENUE', {CAMPAIGN_ACTIVITY: camp, SOURCETYPE: type})|currency >></small></td>
 				</tr>
 			</template>
 		</tbody>
@@ -685,10 +685,10 @@ let rootVue = new Vue({
 		</div>
 
 		<div class="col-xs-12 col-sm-6 col-md-6 col-lg-3">
-			<div class="card-counter info">
+			<div class="card-counter warning">
 				<span class="count-icon">&#128140;</span>
-				<span class="count-numbers"><< calc("PLEDGEID", "unique")|number >></span>
-				<span class="count-name">Revenue Generating Pledge(s)</span>
+				<span class="count-numbers"><< calc("PLEDGEID", "unique", {IS_FIRST_INSTALMENT: -1})|number >></span>
+				<span class="count-name">Pledge Acqusition</span>
 			</div>
 		</div>
 

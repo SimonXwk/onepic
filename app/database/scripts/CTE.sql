@@ -212,7 +212,22 @@ cte_decimal AS (SELECT * FROM (VALUES (0),(1),(2),(3),(4),(5),(6),(7),(8),(9)) A
 -- ====================================================================================================
 -- PAYMENTS
 -- ====================================================================================================
-
+, cte_market_cycle AS(
+  SELECT *
+  FROM (VALUES
+    (1, 'PP', 'Prospecting'),
+    (2, 'AC', 'Acquisition'),
+    (3, 'DV', 'Development'),
+    (4, 'PM', 'Promotion'),
+    (5, 'DF', 'Differentiation'),
+    (6, 'RT', 'Retention'),
+    (7, 'EG', 'Engagement'),
+    (8, 'RN', 'Renewal'),
+    (9, 'RA', 'Reactivation'),
+    (0, '__', 'TBD')
+  ) AS mc (SEQ, CODE, MARKETING_CYCLE)
+)
+-- ----------------------------------------------------------------------------------------------------
 , cte_pledge_first_paid_instalment as (
   SELECT PLEDGEID
     ,[FIRST_INSTALMENTID] = MIN(Tbl_PLEDGEINSTALMENTS_CLOSED.INSTALMENTID)
@@ -327,7 +342,9 @@ SELECT
     THEN '____.Unsolicited'
     ELSE S1.ADDITIONALCODE3
     END
-  END AS [CAMPAIGNCODE]
+  END AS [CAMPAIGN_ACTIVITY]
+
+  , S1.CATEGORY AS [CAMPAIGN_CODE]
 
   , FIRST_VALUE(B2.DATEOFPAYMENT) OVER(PARTITION BY B1.SERIALNUMBER ORDER BY B2.DATEOFPAYMENT) AS [THIS_FIRST_DATE]
 FROM
@@ -363,11 +380,16 @@ WHERE
 -- ----------------------------------------------------------------------------------------------------
 , cte_payments_with_donor_type AS (
   SELECT t1.*
+    , CASE WHEN t2.PREVIOUS_LAST_DATE IS NULL THEN 0 ELSE DATEDIFF(d,t2.PREVIOUS_LAST_DATE, t1.THIS_FIRST_DATE) END AS [DAYS_TO_THIS_FIRST_DATE]
+    , CASE WHEN t2.PREVIOUS_LAST_DATE IS NULL THEN 0 ELSE DATEDIFF(d,t2.PREVIOUS_LAST_DATE, t1.DATEOFPAYMENT) END AS [DAYS_TO_DATEOFPAYMENT]
     , CASE WHEN t2.PREVIOUS_FIRST_DATE IS NULL THEN t1.THIS_FIRST_DATE ELSE t2.PREVIOUS_FIRST_DATE END AS [FIRST_DATE]
     , CASE WHEN t1.DATEOFPAYMENT = CASE WHEN t2.PREVIOUS_FIRST_DATE IS NULL THEN t1.THIS_FIRST_DATE ELSE t2.PREVIOUS_FIRST_DATE END
       THEN -1
       ELSE 0
       END AS [IS_ACQUISITION]
+    , t3.MARKETING_CYCLE
+    , CASE WHEN LEFT(t1.CAMPAIGN_ACTIVITY, 2) = '__' THEN -1 ELSE 0 END AS [IS_CAMPAIGN_ACTIVITY_ONGOING]
+    , CASE WHEN SUBSTRING(t1.CAMPAIGN_ACTIVITY, 3, 2) = '__' THEN -1 ELSE 0 END AS [IS_CAMPAIGN_ACTIVITY_GENERAL]
     , t2.PREVIOUS_FIRST_DATE
     , t2.PREVIOUS_BEFROE_LFY_LAST_DATE
     , t2.PREVIOUS_LAST_DATE
@@ -411,6 +433,7 @@ WHERE
   FROM
     cte_payments t1
     LEFT JOIN cte_previous_date t2 ON (t1.SERIALNUMBER = t2.SERIALNUMBER)
+    LEFT JOIN cte_market_cycle t3 ON (SUBSTRING(t1.CAMPAIGN_ACTIVITY, 3, 2) = t3.CODE)
 )
 -- ----------------------------------------------------------------------------------------------------
 /*<BASE_QUERY>*/

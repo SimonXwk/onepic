@@ -36,6 +36,11 @@ def comparative():
 	return dict(cfy=fy, data=data, progress=progress, budget=budget)
 
 
+@templatified('campaign_activity', title='Campaigns')
+def campaign_activity():
+	pass
+
+
 @templatified('pending', title='Pending Batches')
 def pending():
 	from app.blueprints.api.data_privenue import pending_split, approved_split

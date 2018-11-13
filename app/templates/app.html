@@ -19,7 +19,7 @@ const endpoint = (url, parameter) => $SCRIPT_ROOT + url + (parameter ? parameter
 // Using Fetch API to grab JSON Data
 const fetchJSON = (endpoint, func, silent=false) => {
 	function checkStstus(response) {
-		if (!silent){ console.log('✓ Response received ( endpoint: ' + endpoint + ')', response); }
+		if (!silent){ console.log('✓ Response received (' + endpoint + ')', response); }
 		if (response.status >= 200 && response.status < 300) {
 			// if (!silent){ console.log('✓ Response status success (' + response.status + '), Promise.resolve response ... '); }
 			return Promise.resolve(response)
@@ -168,8 +168,8 @@ function currency(val) {
 					}
 				}
 			});
-			Vue.filter('currency', (val, dec=2, sign='$') => isNaN(val) ? val : sign + String(val.toFixed(dec)).split("").reverse().join("").replace(/(\d{3}\B)/g, "$1,").split("").reverse().join(""));
-			Vue.filter('number', (val, showZero=true,dec=0) => isNaN(val) ? val : (!showZero && val===0) ? null : (String((val).toFixed(dec)).split("").reverse().join("").replace(/(\d{3}\B)/g, "$1,").split("").reverse().join(""))) ;
+			Vue.filter('currency', (val, dec=2, sign='$') => isNaN(val) || val === null  ? val : sign + String(val.toFixed(dec)).split("").reverse().join("").replace(/(\d{3}\B)/g, "$1,").split("").reverse().join(""));
+			Vue.filter('number', (val, showZero=true, dec=0) => isNaN(val) || val === null ? val : (!showZero && val===0) ? null : (String((val).toFixed(dec)).split("").reverse().join("").replace(/(\d{3}\B)/g, "$1,").split("").reverse().join(""))) ;
 			Vue.filter('pct', (val, dec=1) => {
 				if (isNaN(val) ){
 					return val

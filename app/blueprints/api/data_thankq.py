@@ -40,6 +40,12 @@ def fys_summary():
 
 
 @odbc_json_api
+def marketing_cycle():
+	updates = (('BASE_QUERY', ''),)
+	return Tq.query(('CTE', 'CTE_MARKETING_CYCLE'), cached_timeout=10, updates=updates)
+
+
+@odbc_json_api
 def source_code1_summary():
 	s1 = request_arg('s1', '', lambda x: tests.is_valid_string(x, nosql=True, max_length=30))
 	updates = [('SOURCECODE1', s1, '\'')]

@@ -5,6 +5,7 @@ ld = LazyLoader(bp)
 
 # LazyLoading View Functions
 ld.url('view_funcs.overview', ['/'], endpoint='index')
+ld.url('view_funcs.campaign_activity', ['/campaign_activity'])
 ld.url('view_funcs.comparative', ['/comparative'])
 ld.url('view_funcs.pending', ['/pending'])
 ld.url('view_funcs.sourcecode1_created', ['/sourcecode1_created'])
