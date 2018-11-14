@@ -41,7 +41,7 @@ cte_payments as (
   GROUP BY SERIALNUMBER
 )
 -- --------------------------------------------------------------
-,cte_conversion_call_last as (
+,cte_conversion_pack_last as (
    -- The reason of not using aggregating function is all values from the same record are needed not individual aggreation
   SELECT * FROM
   (
@@ -53,7 +53,41 @@ cte_payments as (
     , [CONVERSIONCALL_DATE] = [CREATED]
     , ROW_NUMBER() OVER(PARTITION BY SERIALNUMBER ORDER BY CREATED DESC) AS [ROW]
     FROM TBL_COMMUNICATION
-    WHERE [CATEGORY] = 'Cure One Acquisition' AND [SUBJECT] LIKE '%conversion%call%'
+    WHERE [CATEGORY] = 'Cure One Acquisition' AND [SUBJECT] LIKE '%conversion%'
+  ) tmp
+  WHERE ROW =1
+)
+-- --------------------------------------------------------------
+,cte_followup_call1_last as (
+   -- The reason of not using aggregating function is all values from the same record are needed not individual aggreation
+  SELECT * FROM
+  (
+    SELECT [SERIALNUMBER]
+    , [FOLLOWUP1_TYPE] = [COMMUNICATIONTYPE]
+    , [FOLLOWUP1_SUBJECT] = [SUBJECT]
+    , [FOLLOWUP1_NOTES] = [NOTES]
+    , [FOLLOWUP1_BY] = [CREATEDBY]
+    , [FOLLOWUP1_DATE] = [CREATED]
+    , ROW_NUMBER() OVER(PARTITION BY SERIALNUMBER ORDER BY CREATED DESC) AS [ROW]
+    FROM TBL_COMMUNICATION
+    WHERE [CATEGORY] = 'Cure One Acquisition' AND [SUBJECT] LIKE '%Follow%up%1%'
+  ) tmp
+  WHERE ROW =1
+)
+-- --------------------------------------------------------------
+,cte_followup_call2_last as (
+   -- The reason of not using aggregating function is all values from the same record are needed not individual aggreation
+  SELECT * FROM
+  (
+    SELECT [SERIALNUMBER]
+    , [FOLLOWUP2_TYPE] = [COMMUNICATIONTYPE]
+    , [FOLLOWUP2_SUBJECT] = [SUBJECT]
+    , [FOLLOWUP2_NOTES] = [NOTES]
+    , [FOLLOWUP2_BY] = [CREATEDBY]
+    , [FOLLOWUP2_DATE] = [CREATED]
+    , ROW_NUMBER() OVER(PARTITION BY SERIALNUMBER ORDER BY CREATED DESC) AS [ROW]
+    FROM TBL_COMMUNICATION
+    WHERE [CATEGORY] = 'Cure One Acquisition' AND [SUBJECT] LIKE '%Follow%up%2%'
   ) tmp
   WHERE ROW =1
 )
@@ -136,6 +170,20 @@ select
   ,[CONVERSIONCALL_SUBJECT]  = MIN(t5.CONVERSIONCALL_SUBJECT)
   ,[CONVERSIONCALL_NOTES]  = MIN(t5.CONVERSIONCALL_NOTES)
 
+  --> Follow Up Call1
+  ,[FOLLOWUP1_BY] = MIN(t6.FOLLOWUP1_BY)
+  ,[FOLLOWUP1_DATE] = MIN(t6.FOLLOWUP1_DATE)
+  ,[FOLLOWUP1_TYPE]  = MIN(t6.FOLLOWUP1_TYPE)
+  ,[FOLLOWUP1_SUBJECT]  = MIN(t6.FOLLOWUP1_SUBJECT)
+  ,[FOLLOWUP1_NOTES]  = MIN(t6.FOLLOWUP1_NOTES)
+
+  --> Follow Up Call1
+  ,[FOLLOWUP2_BY] = MIN(t7.FOLLOWUP2_BY)
+  ,[FOLLOWUP2_DATE] = MIN(t7.FOLLOWUP2_DATE)
+  ,[FOLLOWUP2_TYPE]  = MIN(t7.FOLLOWUP2_TYPE)
+  ,[FOLLOWUP2_SUBJECT]  = MIN(t7.FOLLOWUP2_SUBJECT)
+  ,[FOLLOWUP2_NOTES]  = MIN(t7.FOLLOWUP2_NOTES)
+
   --> Mailing Profile
   ,[ACTION_B_UPDATE] = ISNULL(MAX(mp1.[Action Update B]), 0)
   ,[ACTION_A_UPDATE] = ISNULL(MAX(mp1.[Action Update A]), 0)
@@ -187,7 +235,9 @@ from
   left join cte_payments t2 on (t1.SERIALNUMBER = t2.SERIALNUMBER)
   left join cte_journey_profile_last t3 on (t1.SERIALNUMBER = t3.SERIALNUMBER)
   left join cte_first_date t4 on (t1.SERIALNUMBER = t4.SERIALNUMBER)
-  left join cte_conversion_call_last t5 on (t1.SERIALNUMBER = t5.SERIALNUMBER)
+  left join cte_conversion_pack_last t5 on (t1.SERIALNUMBER = t5.SERIALNUMBER)
+  left join cte_followup_call1_last t6 on (t1.SERIALNUMBER = t6.SERIALNUMBER)
+  left join cte_followup_call2_last t7 on (t1.SERIALNUMBER = t7.SERIALNUMBER)
   left join TBL_CONTACT c1 on (t1.SERIALNUMBER = c1.SERIALNUMBER)
   left join TBL_CONTACTATTRIBUTE c2 on (t1.SERIALNUMBER = c2.SERIALNUMBER)
   left join cte_mail_porfile mp1 on (t1.SERIALNUMBER = mp1.SERIALNUMBER)

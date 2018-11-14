@@ -7,7 +7,8 @@ const store = new Vuex.Store({
 		budget: null,
 		marketingCycle: null,
 		// Filters
-		focalCampaignActivity: null,
+		calcDimensionSum: 'PAYMENTAMOUNTNETT',
+		focalMarketingActivity: null,
 
 	},
 	mutations: {
@@ -15,7 +16,7 @@ const store = new Vuex.Store({
 		SET_PAYMENTS:  (state, payload) => state.payments = payload,
 		SET_BUDGET:  (state, payload) => state.budget = payload,
 		SET_MARKET_CYCLE:  (state, payload) => state.marketingCycle = payload,
-		SET_FOCAL_CAMPAIGN_ACTIVITY:  (state, payload) => state.focalCampaignActivity = payload,
+		SET_FOCAL_MARKETING_ACTIVITY:  (state, payload) => state.focalMarketingActivity = payload,
 	},
 	actions: {
 		fetchPayments(ctx, fy){
@@ -47,10 +48,11 @@ const store = new Vuex.Store({
 	getters: {
 		paymentRows: (state, getters) => (state.payments.rows ? state.payments.rows : []),
 		marketingCycleRows: (state, getters) => (state.marketingCycle.rows ? state.marketingCycle.rows : []),
-		allCampaignActivities: (state, getters) => [...new Set(getters.paymentRows.map(v => v.CAMPAIGN_ACTIVITY))],
+		focalPaymentRows:  (state, getters) => (state.payments.rows.map(r => r.MARKETING_ACTIVITY === state.focalMarketingActivity)),
+		allCampaignActivities: (state, getters) => [...new Set(getters.paymentRows.map(v => v.MARKETING_ACTIVITY))],
 		campaignActivityCount:  (state, getters) => getters.allCampaignActivities.length,
-		ongoingCampaigns: (state, getters) => [...new Set(getters.paymentRows.filter(r => r.IS_CAMPAIGN_ACTIVITY_ONGOING === -1).map(v => v.CAMPAIGN_ACTIVITY))],
-		periodicalCampaigns: (state, getters) => [...new Set(getters.paymentRows.filter(r => r.IS_CAMPAIGN_ACTIVITY_ONGOING !== -1).map(v => v.CAMPAIGN_ACTIVITY))],
+		ongoingCampaigns: (state, getters) => [...new Set(getters.paymentRows.filter(r => r.IS_MARKETING_ACTIVITY_ONGOING === -1).map(v => v.MARKETING_ACTIVITY))],
+		periodicalCampaigns: (state, getters) => [...new Set(getters.paymentRows.filter(r => r.IS_MARKETING_ACTIVITY_ONGOING !== -1).map(v => v.MARKETING_ACTIVITY))],
 		isCampaignOngoing: (state, getters) => (camp) => camp.slice(0,2) === '__',
 		uniquesFromPaymentRows: (state, getters) => (dim, filters) => {
 			let rows = !filters ? getters.paymentRows : getters.paymentRows.filter(r => {
@@ -68,36 +70,125 @@ const store = new Vuex.Store({
 				return new Set(rows.map(r => r[dim])).size
 			}
 		},
+		calcFocalPayments: (state, getters) => (dim, clacType, filters) => {
+			return getters.calcPayments(dim, clacType, {...filters, MARKETING_ACTIVITY: state.focalMarketingActivity})
+		},
 	}
+});
+// ##########################################################################################################################################################
+// ##########################################################################################################################################################
+Vue.component('summaries', {
+	computed: {
+		...Vuex.mapState(['focalFY', 'payments', 'budget', 'marketingCycle', 'focalMarketingActivity', 'calcDimensionSum']),
+		...Vuex.mapGetters(['paymentRows', 'marketingCycleRows', 'campaignActivityCount', 'calcPayments', 'calcFocalPayments', 'uniquesFromPaymentRows', 'focalPaymentRows']),
+	},
+	methods: {
+		...Vuex.mapMutations({
+			setFocalCampaignActivity: 'SET_FOCAL_MARKETING_ACTIVITY'
+		}),
+	},
+	template:`<div>
+	<div class="row">
+		<div class="col-xs-12 col-md-6 col-lg-4">
+			<div class="card-counter success">
+				<span class="count-icon">&#128181;</span>
+				<span class="count-numbers"><< calcFocalPayments(calcDimensionSum, 'sum')|currency >></span>
+				<span class="count-name">Revenue</span>
+			</div>
+		</div>
+		<div class="col-xs-12 col-md-6 col-lg-4">
+			<div class="card-counter danger">
+				<span class="count-icon">&#128522;</span>
+				<span class="count-numbers"><< calcFocalPayments('SERIALNUMBER', 'unique')|number >></span>
+				<span class="count-name">Active Donor(s)</span>
+			</div>
+		</div>
+		<div class="col-xs-12 col-md-6 col-lg-4">
+			<div class="card-counter info">
+				<span class="count-icon">&#129309;</span>
+				<span class="count-numbers"><< calcFocalPayments("TRXID", "unique", {ISTRX: -1})|number >></span>
+				<span class="count-name">Transaction(s)</span>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-xs-12 col-md-6 col-lg-4">
+			<div class="card-counter success">
+				<span class="count-icon">&#128512;</span>
+				<span class="count-numbers"><< calcFocalPayments('SERIALNUMBER', 'unique', {LINE_FY_DONTYPE1: 'NEW'})|number >></span>
+				<span class="count-name">New Donor</span>
+			</div>
+		</div>
+		<div class="col-xs-12 col-md-6 col-lg-4">
+			<div class="card-counter warning">
+				<span class="count-icon">&#128512;</span>
+				<span class="count-numbers"><< calcFocalPayments('SERIALNUMBER', 'unique', {LINE_FY_DONTYPE1: 'CON'})|number >></span>
+				<span class="count-name">Continuing Donor(s)</span>
+			</div>
+		</div>
+		<div class="col-xs-12 col-md-6 col-lg-4">
+			<div class="card-counter info">
+				<span class="count-icon">&#128512;</span>
+				<span class="count-numbers"><< calcFocalPayments("TRXID", "unique", {LINE_FY_DONTYPE1: 'REC'})|number >></span>
+				<span class="count-name">Reactivated Donor(s)</span>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-xs-12 col-md-6 col-lg-4">
+			<div class="card-counter success">
+				<span class="count-icon">&#128536;</span>
+				<span class="count-numbers"><< calcFocalPayments('SERIALNUMBER', 'unique', {IS_ACQUISITION: -1})|number >></span>
+				<span class="count-name">Donor Acqusition</span>
+			</div>
+		</div>
+		<div class="col-xs-12 col-md-6 col-lg-4">
+			<div class="card-counter success">
+				<span class="count-icon">&#128536;</span>
+				<span class="count-numbers"><< calcFocalPayments('PLEDGEID', 'unique', {IS_FIRST_INSTALMENT: -1})|number >></span>
+				<span class="count-name">Pledge Acqusition</span>
+			</div>
+		</div>
+		<div class="col-xs-12 col-md-6 col-lg-4">
+			<div class="card-counter info">
+				<span class="count-icon">&#128512;</span>
+				<span class="count-numbers"><< calcFocalPayments(calcDimensionSum, "sum", {ISPLEDGE: -1})|currency >></span>
+				<span class="count-name">Pledge 1ST Instalments</span>
+			</div>
+		</div>
+	</div>
+
+	</div>`
 });
 // ##########################################################################################################################################################
 // ##########################################################################################################################################################
 Vue.component('tree', {
 	computed: {
-		...Vuex.mapState(['focalFY', 'payments', 'budget', 'marketingCycle', 'focalCampaignActivity']),
+		...Vuex.mapState(['focalFY', 'payments', 'budget', 'marketingCycle', 'focalMarketingActivity']),
 		...Vuex.mapGetters(['paymentRows', 'marketingCycleRows', 'campaignActivityCount', 'calcPayments', 'uniquesFromPaymentRows']),
 	},
 	methods: {
 		...Vuex.mapMutations({
-			setFocalCampaignActivity: 'SET_FOCAL_CAMPAIGN_ACTIVITY'
+			setFocalCampaignActivity: 'SET_FOCAL_MARKETING_ACTIVITY'
 		}),
-
 	},
 	template: `<div class="tree">
 	<ul>
 		<li><span><a data-toggle="collapse" href="#Root" aria-expanded="true" aria-controls="Root">Campaign Activities <span class="text-primary"><< campaignActivityCount >></span></a></span>
 		<div id="Root" class="collapse show">
 			<ul>
-				<li v-for="(ca1, idx1) in uniquesFromPaymentRows('IS_CAMPAIGN_ACTIVITY_ONGOING')">
-					<span><a data-toggle="collapse" :href="'#'+(ca1===-1?'Ongoing':'Periodical')" aria-expanded="false" :aria-controls="(ca1===-1?'Ongoing':'Periodical')"> << (ca1===-1?'Ongoing':'Periodical') >> <span class="text-primary"><< uniquesFromPaymentRows('CAMPAIGN_ACTIVITY', {IS_CAMPAIGN_ACTIVITY_ONGOING: ca1}).length >></span></a></span>
+				<li v-for="(ca1, idx1) in uniquesFromPaymentRows('IS_MARKETING_ACTIVITY_ONGOING')">
+					<span><a data-toggle="collapse" :href="'#'+(ca1===-1?'Ongoing':'Periodical')" aria-expanded="false" :aria-controls="(ca1===-1?'Ongoing':'Periodical')"> << (ca1===-1?'Ongoing':'Periodical') >> <span class="text-primary"><< uniquesFromPaymentRows('MARKETING_ACTIVITY', {IS_MARKETING_ACTIVITY_ONGOING: ca1}).length >></span></a></span>
 					<ul>
 						<div :id="(ca1===-1?'Ongoing':'Periodical')" class="collapse">
 							<li v-for="mc in marketingCycleRows">
-								<span><a data-toggle="collapse" :href="'#'+(ca1===-1?'Ongoing':'Periodical')+mc.CODE" aria-expanded="false" :aria-controls="(ca1===-1?'Ongoing':'Periodical')+mc.CODE"><< mc.NAME >> <span class="text-success"><< calcPayments('CAMPAIGN_ACTIVITY', 'unique', {IS_CAMPAIGN_ACTIVITY_ONGOING:ca1, MARKETING_CYCLE:mc.NAME}) >></span></a></span>
-								<ul v-if="calcPayments('CAMPAIGN_ACTIVITY', 'unique', {IS_CAMPAIGN_ACTIVITY_ONGOING:ca1, MARKETING_CYCLE:mc.NAME})>0">
+								<span><a data-toggle="collapse" :href="'#'+(ca1===-1?'Ongoing':'Periodical')+mc.CODE" aria-expanded="false" :aria-controls="(ca1===-1?'Ongoing':'Periodical')+mc.CODE"><< mc.NAME >> <span class="text-success"><< calcPayments('MARKETING_ACTIVITY', 'unique', {IS_MARKETING_ACTIVITY_ONGOING:ca1, MARKETING_CYCLE:mc.NAME}) >></span></a></span>
+								<ul v-if="calcPayments('MARKETING_ACTIVITY', 'unique', {IS_MARKETING_ACTIVITY_ONGOING:ca1, MARKETING_CYCLE:mc.NAME})>0">
 									<div :id="(ca1===-1?'Ongoing':'Periodical')+mc.CODE" class="collapse">
-										<li v-for="ca2 in uniquesFromPaymentRows('CAMPAIGN_ACTIVITY', {IS_CAMPAIGN_ACTIVITY_ONGOING:ca1, MARKETING_CYCLE:mc.NAME})">
-											<span v-bind:class="{'bg-success': ca2===focalCampaignActivity, 'bg-light':ca2!==focalCampaignActivity }"><a href="#!" @click.prevent="setFocalCampaignActivity(ca2)"><< ca2 >></a></span>
+										<li v-for="ca2 in uniquesFromPaymentRows('MARKETING_ACTIVITY', {IS_MARKETING_ACTIVITY_ONGOING:ca1, MARKETING_CYCLE:mc.NAME})">
+											<span v-bind:class="{'bg-success': ca2===focalMarketingActivity, 'bg-light':ca2!==focalMarketingActivity }"><a href="#!" @click.prevent="setFocalCampaignActivity(ca2)"><< ca2 >></a></span>
 										</li>
 									</div>
 								</ul>
@@ -123,7 +214,7 @@ let rootVue = new Vue({
 	},
 	store,
 	computed: {
-		...Vuex.mapState(['focalFY', 'payments', 'budget', 'focalCampaignActivity']),
+		...Vuex.mapState(['focalFY', 'payments', 'budget', 'focalMarketingActivity']),
 		...Vuex.mapGetters(['campaignActivityCount']),
 	},
 	watch: {
@@ -163,15 +254,18 @@ let rootVue = new Vue({
 	<vueLoader msg="Retrieving Budget Information ..." v-else-if="!budgetDataReady&&paymentDataReady"></vueLoader>
 	<div class="container-fluid" v-else>
 		<div class="row">
-			<div class="col text-center">
-				<p class="lead my-0"><span class="text-primary"><< campaignActivityCount >></span> Campaign Activities Generated Revenue in <span class="text-primary">FY<< focalFY >></span></p>
+			<div class="col-xs-12 col-sm-6 col-md-5 col-lg-4 col-xl-3">
+				<tree></tree>
+			</div>
+
+			<div class="col-xs-12 col-sm-6 col-md-7 col-lg-8 col-xl-9">
+				<p class="lead my-0"><span class="text-primary"><< campaignActivityCount >></span> Marketing Activities Generated Revenue in <span class="text-primary">FY<< focalFY >></span></p>
 				<p class="mt-0 mb-1"><small class="text-muted font-italic">Data Captured : << payments.timestamp|dtAU >><small></p>
-				<p class="mt-0 mb-1 text-primary" v-if="focalCampaignActivity"><mark>Focal Campaign : << focalCampaignActivity >></mark></p>
+				<p class="mt-0 mb-1 text-primary" v-if="focalMarketingActivity"><mark>Focal Campaign : << focalMarketingActivity >></mark></p>
+				<summaries></summaries>
 			</div>
 		</div>
 
-
-		<tree></tree>
 
 
 	</div>

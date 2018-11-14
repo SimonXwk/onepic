@@ -200,7 +200,7 @@ let vueTable = Vue.component('vue-table', {
 					 <th scope="col" style="width: 20%">ACTION MAGAZINE MAIL PROFILE</th>
 					 <th scope="col" style="width: 23%">INFOMATION</th>
 					 <th scope="col" style="width: 15%">CONTACT METHOD</th>
-					 <th scope="col" style="width: 18%">CONVERSION CONTACT</th>
+					 <th scope="col" style="width: 18%">CONVERSION PACK</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -332,7 +332,7 @@ let rootVue = new Vue({
 				</li>
 				<li class="nav-item ">
 					<a class="nav-link" id="called-tab" data-toggle="pill" href="#called" role="tab" aria-controls="called" aria-selected="false">
-					 &#128515; Called <span class="badge badge-pill badge-success"> << calledRows.length >></span>
+					 &#128515; Sent <span class="badge badge-pill badge-success"> << calledRows.length >></span>
 					</a>
 				</li>
 				<li class="nav-item ">
