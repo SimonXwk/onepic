@@ -151,14 +151,14 @@ Vue.component('summaries', {
 			<div class="card-counter success">
 				<span class="count-icon">&#128536;</span>
 				<span class="count-numbers"><< calc('PLEDGEID', 'unique', {IS_FIRST_INSTALMENT: -1})|number >></span>
-				<span class="count-name">Pledge Acqusition</span>
+				<span class="count-name">Pledge(S) Have 1st Instalments Paid</span>
 			</div>
 		</div>
 		<div class="col-xs-12 col-md-6 col-lg-4">
 			<div class="card-counter info">
 				<span class="count-icon">&#128512;</span>
 				<span class="count-numbers"><< calc(calcDimensionSum, "sum", {ISPLEDGE: -1})|currency >></span>
-				<span class="count-name">Pledge 1ST Instalments</span>
+				<span class="count-name">Pledge 1st Instalments</span>
 			</div>
 		</div>
 	</div>
@@ -179,7 +179,7 @@ Vue.component('tree', {
 	},
 	template: `<div class="tree">
 	<ul>
-		<li><span  v-bind:class="{'bg-warning': focalMarketingActivity===null}"><a data-toggle="collapse" href="#Root" aria-expanded="true" aria-controls="Root" @dblclick.prevent="setFocalCampaignActivity(null)" >Marketing Activities <span class="text-primary"><< campaignActivityCount >></span></a></span>
+		<li><span  v-bind:class="{'bg-warning': focalMarketingActivity===null}"><a data-toggle="collapse" href="#Root" aria-expanded="true" aria-controls="Root" @click.prevent="setFocalCampaignActivity(null)" >Marketing Activities <span class="text-primary"><< campaignActivityCount >></span></a></span>
 		<div id="Root" class="collapse show">
 			<ul>
 				<li v-for="(ca1, idx1) in uniquesFromPaymentRows('IS_MARKETING_ACTIVITY_ONGOING')">
@@ -262,8 +262,9 @@ let rootVue = new Vue({
 	<vueLoader msg="Retrieving Budget Information ..." v-else-if="!budgetDataReady&&paymentDataReady"></vueLoader>
 	<div class="container-fluid" v-else>
 		<div class="row">
+
 			<div class="col-xs-12 col-sm-6 col-md-5 col-lg-4 col-xl-3">
-				<p class="my-0"><small class="text-muted font-italic">Data Captured : << payments.timestamp|dtAU >><small></p>
+				<p class="my-0 text-center"><small class="text-muted font-italic">Data Captured : << payments.timestamp|dtAU >><small></p>
 				<div>
 					<span>Revenue Calculation : </span>
 					<input type="radio" id="one" value="PAYMENTAMOUNTNETT" v-model="calcDimensionSum">

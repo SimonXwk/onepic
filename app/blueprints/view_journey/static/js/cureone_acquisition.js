@@ -4,21 +4,21 @@ let vueRow = Vue.component('vue-row', {
 		return {
 			weekdays: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
 			toggleColor: false,
-			nextCodes: null
+			nextCodes: null,
 		}
 	},
 	computed:{
 		conversionCallDueDate: function(){
-			let date1 = new Date(this.row['CAMPAIGN_FIRSTDATE']);
-			let date2 = new Date(date1.setDate(date1.getDate() + 7*5));
-			if ( date2.getDay() === 0 ) {
-				return new Date(date1.setDate(date1.getDate() + 7*5 + 1 ));
-			} else if ( date2.getDay() === 6 ) {
-				return new Date(date1.setDate(date1.getDate() + 7*5 + 2 ));
-			}else {
-				return date2
-			}
-
+			// let date1 = new Date(this.row['CAMPAIGN_FIRSTDATE']);
+			// let date2 = new Date(date1.setDate(date1.getDate() + 7*5));
+			// if ( date2.getDay() === 0 ) {
+			// 	return new Date(date1.setDate(date1.getDate() + 7*5 + 1 ));
+			// } else if ( date2.getDay() === 6 ) {
+			// 	return new Date(date1.setDate(date1.getDate() + 7*5 + 2 ));
+			// }else {
+			// 	return date2
+			// }
+			return new Date(Date.UTC(2018, 10, 30, 0, 0, 0))
 		}
 	},
 	methods:{
@@ -38,8 +38,17 @@ let vueRow = Vue.component('vue-row', {
 	template: `
 	<tr class="text-left"  v-on:dblclick="toggleColor=!toggleColor" v-bind:class="{'table-warning': toggleColor}">
 
-		<td scope="row" style="width: 25%" class="align-middle">
+		<td scope="row"  class="align-middle">
 			<mark class="text-dark"><< row.FULLNAME >> <small class="text-primary" v-if="row.SORTKEYREF1">(is << row.SORTKEYREFREL2 >>)</small> <small>(<span class="text-success"><< row.SOURCE >></span>, <span class="text-primary"><< row.STATE >></span>)</small></mark>
+			<span v-if=" row.JOURNEY_BY !== null ">
+				<br>
+				<mark><small><span class="badge " :class="{'badge-primary': row.BOARDED === -1, 'badge-warning': row.BOARDED === -2}">Journey Profile by << row.JOURNEY_BY >></span></small></mark>
+			</span>
+			<span v-else>
+				<br>
+				<mark><small><span class="badge badge-danger">!Journey Profile</span></small></mark>
+			</span>
+
 			<br>
 			<span v-if="row.IS_ACQUISITION===-1" class="badge badge-success">ACQ</span><span v-else-if="row.FIRSTFY===row.CFY" class="badge badge-info">NEW</span><span v-else class="badge badge-warning">OLD</span>
 			<span class="badge badge-secondary"><< row.SERIALNUMBER >></span>
@@ -50,7 +59,7 @@ let vueRow = Vue.component('vue-row', {
 			<span class="badge badge-warning" v-if="row.PLEDGES > 0">[<< row.PLEDGES >>SP] << row.FIRST_PLEDGEID >></span>
 		</td>
 
-		<td style="width: 20%" class="text-muted align-middle">
+		<td  class="text-muted align-middle">
 			<span class="badge badge-success shadow-lg" v-if="row.ACTION_B_UPDATE===1">mUpdateB.</span><span class="badge badge-light text-muted" v-else>mUpdateB,</span>
 			<span class="badge badge-success shadow-lg" v-if="row.ACTION_A_UPDATE===1">mUpdateA.</span><span class="badge badge-light text-muted" v-else>mUpdateA,</span>
 			<span class="badge badge-success shadow-lg" v-if="row.ACTION_A===1">mActionA.</span><span class="badge badge-light text-muted" v-else>mActionA,</span>
@@ -67,7 +76,7 @@ let vueRow = Vue.component('vue-row', {
 			<span class="badge badge-danger shadow-lg" v-if="row.NO_CATALOGUE===1">!Cat.</span><span class="badge badge-light text-muted" v-else>!Cat,</span>
 		</td>
 
-		<td style="width: 23%" class="text-muted align-middle">
+		<td  class="text-muted align-middle">
 			First gift towards campaign on <span class="text-success font-weight-bold"><< row.CAMPAIGN_FIRSTDATE|dAU >></span>
 			<br />
 			Gave <span class="text-primary font-weight-bold"><< row.CAMPAIGN_TOAL|currency >></span> to campaign cumulatively
@@ -82,7 +91,7 @@ let vueRow = Vue.component('vue-row', {
 			</div>
 		</td>
 
-		<td style="width: 15%" class="align-middle">
+		<td  class="align-middle">
 			<span v-if="row.DONOTCALL == -1 || row.DONOTMAIL == -1">
 				<span v-if="row.DONOTCALL == -1" class="text-danger">&#128263;  Do not Call <br></span>
 				<span v-if="row.DONOTMAIL == -1" class="text-danger">&#128075;  Do not Mail <br></span>
@@ -129,19 +138,15 @@ let vueRow = Vue.component('vue-row', {
 
 		</td>
 
-		<td style="width: 18%" class="align-middle">
-			<span v-if=" row.JOURNEY_BY !== null ">
-				<span class="text-success" v-if=" row.BOARDED === -1 ">
-					<mark class="text-success">&#128526; << row.JOURNEY_BY >>: <small><span class="badge badge-primary">Journey Profile</span></small></mark>
-				</span>
-				<span class="text-secondary" v-else-if="row.BOARDED === -2 ">
-					<mark class="text-danger">&#129300; << row.JOURNEY_MODIFIED_BY >> Cancelled Journey</mark>
-					<br><small><p><< row.JOURNEY_NOTE >></p></small>
-				</span>
+		<td class="align-middle">
+			<span v-if=" row.JOURNEY_BY !== null && sublist === 'excluded' && row.BOARDED === -2 ">
+				<mark class="text-danger">&#129300; << row.JOURNEY_MODIFIED_BY >> Cancelled Journey</mark>
+				<br><small><p class="text-danger"><< row.JOURNEY_NOTE >></p></small>
+				<br>
 			</span>
 
 			<span v-if="row.CONVERSIONCALL_BY !== null">
-				<br><mark>&#128521;
+				<mark>&#128521;
 				<span class="font-weight-bold"><< row.CONVERSIONCALL_TYPE >></span> by <span class="font-weight-bold"><< row.CONVERSIONCALL_BY >></span> <small class="text-success"> << row.CONVERSIONCALL_DATE|dAU >></small>
 				</mark>
 				<small class="text-muted"><< row.CONVERSIONCALL_NOTES >></small>
@@ -149,15 +154,37 @@ let vueRow = Vue.component('vue-row', {
 			<span v-else-if="sublist==='excluded'" class="text-muted"></span>
 			<span v-else>
 				<br>
-				<span v-if="conversionCallDueDate <= new Date()" class="text-danger">&#128562;
+				<span v-if="conversionCallDueDate <= new Date()" class="text-danger"><mark>&#128562;
 					Overdue : <span class="text-muted"><< conversionCallDueDate|dAU >>, << weekdays[conversionCallDueDate.getDay()] >></span>
+					</mark>
 				</span>
-				<span v-else>&#128560;
+				<span v-else><mark>&#128560;
 			 	 Due Date : <span class="text-info"><< conversionCallDueDate|dAU >>, << weekdays[conversionCallDueDate.getDay()] >></span>
+				 </mark>
 			 	</span>
 			</span>
 
 		</td>
+
+
+		<td v-if="sublist === 'called'">
+			<span v-if="row.FOLLOWUP1_BY !== null">
+				<mark>&#129488;
+				<span class="font-weight-bold"><< row.FOLLOWUP1_TYPE >></span> by <span class="font-weight-bold"><< row.FOLLOWUP1_BY >></span> <small class="text-success"> << row.FOLLOWUP1_DATE|dAU >></small>
+				</mark>
+				<small class="text-muted"><< row.FOLLOWUP1_NOTES >></small>
+			</span>
+		</td>
+
+		<td v-if="sublist === 'called'">
+			<span v-if="row.FOLLOWUP2_BY !== null">
+				<mark>&#129299;
+				<span class="font-weight-bold"><< row.FOLLOWUP2_TYPE >></span> by <span class="font-weight-bold"><< row.FOLLOWUP2_BY >></span> <small class="text-success"> << row.FOLLOWUP2_DATE|dAU >></small>
+				</mark>
+				<small class="text-muted"><< row.FOLLOWUP2_NOTES >></small>
+			</span>
+		</td>
+
 	</tr>
 	`,
 });
@@ -196,11 +223,13 @@ let vueTable = Vue.component('vue-table', {
 		<table class="table table-sm table-hover table-bordered table-striped" v-bind:id="tableID" >
 			<thead>
 				<tr class=" text-left" v-bind:class="trClassObject">
-					 <th scope="col" style="width: 25%">DONOR</th>
-					 <th scope="col" style="width: 20%">ACTION MAGAZINE MAIL PROFILE</th>
-					 <th scope="col" style="width: 23%">INFOMATION</th>
-					 <th scope="col" style="width: 15%">CONTACT METHOD</th>
-					 <th scope="col" style="width: 18%">CONVERSION PACK</th>
+					<th scope="col" >DONOR</th>
+					<th scope="col" >MAIL PROFILE</th>
+					<th scope="col" >INFOMATION</th>
+					<th scope="col" >CONTACT METHOD</th>
+					<th scope="col" >CONVERSION PACK</th>
+					<th scope="col" v-if="sublist === 'called'">FOLLOWUP1</th>
+					<th scope="col" v-if="sublist === 'called'">FOLLOWUP2</th>
 				</tr>
 			</thead>
 			<tbody>
