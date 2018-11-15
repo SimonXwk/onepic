@@ -281,8 +281,8 @@ SELECT
 
   -- >>>> From SOURCE_CODE Table
   , CASE WHEN S1.SOURCETYPE LIKE '%Merchandise%'
-    THEN 'Merchandise Platform'
-    ELSE 'Non-Merchandise Platform'
+    THEN 'Merchandise_Platform'
+    ELSE 'Non-Merchandise_Platform'
     END AS [PLATFORM]
 
   , CASE WHEN S1.SOURCETYPE LIKE '%Merchandise%'

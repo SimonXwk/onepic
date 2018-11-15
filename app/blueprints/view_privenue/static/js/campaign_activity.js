@@ -2,25 +2,32 @@
 // ##########################################################################################################################################################
 const store = new Vuex.Store({
 	state: {
-		focalFY: $CFY,
+		// Raw Data
 		payments: null,
 		budget: null,
 		marketingCycle: null,
-		// Filters
+		// Specical Filters
+		focalFY: $CFY,
 		focalMarketingActivity: null,
-		focalTypeMarketingActivity: null,
-		focalMarketingCycle: null,
+		// Global Filters
+		// focalTypeMarketingActivity: null,
+		// focalMarketingCycle: null,
 		calcDimensionSum: 'PAYMENTAMOUNTNETT',
+		focalPlatform: ['Merchandise_Platform', 'Non-Merchandise_Platform'],
 	},
 	mutations: {
-		SET_FOCALFY: (state, payload) => state.focalFY = payload,
 		SET_PAYMENTS:  (state, payload) => state.payments = payload,
 		SET_BUDGET:  (state, payload) => state.budget = payload,
 		SET_MARKET_CYCLE:  (state, payload) => state.marketingCycle = payload,
+
+		SET_FOCALFY: (state, payload) => state.focalFY = payload,
 		SET_FOCAL_MARKETING_ACTIVITY:  (state, payload) => state.focalMarketingActivity = payload,
-		SET_FOCAL_TYPE_MARKETING_ACTIVITY:  (state, payload) => state.focalTypeMarketingActivity = payload,
-		SET_FOCAL_MARKETING_CYCLE:  (state, payload) => state.focalMarketingCycle = payload,
+		// SET_FOCAL_TYPE_MARKETING_ACTIVITY:  (state, payload) => state.focalTypeMarketingActivity = payload,
+		// SET_FOCAL_MARKETING_CYCLE:  (state, payload) => state.focalMarketingCycle = payload,
 		SET_CALC_DIMENSION_SUM: (state, payload) => state.calcDimensionSum = payload,
+		SET_FOCAL_PLATFORM: (state, payload) => state.focalPlatform = payload,
+		ADD_FOCAL_PLATFORM: (state, payload) => state.focalPlatform.push(payload),
+		REMOVE_FOCAL_PLATFORM: (state, payload) => state.focalPlatform.splice(state.focalPlatform.indexOf(payload), 1),
 	},
 	actions: {
 		fetchPayments(ctx, fy){
@@ -50,14 +57,22 @@ const store = new Vuex.Store({
 		},
 	},
 	getters: {
-		paymentRows: (state, getters) => (state.payments.rows ? state.payments.rows : []),
+		paymentRows: (state, getters) => {
+			if (state.payments.rows) {
+				// Apply Global Filters Here
+				return state.payments.rows.filter(r => {
+					return (state.focalPlatform.indexOf(r.PLATFORM) !== -1)
+				})
+			} else {
+				return []
+			}
+		},
 		marketingCycleRows: (state, getters) => (state.marketingCycle.rows ? state.marketingCycle.rows : []),
 		focalPaymentRows:  (state, getters) => (state.payments.rows.map(r => r.MARKETING_ACTIVITY === state.focalMarketingActivity)),
 		allCampaignActivities: (state, getters) => [...new Set(getters.paymentRows.map(v => v.MARKETING_ACTIVITY))],
 		campaignActivityCount:  (state, getters) => getters.allCampaignActivities.length,
 		ongoingCampaigns: (state, getters) => [...new Set(getters.paymentRows.filter(r => r.IS_MARKETING_ACTIVITY_ONGOING === -1).map(v => v.MARKETING_ACTIVITY))],
 		periodicalCampaigns: (state, getters) => [...new Set(getters.paymentRows.filter(r => r.IS_MARKETING_ACTIVITY_ONGOING !== -1).map(v => v.MARKETING_ACTIVITY))],
-		isCampaignOngoing: (state, getters) => (camp) => camp.slice(0,2) === '__',
 		uniquesFromPaymentRows: (state, getters) => (dim, filters) => {
 			let rows = !filters ? getters.paymentRows : getters.paymentRows.filter(r => {
 				return Object.keys(filters).reduce((acc, key) =>	acc && (r[key] === filters[key]), true);
@@ -162,42 +177,22 @@ Vue.component('summaries', {
 	template:`<div>
 	<div class="row">
 		<div class="col-xs-12 col-md-6 col-lg-4">
-			<div class="card-counter success">
-				<span class="count-icon">&#128181;</span>
-				<span class="count-numbers"><< calc(calcDimensionSum, 'sum')|currency >></span>
-				<span class="count-name">Revenue</span>
-			</div>
+			<card-counter theme="success" icon="&#128181;" :num="calc(calcDimensionSum, 'sum')|currency" msg="Revenue"></card-counter>
 		</div>
 		<div class="col-xs-12 col-md-6 col-lg-4">
-			<div class="card-counter info">
-				<span class="count-icon">&#129309;</span>
-				<span class="count-numbers"><< calc("TRXID", "unique", {ISTRX: -1})|number >></span>
-				<span class="count-name">Transaction(s)</span>
-			</div>
+			<card-counter theme="info" icon="&#129309;" :num="calc('TRXID', 'unique', {ISTRX: -1})|number" msg="Transaction(s)"></card-counter>
 		</div>
 		<div class="col-xs-12 col-md-6 col-lg-4">
-			<div class="card-counter danger">
-				<span class="count-icon">&#128522;</span>
-				<span class="count-numbers"><< calc('SERIALNUMBER', 'unique')|number >></span>
-				<span class="count-name">Active Donor(s)</span>
-			</div>
+			<card-counter theme="info" icon="&#128522;" :num="calc('SERIALNUMBER', 'unique')|number" msg="Active Donor(s)"></card-counter>
 		</div>
 	</div>
 
 	<div class="row">
 		<div class="col-xs-12 col-md-6 col-lg-4">
-			<div class="card-counter danger">
-				<span class="count-icon">&#128512;</span>
-				<span class="count-numbers"><< calc('SERIALNUMBER', 'unique', {LINE_FY_DONTYPE1: 'NEW'})|number >></span>
-				<span class="count-name">New Donor(s)</span>
-			</div>
+			<card-counter theme="danger" icon="&#128512;" :num="calc('SERIALNUMBER', 'unique', {LINE_FY_DONTYPE1: 'NEW'})|number" msg="1st Year New"></card-counter>
 		</div>
 		<div class="col-xs-12 col-md-6 col-lg-4">
-			<div class="card-counter danger">
-				<span class="count-icon">&#128512;</span>
-				<span class="count-numbers"><< calc('SERIALNUMBER', 'unique', {LINE_FY_DONTYPE1: 'CON'})|number >></span>
-				<span class="count-name">Continuing Donor(s)</span>
-			</div>
+			<card-counter theme="danger" icon="&#128512;" :num="calc('SERIALNUMBER', 'unique', {LINE_FY_DONTYPE1: 'CON'})|number" msg="Continuing"></card-counter>
 		</div>
 		<div class="col-xs-12 col-md-6 col-lg-4">
 			<card-counter theme="danger" icon="&#128512;" :num="calc('SERIALNUMBER', 'unique', {LINE_FY_DONTYPE1: 'REC'})|number" msg="1st Year Reactivated"></card-counter>
@@ -218,25 +213,13 @@ Vue.component('summaries', {
 
 	<div class="row">
 		<div class="col-xs-12 col-md-6 col-lg-4">
-			<div class="card-counter success">
-				<span class="count-icon">&#128536;</span>
-				<span class="count-numbers"><< calc('SERIALNUMBER', 'unique', {IS_ACQUISITION: -1})|number >></span>
-				<span class="count-name">Donor Acqusition</span>
-			</div>
+			<card-counter theme="success" icon="&#128536;" :num="calc('SERIALNUMBER', 'unique', {IS_ACQUISITION: -1})|number" msg="Donor Acqusition"></card-counter>
 		</div>
 		<div class="col-xs-12 col-md-6 col-lg-4">
-			<div class="card-counter success">
-				<span class="count-icon">&#128140;</span>
-				<span class="count-numbers"><< calc('PLEDGEID', 'unique', {IS_FIRST_INSTALMENT: -1})|number >></span>
-				<span class="count-name">Pledge(S) Have 1st Instalments Paid</span>
-			</div>
+			<card-counter theme="success" icon="&#128140;" :num="calc('PLEDGEID', 'unique', {IS_FIRST_INSTALMENT: -1})|number" msg="1st Instalments Paid Pledge(s)"></card-counter>
 		</div>
 		<div class="col-xs-12 col-md-6 col-lg-4">
-			<div class="card-counter success">
-				<span class="count-icon">&#128178;</span>
-				<span class="count-numbers"><< calc(calcDimensionSum, "sum", {ISPLEDGE: -1})|currency >></span>
-				<span class="count-name">Pledge 1st Instalments</span>
-			</div>
+			<card-counter theme="success" icon="&#128178;" :num="calc(calcDimensionSum, 'sum', {ISPLEDGE: -1})|number" msg="Pledge 1st Instalments"></card-counter>
 		</div>
 	</div>
 
@@ -294,7 +277,7 @@ let rootVue = new Vue({
 	},
 	store,
 	computed: {
-		...Vuex.mapState(['focalFY', 'payments', 'budget', 'focalMarketingActivity']),
+		...Vuex.mapState(['focalFY', 'payments', 'focalMarketingActivity']),
 		...Vuex.mapGetters(['campaignActivityCount']),
 		calcDimensionSum: {
 			get: function() {
@@ -302,6 +285,14 @@ let rootVue = new Vue({
 			},
 			set: function(newVal) {
 				this.$store.commit('SET_CALC_DIMENSION_SUM',newVal);
+			}
+		},
+		focalPlatform: {
+			get: function() {
+				return this.$store.state.focalPlatform
+			},
+			set: function(newVal) {
+				this.$store.commit('SET_FOCAL_PLATFORM',newVal);
 			}
 		},
 	},
@@ -341,7 +332,7 @@ let rootVue = new Vue({
 		<div class="row">
 
 			<div class="col-xs-12 col-sm-6 col-md-5 col-lg-4 col-xl-3">
-				<p class="my-0"><small class="text-muted">Data Captured : << payments.timestamp|dtAU >><small></p>
+				<p class="my-0"><small class="text-muted">Data Captured : << payments.timestamp|dtAU >> << payments.bytes|number >> bytes<small></p>
 				<div>
 					<span>Revenue Calculation : </span>
 					<input type="radio" id="one" value="PAYMENTAMOUNTNETT" v-model="calcDimensionSum">
@@ -351,6 +342,15 @@ let rootVue = new Vue({
 					<input type="radio" id="three" value="GSTAMOUNT" v-model="calcDimensionSum">
 					<label for="three">GST</label>
 				</div>
+
+				<div>
+					<span>Platform : </span>
+					<input type="checkbox" id="15" value="Merchandise_Platform" v-model="focalPlatform">
+					<label for="15" class="text-dark">Merchandise</label>
+					<input type="checkbox" id="20" value="Non-Merchandise_Platform" v-model="focalPlatform">
+					<label for="20" class="text-dark">Non-Merchandise</label>
+				</div>
+
 				<tree></tree>
 			</div>
 
@@ -358,7 +358,7 @@ let rootVue = new Vue({
 
 				<template  v-if="focalMarketingActivity">
 					<transition name="slide-fade">
-					<h3 class="lead mt-0 mb-1" v-if="focalMarketingActivity">Focal Campaign (<span class="text-primary">FY<< focalFY >></span>): <mark class="font-weight-bold text-primary"><< focalMarketingActivity >></mark></p>
+					<h3 class="lead mt-0 mb-1" v-if="focalMarketingActivity"><span class="text-primary">FY<< focalFY >></span> : <mark class="font-weight-bold text-danger"><< focalMarketingActivity >></mark></p>
 					</transition>
 					<summaries></summaries>
 					<focal-source-table></focal-source-table>
@@ -366,11 +366,10 @@ let rootVue = new Vue({
 
 				<template v-else>
 					<transition name="slide-fade">
-					<p class="lead my-0"><span class="text-primary font-weight-bold"><< campaignActivityCount >></span> TLMA Marketing Activities Generated Revenue in <span class="text-primary font-weight-bold">FY<< focalFY >></span></p>
+					<h4 class="lead mt-0 mb-2 text-center"><span class="text-primary font-weight-bold"><< campaignActivityCount >></span> TLMA Marketing Activities Generated Revenue in <span class="text-primary font-weight-bold">FY<< focalFY >></span></h4>
 					</transition>
 					<summaries></summaries>
 				</template>
-
 
 			</div>
 		</div>
