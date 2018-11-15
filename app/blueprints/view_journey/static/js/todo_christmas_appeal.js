@@ -133,15 +133,17 @@ let rootVue = new Vue({
 				let dt = new Date();
 				return {
 					header: ['SERIALNUMBER'
-						, 'DATEOFCOMMUNICATION', 'CATEGORY', 'SUBJECT','COMMENTS'
-						,'GENDER','STATE','TITLE','FIRSTNAME','OTHERINITIAL','LASTNAME'
+						, 'TYPE', 'CATEGORY', 'SUBJECT', 'DATEOFCOMMUNICATION', 'COMMENTS'
+						,'GENDER','STATE','TITLE','FIRST_NAME','OTHER_INITIAL','LAST_NAME'
 						,'GIFTS','TOTAL'
 						,'MOBILENUMBER','DAYTELEPHONE','EVENINGTELEPHONE'
 						],
 					data: this.rawData.rows
 								.filter(row => this.calcSubListType(row) === 'todo')
 								.map(d => ["=\"" + d.SERIALNUMBER + "\"" ,
-								dt.getDate() +'/'+(dt.getMonth()+1)+'/'+dt.getFullYear(), 'Thank You', 'Dec 2018 Thank you (TF)',null,
+								'Phone Call', 'Thank You', 'Dec 2018 Thank you (TF)',
+								dt.getDate() +'/'+(dt.getMonth()+1)+'/'+dt.getFullYear(),
+								null,
 								d.GENDER,d.STATE,d.TITLE,d.FIRSTNAME,d.OTHERINITIAL,d.KEYNAME,
 								d.CAMPAIGN_PAYMENTS,d.CAMPAIGN_TOAL,
 								d.MOBILENUMBER,d.DAYTELEPHONE,d.EVENINGTELEPHONE

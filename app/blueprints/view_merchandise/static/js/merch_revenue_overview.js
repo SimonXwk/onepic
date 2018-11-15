@@ -735,10 +735,8 @@ let rootVue = new Vue({
 				<span>Revenue Calc : </span>
 				<input type="radio" id="one" value="PAYMENTAMOUNTNETT" v-model="calcDimensionSum">
 				<label for="one">Net</label>
-
 				<input type="radio" id="two" value="PAYMENTAMOUNT" v-model="calcDimensionSum">
 				<label for="two">Total</label>
-
 				<input type="radio" id="three" value="GSTAMOUNT" v-model="calcDimensionSum">
 				<label for="three">GST</label>
 			</div>
