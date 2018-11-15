@@ -230,6 +230,15 @@ function currency(val) {
 					</div>
 				</div></div>`
 			});
+			Vue.component('card-counter', {
+				props: ['theme', 'icon', 'num', 'msg'],
+				template:`
+				<div class="card-counter" v-bind:class="[theme]">
+					<span class="count-icon" v-html="icon"></span>
+					<span class="count-numbers"><< num >></span>
+					<span class="count-name"><< msg >></span>
+				</div>`
+			});
 	</script>
 
 	{% elif vendor == 'vuex' %}

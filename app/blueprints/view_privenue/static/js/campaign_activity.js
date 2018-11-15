@@ -119,8 +119,8 @@ Vue.component('focal-source-table', {
 				<td><small><< calcFocalPayments('SERIALNUMBER', 'unique', {SOURCECODE: s1, LINE_FY_DONTYPE2: '1NEW'})|number >></small></td>
 				<td><small><< calcFocalPayments('SERIALNUMBER', 'unique', {SOURCECODE: s1, LINE_FY_DONTYPE2: '2NEW'})|number >></small></td>
 				<td><small><< calcFocalPayments('SERIALNUMBER', 'unique', {SOURCECODE: s1, LINE_FY_DONTYPE2: 'MULTI'})|number >></small></td>
-				<td><small><< calcFocalPayments('SERIALNUMBER', 'unique', {SOURCECODE: s1, LINE_FY_DONTYPE2: '1REC'})|number >></small></td>
 				<td><small><< calcFocalPayments('SERIALNUMBER', 'unique', {SOURCECODE: s1, LINE_FY_DONTYPE2: '2REC'})|number >></small></td>
+				<td><small><< calcFocalPayments('SERIALNUMBER', 'unique', {SOURCECODE: s1, LINE_FY_DONTYPE2: '1REC'})|number >></small></td>
 
 			</tr>
 		</tbody>
@@ -135,8 +135,8 @@ Vue.component('focal-source-table', {
 				<td><small class="font-weight-bold"><< calcFocalPayments('SERIALNUMBER', 'unique', {LINE_FY_DONTYPE2: '1NEW'})|number >></small></td>
 				<td><small class="font-weight-bold"><< calcFocalPayments('SERIALNUMBER', 'unique', {LINE_FY_DONTYPE2: '2NEW'})|number >></small></td>
 				<td><small class="font-weight-bold"><< calcFocalPayments('SERIALNUMBER', 'unique', {LINE_FY_DONTYPE2: 'MULTI'})|number >></small></td>
-				<td><small class="font-weight-bold"><< calcFocalPayments('SERIALNUMBER', 'unique', {LINE_FY_DONTYPE2: '1REC'})|number >></small></td>
 				<td><small class="font-weight-bold"><< calcFocalPayments('SERIALNUMBER', 'unique', {LINE_FY_DONTYPE2: '2REC'})|number >></small></td>
+				<td><small class="font-weight-bold"><< calcFocalPayments('SERIALNUMBER', 'unique', {LINE_FY_DONTYPE2: '1REC'})|number >></small></td>
 
 
 			</tr>
@@ -169,42 +169,50 @@ Vue.component('summaries', {
 			</div>
 		</div>
 		<div class="col-xs-12 col-md-6 col-lg-4">
-			<div class="card-counter danger">
-				<span class="count-icon">&#128522;</span>
-				<span class="count-numbers"><< calc('SERIALNUMBER', 'unique')|number >></span>
-				<span class="count-name">Active Donor(s)</span>
-			</div>
-		</div>
-		<div class="col-xs-12 col-md-6 col-lg-4">
 			<div class="card-counter info">
 				<span class="count-icon">&#129309;</span>
 				<span class="count-numbers"><< calc("TRXID", "unique", {ISTRX: -1})|number >></span>
 				<span class="count-name">Transaction(s)</span>
 			</div>
 		</div>
+		<div class="col-xs-12 col-md-6 col-lg-4">
+			<div class="card-counter danger">
+				<span class="count-icon">&#128522;</span>
+				<span class="count-numbers"><< calc('SERIALNUMBER', 'unique')|number >></span>
+				<span class="count-name">Active Donor(s)</span>
+			</div>
+		</div>
 	</div>
 
 	<div class="row">
 		<div class="col-xs-12 col-md-6 col-lg-4">
-			<div class="card-counter success">
+			<div class="card-counter danger">
 				<span class="count-icon">&#128512;</span>
 				<span class="count-numbers"><< calc('SERIALNUMBER', 'unique', {LINE_FY_DONTYPE1: 'NEW'})|number >></span>
-				<span class="count-name">New Donor</span>
+				<span class="count-name">New Donor(s)</span>
 			</div>
 		</div>
 		<div class="col-xs-12 col-md-6 col-lg-4">
-			<div class="card-counter warning">
+			<div class="card-counter danger">
 				<span class="count-icon">&#128512;</span>
 				<span class="count-numbers"><< calc('SERIALNUMBER', 'unique', {LINE_FY_DONTYPE1: 'CON'})|number >></span>
 				<span class="count-name">Continuing Donor(s)</span>
 			</div>
 		</div>
 		<div class="col-xs-12 col-md-6 col-lg-4">
-			<div class="card-counter info">
-				<span class="count-icon">&#128512;</span>
-				<span class="count-numbers"><< calc("TRXID", "unique", {LINE_FY_DONTYPE1: 'REC'})|number >></span>
-				<span class="count-name">Reactivated Donor(s)</span>
-			</div>
+			<card-counter theme="danger" icon="&#128512;" :num="calc('SERIALNUMBER', 'unique', {LINE_FY_DONTYPE1: 'REC'})|number" msg="1st Year Reactivated"></card-counter>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-xs-12 col-md-6 col-lg-4">
+			<card-counter theme="warning" icon="&#128578;" :num="calc('SERIALNUMBER', 'unique', {LINE_FY_DONTYPE2: '2NEW'})|number" msg="2nd Year New"></card-counter>
+		</div>
+		<div class="col-xs-12 col-md-6 col-lg-4">
+			<card-counter theme="warning" icon="&#128578;" :num="calc('SERIALNUMBER', 'unique', {LINE_FY_DONTYPE2: 'MULTI'})|number" msg="Mutli Year"></card-counter>
+		</div>
+		<div class="col-xs-12 col-md-6 col-lg-4">
+			<card-counter theme="warning" icon="&#128578;" :num="calc('SERIALNUMBER', 'unique', {LINE_FY_DONTYPE2: '2REC'})|number" msg="2nd Year Reactivated"></card-counter>
 		</div>
 	</div>
 
@@ -218,14 +226,14 @@ Vue.component('summaries', {
 		</div>
 		<div class="col-xs-12 col-md-6 col-lg-4">
 			<div class="card-counter success">
-				<span class="count-icon">&#128536;</span>
+				<span class="count-icon">&#128140;</span>
 				<span class="count-numbers"><< calc('PLEDGEID', 'unique', {IS_FIRST_INSTALMENT: -1})|number >></span>
 				<span class="count-name">Pledge(S) Have 1st Instalments Paid</span>
 			</div>
 		</div>
 		<div class="col-xs-12 col-md-6 col-lg-4">
-			<div class="card-counter info">
-				<span class="count-icon">&#128512;</span>
+			<div class="card-counter success">
+				<span class="count-icon">&#128178;</span>
 				<span class="count-numbers"><< calc(calcDimensionSum, "sum", {ISPLEDGE: -1})|currency >></span>
 				<span class="count-name">Pledge 1st Instalments</span>
 			</div>
