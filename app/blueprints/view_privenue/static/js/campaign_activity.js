@@ -8,6 +8,8 @@ const store = new Vuex.Store({
 		marketingCycle: null,
 		// Filters
 		focalMarketingActivity: null,
+		focalTypeMarketingActivity: null,
+		focalMarketingCycle: null,
 		calcDimensionSum: 'PAYMENTAMOUNTNETT',
 	},
 	mutations: {
@@ -16,6 +18,8 @@ const store = new Vuex.Store({
 		SET_BUDGET:  (state, payload) => state.budget = payload,
 		SET_MARKET_CYCLE:  (state, payload) => state.marketingCycle = payload,
 		SET_FOCAL_MARKETING_ACTIVITY:  (state, payload) => state.focalMarketingActivity = payload,
+		SET_FOCAL_TYPE_MARKETING_ACTIVITY:  (state, payload) => state.focalTypeMarketingActivity = payload,
+		SET_FOCAL_MARKETING_CYCLE:  (state, payload) => state.focalMarketingCycle = payload,
 		SET_CALC_DIMENSION_SUM: (state, payload) => state.calcDimensionSum = payload,
 	},
 	actions: {
@@ -60,6 +64,9 @@ const store = new Vuex.Store({
 			});
 			return [...new Set(rows.map(r => r[dim]))]
 		},
+		uniquesFromFocalPaymentRows: (state, getters) => (dim, filters) => {
+			return getters.uniquesFromPaymentRows(dim, {...filters, MARKETING_ACTIVITY: state.focalMarketingActivity})
+		},
 		calcPayments: (state, getters) => (dim, clacType, filters) => {
 			let rows = !filters ? getters.paymentRows : getters.paymentRows.filter(r => {
 				return Object.keys(filters).reduce((acc, key) =>	acc && (r[key] === filters[key]), true);
@@ -74,6 +81,68 @@ const store = new Vuex.Store({
 			return getters.calcPayments(dim, clacType, {...filters, MARKETING_ACTIVITY: state.focalMarketingActivity})
 		},
 	}
+});
+// ##########################################################################################################################################################
+// ##########################################################################################################################################################
+Vue.component('focal-source-table', {
+	computed: {
+		...Vuex.mapState(['focalFY', 'payments', 'budget', 'marketingCycle', 'focalMarketingActivity', 'calcDimensionSum']),
+		...Vuex.mapGetters([ 'calcFocalPayments', 'uniquesFromFocalPaymentRows']),
+	},
+	methods: {
+	},
+	template:`<div class="table-responsive">
+	<table class="table table-sm table-hover shadow-sm">
+		<thead>
+			<tr class="bg-light text-dark">
+				<th scope="col"><small class="font-weight-bold">SourceCodes</small></th>
+				<th scope="col"><small class="font-weight-bold">Revenue</small></th>
+				<th scope="col"><small class="font-weight-bold">TRX</small></th>
+				<th scope="col"><small class="font-weight-bold">ACQ:P</small></th>
+				<th scope="col"><small class="font-weight-bold">ACQ:D</small></th>
+				<th scope="col"><small class="font-weight-bold">Active</small></th>
+				<th scope="col"><small class="font-weight-bold">1New</small></th>
+				<th scope="col"><small class="font-weight-bold">2New</small></th>
+				<th scope="col"><small class="font-weight-bold">Multi</small></th>
+				<th scope="col"><small class="font-weight-bold">2Rec</small></th>
+				<th scope="col"><small class="font-weight-bold">1Rec</small></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr v-for="s1 in uniquesFromFocalPaymentRows('SOURCECODE')">
+				<td><small><< s1 >></small></td>
+				<td><small><< calcFocalPayments(calcDimensionSum, 'sum', {SOURCECODE: s1})|currency >></small></td>
+				<td><small><< calcFocalPayments("TRXID", "unique", {SOURCECODE: s1, ISTRX: -1})|number >></small></td>
+				<td><small><< calcFocalPayments('PLEDGEID', 'unique', {SOURCECODE: s1, IS_FIRST_INSTALMENT: -1})|number >></small></td>
+				<td><small><< calcFocalPayments('SERIALNUMBER', 'unique', {SOURCECODE: s1, IS_ACQUISITION: -1})|number >></small></td>
+				<td><small><< calcFocalPayments('SERIALNUMBER', 'unique', {SOURCECODE: s1})|number >></small></td>
+				<td><small><< calcFocalPayments('SERIALNUMBER', 'unique', {SOURCECODE: s1, LINE_FY_DONTYPE2: '1NEW'})|number >></small></td>
+				<td><small><< calcFocalPayments('SERIALNUMBER', 'unique', {SOURCECODE: s1, LINE_FY_DONTYPE2: '2NEW'})|number >></small></td>
+				<td><small><< calcFocalPayments('SERIALNUMBER', 'unique', {SOURCECODE: s1, LINE_FY_DONTYPE2: 'MULTI'})|number >></small></td>
+				<td><small><< calcFocalPayments('SERIALNUMBER', 'unique', {SOURCECODE: s1, LINE_FY_DONTYPE2: '1REC'})|number >></small></td>
+				<td><small><< calcFocalPayments('SERIALNUMBER', 'unique', {SOURCECODE: s1, LINE_FY_DONTYPE2: '2REC'})|number >></small></td>
+
+			</tr>
+		</tbody>
+		<tfoot>
+			<tr class="bg-light text-dark font-weight-bold">
+				<td><small class="font-weight-bold">Total</small></td>
+				<td><small class="font-weight-bold"><< calcFocalPayments(calcDimensionSum, 'sum')|currency >></small></td>
+				<td><small class="font-weight-bold"><< calcFocalPayments("TRXID", "unique", {ISTRX: -1})|number >></small></td>
+				<td><small class="font-weight-bold"><< calcFocalPayments('PLEDGEID', 'unique', {IS_FIRST_INSTALMENT: -1})|number >></small></td>
+				<td><small class="font-weight-bold"><< calcFocalPayments('SERIALNUMBER', 'unique', {IS_ACQUISITION: -1})|number >></small></td>
+				<td><small class="font-weight-bold"><< calcFocalPayments('SERIALNUMBER', 'unique')|number >></small></td>
+				<td><small class="font-weight-bold"><< calcFocalPayments('SERIALNUMBER', 'unique', {LINE_FY_DONTYPE2: '1NEW'})|number >></small></td>
+				<td><small class="font-weight-bold"><< calcFocalPayments('SERIALNUMBER', 'unique', {LINE_FY_DONTYPE2: '2NEW'})|number >></small></td>
+				<td><small class="font-weight-bold"><< calcFocalPayments('SERIALNUMBER', 'unique', {LINE_FY_DONTYPE2: 'MULTI'})|number >></small></td>
+				<td><small class="font-weight-bold"><< calcFocalPayments('SERIALNUMBER', 'unique', {LINE_FY_DONTYPE2: '1REC'})|number >></small></td>
+				<td><small class="font-weight-bold"><< calcFocalPayments('SERIALNUMBER', 'unique', {LINE_FY_DONTYPE2: '2REC'})|number >></small></td>
+
+
+			</tr>
+		</tfoot>
+	</table>
+	</div>`
 });
 // ##########################################################################################################################################################
 // ##########################################################################################################################################################
@@ -186,7 +255,7 @@ Vue.component('tree', {
 					<span><a data-toggle="collapse" :href="'#'+(ca1===-1?'Ongoing':'Periodical')" aria-expanded="false" :aria-controls="(ca1===-1?'Ongoing':'Periodical')"> << (ca1===-1?'Ongoing':'Periodical') >> <span class="text-primary"><< uniquesFromPaymentRows('MARKETING_ACTIVITY', {IS_MARKETING_ACTIVITY_ONGOING: ca1}).length >></span></a></span>
 					<ul>
 						<div :id="(ca1===-1?'Ongoing':'Periodical')" class="collapse">
-							<li v-for="mc in marketingCycleRows">
+							<li v-for="mc in marketingCycleRows" v-if="ca1===0||calcPayments('MARKETING_ACTIVITY', 'unique', {IS_MARKETING_ACTIVITY_ONGOING:ca1, MARKETING_CYCLE:mc.NAME})!==0">
 								<span><a data-toggle="collapse" :href="'#'+(ca1===-1?'Ongoing':'Periodical')+mc.CODE" aria-expanded="false" :aria-controls="(ca1===-1?'Ongoing':'Periodical')+mc.CODE"><< mc.NAME >> <span class="text-success"><< calcPayments('MARKETING_ACTIVITY', 'unique', {IS_MARKETING_ACTIVITY_ONGOING:ca1, MARKETING_CYCLE:mc.NAME}) >></span></a></span>
 								<ul v-if="calcPayments('MARKETING_ACTIVITY', 'unique', {IS_MARKETING_ACTIVITY_ONGOING:ca1, MARKETING_CYCLE:mc.NAME})>0">
 									<div :id="(ca1===-1?'Ongoing':'Periodical')+mc.CODE" class="collapse">
@@ -264,7 +333,7 @@ let rootVue = new Vue({
 		<div class="row">
 
 			<div class="col-xs-12 col-sm-6 col-md-5 col-lg-4 col-xl-3">
-				<p class="my-0 text-center"><small class="text-muted font-italic">Data Captured : << payments.timestamp|dtAU >><small></p>
+				<p class="my-0"><small class="text-muted">Data Captured : << payments.timestamp|dtAU >><small></p>
 				<div>
 					<span>Revenue Calculation : </span>
 					<input type="radio" id="one" value="PAYMENTAMOUNTNETT" v-model="calcDimensionSum">
@@ -278,16 +347,23 @@ let rootVue = new Vue({
 			</div>
 
 			<div class="col-xs-12 col-sm-6 col-md-7 col-lg-8 col-xl-9">
+
 				<template  v-if="focalMarketingActivity">
-					<h3 class="lead mt-0 mb-1 text-primary" v-if="focalMarketingActivity">Focal Campaign (<span class="text-primary">FY<< focalFY >></span>): <mark><< focalMarketingActivity >></mark></p>
+					<transition name="slide-fade">
+					<h3 class="lead mt-0 mb-1" v-if="focalMarketingActivity">Focal Campaign (<span class="text-primary">FY<< focalFY >></span>): <mark class="font-weight-bold text-primary"><< focalMarketingActivity >></mark></p>
+					</transition>
 					<summaries></summaries>
+					<focal-source-table></focal-source-table>
 				</template>
+
 				<template v-else>
-					<transition name="bounce">
+					<transition name="slide-fade">
 					<p class="lead my-0"><span class="text-primary font-weight-bold"><< campaignActivityCount >></span> TLMA Marketing Activities Generated Revenue in <span class="text-primary font-weight-bold">FY<< focalFY >></span></p>
 					</transition>
 					<summaries></summaries>
 				</template>
+
+
 			</div>
 		</div>
 
