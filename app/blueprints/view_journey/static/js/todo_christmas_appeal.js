@@ -111,14 +111,16 @@ let rootVue = new Vue({
 				let dt = new Date();
 				return {
 					header: ['SERIALNUMBER'
-						, 'DATEOFCOMMUNICATION', 'CATEGORY', 'SUBJECT','COMMENTS'
+						, 'TYPE', 'CATEGORY', 'SUBJECT', 'DATEOFCOMMUNICATION', 'COMMUNICATION_BY','COMMENTS'
 						,'GENDER','STATE','TITLE','FIRSTNAME','OTHERINITIAL','LASTNAME'
 						,'GIFTS','TOTAL'
 						,'MOBILENUMBER','DAYTELEPHONE','EVENINGTELEPHONE'
 						],
 					data: this.rawData.rows
 								.map(d => ["=\"" + d.SERIALNUMBER + "\"" ,
-								dt.getDate() +'/'+(dt.getMonth()+1)+'/'+dt.getFullYear(), 'Thank You', 'Dec 2018 Thank you (TF)',null,
+								'Phone Call', 'Thank You', 'Dec 2018 Thank you (TF)',
+								dt.getDate() +'/'+(dt.getMonth()+1)+'/'+dt.getFullYear(),
+								d.THANKYOUCALL_BY,d.THANKYOUCALL_NOTES,
 								d.GENDER,d.STATE,d.TITLE,d.FIRSTNAME,d.OTHERINITIAL,d.KEYNAME,
 								d.CAMPAIGN_PAYMENTS,d.CAMPAIGN_TOAL,
 								d.MOBILENUMBER,d.DAYTELEPHONE,d.EVENINGTELEPHONE
