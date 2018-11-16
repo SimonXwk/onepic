@@ -8,7 +8,7 @@ const store = new Vuex.Store({
 		// Filters
 		focalDonorTypes: [],
 		focalSourceTypes: [],
-		focalCampaigns: [],
+		focalActivities: [],
 		// Other Controllers
 		calcDimensionSum: 'PAYMENTAMOUNTNETT',
 		campaignActualBudget: [-1],
@@ -20,8 +20,8 @@ const store = new Vuex.Store({
 		SET_FOCALFY: (state, payload) => state.focalFY = payload,
 		SET_CALC_DIMENSION_SUM: (state, payload) => state.calcDimensionSum = payload,
 		SET_FOCAL_DONORTYPES: (state, payload) => state.focalDonorTypes = payload,
-		ADD_FOCAL_CAMPAIGN: (state, payload) => state.focalCampaigns.push(payload),
-		REMOVE_FOCAL_CAMPAIGN: (state, payload) => state.focalCampaigns.splice(state.focalCampaigns.indexOf(payload), 1) ,
+		ADD_FOCAL_ACTIVITY: (state, payload) => state.focalActivities.push(payload),
+		REMOVE_FOCAL_ACTIVITY: (state, payload) => state.focalActivities.splice(state.focalActivities.indexOf(payload), 1) ,
 		ADD_FOCAL_SOURCETYPE: (state, payload) => state.focalSourceTypes.push(payload),
 		REMOVE_FOCAL_SOURCETYPE: (state, payload) => state.focalSourceTypes.splice(state.focalSourceTypes.indexOf(payload), 1) ,
 		SET_CAMPAIGN_ACTUAL_BUDGET: (state, payload) => state.campaignActualBudget = payload,
@@ -49,17 +49,17 @@ const store = new Vuex.Store({
 		merchRows: (state, getters) => (state.payments.rows ? state.payments.rows.filter(p => p.SOURCETYPE.indexOf('Merch') !== -1 ) : []),
 		nonMerchRows:  (state, getters) => (state.payments.rows ? state.payments.rows.filter(p => p.SOURCETYPE.indexOf('Merch') === -1 ) : []),
 		merchBudgetRows: (state, getters) => (state.budget.rows ? state.budget.rows.filter(r => r.CLASS1 === 15 && r.FY === state.focalFY) : []),
-		merchTotalUnallocatedPostage: (state, getters) => (getters.merchRows.filter(v => v.MARKETING_ACTIVITY===state.arbitraryMerchPostageCampaignActivity).reduce((acc, cur) => acc+cur[state.calcDimensionSum],0)),
+		merchTotalUnallocatedPostage: (state, getters) => (getters.merchRows.filter(v => v.ACTIVITY_CODE===state.arbitraryMerchPostageCampaignActivity).reduce((acc, cur) => acc+cur[state.calcDimensionSum],0)),
 		filteredMerchRows: (state, getters) => {
 			return getters.merchRows.filter(r =>
-				( state.focalCampaigns.length!==0 ? state.focalCampaigns.indexOf(r.MARKETING_ACTIVITY) !==-1 : true)
+				( state.focalActivities.length!==0 ? state.focalActivities.indexOf(r.ACTIVITY_CODE) !==-1 : true)
 				&& ( (state.focalSourceTypes.length===0) ? false : state.focalSourceTypes.reduce((acc, cur)=>  acc || r.SOURCETYPE === cur, false))
 				&& ( (state.focalDonorTypes.length===0) ? false : state.focalDonorTypes.reduce((acc, cur)=>  acc || r.LINE_FY_DONTYPE2 === cur, false))
 			)
 		},
 		filteredBudgetRows: (state, getters) => {
 			return getters.merchBudgetRows.filter(r =>
-				( ( state.focalCampaigns.length!==0)  ? state.focalCampaigns.indexOf(r.MARKETING_ACTIVITY) !==-1 : true ) // Budget Must Have Campaign Code for every row
+				( ( state.focalActivities.length!==0)  ? state.focalActivities.indexOf(r.ACTIVITY_CODE) !==-1 : true ) // Budget Must Have Campaign Code for every row
 				&& ( !r.SOURCETYPE ? true :  ( state.focalSourceTypes.length===0 ? false : state.focalSourceTypes.reduce((acc, cur)=>  acc || r.SOURCETYPE  === cur, false)))  // Allow SOURCETYPE to be empty
 			)
 		},
@@ -70,11 +70,11 @@ const store = new Vuex.Store({
 let summaryTable = Vue.component('table-summary', {
 	computed:{
 		...Vuex.mapState([
-			'focalFY', 'calcDimensionSum', 'arbitraryMerchPostageCampaignActivity', 'focalDonorTypes', 'focalSourceTypes', 'focalCampaigns', 'campaignActualBudget'
+			'focalFY', 'calcDimensionSum', 'arbitraryMerchPostageCampaignActivity', 'focalDonorTypes', 'focalSourceTypes', 'focalActivities', 'campaignActualBudget'
 		]),
 		...Vuex.mapGetters(['merchRows', 'merchBudgetRows', 'merchTotalUnallocatedPostage']),
-		actualCampaigns:function(){return new Set(this.merchRows.map(v => v.MARKETING_ACTIVITY))},
-		budgetCampaigns:function(){return new Set(this.merchBudgetRows.map(v => v.MARKETING_ACTIVITY))},
+		actualCampaigns:function(){return new Set(this.merchRows.map(v => v.ACTIVITY_CODE))},
+		budgetCampaigns:function(){return new Set(this.merchBudgetRows.map(v => v.ACTIVITY_CODE))},
 		merchCampaigns: function(){return [...new Set([...this.actualCampaigns, ...this.budgetCampaigns])].sort()},
 		merchRevenueTypes: function(){return Array.from(new Set(this.merchRows.map(v => v.SOURCETYPE))).sort()},
 		merchPostagePerPurchase: function(){
@@ -90,7 +90,7 @@ let summaryTable = Vue.component('table-summary', {
 	},
 	methods:{
 		setFocalCampaign: function(camp){
-			this.focalCampaigns.indexOf(camp) === -1 ? this.$store.commit('ADD_FOCAL_CAMPAIGN', camp) : this.$store.commit('REMOVE_FOCAL_CAMPAIGN', camp)
+			this.focalActivities.indexOf(camp) === -1 ? this.$store.commit('ADD_FOCAL_ACTIVITY', camp) : this.$store.commit('REMOVE_FOCAL_ACTIVITY', camp)
 		},
 		updateFocalSourceTypes: function(srcType){
 			this.focalSourceTypes.indexOf(srcType) === -1 ? this.$store.commit('ADD_FOCAL_SOURCETYPE', srcType) : this.$store.commit('REMOVE_FOCAL_SOURCETYPE', srcType)
@@ -163,29 +163,29 @@ let summaryTable = Vue.component('table-summary', {
 		</thead>
 		<tbody>
 			<template v-for="camp in merchCampaigns" v-if="campaignActualBudget.indexOf(checkCampaignExist(camp))!==-1">
-				<tr v-on:dblclick="setFocalCampaign(camp)" v-bind:class="{'table-success': focalCampaigns.indexOf(camp)!==-1}" style="cursor: -webkit-grab; cursor: grab;">
+				<tr v-on:click="setFocalCampaign(camp)" v-bind:class="{'table-success': focalActivities.indexOf(camp)!==-1}" style="cursor: -webkit-grab; cursor: grab;">
 					<th rowspan="2" class="align-middle" v-bind:class="{'text-primary': checkCampaignExist(camp)===-1, 'text-success': checkCampaignExist(camp)===-2, 'text-danger': checkCampaignExist(camp)===-3}" >
 						<small class="font-weight-bold"><< camp >></small>
 					</th>
 					<td class="text-primary"><small>A</small></td>
-					<td class="text-success"><small><< calc('SERIALNUMBER', 'unique', {MARKETING_ACTIVITY:camp, IS_ACQUISITION: -1})|number >></small></td>
-					<td class="text-primary"><small><< calc('SERIALNUMBER', 'unique', {MARKETING_ACTIVITY:camp})|number >></small></td>
-					<td class="text-secondary"><small class="font-weight-bold"><< calc('TRXID', 'unique', {MARKETING_ACTIVITY:camp, ISTRX: -1})|number >></small></td>
-					<td class="text-danger" v-if="camp===arbitraryMerchPostageCampaignActivity"><small><< (calc(calcDimensionSum, 'sum', {MARKETING_ACTIVITY:camp})-merchTotalUnallocatedPostage)|currency >></small></td>
-					<td class="text-dark" v-else><small class="font-weight-bold"><< (allocatePostage(calc(calcDimensionSum, 'sum', {SOURCETYPE:'Merchandise Purchase', MARKETING_ACTIVITY:camp})) + calc(calcDimensionSum, 'sum', {MARKETING_ACTIVITY:camp}))|currency >></small></td>
-					<td class="text-danger"><small><< allocatePostage(calc(calcDimensionSum, 'sum', {SOURCETYPE:'Merchandise Purchase', MARKETING_ACTIVITY:camp}))|currency >></small></td>
-					<td class="text-info"><small><< calc(calcDimensionSum, 'sum', {MARKETING_ACTIVITY:camp})|currency >></small></td>
-					<td v-for="type in merchRevenueTypes"><small><< calc(calcDimensionSum, 'sum', {SOURCETYPE:type, MARKETING_ACTIVITY:camp})|currency >></small></td>
+					<td class="text-success"><small><< calc('SERIALNUMBER', 'unique', {ACTIVITY_CODE:camp, IS_ACQUISITION: -1})|number >></small></td>
+					<td class="text-primary"><small><< calc('SERIALNUMBER', 'unique', {ACTIVITY_CODE:camp})|number >></small></td>
+					<td class="text-secondary"><small class="font-weight-bold"><< calc('TRXID', 'unique', {ACTIVITY_CODE:camp, ISTRX: -1})|number >></small></td>
+					<td class="text-danger" v-if="camp===arbitraryMerchPostageCampaignActivity"><small><< (calc(calcDimensionSum, 'sum', {ACTIVITY_CODE:camp})-merchTotalUnallocatedPostage)|currency >></small></td>
+					<td class="text-dark" v-else><small class="font-weight-bold"><< (allocatePostage(calc(calcDimensionSum, 'sum', {SOURCETYPE:'Merchandise Purchase', ACTIVITY_CODE:camp})) + calc(calcDimensionSum, 'sum', {ACTIVITY_CODE:camp}))|currency >></small></td>
+					<td class="text-danger"><small><< allocatePostage(calc(calcDimensionSum, 'sum', {SOURCETYPE:'Merchandise Purchase', ACTIVITY_CODE:camp}))|currency >></small></td>
+					<td class="text-info"><small><< calc(calcDimensionSum, 'sum', {ACTIVITY_CODE:camp})|currency >></small></td>
+					<td v-for="type in merchRevenueTypes"><small><< calc(calcDimensionSum, 'sum', {SOURCETYPE:type, ACTIVITY_CODE:camp})|currency >></small></td>
 				</tr>
 				<tr class="font-italic bg-light">
 					<td class="text-secondary"><small>B</small></td>
 					<td class="text-secondary"><small>-</small></td>
 					<td class="text-secondary"><small>-</small></td>
-					<td class="text-secondary"><small><< sumBudget('TRANSACTION', {MARKETING_ACTIVITY: camp})|number >></small></td>
-					<td class="text-secondary"><small><< sumBudget('REVENUE', {MARKETING_ACTIVITY: camp})|currency >></small></td>
-					<td class="text-secondary"><small><< sumBudget('REVENUE', {MARKETING_ACTIVITY: camp, SOURCETYPE: 'Merchandise Postage'})|currency >></small></td>
-					<td class="text-secondary"><small><< sumBudget('REVENUE', {MARKETING_ACTIVITY: camp})|currency >></small></td>
-					<td class="text-secondary" v-for="type in merchRevenueTypes"><small><< sumBudget('REVENUE', {MARKETING_ACTIVITY: camp, SOURCETYPE: type})|currency >></small></td>
+					<td class="text-secondary"><small><< sumBudget('TRANSACTION', {ACTIVITY_CODE: camp})|number >></small></td>
+					<td class="text-secondary"><small><< sumBudget('REVENUE', {ACTIVITY_CODE: camp})|currency >></small></td>
+					<td class="text-secondary"><small><< sumBudget('REVENUE', {ACTIVITY_CODE: camp, SOURCETYPE: 'Merchandise Postage'})|currency >></small></td>
+					<td class="text-secondary"><small><< sumBudget('REVENUE', {ACTIVITY_CODE: camp})|currency >></small></td>
+					<td class="text-secondary" v-for="type in merchRevenueTypes"><small><< sumBudget('REVENUE', {ACTIVITY_CODE: camp, SOURCETYPE: type})|currency >></small></td>
 				</tr>
 			</template>
 		</tbody>
@@ -242,7 +242,7 @@ let compareBarChartVue = Vue.component('chart-compare', {
 		}
 	},
 	computed: {
-		...Vuex.mapState(['focalFY', 'calcDimensionSum', 'focalDonorTypes', 'focalSourceTypes', 'focalCampaigns']),
+		...Vuex.mapState(['focalFY', 'calcDimensionSum', 'focalDonorTypes', 'focalSourceTypes', 'focalActivities']),
 		...Vuex.mapGetters(['merchRows', 'merchBudgetRows', 'filteredMerchRows', 'filteredBudgetRows']),
 		isRevenue: function(){ return this.meta.item ==='Revenue' },
 		calcDim: function(){
@@ -380,7 +380,7 @@ let compareBarChartVue = Vue.component('chart-compare', {
 	},
 	watch:{
 		calcDim: function(newVal, oldVal){ this.reDraw(); },
-		focalCampaigns: function(newVal, oldVal){ this.reDraw(); },
+		focalActivities: function(newVal, oldVal){ this.reDraw(); },
 		focalDonorTypes: function(newVal, oldVal){ this.reDraw(); },
 		focalSourceTypes: function(newVal, oldVal){ this.reDraw(); }
 	},
@@ -390,7 +390,7 @@ let compareBarChartVue = Vue.component('chart-compare', {
 		},
 		reDraw: function(){
 			this.chart.update({
-				subtitle: { text:  (this.focalCampaigns && this.focalCampaigns.length!==0 ?  this.focalCampaigns : 'All Campaigns') },
+				subtitle: { text:  (this.focalActivities && this.focalActivities.length!==0 ?  this.focalActivities : 'All Campaigns') },
 			});
 			this.chart.series.forEach(s => {
 				if (s.stackKey.indexOf('Budget')!==-1) {
