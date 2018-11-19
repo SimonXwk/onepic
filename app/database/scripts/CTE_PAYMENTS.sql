@@ -1,2 +1,2 @@
 select *
-from cte_payments_with_donor_type
+from cte_payments_with_donor_type_and_detail

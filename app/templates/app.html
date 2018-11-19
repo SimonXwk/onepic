@@ -168,7 +168,7 @@ function currency(val) {
 					}
 				}
 			});
-			Vue.filter('currency', (val, dec=2, sign='$') => isNaN(val) || val === null  ? val : sign + String(val.toFixed(dec)).split("").reverse().join("").replace(/(\d{3}\B)/g, "$1,").split("").reverse().join(""));
+			Vue.filter('currency', (val, showZero=true, dec=2, sign='$') => isNaN(val) || val === null  ? val : (!showZero && val===0) ? null : sign + String(val.toFixed(dec)).split("").reverse().join("").replace(/(\d{3}\B)/g, "$1,").split("").reverse().join(""));
 			Vue.filter('number', (val, showZero=true, dec=0) => isNaN(val) || val === null ? val : (!showZero && val===0) ? null : (String((val).toFixed(dec)).split("").reverse().join("").replace(/(\d{3}\B)/g, "$1,").split("").reverse().join(""))) ;
 			Vue.filter('pct', (val, dec=1) => {
 				if (isNaN(val) ){
