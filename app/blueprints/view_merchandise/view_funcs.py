@@ -60,23 +60,24 @@ def track_shipped_order(order_number=None):
 
 @templatified('starshipit_unshipped_orders')
 def list_unshipped_orders(order_number=None):
-
 	return dict(order_number=order_number)
 
 
 @templatified('merch_new_customer_courtesy_call', title='Merch Courtesy Call')
 def merchandise_new_courtesy_call():
-	return None
+	pass
 
 
 @templatified('merch_new_customer_welcome_pack', title='Merch Welcome Pack')
 def merchandise_new_welcome_pack():
-	return None
+	pass
 
 
 @templatified('merch_revenue_overview', title='Merch Revenue')
 def merchandise_revenue_overview():
-	fy = int(request_arg('fy', TLMA.cfy, tests.is_year))
-	# Prepare for SQL parameters
-	d1, d2 = TLMA.fy_range(fy)
-	return dict(thisfy=fy)
+	pass
+
+
+@templatified('merchandise_activity', title='Merch Activity')
+def merchandise_activity():
+	pass

@@ -177,6 +177,12 @@ Vue.component('focal-source-table', {
 // ##########################################################################################################################################################
 // ##########################################################################################################################################################
 Vue.component('focal-month-table', {
+	data: function(){
+		return {
+			calculations: ['Revenue', 'Transaction', 'Giver', 'Acqusition', 'Pledge'],
+			focalCalculation: 'Revenue'
+		}
+	},
 	computed: {
 		...Vuex.mapState(['focalFY', 'payments', 'budget', 'fyMth', 'marketingCycle', 'focalActivity', 'calcDimensionSum']),
 		...Vuex.mapGetters([ 'calcFocalPayments', 'uniquesFromFocalPaymentRows']),
@@ -184,127 +190,83 @@ Vue.component('focal-month-table', {
 	methods: {
 	},
 	template:`<div>
+	<select v-model="focalCalculation" >
+		<option v-for="c in calculations" v-bind:value="c" ><< c >></option>
+	</select>
+
 	<div class="table-responsive">
 		<table class="table table-sm table-bordered table-hover shadow-sm text-right">
 			<thead>
 				<tr class="bg-light text-dark">
 					<th scope="col"><small class="font-weight-bold">SourceCodes</small></th>
-					<th scope="col"><small class="font-weight-bold">Revenue</small></th>
+					<th scope="col"><small class="font-weight-bold"><< focalCalculation >></small></th>
 					<th scope="col" v-for="mth in fyMth.short"><small class="font-weight-bold "><< mth >></small></th>
 				</tr>
 			</thead>
-			<tbody>
+			<tbody v-if="focalCalculation==='Revenue'">
 				<tr v-for="s1 in uniquesFromFocalPaymentRows('SOURCECODE')">
 					<td style="width:5%"><small><< s1 >></small></td>
 					<td style="width:5%"><small class="text-primary font-weight-bold"><< calcFocalPayments(calcDimensionSum, 'sum', {SOURCECODE: s1})|currency >></small></td>
 					<td v-for="(mth, idx) in fyMth.number" style="width:7.5%"><small><<  calcFocalPayments(calcDimensionSum, 'sum', {SOURCECODE: s1, PAYMENT_FYMTH:idx+1})|currency(false) >></small></td>
 				</tr>
 			</tbody>
-			<tfoot>
-				<tr class="bg-light text-dark font-weight-bold">
-					<td><small class="font-weight-bold">Total</small></td>
-					<td><small class="font-weight-bold "><< calcFocalPayments(calcDimensionSum, 'sum')|currency >></small></td>
-					<td v-for="(mth, idx) in fyMth.number"><small class="font-weight-bold "><< calcFocalPayments(calcDimensionSum, 'sum', {PAYMENT_FYMTH:idx+1})|currency >></small></td>
-				</tr>
-			</tfoot>
-		</table>
-	</div>
-
-	<div class="table-responsive">
-		<table class="table table-sm table-bordered table-hover shadow-sm text-right">
-			<thead>
-				<tr class="bg-light text-dark">
-					<th scope="col"><small class="font-weight-bold">SourceCodes</small></th>
-					<th scope="col"><small class="font-weight-bold">Transaction</small></th>
-					<th scope="col" v-for="mth in fyMth.short"><small class="font-weight-bold  "><< mth >></small></th>
-				</tr>
-			</thead>
-			<tbody>
+			<tbody v-else-if="focalCalculation==='Transaction'">
 				<tr v-for="s1 in uniquesFromFocalPaymentRows('SOURCECODE')">
 					<td style="width:5%"><small><< s1 >></small></td>
 					<td style="width:5%"><small class="text-primary font-weight-bold"><< calcFocalPayments("TRXID", "unique", {ISTRX: -1,  SOURCECODE: s1,})|number >></small></td>
 					<td v-for="(mth, idx) in fyMth.number" style="width:7.5%"><small><<  calcFocalPayments("TRXID", "unique", {ISTRX: -1, SOURCECODE: s1, PAYMENT_FYMTH:idx+1} )|number(false) >></small></td>
 				</tr>
 			</tbody>
-			<tfoot>
-				<tr class="bg-light text-dark font-weight-bold">
-					<td><small class="font-weight-bold">Total</small></td>
-					<td><small class="font-weight-bold "><< calcFocalPayments("TRXID", "unique", {ISTRX: -1})|number >></small></td>
-					<td v-for="(mth, idx) in fyMth.number"><small class="font-weight-bold "><<  calcFocalPayments("TRXID", "unique", {ISTRX: -1,PAYMENT_FYMTH:idx+1})|number >></small></td>
-				</tr>
-			</tfoot>
-		</table>
-	</div>
-
-	<div class="table-responsive">
-		<table class="table table-sm table-bordered table-hover shadow-sm text-right">
-			<thead>
-				<tr class="bg-light text-dark">
-					<th scope="col"><small class="font-weight-bold">SourceCodes</small></th>
-					<th scope="col"><small class="font-weight-bold">Active</small></th>
-					<th scope="col" v-for="mth in fyMth.short"><small class="font-weight-bold "><< mth >></small></th>
-				</tr>
-			</thead>
-			<tbody>
+			<tbody v-else-if="focalCalculation==='Giver'">
 				<tr v-for="s1 in uniquesFromFocalPaymentRows('SOURCECODE')">
 					<td style="width:5%"><small><< s1 >></small></td>
 					<td style="width:5%"><small class="text-primary font-weight-bold"><< calcFocalPayments("SERIALNUMBER", "unique", {SOURCECODE: s1,})|number >></small></td>
 					<td v-for="(mth, idx) in fyMth.number" style="width:7.5%"><small><<  calcFocalPayments("SERIALNUMBER", "unique", { SOURCECODE: s1, PAYMENT_FYMTH:idx+1} )|number(false) >></small></td>
 				</tr>
 			</tbody>
-			<tfoot>
-				<tr class="bg-light text-dark font-weight-bold">
-					<td><small class="font-weight-bold">Total</small></td>
-					<td><small class="font-weight-bold "><< calcFocalPayments("SERIALNUMBER", "unique")|number >></small></td>
-					<td v-for="(mth, idx) in fyMth.number"><small class="font-weight-bold "><<  calcFocalPayments("SERIALNUMBER", "unique", {PAYMENT_FYMTH:idx+1})|number >></small></td>
-				</tr>
-			</tfoot>
-		</table>
-	</div>
-
-	<div class="table-responsive">
-		<table class="table table-sm table-bordered table-hover shadow-sm text-right">
-			<thead>
-				<tr class="bg-light text-dark">
-					<th scope="col"><small class="font-weight-bold">SourceCodes</small></th>
-					<th scope="col"><small class="font-weight-bold">Acqusition</small></th>
-					<th scope="col" v-for="mth in fyMth.short"><small class="font-weight-bold "><< mth >></small></th>
-				</tr>
-			</thead>
-			<tbody>
+			<tbody v-else-if="focalCalculation==='Acqusition'">
 				<tr v-for="s1 in uniquesFromFocalPaymentRows('SOURCECODE')">
 					<td style="width:5%"><small><< s1 >></small></td>
 					<td style="width:5%"><small class="text-success font-weight-bold"><< calcFocalPayments("SERIALNUMBER", "unique", {SOURCECODE: s1, IS_ACQUISITION: -1})|number(false) >></small></td>
 					<td v-for="(mth, idx) in fyMth.number" style="width:7.5%"><small><<  calcFocalPayments("SERIALNUMBER", "unique", {SOURCECODE: s1, IS_ACQUISITION: -1, PAYMENT_FYMTH:idx+1} )|number(false) >></small></td>
 				</tr>
 			</tbody>
-			<tfoot>
-				<tr class="bg-light text-dark font-weight-bold">
-					<td><small class="font-weight-bold">Total</small></td>
-					<td><small class="font-weight-bold "><< calcFocalPayments("SERIALNUMBER", "unique", {IS_ACQUISITION: -1})|number >></small></td>
-					<td v-for="(mth, idx) in fyMth.number"><small class="font-weight-bold "><<  calcFocalPayments("SERIALNUMBER", "unique", {IS_ACQUISITION: -1, PAYMENT_FYMTH:idx+1})|number >></small></td>
-				</tr>
-			</tfoot>
-		</table>
-	</div>
-
-	<div class="table-responsive">
-		<table class="table table-sm table-bordered table-hover shadow-sm text-right">
-			<thead>
-				<tr class="bg-light text-dark">
-					<th scope="col"><small class="font-weight-bold">SourceCodes</small></th>
-					<th scope="col"><small class="font-weight-bold">Pledge</small></th>
-					<th scope="col" v-for="mth in fyMth.short"><small class="font-weight-bold "><< mth >></small></th>
-				</tr>
-			</thead>
-			<tbody>
+			<tbody v-else-if="focalCalculation==='Pledge'">
 				<tr v-for="s1 in uniquesFromFocalPaymentRows('SPONSORSHIP1')">
 					<td style="width:5%"><small><< s1 >></small></td>
 					<td style="width:5%"><small class="text-success font-weight-bold"><< calcFocalPayments("PLEDGEID", "unique", {SPONSORSHIP1: s1, IS_FIRST_INSTALMENT: -1})|number(false) >></small></td>
 					<td v-for="(mth, idx) in fyMth.number" style="width:7.5%"><small><<  calcFocalPayments("PLEDGEID", "unique", {SPONSORSHIP1: s1, IS_FIRST_INSTALMENT: -1, PAYMENT_FYMTH:idx+1} )|number(false) >></small></td>
 				</tr>
 			</tbody>
-			<tfoot>
+			<tfoot v-if="focalCalculation==='Revenue'">
+				<tr class="bg-light text-dark font-weight-bold">
+					<td><small class="font-weight-bold">Total</small></td>
+					<td><small class="font-weight-bold "><< calcFocalPayments(calcDimensionSum, 'sum')|currency >></small></td>
+					<td v-for="(mth, idx) in fyMth.number"><small class="font-weight-bold "><< calcFocalPayments(calcDimensionSum, 'sum', {PAYMENT_FYMTH:idx+1})|currency >></small></td>
+				</tr>
+			</tfoot>
+			<tfoot v-else-if="focalCalculation==='Transaction'">
+				<tr class="bg-light text-dark font-weight-bold">
+					<td><small class="font-weight-bold">Total</small></td>
+					<td><small class="font-weight-bold "><< calcFocalPayments("TRXID", "unique", {ISTRX: -1})|number >></small></td>
+					<td v-for="(mth, idx) in fyMth.number"><small class="font-weight-bold "><<  calcFocalPayments("TRXID", "unique", {ISTRX: -1,PAYMENT_FYMTH:idx+1})|number >></small></td>
+				</tr>
+			</tfoot>
+			<tfoot v-else-if="focalCalculation==='Giver'">
+				<tr class="bg-light text-dark font-weight-bold">
+					<td><small class="font-weight-bold">Total</small></td>
+					<td><small class="font-weight-bold "><< calcFocalPayments("SERIALNUMBER", "unique")|number >></small></td>
+					<td v-for="(mth, idx) in fyMth.number"><small class="font-weight-bold "><<  calcFocalPayments("SERIALNUMBER", "unique", {PAYMENT_FYMTH:idx+1})|number >></small></td>
+				</tr>
+			</tfoot>
+			<tfoot v-else-if="focalCalculation==='Acqusition'">
+				<tr class="bg-light text-dark font-weight-bold">
+					<td><small class="font-weight-bold">Total</small></td>
+					<td><small class="font-weight-bold "><< calcFocalPayments("SERIALNUMBER", "unique", {IS_ACQUISITION: -1})|number >></small></td>
+					<td v-for="(mth, idx) in fyMth.number"><small class="font-weight-bold "><<  calcFocalPayments("SERIALNUMBER", "unique", {IS_ACQUISITION: -1, PAYMENT_FYMTH:idx+1})|number >></small></td>
+				</tr>
+			</tfoot>
+			<tfoot v-else-if="focalCalculation==='Pledge'">
 				<tr class="bg-light text-dark font-weight-bold">
 					<td><small class="font-weight-bold">Total</small></td>
 					<td><small class="font-weight-bold "><< calcFocalPayments("PLEDGEID", "unique", {IS_FIRST_INSTALMENT: -1})|number >></small></td>
@@ -313,6 +275,8 @@ Vue.component('focal-month-table', {
 			</tfoot>
 		</table>
 	</div>
+
+
 
 	</div>`
 });
