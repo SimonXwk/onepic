@@ -33,6 +33,14 @@ def payments():
 
 
 @odbc_json_api
+def merch_activities():
+	fy = int(request_arg('fy', TLMA.cfy, tests.is_year))
+	d1, d2 = Tq.format_date(TLMA.fy_range(fy))
+	updates = [('BASE_QUERY', ''), ('PAYMENT_DATE1', d1, '\''), ('PAYMENT_DATE2', d2, '\'')]
+	return Tq.query(('CTE', 'CTE_MERCH_ACTIVITY_SUMMARY'), cached_timeout=60, updates=updates)
+
+
+@odbc_json_api
 def fys_summary():
 	ltd = int(request_arg('ltd', 0, lambda x: tests.is_int(x) and (int(x) == 0 or int(x) == -1)))
 	params = (TLMA.cfy, ltd)

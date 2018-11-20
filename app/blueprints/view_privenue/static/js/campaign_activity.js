@@ -180,7 +180,7 @@ Vue.component('focal-month-table', {
 	data: function(){
 		return {
 			calculations: ['Revenue', 'Transaction', 'Giver', 'Acqusition', 'Pledge'],
-			focalCalculation: 'Revenue'
+			focalCalculation: 'Revenue',
 		}
 	},
 	computed: {
@@ -275,8 +275,6 @@ Vue.component('focal-month-table', {
 			</tfoot>
 		</table>
 	</div>
-
-
 
 	</div>`
 });

@@ -36,7 +36,7 @@ def comparative():
 	return dict(cfy=fy, data=data, progress=progress, budget=budget)
 
 
-@templatified('campaign_activity', title='Campaigns')
+@templatified('campaign_activity', title='Activities')
 def campaign_activity():
 	pass
 

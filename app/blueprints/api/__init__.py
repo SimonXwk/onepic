@@ -22,9 +22,13 @@ ld.url('data_thankq.journey_cureone_acquisiton_donors', ['/campaign/journey_cure
 ld.url('data_thankq.christmas_appeal_donors', ['/campaign/christmas_appeal'])
 
 ld.url('data_thankq.get_first_date_source1_by_contacts_since', ['/tq/get_first_date_source1_by_contacts_since'])
+ld.url('data_thankq.merch_activities', ['/tq/merch_activities'])
+
 
 ld.url('data_thankq.pledge_headers', ['/tq/pledges'])
 ld.url('data_thankq.marketing_cycle', ['/marketing_cycle'])
+
+
 
 # BUDGET
 ld.url('data_budget.budget', ['/budget'])
