@@ -19,12 +19,12 @@ const endpoint = (url, parameter) => $SCRIPT_ROOT + url + (parameter ? parameter
 // Using Fetch API to grab JSON Data
 const fetchJSON = (endpoint, func, silent=false) => {
 	function checkStstus(response) {
-		if (!silent){ console.log('✓ Response received (' + endpoint + ')', response); }
+		if (!silent){ console.log('%c✓ Response received (' + endpoint + ')', 'color: green;', response, ); }
 		if (response.status >= 200 && response.status < 300) {
 			// if (!silent){ console.log('✓ Response status success (' + response.status + '), Promise.resolve response ... '); }
 			return Promise.resolve(response)
 		} else {
-			console.log('✘ Response Status Failed, Promise.reject response now ...');
+			console.log('%c✘ Response Status Failed, Promise.reject response now ...', 'color: red; background: red;');
 			return Promise.reject(new Error(response.statusText))
 		}
 	}
@@ -44,8 +44,8 @@ const fetchJSON = (endpoint, func, silent=false) => {
 			// Call Processing Function
 			func(jsonData);
 			// ---------------------------------------------------------------------------------
-			if (!silent){ console.log('✓ JSON data processed for endpoint: ' + endpoint); }
-		}).catch((error) => { console.log('✘ Request Failed', endpoint, error); });
+			if (!silent){ console.log('%c✓ JSON data processed for endpoint: ' + endpoint, 'color: purple; background: lime;'); }
+		}).catch((error) => { console.log('%c✘ Request Failed', 'color: red; background: red;', endpoint, error); });
 };
 
 
@@ -239,6 +239,30 @@ function currency(val) {
 					<span class="count-name"><< msg >></span>
 				</div>`
 			});
+			Vue.component('v-switch', {
+				props: ['text', 'value', 'checked'],
+				updated() { console.log(this.value, this.modelObj) },
+				computed: {
+					isOn: function() {
+						if (this.modelObj) {
+							if (this.value === this.modelObj) {
+								return true
+							} else {
+								return this.modelObj.indexOf(this.value) !== -1
+							}
+						}else {
+							return this.value
+						}
+					}
+				},
+				template:`<div class="fat-switch">
+				<label class="label" v-bind:class="{'on':isOn , 'off':!isOn}" v-bind:for="_uid"><< text >> << this.value >> </label>
+				<label class="switch">
+					<input type="checkbox" v-bind:id="_uid" v-bind:value="value" v-on:input="modelObj = $event.target.value">
+					<span class="slider"></span>
+				</label>
+			</div>`
+			});
 	</script>
 
 	{% elif vendor == 'vuex' %}
@@ -380,7 +404,7 @@ function currency(val) {
 
 {# Set High Chart Global Defaults #}
 <script type="text/javascript">
-console.log('✓ Highchart ready to serve: ', "{{ bases|safe }}{{ modules|safe }}");
+console.log('%c✓ Highchart ready to serve: ' + "{{ bases|safe }}{{ modules|safe }}", 'color: snow;background:navy; ');
 Highcharts.setOptions({
 	lang: {
 		decimalPoint: '.',

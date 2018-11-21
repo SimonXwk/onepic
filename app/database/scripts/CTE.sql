@@ -39,7 +39,9 @@ cte_decimal AS (SELECT * FROM (VALUES (0),(1),(2),(3),(4),(5),(6),(7),(8),(9)) A
 )
 -- ----------------------------------------------------------------------------------------------------
 , cte_contacts AS (
-  SELECT RTRIM(C1.SERIALNUMBER) AS [SN]
+  SELECT
+--     RTRIM(C1.SERIALNUMBER) AS [SN]
+    C1.SERIALNUMBER AS [SN]
     ,C1.CREATED
     ,CONCAT(
       CASE WHEN RTRIM(C1.TITLE)='' OR C1.TITLE IS NULL THEN '' ELSE TRIM(C1.TITLE) + ' ' END,
@@ -299,7 +301,8 @@ cte_decimal AS (SELECT * FROM (VALUES (0),(1),(2),(3),(4),(5),(6),(7),(8),(9)) A
 ,cte_payments AS (
 SELECT
   -- >>>> From BATCH_ITEM_SPLIT
-  RTRIM(B1.SERIALNUMBER) AS [SERIALNUMBER]  -- This Primary Key tends to have trailing spaces from time to time
+--   RTRIM(B1.SERIALNUMBER) AS [SERIALNUMBER]  -- This Primary Key tends to have trailing spaces from time to time
+  B1.SERIALNUMBER
   , B1.PAYMENTAMOUNT , B1.GSTAMOUNT , B1.PAYMENTAMOUNTNETT
   , B1.SOURCECODE, B1.SOURCECODE2
   , B1.DESTINATIONCODE, B1.DESTINATIONCODE2

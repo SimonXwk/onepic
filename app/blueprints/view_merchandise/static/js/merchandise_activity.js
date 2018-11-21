@@ -198,7 +198,7 @@ Vue.component('activity-summary', {
 								<th scope="col" style="width:2%"><small class="font-weight-bold">Combination</small></th>
 								<th scope="col" style="width:14%" v-for="t in merchRevenueTypes"><small class="font-weight-bold text-primary"><< t >></small></th>
 								<th scope="col" style="width:14%"><small class="font-weight-bold text-danger">Revenue</small></th>
-								<th scope="col" style="width:14%"><small class="font-weight-bold text-success">Customer</small></th>
+								<th scope="col" style="width:14%"><small class="font-weight-bold text-primary">Customer</small></th>
 								<th scope="col" style="width:14%"><small class="font-weight-bold text-info">Revenue/Customer</small></th>
 							</tr>
 						</thead>
@@ -207,7 +207,7 @@ Vue.component('activity-summary', {
 								<td><small><< cb >></small></td>
 								<td v-for="t in merchRevenueTypes"><small class="text-primary"><< calc(t, 'sum', {ACTIVITY_CODE:activity,MCOMBINE:cb })|currency(false) >></small></td>
 								<td><small class="text-danger"><< calc(calcDimensionSum, 'sum', {ACTIVITY_CODE:activity,MCOMBINE:cb })|currency(false) >></small></td>
-								<td><small class="text-success"><< calc('SERIALNUMBER', 'unique', {ACTIVITY_CODE:activity,MCOMBINE:cb })|number(false) >></small></td>
+								<td><small class="text-primary"><< calc('SERIALNUMBER', 'unique', {ACTIVITY_CODE:activity,MCOMBINE:cb })|number(false) >></small></td>
 								<td><small class="text-info"><< calc(calcDimensionSum, 'sum', {ACTIVITY_CODE:activity,MCOMBINE:cb })/calc('SERIALNUMBER', 'unique', {ACTIVITY_CODE:activity,MCOMBINE:cb })|currency(false) >></small></td>
 							</tr>
 						</tbody>
@@ -216,7 +216,7 @@ Vue.component('activity-summary', {
 								<td><small class="font-weight-bold">Total</small></td>
 								<td v-for="t in merchRevenueTypes"><small class="font-weight-bold text-primary"><< calc(t, 'sum', {ACTIVITY_CODE:activity })|currency(false) >></small></td>
 								<td><small class="font-weight-bold text-danger"><< calc(calcDimensionSum, 'sum', {ACTIVITY_CODE:activity })|currency(false) >></small></td>
-								<td><small class="font-weight-bold text-success"><< calc('SERIALNUMBER', 'unique', {ACTIVITY_CODE:activity })|number(false) >></small></td>
+								<td><small class="font-weight-bold text-primary"><< calc('SERIALNUMBER', 'unique', {ACTIVITY_CODE:activity })|number(false) >></small></td>
 								<td><small class="font-weight-bold text-info"><< calc(calcDimensionSum, 'sum', {ACTIVITY_CODE:activity})/calc('SERIALNUMBER', 'unique', {ACTIVITY_CODE:activity})|currency(false) >></small></td>
 							</tr>
 							<tr class="table-warning text-dark font-weight-bold">
@@ -228,7 +228,7 @@ Vue.component('activity-summary', {
 									<small class="font-weight-bold text-primary" v-else-if="t === 'MSPN'"><< sumBudget('REVENUE', {ACTIVITY_CODE:activity,SOURCETYPE:'Merchandise Sponsorship'})|currency(false) >></small>
 								</td>
 								<td><small class="font-weight-bold text-danger"><< sumBudget('REVENUE', {ACTIVITY_CODE:activity})|currency(false) >></small></td>
-								<td><small class="font-weight-bold text-success"></small></td>
+								<td><small class="font-weight-bold text-primary"></small></td>
 								<td><small class="font-weight-bold text-info"></small></td>
 							</tr>
 						</tfoot>
@@ -269,29 +269,37 @@ Vue.component('global-filters', {
 	},
 	template: `<div>
 
-			<label for="activityTypes1" :class="{'text-success': activityTypes.indexOf(-1)!==-1}">BOTH</label>
-			<label class="fat-switch">
-				<input type="checkbox" id="activityTypes1" v-bind:value="-1" v-model="activityTypes">
-				<span class="fat-switch-slider"></span>
-			</label>
+			<div class="fat-switch">
+				<label class="label" for="activityTypes1" :class="{'on': activityTypes.indexOf(-1)!==-1, 'off': activityTypes.indexOf(-1)===-1}">BOTH</label>
+				<label class="switch">
+					<input type="checkbox" id="activityTypes1" v-bind:value="-1" v-model="activityTypes">
+					<span class="slider"></span>
+				</label>
+			</div>
 
-			<label for="activityTypes2" :class="{'text-success': activityTypes.indexOf(-2)!==-1}">ACTUAL ONLY</label>
-			<label class="fat-switch">
-				<input type="checkbox" id="activityTypes2" v-bind:value="-2" v-model="activityTypes">
-				<span class="fat-switch-slider"></span>
-			</label>
+			<div class="fat-switch">
+				<label class="label" for="activityTypes2" :class="{'on': activityTypes.indexOf(-2)!==-1, 'off': activityTypes.indexOf(-2)===-1}">ACTUAL ONLY</label>
+				<label class="switch">
+					<input type="checkbox" id="activityTypes2" v-bind:value="-2" v-model="activityTypes">
+					<span class="slider"></span>
+				</label>
+			</div>
 
-			<label for="activityTypes3" :class="{'text-success': activityTypes.indexOf(-3)!==-1}">BUDGET ONLY</label>
-			<label class="fat-switch">
-				<input type="checkbox" id="activityTypes3" v-bind:value="-3" v-model="activityTypes">
-				<span class="fat-switch-slider"></span>
-			</label>
+			<div class="fat-switch">
+				<label class="label" for="activityTypes3" :class="{'on': activityTypes.indexOf(-3)!==-1, 'off': activityTypes.indexOf(-3)===-1}">BUDGET ONLY</label>
+				<label class="switch">
+					<input type="checkbox" id="activityTypes3" v-bind:value="-3" v-model="activityTypes">
+					<span class="slider"></span>
+				</label>
+			</div>
 
-			<label for="activityTypes4" :class="{'text-success': activityTypes.indexOf(0)!==-1}">OTHER</label>
-			<label class="fat-switch">
-				<input type="checkbox" id="activityTypes4" v-bind:value="0" v-model="activityTypes">
-				<span class="fat-switch-slider"></span>
-			</label>
+			<div class="fat-switch">
+				<label class="label" for="activityTypes4" :class="{'on': activityTypes.indexOf(0)!==-1, 'off': activityTypes.indexOf(0)===-1}">OTHER</label>
+				<label class="switch">
+					<input type="checkbox" id="activityTypes4" v-bind:value="0" v-model="activityTypes">
+					<span class="slider"></span>
+				</label>
+			</div>
 
 
 	<div>`
