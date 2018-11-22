@@ -15,3 +15,9 @@ def chart_of_account():
 @templatified('classes', title='Classes')
 def classes():
 	return dict(data=get_class_list_of_dicts())
+
+
+@templatified('load_reckon_data', title='Load Reckon Data')
+def load_reckon_data():
+	pass
+

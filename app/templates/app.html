@@ -404,7 +404,7 @@ function currency(val) {
 
 {# Set High Chart Global Defaults #}
 <script type="text/javascript">
-console.log('%c✓ Highchart ready to serve: ' + "{{ bases|safe }}{{ modules|safe }}", 'color: snow;background:navy; ');
+console.log('%c%s%c%s%c%s', 'color:lightcyan;background:navy;', '✓ Highchart ready to serve: ', 'color:khaki;background:navy;', "{{ bases|safe }}", 'color:aqua;background:navy;', "{{ modules|safe }}");
 Highcharts.setOptions({
 	lang: {
 		decimalPoint: '.',
