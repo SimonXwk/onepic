@@ -5,6 +5,8 @@
 {% endblock %}
 
 {% block js_optional %}
+{{ import('vue') }}
+{{ import('vuex') }}
 {% endblock %}
 
 
@@ -13,6 +15,7 @@
 {% endblock %}
 
 {% block js_custom %}
+{{ bp_js('fishing_pool') }}
 {% endblock %}
 
 

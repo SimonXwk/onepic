@@ -653,7 +653,7 @@ let rootVue = new Vue({
 
 						<div class="row">
 
-							<div class="col-md-8">
+							<div class="col-md-7">
 								<blockquote class="blockquote mb-1">
 									<p class="mb-0"><span class="text-primary font-weight-bold"><< raw.rows.length >></span> Total New Merchandise Customers <span class="text-muted">(<span class="text-success font-weight-bold"><< todoCount >></span> to be called)</span> Found in <span v-if="fy===null">Current Financial Year</span><span v-else>FY<< fy >></span></p>
 									<footer class="blockquote-footer" v-on:dblclick="showFYSelection=!showFYSelection"> from thankQ <small><< raw.timestamp|dtAU >>, << raw.processed >>/<< raw.rows.length >> </small></footer>
@@ -665,26 +665,39 @@ let rootVue = new Vue({
 
 								<transition name="slide-fade">
 								<div class="p-0 m-0" v-if="progress === 100">
-									<label class="switch m-lg-3 m-md-2">
-										<input type="checkbox" class="switch-success" v-model="showSuccess" v-bind:disabled="progress !== 100" >
-										<span class="switch-slider round"></span>
-									</label>
-									<label class="switch m-lg-3 m-md-2">
-										<input type="checkbox" class="switch-info" v-model="showWaiting" v-bind:disabled="progress !== 100">
-										<span class="switch-slider round"></span>
-									</label>
-									<label class="switch m-lg-3 m-md-2">
-										<input type="checkbox" class="switch-danger" v-model="showMissing" v-bind:disabled="progress !== 100">
-										<span class="switch-slider round"></span>
-									</label>
+
+									<div class="fat-switch">
+										<label class="label" for="sw1" :class="{'on': showSuccess, 'off': !showSuccess}" v-bind:disabled="progress !== 100">Todo & Done</label>
+										<label class="switch">
+											<input type="checkbox" id="sw1" v-bind:value="-1" v-model="showSuccess">
+											<span class="slider"></span>
+										</label>
+									</div>
+
+									<div class="fat-switch">
+										<label class="label" for="sw2" :class="{'on': showWaiting, 'off': !showWaiting}" v-bind:disabled="progress !== 100">In Transit</label>
+										<label class="switch">
+											<input type="checkbox" id="sw2" v-bind:value="-1" v-model="showWaiting">
+											<span class="slider"></span>
+										</label>
+									</div>
+
+									<div class="fat-switch">
+										<label class="label" for="sw3" :class="{'on': showMissing, 'off': !showMissing}" v-bind:disabled="progress !== 100">Not Found</label>
+										<label class="switch">
+											<input type="checkbox" id="sw3" v-bind:value="-1" v-model="showMissing">
+											<span class="slider"></span>
+										</label>
+									</div>
+
 								</div>
 								</transition>
 
 							</div>
 
-							<div class="col-md-4">
+							<div class="col-md-5 p-1">
 								<transition name="bounce">
-								<div class="alert  m-0 p-1 align-middle shadow-lg" v-if="csvEncodedURI || csvEncodedURIMobile || csvEncodedURIEmail || csvEncodedURIPureDonor">
+								<div class="alert m-0 p-1 align-middle shadow-lg" v-if="csvEncodedURI || csvEncodedURIMobile || csvEncodedURIEmail || csvEncodedURIPureDonor">
 									<div class="row">
 										<div class="col-6">
 											<a v-if="csvEncodedURIPureDonor!==null"  v-bind:href="csvEncodedURIPureDonor" class="btn btn-block btn-sm btn-outline-success align-middle text-left shadow" role="button" aria-pressed="true" download="courtesy_pure_donor_data_todo.csv"><small>CSV: <span class="text-danger">PURE DONONRS</span></small></a>

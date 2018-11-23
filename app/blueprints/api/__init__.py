@@ -25,9 +25,12 @@ ld.url('data_thankq.get_first_date_source1_by_contacts_since', ['/tq/get_first_d
 ld.url('data_thankq.merch_activities', ['/tq/merch_activities'])
 
 
+ld.url('data_thankq.fishing_pool_prexit1', ['/tq/fishing_pool_prexit1'])
+ld.url('data_thankq.fishing_pool_prexit2', ['/tq/fishing_pool_prexit2'])
+
+
 ld.url('data_thankq.pledge_headers', ['/tq/pledges'])
 ld.url('data_thankq.marketing_cycle', ['/marketing_cycle'])
-
 
 
 # BUDGET

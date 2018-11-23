@@ -99,3 +99,16 @@ def pledge_headers():
 	fy = int(request_arg('fy', TLMA.cfy, tests.is_year))
 	updates = (('FY', fy), ('BASE_QUERY', ''))
 	return Tq.query(('CTE', 'PLEDGE_OVERVIEW'), cached_timeout=30, updates=updates)
+
+
+# Finshing Pool
+@odbc_json_api
+def fishing_pool_prexit1():
+	updates = (('BASE_QUERY', ''),)
+	return Tq.query(('CTE', 'CTE_FISHING1_PREXIST'), cached_timeout=10, updates=updates)
+
+
+@odbc_json_api
+def fishing_pool_prexit2():
+	updates = (('BASE_QUERY', ''),)
+	return Tq.query(('CTE', 'CTE_FISHING2_PREXIST'), cached_timeout=10, updates=updates)

@@ -230,6 +230,9 @@ function currency(val) {
 					</div>
 				</div></div>`
 			});
+			Vue.component('loader-ellipsis', {
+				template: '<div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>'
+			});
 			Vue.component('card-counter', {
 				props: ['theme', 'icon', 'num', 'msg'],
 				template:`
