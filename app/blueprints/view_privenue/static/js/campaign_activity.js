@@ -553,6 +553,7 @@ Vue.component('global-filters', {
 		<input type="checkbox" id="focalIsAnon2" value="0" v-model.number="focalIsAnon">
 		<label for="focalIsAnon2" class="text-dark">!Anon</label>
 	<div>
+
 	<div>
 		<input type="checkbox" id="focalIsDecd1" value="-1" v-model.number="focalIsDecd">
 		<label for="focalIsDecd1" class="text-dark">DECD</label>

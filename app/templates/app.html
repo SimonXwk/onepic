@@ -38,7 +38,7 @@ const fetchJSON = (endpoint, func, silent=false) => {
 		.then(checkStstus)
 		.then(toJSON)
 		.then(jsonData => {
-			// if (!silent){ console.log('✓ JSON data converted'); }
+			if (!silent){ console.log('✓ JSON data converted'); }
 			// console.log(jsonData);
 			// ---------------------------------------------------------------------------------
 			// Call Processing Function

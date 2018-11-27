@@ -4,6 +4,7 @@ from app.api import ApiResult, ApiException
 from app.helper import request_arg
 import app.tests as tests
 import functools
+import datetime
 
 
 # The * in the argument list means that the remaining arguments can’t be called as positional arguments
@@ -101,14 +102,11 @@ def pledge_headers():
 	return Tq.query(('CTE', 'PLEDGE_OVERVIEW'), cached_timeout=30, updates=updates)
 
 
-# Finshing Pool
 @odbc_json_api
-def fishing_pool_prexit1():
-	updates = (('BASE_QUERY', ''),)
-	return Tq.query(('CTE', 'CTE_FISHING1_PREXIST'), cached_timeout=10, updates=updates)
+def fishing_pool():
+	fy = int(request_arg('fy', TLMA.cfy, tests.is_year))
+	d1, d2 = TLMA.fy_range(fy)
+	updates = (('BASE_QUERY', ''), ('PAYMENT_DATE1', Tq.format_date(d1), '\''), ('PAYMENT_DATE2', Tq.format_date(d2), '\''), ('FISHINGPOOL_DATE1', Tq.format_date(d1 - datetime.timedelta(days=1)), '\''), ('FISHINGPOOL_DATE2', Tq.format_date(datetime.date.today()), '\''))
+	print(updates)
+	return Tq.query(('CTE', 'CTE_FISHING'), cached_timeout=10, updates=updates)
 
-
-@odbc_json_api
-def fishing_pool_prexit2():
-	updates = (('BASE_QUERY', ''),)
-	return Tq.query(('CTE', 'CTE_FISHING2_PREXIST'), cached_timeout=10, updates=updates)

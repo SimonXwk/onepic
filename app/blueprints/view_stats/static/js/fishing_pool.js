@@ -4,6 +4,8 @@ const store = new Vuex.Store({
 	state: {
 		focalDate1: new Date(Date.UTC(new Date().getMonth()<6?new Date().getFullYear()-2:new Date().getFullYear()-1, 5, 30, 0 , 0 , 0 ,0)),
 		focalDate2: new Date(Date.UTC(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 0 , 0 , 0 ,0)),
+		rawData: null,
+		rawDataReady: false,
 		// Global filters
 		fDecd: [-1, 0],
 		fDNM: [-1, 0],
@@ -11,13 +13,15 @@ const store = new Vuex.Store({
 		fMajDon: [-1, 0],
 		fAnon: [-1, 0],
 		fHasEmail: [-1, 0],
+		fGivingType: [-2, -1, 0],
 		fDonType: ['Individual', 'Organisation'],
 		fGender: ['Male', 'Female'],
-
 	},
 	mutations: {
 		SET_FOCA_LDATE1: (state, payload) => state.focalDate1 = payload,
 		SET_FOCAL_DATE2: (state, payload) => state.focalDate2 = payload,
+		SET_RAWDATA:  (state, payload) => state.rawData = payload,
+		SET_RAWDATA_READY_STATUS: (state, payload) => state.rawDataReady = payload,
 		SET_FOCAL_DECD: (state, payload) => state.fDecd = payload,
 		SET_FOCAL_DNM: (state, payload) => state.fDNM = payload,
 		SET_FOCAL_ESTATE: (state, payload) => state.fEstate = payload,
@@ -28,35 +32,46 @@ const store = new Vuex.Store({
 		SET_FOCAL_CGENDER: (state, payload) => state.fGender = payload,
 	},
 	actions: {
-		// fetchPayments(ctx, fy){
-		// 	fy = fy ? fy : ctx.state.focalFY;
-		// 	return new Promise((resolve, reject) => {
-		// 		fetchJSON(endpoint('/api/tq/merch_activities' + '?fy=' + fy), (pmtJSON) => {
-		// 			ctx.commit('SET_MERCHPAYMENTS', pmtJSON);
-		// 			resolve()
-		// 		});
-		// 	});
-		// },
-
+		fetchRawData(ctx, fy){
+			fy = fy ? fy : ctx.state.focalFY;
+			return new Promise((resolve, reject) => {
+				fetchJSON(endpoint('/api/tq/fishing_pool'), (json) => {
+					ctx.commit('SET_RAWDATA', json);
+					ctx.commit('SET_RAWDATA_READY_STATUS', true);
+					console.log('Raw data added to Vuex', json.rows.length)
+					resolve()
+				});
+			});
+		},
 	},
 	getters: {
-		filterRows:  (state, getters) => (rows) => {
-			return rows.filter(r => state.fDecd.indexOf(r.FILTER_DECEASED) !== -1
+		timestamp:  (state, getters) => !state.rawDataReady ? null : state.rawData.timestamp,
+		totalCount: (state, getters) => !state.rawDataReady ? 0 : state.rawData.rows.length,
+		errCount:  (state, getters) => !state.rawDataReady ? 0 : state.rawData.rows.filter(r => r.CONTACT_CREATED === null || r.CONTACT_CREATED.trim() === '').length,
+		applyGolbalFilters:  (state, getters) => (r) => {
+			return (state.fDecd.indexOf(r.FILTER_DECEASED) !== -1)
 				&& (state.fDNM.indexOf(r.FILTER_DONOTMAIL) !== -1 )
-				&& (state.fEstate.indexOf(r.FILTER_DECEASED) !== -1 )
+				&& (state.fEstate.indexOf(r.FILTER_ESTATE) !== -1 )
 				&& (state.fMajDon.indexOf(r.FILTER_MAJDONOR) !== -1 )
 				&& (state.fAnon.indexOf(r.FILTER_ANONYMOUS) !== -1 )
 				&& (state.fHasEmail.indexOf(r.FILTER_EMAIL) !== -1 )
 				&& (state.fDonType.indexOf(r.CONTACTTYPE) !== -1 )
-				&& (state.fGender.indexOf(r.GENDER) !== -1 )
+				// && (state.fGender.indexOf(r.GENDER) !== -1 )
+		},
+		filterRows:  (state, getters) => (rows) => {
+			return rows.filter(r => state.applyGolbalFilters(r))
+		},
+		filteredRows: (state, getters) => {
+			return !state.rawDataReady ? [] : state.rawData.rows.filter(r => getters.applyGolbalFilters(r))
+		},
+		filteredCount: (state, getters) => getters.filteredRows.length,
+		filteredTypeCount: (state, getters) => (anchor, val) => getters.filteredRows.filter(r => (anchor === 1 ? r.FILTER_ANCHOR1_GIVER :  r.FILTER_ANCHOR2_GIVER) === val).length,
 
-		)
-		}
 	}
 });
 // ##########################################################################################################################################################
 // ##########################################################################################################################################################
-Vue.component('type-prexist', {
+Vue.component('anchor-summary', {
 	props: ['anchor'],
 	data: function() {
 		return {
@@ -64,19 +79,85 @@ Vue.component('type-prexist', {
 		}
 	},
 	computed: {
-		...Vuex.mapGetters(['filterRows']),
-		fiteredRows: function() {
-			return this.filterRows(this.data.rows)
-		}
+		...Vuex.mapState(['rawDataReady']),
+		...Vuex.mapGetters(['filteredRows', 'filteredTypeCount']),
 	},
-	created() {
-		fetchJSON(endpoint('/api/tq/fishing_pool_prexit' + this.anchor), (json) => {
-			this.data = json
-		});
-	},
-	template: `<div v-if="data===null"><loader-ellipsis></loader-ellipsis></div>
+	template: `<div v-if="!rawDataReady" class="row justify-content-center"><loader-ellipsis></loader-ellipsis></div>
 	<div v-else>
-	<< fiteredRows.length|number >>
+
+	<div class="card border-success mt-3">
+		<div class="card-body">
+			<h5 class="card-title text-center text-success">Anchor << anchor >>: Active</h5>
+			<div class="row justify-content-center">
+				<div class="col-xs-12 col-md-2 col">
+					<card-counter theme="success" icon="&#127793;" :num="filteredTypeCount(anchor, -11)|number" msg="1ST NEW"></card-counter>
+				</div>
+				<div class="col-xs-12 col-md-2 col">
+					<card-counter theme="success" icon="&#127807;" :num="filteredTypeCount(anchor, -121)|number" msg="2ND NEW"></card-counter>
+				</div>
+				<div class="col-xs-12 col-md-2 col">
+					<card-counter theme="success" icon="&#127794;" :num="filteredTypeCount(anchor, -122)|number" msg="MULTI"></card-counter>
+				</div>
+				<div class="col-xs-12 col-md-2 col">
+					<card-counter theme="success" icon="&#127796;" :num="filteredTypeCount(anchor, -123)|number" msg="2ND REC"></card-counter>
+				</div>
+				<div class="col-xs-12 col-md-2 col">
+					<card-counter theme="success" icon="&#127811;" :num="filteredTypeCount(anchor, -13)|number" msg="1ST REC"></card-counter>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="card border-warning mt-1">
+		<div class="card-body">
+			<h5 class="card-title text-center text-warning">Anchor << anchor >>: Lapsed(months)</h5>
+			<div class="row justify-content-center">
+				<div class="col-xs-12 col-md-3 col">
+					<card-counter theme="warning" icon="&#127806;" :num="filteredTypeCount(anchor, -21)|number" msg="LPSD1 [0, 12]"></card-counter>
+				</div>
+				<div class="col-xs-12 col-md-3 col">
+					<card-counter theme="warning" icon="&#127810;" :num="filteredTypeCount(anchor, -22)|number" msg="LPSD2 (12, 24]"></card-counter>
+				</div>
+				<div class="col-xs-12 col-md-3 col">
+					<card-counter theme="warning" icon="&#127809;" :num="filteredTypeCount(anchor, -23)|number" msg="LPSD3 (24, 60)"></card-counter>
+				</div>
+				<div class="col-xs-12 col-md-3 col">
+					<card-counter theme="warning" icon="&#129344;" :num="filteredTypeCount(anchor, -24)|number" msg="LPSD4 [60, inf)"></card-counter>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="card border-primary mt-1">
+		<div class="card-body">
+			<h5 class="card-title text-center text-primary">Anchor << anchor >>: Never Given(months)</h5>
+			<div class="row justify-content-center">
+				<div class="col-xs-12 col-md-3 col">
+					<card-counter theme="primary" icon="&#128167;" :num="filteredTypeCount(anchor, 21)|number" msg="NG1 [0, 12]"></card-counter>
+				</div>
+				<div class="col-xs-12 col-md-3 col">
+					<card-counter theme="primary" icon="&#127754;" :num="filteredTypeCount(anchor, 22)|number" msg="NG2 (12, 24]"></card-counter>
+				</div>
+				<div class="col-xs-12 col-md-3 col">
+					<card-counter theme="primary" icon="&#9732;" :num="filteredTypeCount(anchor, 23)|number" msg="NG3 (24, 60)"></card-counter>
+				</div>
+				<div class="col-xs-12 col-md-3 col">
+					<card-counter theme="primary" icon="&#10052;" :num="filteredTypeCount(anchor, 24)|number" msg="NG4 [60, inf)"></card-counter>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="card border-dark mt-1">
+		<div class="card-body">
+			<h5 class="card-title text-center text-dark">Anchor << anchor >>: Not Exist</h5>
+			<div class="row justify-content-center">
+				<div class="col-xs-12 col-md-2 col">
+					<card-counter theme="dark" icon="&#128528;" :num="filteredTypeCount(anchor, 0)|number" msg="Not Exist"></card-counter>
+				</div>
+			</div>
+		</div>
+	</div>
 
 	<div>`
 });
@@ -254,7 +335,6 @@ Vue.component('global-filters', {
 		</div>
 	</div>
 
-	<hr class="my-2">
 
 	<div class="card bg-light my-1 mx-0 px-1 py-0 d-inline-block" :class="{'border-secondary':fDonType.length===0, 'border-success':fDonType.length!==0}">
 		<div class="fat-switch">
@@ -273,24 +353,7 @@ Vue.component('global-filters', {
 		</div>
 	</div>
 
-	<div class="card bg-light my-1 mx-0 px-1 py-0 d-inline-block" :class="{'border-secondary':fGender.length===0, 'border-success':fGender.length!==0}">
-		<div class="fat-switch">
-			<label class="label" for="fGender1" :class="{'on': fGender.indexOf('Male')!==-1, 'off': fGender.indexOf('Male')===-1}">Male</label>
-			<label class="switch">
-				<input type="checkbox" id="fGender1" value="Male" v-model="fGender">
-				<span class="slider"></span>
-			</label>
-		</div>
-		<div class="fat-switch">
-			<label class="label" for="fGender2" :class="{'on': fGender.indexOf('Female')!==-1, 'off': fGender.indexOf('Female')===-1}">Female</label>
-			<label class="switch">
-				<input type="checkbox" id="fGender2" value="Female" v-model="fGender">
-				<span class="slider"></span>
-			</label>
-		</div>
-	</div>
-
-
+	<hr class="my-2">
 
 
 	<div>`
@@ -300,25 +363,32 @@ Vue.component('global-filters', {
 let rootVue = new Vue({
 	el: '#root',
 	data: {
-
 	},
 	store,
 	computed: {
-		...Vuex.mapState(['focalDate1', 'focalDate2']),
-		// ...Vuex.mapGetters([]),
+		...Vuex.mapState(['focalDate1', 'focalDate2', 'rawDataReady']),
+		...Vuex.mapGetters(['timestamp', 'totalCount', 'errCount', 'filteredCount', 'filteredTypeCount']),
 	},
 
 	methods: {
-		// ...Vuex.mapActions(['fetchPayments', 'fetchBudget']),
-		getData: function(){
-		},
+		...Vuex.mapActions(['fetchRawData']),
+	},
+	created(){
+		this.fetchRawData().then(() => {});
 	},
 	template:`<div class="container-fluid">
-		<h5 class="text-primary text-center">Fishing Pool with Anchors @ <span class="text-danger"><< focalDate1|dAU >></span> and <span class="text-danger"><< focalDate2|dAU >></span></h5>
+		<h5 class="text-primary text-center">Fishing Pool with Anchor1 <span class="text-danger"><< focalDate1|dAU >></span> and Anchor2 <span class="text-danger"><< focalDate2|dAU >></span></h5>
+		<transition name="slide-fade">
+			<p class="text-center text-muted font-italic m-0" v-if="rawDataReady"><small>Data from thankQ : << timestamp|dtAU >></small></p>
+		</transition>
+		<transition name="bounce">
+			<p class="lead text-center" key=1 v-if="rawDataReady"><small><span class="text-info"><< filteredCount|number >> (<< filteredCount/totalCount|pct(2) >>)</small></span> / <span class="text-dark font-weight-bold"><< totalCount|number >></span> Contacts Exist in Database <small class="text-danger" v-if="errCount!==0">(<< errCount >> no creation date)</small></p>
+			<p class="lead text-center" key=2 v-else>&#9201;  Reading Contacts & Preparing Views ... </p>
+		</transition>
 		<global-filters></global-filters>
 
-
-		<type-prexist :anchor="2"></type-prexist>
+		<anchor-summary :anchor="2"></anchor-summary>
+		<anchor-summary :anchor="1"></anchor-summary>
 
 	</div>`
 });
