@@ -6,6 +6,9 @@ const store = new Vuex.Store({
 		focalDate2: new Date(Date.UTC(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 0 , 0 , 0 ,0)),
 		rawData: null,
 		rawDataReady: false,
+		rawDataStatus: '',
+		rawSanketData: null,
+		rawSnakeyDataReady: false,
 		// Global filters
 		fDecd: [-1, 0],
 		fDNM: [-1, 0],
@@ -13,41 +16,87 @@ const store = new Vuex.Store({
 		fMajDon: [-1, 0],
 		fAnon: [-1, 0],
 		fHasEmail: [-1, 0],
-		fGivingType: [-2, -1, 0],
-		fDonType: ['Individual', 'Organisation'],
-		fGender: ['Male', 'Female'],
+		fContactType: [-1, 0],
+		fGender: [-2, -1, 0, 1],
+		trackingAnchor: null,
+		trackingType: null,
+		trackingSoft: null,
 	},
 	mutations: {
 		SET_FOCA_LDATE1: (state, payload) => state.focalDate1 = payload,
 		SET_FOCAL_DATE2: (state, payload) => state.focalDate2 = payload,
 		SET_RAWDATA:  (state, payload) => state.rawData = payload,
 		SET_RAWDATA_READY_STATUS: (state, payload) => state.rawDataReady = payload,
+		SET_RAWDATA_MESSAGE_STATUS: (state, payload) => state.rawDataStatus = payload,
+		SET_RAWSANKEYDATA:  (state, payload) => state.rawSanketData = payload,
+		SET_RAWSANKEYDATA_READY_STATUS: (state, payload) => state.rawSnakeyDataReady = payload,
 		SET_FOCAL_DECD: (state, payload) => state.fDecd = payload,
 		SET_FOCAL_DNM: (state, payload) => state.fDNM = payload,
 		SET_FOCAL_ESTATE: (state, payload) => state.fEstate = payload,
 		SET_FOCAL_MAJORDON: (state, payload) => state.fMajDon = payload,
 		SET_FOCAL_ANONYMOUS: (state, payload) => state.fAnon = payload,
 		SET_FOCAL_HASEMAIL: (state, payload) => state.fHasEmail = payload,
-		SET_FOCAL_CONTACTTYPE: (state, payload) => state.fDonType = payload,
+		SET_FOCAL_CONTACTTYPE: (state, payload) => state.fContactType = payload,
 		SET_FOCAL_CGENDER: (state, payload) => state.fGender = payload,
+
+		SET_TRACKING_ANCHOR: (state, payload) => state.trackingAnchor = payload,
+		SET_TRACKING_TYPE: (state, payload) => state.trackingType = payload,
+		SET_TRACKING_SOFT: (state, payload) => state.trackingSoft = payload,
 	},
 	actions: {
 		fetchRawData(ctx, fy){
 			fy = fy ? fy : ctx.state.focalFY;
 			return new Promise((resolve, reject) => {
-				fetchJSON(endpoint('/api/tq/fishing_pool'), (json) => {
-					ctx.commit('SET_RAWDATA', json);
-					ctx.commit('SET_RAWDATA_READY_STATUS', true);
-					console.log('Raw data added to Vuex', json.rows.length)
-					resolve()
-				});
+				ctx.commit('SET_RAWDATA_MESSAGE_STATUS', 'Fetching data from thankQ ...');
+				fetch(endpoint('/api/tq/fishing_pool'))
+					.then(resp => {
+						if (resp.status >= 200 && resp.status < 300) {
+							ctx.commit('SET_RAWDATA_MESSAGE_STATUS', '✓ Response received successfully');
+							return Promise.resolve(resp)
+						} else {
+							ctx.commit('SET_RAWDATA_MESSAGE_STATUS', '✘ Response Status Failed');
+							return Promise.reject(new Error(resp.statusText))
+						}
+					})
+					.then(resp => {
+						ctx.commit('SET_RAWDATA_MESSAGE_STATUS', 'Convering data to JSON format');
+						return resp.json()
+					})
+					.then(json => {
+						ctx.commit('SET_RAWDATA_MESSAGE_STATUS', '✓ Storing JSON data to context');
+						ctx.commit('SET_RAWDATA', json);
+						ctx.commit('SET_RAWDATA_MESSAGE_STATUS', '✓ Data stored, preparing Page Views');
+						ctx.commit('SET_RAWDATA_READY_STATUS', true);
+						resolve()
+					});
+			});
+		},
+		fetchSankeyData(ctx, fy){
+			fy = fy ? fy : ctx.state.focalFY;
+			return new Promise((resolve, reject) => {
+				fetch(endpoint('/api/tq/fishing_pool_sankey'))
+					.then(resp => {
+						if (resp.status >= 200 && resp.status < 300) {
+							return Promise.resolve(resp)
+						} else {
+							return Promise.reject(new Error(resp.statusText))
+						}
+					})
+					.then(resp => {
+						return resp.json()
+					})
+					.then(json => {
+						ctx.commit('SET_RAWSANKEYDATA', json);
+						ctx.commit('SET_RAWSANKEYDATA_READY_STATUS', true);
+						resolve()
+					});
 			});
 		},
 	},
 	getters: {
 		timestamp:  (state, getters) => !state.rawDataReady ? null : state.rawData.timestamp,
 		totalCount: (state, getters) => !state.rawDataReady ? 0 : state.rawData.rows.length,
-		errCount:  (state, getters) => !state.rawDataReady ? 0 : state.rawData.rows.filter(r => r.CONTACT_CREATED === null || r.CONTACT_CREATED.trim() === '').length,
+		errCount:  (state, getters) => !state.rawDataReady ? 0 : state.rawData.rows.filter(r => r.CONTACT_CREATED === null).length,
 		applyGolbalFilters:  (state, getters) => (r) => {
 			return (state.fDecd.indexOf(r.FILTER_DECEASED) !== -1)
 				&& (state.fDNM.indexOf(r.FILTER_DONOTMAIL) !== -1 )
@@ -55,19 +104,79 @@ const store = new Vuex.Store({
 				&& (state.fMajDon.indexOf(r.FILTER_MAJDONOR) !== -1 )
 				&& (state.fAnon.indexOf(r.FILTER_ANONYMOUS) !== -1 )
 				&& (state.fHasEmail.indexOf(r.FILTER_EMAIL) !== -1 )
-				&& (state.fDonType.indexOf(r.CONTACTTYPE) !== -1 )
-				// && (state.fGender.indexOf(r.GENDER) !== -1 )
+				&& (state.fContactType.indexOf(r.FILTER_ORGANISATION) !== -1 )
+				&& (state.fGender.indexOf(r.FILTER_GENDER) !== -1 )
 		},
-		filterRows:  (state, getters) => (rows) => {
-			return rows.filter(r => state.applyGolbalFilters(r))
+		trackingFilter: (state, getters) => {
+			if (!state.trackingAnchor || !state.trackingType) {
+				return {}
+			} else {
+				let type = (state.trackingAnchor === 1 ? 'FILTER_ANCHOR1_GIVER' :  'FILTER_ANCHOR2_GIVER');
+				let soft = (state.trackingAnchor === 1 ? 'FILTER_ANCHOR1_SOFT' :  'FILTER_ANCHOR2_SOFT');
+				let f = {};
+				if (state.trackingType!==undefined && state.trackingType!==null) {
+					f[type] = state.trackingType;
+				}
+				if (state.trackingSoft!==undefined && state.trackingSoft!==null) {
+					f[soft] = state.trackingSoft;
+				}
+				return f
+			}
 		},
 		filteredRows: (state, getters) => {
 			return !state.rawDataReady ? [] : state.rawData.rows.filter(r => getters.applyGolbalFilters(r))
 		},
 		filteredCount: (state, getters) => getters.filteredRows.length,
-		filteredTypeCount: (state, getters) => (anchor, val) => getters.filteredRows.filter(r => (anchor === 1 ? r.FILTER_ANCHOR1_GIVER :  r.FILTER_ANCHOR2_GIVER) === val).length,
-
+		count: (state, getters) => (filters) => {
+			return ( (filters==={} || filters===undefined || filters===null) ? getters.filteredRows : getters.filteredRows.filter(r => {
+				return Object.keys(filters).reduce((acc, key) =>	acc && (r[key] === filters[key]), true);
+			})).length
+		}
 	}
+});
+// ##########################################################################################################################################################
+// ##########################################################################################################################################################
+Vue.component('highchart-sankey', {
+	data: function(){
+		return {
+			chart: null,
+		}
+	},
+	computed: {
+		...Vuex.mapState(['rawSnakeyDataReady', 'rawSanketData']),
+	},
+	methods: {
+		...Vuex.mapActions(['fetchSankeyData']),
+	},
+	watch: {
+		rawSnakeyDataReady: function(newVal, oldVal) {
+			if (newVal === true) {
+				this.chart = Highcharts.chart({
+					chart: { renderTo: this.$el },
+					title: { text: null },
+					tooltip: {
+						pointFormat: '{series.name}: ' + (this.isYCurrency ? '${point.y:,.2f}' : '{point.y:,.0f}') + ' <b>{point.percentage:.1f}%</b>',
+						useHTML: true
+					},
+
+					series: [{
+						keys: ['from', 'to', 'weight'],
+						data: this.rawSanketData.rows,
+						// nodes: chart.nodes,
+						type: 'sankey',
+						name: 'Movement'
+		 			}]
+				});
+			}
+		}
+	},
+	created(){
+		this.fetchSankeyData().then(() => {});
+	},
+	mounted() {
+
+	},
+	template:`<div class="chart" style="height: 750px;"><div class="row justify-content-center"><loader-ellipsis></loader-ellipsis></div></div>`
 });
 // ##########################################################################################################################################################
 // ##########################################################################################################################################################
@@ -75,91 +184,178 @@ Vue.component('anchor-summary', {
 	props: ['anchor'],
 	data: function() {
 		return {
-			data: null
 		}
 	},
 	computed: {
-		...Vuex.mapState(['rawDataReady']),
-		...Vuex.mapGetters(['filteredRows', 'filteredTypeCount']),
+		...Vuex.mapState(['rawDataReady', 'trackingAnchor', 'trackingType', 'trackingSoft']),
+		...Vuex.mapGetters(['count', 'trackingFilter']),
+		type: function() {
+			return  this.anchor === 1 ? 'FILTER_ANCHOR1_GIVER' :  'FILTER_ANCHOR2_GIVER'
+		},
+		soft: function() {
+			return  this.anchor === 1 ? 'FILTER_ANCHOR1_SOFT' :  'FILTER_ANCHOR2_SOFT'
+		}
 	},
-	template: `<div v-if="!rawDataReady" class="row justify-content-center"><loader-ellipsis></loader-ellipsis></div>
-	<div v-else>
-
-	<div class="card border-success mt-3">
+	methods: {
+		filter: function(type, soft) {
+			let f = {};
+			if (type!==undefined && type!==null) {
+				f[this.type] = type;
+			}
+			if (soft!==undefined && soft!==null) {
+				f[this.soft] = soft;
+			}
+			if (this.trackingAnchor === this.anchor) {
+				return f
+			}else {
+				return Object.assign(f, this.trackingFilter)
+			}
+		},
+		setTracking: function(type, soft) {
+			// console.log("clciked-before", type, soft, this.trackingFilter);
+			if (this.trackingAnchor === this.anchor && (this.trackingType === type || (this.trackingType ==null && type === undefined))  && (this.trackingSoft === soft || (this.trackingSoft ==null && soft === undefined))) {
+				this.$store.commit('SET_TRACKING_ANCHOR',null);
+				this.$store.commit('SET_TRACKING_TYPE',null);
+				this.$store.commit('SET_TRACKING_SOFT',null);
+			}else {
+				this.$store.commit('SET_TRACKING_ANCHOR',this.anchor);
+				this.$store.commit('SET_TRACKING_TYPE',type===undefined?null:type);
+				this.$store.commit('SET_TRACKING_SOFT',soft===undefined?null:soft);
+			}
+			// console.log("clciked-after", type, soft, this.trackingFilter);
+		},
+		setFocalTheme: function(type, soft) {
+			return (this.trackingAnchor === this.anchor && (this.trackingType === type || (this.trackingType ==null && type === undefined)) && (this.trackingSoft === soft || (this.trackingSoft ==null && soft === undefined)))
+		}
+	},
+	template: `
+	<div class="card shadow-sm mt-3">
 		<div class="card-body">
-			<h5 class="card-title text-center text-success">Anchor << anchor >>: Active</h5>
-			<div class="row justify-content-center">
-				<div class="col-xs-12 col-md-2 col">
-					<card-counter theme="success" icon="&#127793;" :num="filteredTypeCount(anchor, -11)|number" msg="1ST NEW"></card-counter>
+			<h4 class="card-title text-center"><mark>Fishing Pool using Anchor << anchor >> &#9875;</mark></h4>
+
+			<h5 class="text-center text-success">Active</h5>
+			<div class="row mb-2 justify-content-center">
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-110)">
+					<card-counter theme="success" icon="&#127793;" :num="count(filter(-110))|number" msg="1ST NEW" :class="{'bg-danger': setFocalTheme(-110)}" style="cursor: pointer;"></card-counter>
 				</div>
-				<div class="col-xs-12 col-md-2 col">
-					<card-counter theme="success" icon="&#127807;" :num="filteredTypeCount(anchor, -121)|number" msg="2ND NEW"></card-counter>
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-121)">
+					<card-counter theme="success" icon="&#127807;" :num="count(filter(-121))|number" msg="2ND NEW" :class="{'bg-danger': setFocalTheme(-121)}" style="cursor: pointer;"></card-counter>
 				</div>
-				<div class="col-xs-12 col-md-2 col">
-					<card-counter theme="success" icon="&#127794;" :num="filteredTypeCount(anchor, -122)|number" msg="MULTI"></card-counter>
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-122)">
+					<card-counter theme="success" icon="&#127794;" :num="count(filter(-122))|number" msg="MULTI" :class="{'bg-danger': setFocalTheme(-122)}" style="cursor: pointer;"></card-counter>
 				</div>
-				<div class="col-xs-12 col-md-2 col">
-					<card-counter theme="success" icon="&#127796;" :num="filteredTypeCount(anchor, -123)|number" msg="2ND REC"></card-counter>
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-123)">
+					<card-counter theme="success" icon="&#127796;" :num="count(filter(-123))|number" msg="2ND REC" :class="{'bg-danger': setFocalTheme(-123)}" style="cursor: pointer;"></card-counter>
 				</div>
-				<div class="col-xs-12 col-md-2 col">
-					<card-counter theme="success" icon="&#127811;" :num="filteredTypeCount(anchor, -13)|number" msg="1ST REC"></card-counter>
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-130)">
+					<card-counter theme="success" icon="&#127811;" :num="count(filter(-130))|number" msg="1ST REC" :class="{'bg-danger': setFocalTheme(-130)}" style="cursor: pointer;"></card-counter>
 				</div>
 			</div>
-		</div>
-	</div>
 
-	<div class="card border-warning mt-1">
-		<div class="card-body">
-			<h5 class="card-title text-center text-warning">Anchor << anchor >>: Lapsed(months)</h5>
-			<div class="row justify-content-center">
-				<div class="col-xs-12 col-md-3 col">
-					<card-counter theme="warning" icon="&#127806;" :num="filteredTypeCount(anchor, -21)|number" msg="LPSD1 [0, 12]"></card-counter>
+			<h5 class="text-center text-warning">Lapsed (months)</h5>
+			<div class="row mb-2 justify-content-center">
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-210)">
+					<card-counter theme="warning" icon="&#127806;" :num="count(filter(-210))|number" msg="LPSD1 [0, 12]" :class="{'bg-danger': setFocalTheme(-210)}" style="cursor: pointer;"></card-counter>
 				</div>
-				<div class="col-xs-12 col-md-3 col">
-					<card-counter theme="warning" icon="&#127810;" :num="filteredTypeCount(anchor, -22)|number" msg="LPSD2 (12, 24]"></card-counter>
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-220)">
+					<card-counter theme="warning" icon="&#127810;" :num="count(filter(-220))|number" msg="LPSD2 (12, 24]" :class="{'bg-danger': setFocalTheme(-220)}" style="cursor: pointer;"></card-counter>
 				</div>
-				<div class="col-xs-12 col-md-3 col">
-					<card-counter theme="warning" icon="&#127809;" :num="filteredTypeCount(anchor, -23)|number" msg="LPSD3 (24, 60)"></card-counter>
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-230)">
+					<card-counter theme="warning" icon="&#127809;" :num="count(filter(-230))|number" msg="LPSD3 (24, 60)" :class="{'bg-danger': setFocalTheme(-230)}" style="cursor: pointer;"></card-counter>
 				</div>
-				<div class="col-xs-12 col-md-3 col">
-					<card-counter theme="warning" icon="&#129344;" :num="filteredTypeCount(anchor, -24)|number" msg="LPSD4 [60, inf)"></card-counter>
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-240)">
+					<card-counter theme="warning" icon="&#129344;" :num="count(filter(-240))|number" msg="LPSD4 [60, inf)" :class="{'bg-danger': setFocalTheme(-240)}" style="cursor: pointer;"></card-counter>
 				</div>
 			</div>
-		</div>
-	</div>
 
-	<div class="card border-primary mt-1">
-		<div class="card-body">
-			<h5 class="card-title text-center text-primary">Anchor << anchor >>: Never Given(months)</h5>
-			<div class="row justify-content-center">
-				<div class="col-xs-12 col-md-3 col">
-					<card-counter theme="primary" icon="&#128167;" :num="filteredTypeCount(anchor, 21)|number" msg="NG1 [0, 12]"></card-counter>
+			<div class="row mb-2 justify-content-center">
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-210, -1)">
+					<card-counter theme="monitor" icon="&#127806;" :num="count(filter(-210, -1))|number" msg="S-LPSD1 [0, 12]" :class="{'bg-danger': setFocalTheme(-210, -1)}" style="cursor: pointer;"></card-counter>
 				</div>
-				<div class="col-xs-12 col-md-3 col">
-					<card-counter theme="primary" icon="&#127754;" :num="filteredTypeCount(anchor, 22)|number" msg="NG2 (12, 24]"></card-counter>
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-220, -1)">
+					<card-counter theme="monitor" icon="&#127810;" :num="count(filter(-220, -1))|number" msg="S-LPSD2 (12, 24]" :class="{'bg-danger': setFocalTheme(-220, -1)}" style="cursor: pointer;"></card-counter>
 				</div>
-				<div class="col-xs-12 col-md-3 col">
-					<card-counter theme="primary" icon="&#9732;" :num="filteredTypeCount(anchor, 23)|number" msg="NG3 (24, 60)"></card-counter>
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-230, -1)">
+					<card-counter theme="monitor" icon="&#127809;" :num="count(filter(-230, -1))|number" msg="S-LPSD3 (24, 60)" :class="{'bg-danger': setFocalTheme(-230, -1)}" style="cursor: pointer;"></card-counter>
 				</div>
-				<div class="col-xs-12 col-md-3 col">
-					<card-counter theme="primary" icon="&#10052;" :num="filteredTypeCount(anchor, 24)|number" msg="NG4 [60, inf)"></card-counter>
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-240, -1)">
+					<card-counter theme="monitor" icon="&#129344;" :num="count(filter(-240, -1))|number" msg="S-LPSD4 [60, inf)" :class="{'bg-danger': setFocalTheme(-240, -1)}" style="cursor: pointer;"></card-counter>
 				</div>
 			</div>
-		</div>
-	</div>
 
-	<div class="card border-dark mt-1">
-		<div class="card-body">
-			<h5 class="card-title text-center text-dark">Anchor << anchor >>: Not Exist</h5>
-			<div class="row justify-content-center">
-				<div class="col-xs-12 col-md-2 col">
-					<card-counter theme="dark" icon="&#128528;" :num="filteredTypeCount(anchor, 0)|number" msg="Not Exist"></card-counter>
+			<div class="row mb-2 justify-content-center">
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-210, 0)">
+					<card-counter theme="monitor" icon="&#127806;" :num="count(filter(-210, 0))|number" msg="H-LPSD1 [0, 12]" :class="{'bg-danger': setFocalTheme(-210, 0)}" style="cursor: pointer;"></card-counter>
+				</div>
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-220, 0)">
+					<card-counter theme="monitor" icon="&#127810;" :num="count(filter(-220, 0))|number" msg="H-LPSD2 (12, 24]" :class="{'bg-danger': setFocalTheme(-220, 0)}" style="cursor: pointer;"></card-counter>
+				</div>
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-230, 0)">
+					<card-counter theme="monitor" icon="&#127809;" :num="count(filter(-230, 0))|number" msg="H-LPSD3 (24, 60)" :class="{'bg-danger': setFocalTheme(-230, 0)}" style="cursor: pointer;"></card-counter>
+				</div>
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-240, 0)">
+					<card-counter theme="monitor" icon="&#129344;" :num="count(filter(-240, 0))|number" msg="H-LPSD4 [60, inf)" :class="{'bg-danger': setFocalTheme(-240, 0)}" style="cursor: pointer;"></card-counter>
 				</div>
 			</div>
-		</div>
-	</div>
 
-	<div>`
+			<hr class="my-3 shadow-sm" />
+
+			<h5 class="text-center text-primary">Never Given (months)</h5>
+			<div class="row mb-2 justify-content-center">
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(210)">
+					<card-counter theme="primary" icon="&#128167;" :num="count(filter(210))|number" msg="NG1 [0, 12]" :class="{'bg-danger': setFocalTheme(210)}" style="cursor: pointer;"></card-counter>
+				</div>
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(220)">
+					<card-counter theme="primary" icon="&#127754;" :num="count(filter(220))|number" msg="NG2 (12, 24]" :class="{'bg-danger': setFocalTheme(220)}" style="cursor: pointer;"></card-counter>
+				</div>
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(230)">
+					<card-counter theme="primary" icon="&#9732;" :num="count(filter(230))|number" msg="NG3 (24, 60)" :class="{'bg-danger': setFocalTheme(230)}" style="cursor: pointer;"></card-counter>
+				</div>
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(240)">
+					<card-counter theme="primary" icon="&#10052;" :num="count(filter(240))|number" msg="NG4 [60, inf)" :class="{'bg-danger': setFocalTheme(240)}" style="cursor: pointer;"></card-counter>
+				</div>
+			</div>
+
+			<div class="row mb-2 justify-content-center">
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(210, -1)">
+					<card-counter theme="info" icon="&#128167;" :num="count(filter(210, -1))|number" msg="S-NG1 [0, 12]" :class="{'bg-danger': setFocalTheme(210, -1)}" style="cursor: pointer;"></card-counter>
+				</div>
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(220, -1)">
+					<card-counter theme="info" icon="&#127754;" :num="count(filter(220, -1))|number" msg="S-NG2 (12, 24]" :class="{'bg-danger': setFocalTheme(220, -1)}" style="cursor: pointer;"></card-counter>
+				</div>
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(230, -1)">
+					<card-counter theme="info" icon="&#9732;" :num="count(filter(230, -1))|number" msg="S-NG3 (24, 60)" :class="{'bg-danger': setFocalTheme(230, -1)}" style="cursor: pointer;"></card-counter>
+				</div>
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(240, -1)">
+					<card-counter theme="info" icon="&#10052;" :num="count(filter(240, -1))|number" msg="S-NG4 [60, inf)" :class="{'bg-danger': setFocalTheme(240, -1)}" style="cursor: pointer;"></card-counter>
+				</div>
+			</div>
+
+			<div class="row mb-2 justify-content-center">
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(210, 0)">
+					<card-counter theme="info" icon="&#128167;" :num="count(filter(210, 0))|number" msg="H-NG1 [0, 12]" :class="{'bg-danger': setFocalTheme(210, 0)}" style="cursor: pointer;"></card-counter>
+				</div>
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(220, 0)">
+					<card-counter theme="info" icon="&#127754;" :num="count(filter(220, 0))|number" msg="H-NG2 (12, 24]" :class="{'bg-danger': setFocalTheme(220, 0)}" style="cursor: pointer;"></card-counter>
+				</div>
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(230, 0)">
+					<card-counter theme="info" icon="&#9732;" :num="count(filter(230, 0))|number" msg="H-NG3 (24, 60)" :class="{'bg-danger': setFocalTheme(230, 0)}" style="cursor: pointer;"></card-counter>
+				</div>
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(240, 0)">
+					<card-counter theme="info" icon="&#10052;" :num="count(filter(240, 0))|number" msg="H-NG4 [60, inf)" :class="{'bg-danger': setFocalTheme(240, 0)}" style="cursor: pointer;"></card-counter>
+				</div>
+			</div>
+
+
+			<h5 class="text-center text-dark">Not Exist (Prospect Created in Future)</h5>
+			<div class="row mb-2 justify-content-center">
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(0)">
+					<card-counter theme="dark" icon="&#127787;" :num="count(filter(0))|number" msg="Not Exist" :class="{'bg-danger': setFocalTheme(0)}" style="cursor: pointer;"></card-counter>
+				</div>
+			</div>
+
+		</div>
+	</div>`
 });
 // ##########################################################################################################################################################
 // ##########################################################################################################################################################
@@ -214,9 +410,9 @@ Vue.component('global-filters', {
 				this.$store.commit('SET_FOCAL_HASEMAIL',newVal);
 			}
 		},
-		fDonType: {
+		fContactType: {
 			get: function() {
-				return this.$store.state.fDonType
+				return this.$store.state.fContactType
 			},
 			set: function(newVal) {
 				this.$store.commit('SET_FOCAL_CONTACTTYPE',newVal);
@@ -233,6 +429,7 @@ Vue.component('global-filters', {
 
 	},
 	template: `<div class="container">
+
 	<div class="card bg-light my-1 mx-0 px-1 py-0 d-inline-block" :class="{'border-secondary':fDecd.length===0, 'border-success':fDecd.length!==0}">
 		<div class="fat-switch">
 			<label class="label" for="fDecd1" :class="{'on': fDecd.indexOf(-1)!==-1, 'off': fDecd.indexOf(-1)===-1}">DECD</label>
@@ -335,26 +532,55 @@ Vue.component('global-filters', {
 		</div>
 	</div>
 
-
-	<div class="card bg-light my-1 mx-0 px-1 py-0 d-inline-block" :class="{'border-secondary':fDonType.length===0, 'border-success':fDonType.length!==0}">
+	<div class="card bg-light my-1 mx-0 px-1 py-0 d-inline-block" :class="{'border-secondary':fContactType.length===0, 'border-success':fContactType.length!==0}">
 		<div class="fat-switch">
-			<label class="label" for="fDonType1" :class="{'on': fDonType.indexOf('Individual')!==-1, 'off': fDonType.indexOf('Individual')===-1}">IND</label>
+			<label class="label" for="fContactType1" :class="{'on': fContactType.indexOf(-1)!==-1, 'off': fContactType.indexOf(-1)===-1}">ORG</label>
 			<label class="switch">
-				<input type="checkbox" id="fDonType1" value="Individual" v-model="fDonType">
+				<input type="checkbox" id="fContactType1" v-bind:value="-1" v-model="fContactType">
 				<span class="slider"></span>
 			</label>
 		</div>
 		<div class="fat-switch">
-			<label class="label" for="fDonType2" :class="{'on': fDonType.indexOf('Organisation')!==-1, 'off': fDonType.indexOf('Organisation')===-1}">ORG</label>
+			<label class="label" for="fContactType2" :class="{'on': fContactType.indexOf(0)!==-1, 'off': fContactType.indexOf(0)===-1}">IND</label>
 			<label class="switch">
-				<input type="checkbox" id="fDonType2" value="Organisation" v-model="fDonType">
+				<input type="checkbox" id="fContactType2" v-bind:value="0" v-model="fContactType">
+				<span class="slider"></span>
+			</label>
+		</div>
+	</div>
+
+	<div class="card bg-light my-1 mx-0 px-1 py-0 d-inline-block" :class="{'border-secondary':fGender.length===0, 'border-success':fGender.length!==0}">
+		<div class="fat-switch">
+			<label class="label" for="fGender1" :class="{'on': fGender.indexOf(-1)!==-1, 'off': fGender.indexOf(-1)===-1}">Male</label>
+			<label class="switch">
+				<input type="checkbox" id="fGender1" v-bind:value="-1" v-model="fGender">
+				<span class="slider"></span>
+			</label>
+		</div>
+		<div class="fat-switch">
+			<label class="label" for="fGender2" :class="{'on': fGender.indexOf(-2)!==-1, 'off': fGender.indexOf(-2)===-1}">Female</label>
+			<label class="switch">
+				<input type="checkbox" id="fGender2" v-bind:value="-2" v-model="fGender">
+				<span class="slider"></span>
+			</label>
+		</div>
+		<div class="fat-switch">
+			<label class="label" for="fGender3" :class="{'on': fGender.indexOf(0)!==-1, 'off': fGender.indexOf(0)===-1}">MIS</label>
+			<label class="switch">
+				<input type="checkbox" id="fGender3" v-bind:value="0" v-model="fGender">
+				<span class="slider"></span>
+			</label>
+		</div>
+		<div class="fat-switch">
+			<label class="label" for="fGender4" :class="{'on': fGender.indexOf(1)!==-1, 'off': fGender.indexOf(1)===-1}">N/A</label>
+			<label class="switch">
+				<input type="checkbox" id="fGender4" v-bind:value="1" v-model="fGender">
 				<span class="slider"></span>
 			</label>
 		</div>
 	</div>
 
 	<hr class="my-2">
-
 
 	<div>`
 });
@@ -366,7 +592,7 @@ let rootVue = new Vue({
 	},
 	store,
 	computed: {
-		...Vuex.mapState(['focalDate1', 'focalDate2', 'rawDataReady']),
+		...Vuex.mapState(['focalDate1', 'focalDate2', 'rawDataReady', 'rawDataStatus', 'rawSnakeyDataReady']),
 		...Vuex.mapGetters(['timestamp', 'totalCount', 'errCount', 'filteredCount', 'filteredTypeCount']),
 	},
 
@@ -378,17 +604,27 @@ let rootVue = new Vue({
 	},
 	template:`<div class="container-fluid">
 		<h5 class="text-primary text-center">Fishing Pool with Anchor1 <span class="text-danger"><< focalDate1|dAU >></span> and Anchor2 <span class="text-danger"><< focalDate2|dAU >></span></h5>
-		<transition name="slide-fade">
+
+		<template v-if="rawDataReady">
 			<p class="text-center text-muted font-italic m-0" v-if="rawDataReady"><small>Data from thankQ : << timestamp|dtAU >></small></p>
-		</transition>
-		<transition name="bounce">
-			<p class="lead text-center" key=1 v-if="rawDataReady"><small><span class="text-info"><< filteredCount|number >> (<< filteredCount/totalCount|pct(2) >>)</small></span> / <span class="text-dark font-weight-bold"><< totalCount|number >></span> Contacts Exist in Database <small class="text-danger" v-if="errCount!==0">(<< errCount >> no creation date)</small></p>
-			<p class="lead text-center" key=2 v-else>&#9201;  Reading Contacts & Preparing Views ... </p>
-		</transition>
+			<transition name="bounce">
+				<p class="lead text-center" v-if="rawDataReady"><small><span class="text-info"><< filteredCount|number >> (<< filteredCount/totalCount|pct(2) >>)</small></span> / <span class="text-dark font-weight-bold"><< totalCount|number >></span> Contacts Exist in Database <small class="text-danger" v-if="errCount!==0">(<< errCount >> no creation date)</small></p>
+			</transition>
+		</template>
+
 		<global-filters></global-filters>
 
-		<anchor-summary :anchor="2"></anchor-summary>
-		<anchor-summary :anchor="1"></anchor-summary>
+		<p class="lead text-center"><small>Click on the card to track movement, re-click the smae card to cancel tracking</small><p>
+
+		<template v-if="rawDataReady">
+			<anchor-summary :anchor="2"></anchor-summary>
+			<anchor-summary :anchor="1"></anchor-summary>
+		</template>
+		<template v-else>
+			<p class="text-center text-muted"><< rawDataStatus >></p>
+		</template>
+
+		<highchart-sankey></highchart-sankey>
 
 	</div>`
 });

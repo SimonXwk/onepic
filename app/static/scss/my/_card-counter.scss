@@ -17,6 +17,11 @@
 		color: #FFF;
 	}
 
+	&.info {
+		background-color: #26c6da;
+		color: #FFF;
+	}
+
 	&.danger {
 		background-color: #ef5350;
 		color: #FFF;
@@ -27,13 +32,13 @@
 		color: #FFF;
 	}
 
-	&.success {
-		background-color: #66bb6a;
-		color: #FFF;
+	&.monitor {
+		background-color: #ffdd00;
+		color: #59626a;
 	}
 
-	&.info {
-		background-color: #26c6da;
+	&.success {
+		background-color: #66bb6a;
 		color: #FFF;
 	}
 
