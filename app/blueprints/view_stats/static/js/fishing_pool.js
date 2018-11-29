@@ -9,6 +9,7 @@ const store = new Vuex.Store({
 		rawDataStatus: '',
 		rawSanketData: null,
 		rawSnakeyDataReady: false,
+		countDim: 'COUNT',
 		// Global filters
 		fDecd: [-1, 0],
 		fDNM: [-1, 0],
@@ -95,8 +96,8 @@ const store = new Vuex.Store({
 	},
 	getters: {
 		timestamp:  (state, getters) => !state.rawDataReady ? null : state.rawData.timestamp,
-		totalCount: (state, getters) => !state.rawDataReady ? 0 : state.rawData.rows.length,
-		errCount:  (state, getters) => !state.rawDataReady ? 0 : state.rawData.rows.filter(r => r.CONTACT_CREATED === null).length,
+		totalCount: (state, getters) => !state.rawDataReady ? 0 : state.rawData.rows.reduce((acc, cur) => acc + cur[state.countDim]  ,0),
+		errCount:  (state, getters) => !state.rawDataReady ? 0 : state.rawData.rows.filter(r => r.CONTACT_CREATED === null).reduce((acc, cur) => acc + cur[state.countDim]  ,0),
 		applyGolbalFilters:  (state, getters) => (r) => {
 			return (state.fDecd.indexOf(r.FILTER_DECEASED) !== -1)
 				&& (state.fDNM.indexOf(r.FILTER_DONOTMAIL) !== -1 )
@@ -107,18 +108,18 @@ const store = new Vuex.Store({
 				&& (state.fContactType.indexOf(r.FILTER_ORGANISATION) !== -1 )
 				&& (state.fGender.indexOf(r.FILTER_GENDER) !== -1 )
 		},
+		getTypeDim:  (state, getters) => (anchor) => (anchor === 1 ? 'FILTER_ANCHOR1_GIVER' :  'FILTER_ANCHOR2_GIVER'),
+		getSoftDim:  (state, getters) => (anchor) => (anchor === 1 ? 'FILTER_ANCHOR1_SOFT' :  'FILTER_ANCHOR2_SOFT'),
 		trackingFilter: (state, getters) => {
-			if (!state.trackingAnchor || !state.trackingType) {
-				return {}
+			let f = {};
+			if (state.trackingAnchor===null || state.trackingAnchor===undefined || state.trackingType===null || state.trackingType===undefined) {
+				return f
 			} else {
-				let type = (state.trackingAnchor === 1 ? 'FILTER_ANCHOR1_GIVER' :  'FILTER_ANCHOR2_GIVER');
-				let soft = (state.trackingAnchor === 1 ? 'FILTER_ANCHOR1_SOFT' :  'FILTER_ANCHOR2_SOFT');
-				let f = {};
 				if (state.trackingType!==undefined && state.trackingType!==null) {
-					f[type] = state.trackingType;
+					f[getters.getTypeDim(state.trackingAnchor)] = state.trackingType;
 				}
 				if (state.trackingSoft!==undefined && state.trackingSoft!==null) {
-					f[soft] = state.trackingSoft;
+					f[getters.getSoftDim(state.trackingAnchor)] = state.trackingSoft;
 				}
 				return f
 			}
@@ -126,11 +127,12 @@ const store = new Vuex.Store({
 		filteredRows: (state, getters) => {
 			return !state.rawDataReady ? [] : state.rawData.rows.filter(r => getters.applyGolbalFilters(r))
 		},
-		filteredCount: (state, getters) => getters.filteredRows.length,
+		filteredCount: (state, getters) => getters.filteredRows.reduce((acc, cur) => acc + cur[state.countDim]  ,0),
 		count: (state, getters) => (filters) => {
+			console.log(filters);
 			return ( (filters==={} || filters===undefined || filters===null) ? getters.filteredRows : getters.filteredRows.filter(r => {
 				return Object.keys(filters).reduce((acc, key) =>	acc && (r[key] === filters[key]), true);
-			})).length
+			})).reduce((acc, cur) => acc + cur[state.countDim]  ,0)
 		}
 	}
 });
@@ -188,16 +190,16 @@ Vue.component('anchor-summary', {
 	},
 	computed: {
 		...Vuex.mapState(['rawDataReady', 'trackingAnchor', 'trackingType', 'trackingSoft']),
-		...Vuex.mapGetters(['count', 'trackingFilter']),
+		...Vuex.mapGetters(['count', 'trackingFilter', 'getTypeDim', 'getSoftDim']),
 		type: function() {
-			return  this.anchor === 1 ? 'FILTER_ANCHOR1_GIVER' :  'FILTER_ANCHOR2_GIVER'
+			return this.getTypeDim(this.anchor)
 		},
 		soft: function() {
-			return  this.anchor === 1 ? 'FILTER_ANCHOR1_SOFT' :  'FILTER_ANCHOR2_SOFT'
+			return this.getSoftDim(this.anchor)
 		}
 	},
 	methods: {
-		filter: function(type, soft) {
+		filter: function(type, soft, other) {
 			let f = {};
 			if (type!==undefined && type!==null) {
 				f[this.type] = type;
@@ -206,14 +208,17 @@ Vue.component('anchor-summary', {
 				f[this.soft] = soft;
 			}
 			if (this.trackingAnchor === this.anchor) {
-				return f
+				return Object.assign(f, other)
 			}else {
-				return Object.assign(f, this.trackingFilter)
+				return  Object.assign(Object.assign(f, this.trackingFilter), other)
 			}
 		},
+		isTrackingTarget: function(type, soft) {
+			return (this.trackingAnchor === this.anchor && (this.trackingType === type || (this.trackingType ==null && type === undefined)) && (this.trackingSoft === soft || (this.trackingSoft ==null && soft === undefined)))
+		},
 		setTracking: function(type, soft) {
-			// console.log("clciked-before", type, soft, this.trackingFilter);
-			if (this.trackingAnchor === this.anchor && (this.trackingType === type || (this.trackingType ==null && type === undefined))  && (this.trackingSoft === soft || (this.trackingSoft ==null && soft === undefined))) {
+			console.log("before: ", type, soft, this.trackingFilter);
+			if (this.isTrackingTarget(type, soft)) {
 				this.$store.commit('SET_TRACKING_ANCHOR',null);
 				this.$store.commit('SET_TRACKING_TYPE',null);
 				this.$store.commit('SET_TRACKING_SOFT',null);
@@ -222,79 +227,107 @@ Vue.component('anchor-summary', {
 				this.$store.commit('SET_TRACKING_TYPE',type===undefined?null:type);
 				this.$store.commit('SET_TRACKING_SOFT',soft===undefined?null:soft);
 			}
-			// console.log("clciked-after", type, soft, this.trackingFilter);
+			console.log("after: ", type, soft, this.trackingFilter);
 		},
-		setFocalTheme: function(type, soft) {
-			return (this.trackingAnchor === this.anchor && (this.trackingType === type || (this.trackingType ==null && type === undefined)) && (this.trackingSoft === soft || (this.trackingSoft ==null && soft === undefined)))
-		}
+
 	},
 	template: `
 	<div class="card shadow-sm mt-3">
 		<div class="card-body">
 			<h4 class="card-title text-center"><mark>Fishing Pool using Anchor << anchor >> &#9875;</mark></h4>
+			<div class="row my-3 justify-content-center" v-if="anchor === 2">
+				<div class="col-xs-12 col-sm-6">
+					<card-counter theme="primary" icon="&#127907;" :num="count(filter(210, null, {'FILTER_DECEASED': 0}))+count(filter(220, null, {'FILTER_DECEASED': 0}))+count(filter(230, null, {'FILTER_DECEASED': 0}))
+						+count(filter(-110, null, {'FILTER_DECEASED': 0}))+count(filter(-121, null, {'FILTER_DECEASED': 0}))+count(filter(-122, null, {'FILTER_DECEASED': 0}))+count(filter(-123, null, {'FILTER_DECEASED': 0}))+count(filter(-130, null, {'FILTER_DECEASED': 0}))
+						+count(filter(-210, null, {'FILTER_DECEASED': 0}))+count(filter(-220, null, {'FILTER_DECEASED': 0}))+count(filter(-230, null, {'FILTER_DECEASED': 0}))|number"
+						:msg="'Fishing Pool'">
+					</card-counter>
+				</div>
+			</div>
+
+			<div class="row my-3 justify-content-center" v-if="anchor === 2">
+				<div class="col-xs-12 col-sm-6 col-md-4">
+					<card-counter theme="merch" icon="&#9904;" :num="count() - count(filter(0))|number" msg="Exist (contact or payment)"></card-counter>
+				</div>
+				<div class="col-xs-12 col-sm-6 col-md-4">
+					<card-counter theme="info" icon="&#127887;" :num="count(filter(210, null, {'FILTER_DECEASED': 0}))+count(filter(220, null, {'FILTER_DECEASED': 0}))+count(filter(230, null, {'FILTER_DECEASED': 0}))|number" msg="No Gift (pool)"></card-counter>
+				</div>
+				<div class="col-xs-12 col-sm-6 col-md-4">
+					<card-counter theme="success" icon="&#128032;" :num="count(filter(-110, null, {'FILTER_DECEASED': 0}))+count(filter(-121, null, {'FILTER_DECEASED': 0}))+count(filter(-122, null, {'FILTER_DECEASED': 0}))+count(filter(-123, null, {'FILTER_DECEASED': 0}))+count(filter(-130, null, {'FILTER_DECEASED': 0}))|number" msg="Active (pool)"></card-counter>
+				</div>
+				<div class="col-xs-12 col-sm-6 col-md-4">
+					<card-counter theme="monitor" icon="&#128031;" :num="count(filter(-210, null, {'FILTER_DECEASED': 0}))+count(filter(-220, null, {'FILTER_DECEASED': 0}))+count(filter(-230, null, {'FILTER_DECEASED': 0}))|number" msg="Lapsed (pool)"></card-counter>
+				</div>
+				<div class="col-xs-12 col-sm-6 col-md-4">
+					<card-counter theme="warning" icon="&#128033;" :num="count(filter(-240, null, {'FILTER_DECEASED': 0}))+count(filter(240, null, {'FILTER_DECEASED': 0}))|number" msg="Lost"></card-counter>
+				</div>
+				<div class="col-xs-12 col-sm-6 col-md-4">
+					<card-counter theme="dark" icon="&#9904;" :num="count({'FILTER_DECEASED': -1})- count(filter(0, null, {'FILTER_DECEASED': -1}))|number" msg="Deceased"></card-counter>
+				</div>
+			</div>
 
 			<h5 class="text-center text-success">Active</h5>
 			<div class="row mb-2 justify-content-center">
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-110)">
-					<card-counter theme="success" icon="&#127793;" :num="count(filter(-110))|number" msg="1ST NEW" :class="{'bg-danger': setFocalTheme(-110)}" style="cursor: pointer;"></card-counter>
+				<div class="col-xs-12 col-sm-6 col-md-2" v-on:click="setTracking(-110)">
+					<card-counter theme="success" icon="&#127793;" :num="count(filter(-110))|number" msg="1ST NEW" :class="{'bg-danger': isTrackingTarget(-110)}" style="cursor: pointer;"></card-counter>
 				</div>
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-121)">
-					<card-counter theme="success" icon="&#127807;" :num="count(filter(-121))|number" msg="2ND NEW" :class="{'bg-danger': setFocalTheme(-121)}" style="cursor: pointer;"></card-counter>
+				<div class="col-xs-12 col-sm-6 col-md-2" v-on:click="setTracking(-121)">
+					<card-counter theme="success" icon="&#127807;" :num="count(filter(-121))|number" msg="2ND NEW" :class="{'bg-danger': isTrackingTarget(-121)}" style="cursor: pointer;"></card-counter>
 				</div>
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-122)">
-					<card-counter theme="success" icon="&#127794;" :num="count(filter(-122))|number" msg="MULTI" :class="{'bg-danger': setFocalTheme(-122)}" style="cursor: pointer;"></card-counter>
+				<div class="col-xs-12 col-sm-6 col-md-2" v-on:click="setTracking(-122)">
+					<card-counter theme="success" icon="&#127794;" :num="count(filter(-122))|number" msg="MULTI" :class="{'bg-danger': isTrackingTarget(-122)}" style="cursor: pointer;"></card-counter>
 				</div>
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-123)">
-					<card-counter theme="success" icon="&#127796;" :num="count(filter(-123))|number" msg="2ND REC" :class="{'bg-danger': setFocalTheme(-123)}" style="cursor: pointer;"></card-counter>
+				<div class="col-xs-12 col-sm-6 col-md-2" v-on:click="setTracking(-123)">
+					<card-counter theme="success" icon="&#127796;" :num="count(filter(-123))|number" msg="2ND REC" :class="{'bg-danger': isTrackingTarget(-123)}" style="cursor: pointer;"></card-counter>
 				</div>
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-130)">
-					<card-counter theme="success" icon="&#127811;" :num="count(filter(-130))|number" msg="1ST REC" :class="{'bg-danger': setFocalTheme(-130)}" style="cursor: pointer;"></card-counter>
+				<div class="col-xs-12 col-sm-6 col-md-2" v-on:click="setTracking(-130)">
+					<card-counter theme="success" icon="&#127811;" :num="count(filter(-130))|number" msg="1ST REC" :class="{'bg-danger': isTrackingTarget(-130)}" style="cursor: pointer;"></card-counter>
 				</div>
 			</div>
 
 			<h5 class="text-center text-warning">Lapsed (months)</h5>
 			<div class="row mb-2 justify-content-center">
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-210)">
-					<card-counter theme="warning" icon="&#127806;" :num="count(filter(-210))|number" msg="LPSD1 [0, 12]" :class="{'bg-danger': setFocalTheme(-210)}" style="cursor: pointer;"></card-counter>
+				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(-210)">
+					<card-counter theme="warning" icon="&#127806;" :num="count(filter(-210))|number" msg="LPSD1 [0, 12]" :class="{'bg-danger': isTrackingTarget(-210)}" style="cursor: pointer;"></card-counter>
 				</div>
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-220)">
-					<card-counter theme="warning" icon="&#127810;" :num="count(filter(-220))|number" msg="LPSD2 (12, 24]" :class="{'bg-danger': setFocalTheme(-220)}" style="cursor: pointer;"></card-counter>
+				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(-220)">
+					<card-counter theme="warning" icon="&#127810;" :num="count(filter(-220))|number" msg="LPSD2 (12, 24]" :class="{'bg-danger': isTrackingTarget(-220)}" style="cursor: pointer;"></card-counter>
 				</div>
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-230)">
-					<card-counter theme="warning" icon="&#127809;" :num="count(filter(-230))|number" msg="LPSD3 (24, 60)" :class="{'bg-danger': setFocalTheme(-230)}" style="cursor: pointer;"></card-counter>
+				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(-230)">
+					<card-counter theme="warning" icon="&#127809;" :num="count(filter(-230))|number" msg="LPSD3 (24, 60)" :class="{'bg-danger': isTrackingTarget(-230)}" style="cursor: pointer;"></card-counter>
 				</div>
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-240)">
-					<card-counter theme="warning" icon="&#129344;" :num="count(filter(-240))|number" msg="LPSD4 [60, inf)" :class="{'bg-danger': setFocalTheme(-240)}" style="cursor: pointer;"></card-counter>
-				</div>
-			</div>
-
-			<div class="row mb-2 justify-content-center">
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-210, -1)">
-					<card-counter theme="monitor" icon="&#127806;" :num="count(filter(-210, -1))|number" msg="S-LPSD1 [0, 12]" :class="{'bg-danger': setFocalTheme(-210, -1)}" style="cursor: pointer;"></card-counter>
-				</div>
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-220, -1)">
-					<card-counter theme="monitor" icon="&#127810;" :num="count(filter(-220, -1))|number" msg="S-LPSD2 (12, 24]" :class="{'bg-danger': setFocalTheme(-220, -1)}" style="cursor: pointer;"></card-counter>
-				</div>
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-230, -1)">
-					<card-counter theme="monitor" icon="&#127809;" :num="count(filter(-230, -1))|number" msg="S-LPSD3 (24, 60)" :class="{'bg-danger': setFocalTheme(-230, -1)}" style="cursor: pointer;"></card-counter>
-				</div>
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-240, -1)">
-					<card-counter theme="monitor" icon="&#129344;" :num="count(filter(-240, -1))|number" msg="S-LPSD4 [60, inf)" :class="{'bg-danger': setFocalTheme(-240, -1)}" style="cursor: pointer;"></card-counter>
+				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(-240)">
+					<card-counter theme="warning" icon="&#129344;" :num="count(filter(-240))|number" msg="LPSD4 [60, inf)" :class="{'bg-danger': isTrackingTarget(-240)}" style="cursor: pointer;"></card-counter>
 				</div>
 			</div>
 
 			<div class="row mb-2 justify-content-center">
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-210, 0)">
-					<card-counter theme="monitor" icon="&#127806;" :num="count(filter(-210, 0))|number" msg="H-LPSD1 [0, 12]" :class="{'bg-danger': setFocalTheme(-210, 0)}" style="cursor: pointer;"></card-counter>
+				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(-210, -1)">
+					<card-counter theme="monitor" icon="&#127806;" :num="count(filter(-210, -1))|number" msg="S-LPSD1 [0, 12]" :class="{'bg-danger': isTrackingTarget(-210, -1)}" style="cursor: pointer;"></card-counter>
 				</div>
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-220, 0)">
-					<card-counter theme="monitor" icon="&#127810;" :num="count(filter(-220, 0))|number" msg="H-LPSD2 (12, 24]" :class="{'bg-danger': setFocalTheme(-220, 0)}" style="cursor: pointer;"></card-counter>
+				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(-220, -1)">
+					<card-counter theme="monitor" icon="&#127810;" :num="count(filter(-220, -1))|number" msg="S-LPSD2 (12, 24]" :class="{'bg-danger': isTrackingTarget(-220, -1)}" style="cursor: pointer;"></card-counter>
 				</div>
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-230, 0)">
-					<card-counter theme="monitor" icon="&#127809;" :num="count(filter(-230, 0))|number" msg="H-LPSD3 (24, 60)" :class="{'bg-danger': setFocalTheme(-230, 0)}" style="cursor: pointer;"></card-counter>
+				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(-230, -1)">
+					<card-counter theme="monitor" icon="&#127809;" :num="count(filter(-230, -1))|number" msg="S-LPSD3 (24, 60)" :class="{'bg-danger': isTrackingTarget(-230, -1)}" style="cursor: pointer;"></card-counter>
 				</div>
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(-240, 0)">
-					<card-counter theme="monitor" icon="&#129344;" :num="count(filter(-240, 0))|number" msg="H-LPSD4 [60, inf)" :class="{'bg-danger': setFocalTheme(-240, 0)}" style="cursor: pointer;"></card-counter>
+				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(-240, -1)">
+					<card-counter theme="monitor" icon="&#129344;" :num="count(filter(-240, -1))|number" msg="S-LPSD4 [60, inf)" :class="{'bg-danger': isTrackingTarget(-240, -1)}" style="cursor: pointer;"></card-counter>
+				</div>
+			</div>
+
+			<div class="row mb-2 justify-content-center">
+				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(-210, 0)">
+					<card-counter theme="monitor" icon="&#127806;" :num="count(filter(-210, 0))|number" msg="H-LPSD1 [0, 12]" :class="{'bg-danger': isTrackingTarget(-210, 0)}" style="cursor: pointer;"></card-counter>
+				</div>
+				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(-220, 0)">
+					<card-counter theme="monitor" icon="&#127810;" :num="count(filter(-220, 0))|number" msg="H-LPSD2 (12, 24]" :class="{'bg-danger': isTrackingTarget(-220, 0)}" style="cursor: pointer;"></card-counter>
+				</div>
+				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(-230, 0)">
+					<card-counter theme="monitor" icon="&#127809;" :num="count(filter(-230, 0))|number" msg="H-LPSD3 (24, 60)" :class="{'bg-danger': isTrackingTarget(-230, 0)}" style="cursor: pointer;"></card-counter>
+				</div>
+				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(-240, 0)">
+					<card-counter theme="monitor" icon="&#129344;" :num="count(filter(-240, 0))|number" msg="H-LPSD4 [60, inf)" :class="{'bg-danger': isTrackingTarget(-240, 0)}" style="cursor: pointer;"></card-counter>
 				</div>
 			</div>
 
@@ -302,55 +335,55 @@ Vue.component('anchor-summary', {
 
 			<h5 class="text-center text-primary">Never Given (months)</h5>
 			<div class="row mb-2 justify-content-center">
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(210)">
-					<card-counter theme="primary" icon="&#128167;" :num="count(filter(210))|number" msg="NG1 [0, 12]" :class="{'bg-danger': setFocalTheme(210)}" style="cursor: pointer;"></card-counter>
+				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(210)">
+					<card-counter theme="primary" icon="&#9732;" :num="count(filter(210))|number" msg="NG1 [0, 12]" :class="{'bg-danger': isTrackingTarget(210)}" style="cursor: pointer;"></card-counter>
 				</div>
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(220)">
-					<card-counter theme="primary" icon="&#127754;" :num="count(filter(220))|number" msg="NG2 (12, 24]" :class="{'bg-danger': setFocalTheme(220)}" style="cursor: pointer;"></card-counter>
+				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(220)">
+					<card-counter theme="primary" icon="&#128167;" :num="count(filter(220))|number" msg="NG2 (12, 24]" :class="{'bg-danger': isTrackingTarget(220)}" style="cursor: pointer;"></card-counter>
 				</div>
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(230)">
-					<card-counter theme="primary" icon="&#9732;" :num="count(filter(230))|number" msg="NG3 (24, 60)" :class="{'bg-danger': setFocalTheme(230)}" style="cursor: pointer;"></card-counter>
+				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(230)">
+					<card-counter theme="primary" icon="&#127754;" :num="count(filter(230))|number" msg="NG3 (24, 60)" :class="{'bg-danger': isTrackingTarget(230)}" style="cursor: pointer;"></card-counter>
 				</div>
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(240)">
-					<card-counter theme="primary" icon="&#10052;" :num="count(filter(240))|number" msg="NG4 [60, inf)" :class="{'bg-danger': setFocalTheme(240)}" style="cursor: pointer;"></card-counter>
-				</div>
-			</div>
-
-			<div class="row mb-2 justify-content-center">
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(210, -1)">
-					<card-counter theme="info" icon="&#128167;" :num="count(filter(210, -1))|number" msg="S-NG1 [0, 12]" :class="{'bg-danger': setFocalTheme(210, -1)}" style="cursor: pointer;"></card-counter>
-				</div>
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(220, -1)">
-					<card-counter theme="info" icon="&#127754;" :num="count(filter(220, -1))|number" msg="S-NG2 (12, 24]" :class="{'bg-danger': setFocalTheme(220, -1)}" style="cursor: pointer;"></card-counter>
-				</div>
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(230, -1)">
-					<card-counter theme="info" icon="&#9732;" :num="count(filter(230, -1))|number" msg="S-NG3 (24, 60)" :class="{'bg-danger': setFocalTheme(230, -1)}" style="cursor: pointer;"></card-counter>
-				</div>
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(240, -1)">
-					<card-counter theme="info" icon="&#10052;" :num="count(filter(240, -1))|number" msg="S-NG4 [60, inf)" :class="{'bg-danger': setFocalTheme(240, -1)}" style="cursor: pointer;"></card-counter>
+				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(240)">
+					<card-counter theme="primary" icon="&#10052;" :num="count(filter(240))|number" msg="NG4 [60, inf)" :class="{'bg-danger': isTrackingTarget(240)}" style="cursor: pointer;"></card-counter>
 				</div>
 			</div>
 
 			<div class="row mb-2 justify-content-center">
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(210, 0)">
-					<card-counter theme="info" icon="&#128167;" :num="count(filter(210, 0))|number" msg="H-NG1 [0, 12]" :class="{'bg-danger': setFocalTheme(210, 0)}" style="cursor: pointer;"></card-counter>
+				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(210, -1)">
+					<card-counter theme="info" icon="&#9732;" :num="count(filter(210, -1))|number" msg="S-NG1 [0, 12]" :class="{'bg-danger': isTrackingTarget(210, -1)}" style="cursor: pointer;"></card-counter>
 				</div>
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(220, 0)">
-					<card-counter theme="info" icon="&#127754;" :num="count(filter(220, 0))|number" msg="H-NG2 (12, 24]" :class="{'bg-danger': setFocalTheme(220, 0)}" style="cursor: pointer;"></card-counter>
+				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(220, -1)">
+					<card-counter theme="info" icon="&#128167;" :num="count(filter(220, -1))|number" msg="S-NG2 (12, 24]" :class="{'bg-danger': isTrackingTarget(220, -1)}" style="cursor: pointer;"></card-counter>
 				</div>
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(230, 0)">
-					<card-counter theme="info" icon="&#9732;" :num="count(filter(230, 0))|number" msg="H-NG3 (24, 60)" :class="{'bg-danger': setFocalTheme(230, 0)}" style="cursor: pointer;"></card-counter>
+				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(230, -1)">
+					<card-counter theme="info" icon="&#127754;" :num="count(filter(230, -1))|number" msg="S-NG3 (24, 60)" :class="{'bg-danger': isTrackingTarget(230, -1)}" style="cursor: pointer;"></card-counter>
 				</div>
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(240, 0)">
-					<card-counter theme="info" icon="&#10052;" :num="count(filter(240, 0))|number" msg="H-NG4 [60, inf)" :class="{'bg-danger': setFocalTheme(240, 0)}" style="cursor: pointer;"></card-counter>
+				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(240, -1)">
+					<card-counter theme="info" icon="&#10052;" :num="count(filter(240, -1))|number" msg="S-NG4 [60, inf)" :class="{'bg-danger': isTrackingTarget(240, -1)}" style="cursor: pointer;"></card-counter>
+				</div>
+			</div>
+
+			<div class="row mb-2 justify-content-center">
+				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(210, 0)">
+					<card-counter theme="info" icon="&#9732;" :num="count(filter(210, 0))|number" msg="H-NG1 [0, 12]" :class="{'bg-danger': isTrackingTarget(210, 0)}" style="cursor: pointer;"></card-counter>
+				</div>
+				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(220, 0)">
+					<card-counter theme="info" icon="&#128167;" :num="count(filter(220, 0))|number" msg="H-NG2 (12, 24]" :class="{'bg-danger': isTrackingTarget(220, 0)}" style="cursor: pointer;"></card-counter>
+				</div>
+				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(230, 0)">
+					<card-counter theme="info" icon="&#127754;" :num="count(filter(230, 0))|number" msg="H-NG3 (24, 60)" :class="{'bg-danger': isTrackingTarget(230, 0)}" style="cursor: pointer;"></card-counter>
+				</div>
+				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(240, 0)">
+					<card-counter theme="info" icon="&#10052;" :num="count(filter(240, 0))|number" msg="H-NG4 [60, inf)" :class="{'bg-danger': isTrackingTarget(240, 0)}" style="cursor: pointer;"></card-counter>
 				</div>
 			</div>
 
 
 			<h5 class="text-center text-dark">Not Exist (Prospect Created in Future)</h5>
 			<div class="row mb-2 justify-content-center">
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-on:click="setTracking(0)">
-					<card-counter theme="dark" icon="&#127787;" :num="count(filter(0))|number" msg="Not Exist" :class="{'bg-danger': setFocalTheme(0)}" style="cursor: pointer;"></card-counter>
+				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(0)">
+					<card-counter theme="dark" icon="&#127787;" :num="count(filter(0))|number" msg="Not Exist" :class="{'bg-danger': isTrackingTarget(0)}" style="cursor: pointer;"></card-counter>
 				</div>
 			</div>
 
@@ -614,7 +647,7 @@ let rootVue = new Vue({
 
 		<global-filters></global-filters>
 
-		<p class="lead text-center"><small>Click on the card to track movement, re-click the smae card to cancel tracking</small><p>
+		<p class="lead text-center"><small>Click on the card to track movement, re-click the same card to cancel tracking</small><p>
 
 		<template v-if="rawDataReady">
 			<anchor-summary :anchor="2"></anchor-summary>
