@@ -74,7 +74,7 @@ function drawSankey(chart){
 			series: {
 			},
 			sankey: {
-		 		point: {
+				point: {
 					events: {
 						mouseOver: function() {
 							linksHover(this, 'hover');
@@ -82,8 +82,8 @@ function drawSankey(chart){
 						mouseOut: function() {
 							linksHover(this, '');
 						}
-        	}
-      	},
+					}
+				},
 				tooltip: {
 		 			headerFormat: '<span style="color:{point.color}" class="highcharts-header">{series.name}</span><br/>',
 					nodeFormat: '<b>{point.name}</b> : <span style="font-size:1em">${point.sum:,.2f}</span>',
@@ -209,4 +209,3 @@ drawWordCloud('chart6', des2Total, 'Total Value','Destination 2 Total Value Word
 
 </script>
 {% endblock %}
-
