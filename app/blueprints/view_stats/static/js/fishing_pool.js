@@ -266,7 +266,7 @@ Vue.component('anchor-summary', {
 
 			<div class="row my-3 justify-content-center" v-if="anchor === 2">
 				<div class="col-xs-12 col-sm-6 col-md-4">
-					<card-counter theme="merch" icon="&#128150;" :num="cntExist|number" msg="Exist (contact or payment)"></card-counter>
+					<card-counter theme="light" icon="&#128150;" :num="cntExist|number" msg="Exist (contact or payment)"></card-counter>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<card-counter theme="info" icon="&#128033;" :num="cntNoGift|number" :msg="'🎣 No Gift ' + ((cntNoGift/cntExist)*100).toFixed(2) + '%'"></card-counter>
@@ -281,72 +281,72 @@ Vue.component('anchor-summary', {
 					<card-counter theme="warning" icon="&#129416;" :num="cntLost|number" :msg="'Lost ' + ((cntLost/cntExist)*100).toFixed(2) + '%'""></card-counter>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
-					<card-counter theme="dark" icon="&#9904;" :num="cntDECD|number" :msg="'Deceased ' + ((cntDECD/cntExist)*100).toFixed(2) + '%'""></card-counter>
+					<card-counter theme="danger" icon="&#9904;" :num="cntDECD|number" :msg="'Deceased ' + ((cntDECD/cntExist)*100).toFixed(2) + '%'""></card-counter>
 				</div>
 			</div>
 
 			<h5 class="text-center text-success">Active</h5>
 			<div class="row mb-1 justify-content-center">
 				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-2" v-on:click="setTracking(-110)">
-					<card-counter theme="success" icon="&#127793;" :num="count(filter(-110))|number" msg="🎣 1ST NEW" :class="{'bg-danger': isTrackingTarget(-110)}" style="cursor: pointer;"></card-counter>
+					<card-counter theme="success" icon="&#127793;" :num="count(filter(-110))|number" msg="🎣 1ST NEW" :class="{'bg-dark': isTrackingTarget(-110)}" style="cursor: pointer;"></card-counter>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-2" v-on:click="setTracking(-121)">
-					<card-counter theme="success" icon="&#127807;" :num="count(filter(-121))|number" msg="🎣 2ND NEW" :class="{'bg-danger': isTrackingTarget(-121)}" style="cursor: pointer;"></card-counter>
+					<card-counter theme="success" icon="&#127807;" :num="count(filter(-121))|number" msg="🎣 2ND NEW" :class="{'bg-dark': isTrackingTarget(-121)}" style="cursor: pointer;"></card-counter>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-2" v-on:click="setTracking(-122)">
-					<card-counter theme="success" icon="&#127794;" :num="count(filter(-122))|number" msg="🎣 MULTI" :class="{'bg-danger': isTrackingTarget(-122)}" style="cursor: pointer;"></card-counter>
+					<card-counter theme="success" icon="&#127794;" :num="count(filter(-122))|number" msg="🎣 MULTI" :class="{'bg-dark': isTrackingTarget(-122)}" style="cursor: pointer;"></card-counter>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-2" v-on:click="setTracking(-123)">
-					<card-counter theme="success" icon="&#127796;" :num="count(filter(-123))|number" msg="🎣 2ND REC" :class="{'bg-danger': isTrackingTarget(-123)}" style="cursor: pointer;"></card-counter>
+					<card-counter theme="success" icon="&#127796;" :num="count(filter(-123))|number" msg="🎣 2ND REC" :class="{'bg-dark': isTrackingTarget(-123)}" style="cursor: pointer;"></card-counter>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-2" v-on:click="setTracking(-130)">
-					<card-counter theme="success" icon="&#127811;" :num="count(filter(-130))|number" msg="🎣 1ST REC" :class="{'bg-danger': isTrackingTarget(-130)}" style="cursor: pointer;"></card-counter>
+					<card-counter theme="success" icon="&#127811;" :num="count(filter(-130))|number" msg="🎣 1ST REC" :class="{'bg-dark': isTrackingTarget(-130)}" style="cursor: pointer;"></card-counter>
 				</div>
 			</div>
 
 			<h5 class="text-center text-warning">Lapsed (months)</h5>
 			<div class="row mb-1 justify-content-center">
 				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(-210)">
-					<card-counter theme="warning" icon="&#127806;" :num="count(filter(-210))|number" msg="🎣 LPSD1 [0, 12]" :class="{'bg-danger': isTrackingTarget(-210)}" style="cursor: pointer;"></card-counter>
+					<card-counter theme="warning" icon="&#127806;" :num="count(filter(-210))|number" msg="🎣 LPSD1 [0, 12]" :class="{'bg-dark': isTrackingTarget(-210)}" style="cursor: pointer;"></card-counter>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(-220)">
-					<card-counter theme="warning" icon="&#127810;" :num="count(filter(-220))|number" msg="🎣 LPSD2 (12, 24]" :class="{'bg-danger': isTrackingTarget(-220)}" style="cursor: pointer;"></card-counter>
+					<card-counter theme="warning" icon="&#127810;" :num="count(filter(-220))|number" msg="🎣 LPSD2 (12, 24]" :class="{'bg-dark': isTrackingTarget(-220)}" style="cursor: pointer;"></card-counter>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(-230)">
-					<card-counter theme="warning" icon="&#127809;" :num="count(filter(-230))|number" msg="🎣 LPSD3 (24, 60)" :class="{'bg-danger': isTrackingTarget(-230)}" style="cursor: pointer;"></card-counter>
+					<card-counter theme="warning" icon="&#127809;" :num="count(filter(-230))|number" msg="🎣 LPSD3 (24, 60)" :class="{'bg-dark': isTrackingTarget(-230)}" style="cursor: pointer;"></card-counter>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(-240)">
-					<card-counter theme="warning" icon="&#129344;" :num="count(filter(-240))|number" msg="LPSD4 [60, inf)" :class="{'bg-danger': isTrackingTarget(-240)}" style="cursor: pointer;"></card-counter>
+					<card-counter theme="warning" icon="&#129344;" :num="count(filter(-240))|number" msg="LPSD4 [60, inf)" :class="{'bg-dark': isTrackingTarget(-240)}" style="cursor: pointer;"></card-counter>
 				</div>
 			</div>
 
 			<div class="row mb-1 justify-content-center">
 				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(-210, -1)">
-					<card-counter theme="monitor" icon="&#127806;" :num="count(filter(-210, -1))|number" msg="🎣 Soft [0, 12]" :class="{'bg-danger': isTrackingTarget(-210, -1)}" style="cursor: pointer;"></card-counter>
+					<card-counter theme="monitor" icon="&#127806;" :num="count(filter(-210, -1))|number" msg="🎣 Soft [0, 12]" :class="{'bg-dark': isTrackingTarget(-210, -1)}" style="cursor: pointer;"></card-counter>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(-220, -1)">
-					<card-counter theme="monitor" icon="&#127810;" :num="count(filter(-220, -1))|number" msg="🎣 Soft (12, 24]" :class="{'bg-danger': isTrackingTarget(-220, -1)}" style="cursor: pointer;"></card-counter>
+					<card-counter theme="monitor" icon="&#127810;" :num="count(filter(-220, -1))|number" msg="🎣 Soft (12, 24]" :class="{'bg-dark': isTrackingTarget(-220, -1)}" style="cursor: pointer;"></card-counter>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(-230, -1)">
-					<card-counter theme="monitor" icon="&#127809;" :num="count(filter(-230, -1))|number" msg="🎣 Soft (24, 60)" :class="{'bg-danger': isTrackingTarget(-230, -1)}" style="cursor: pointer;"></card-counter>
+					<card-counter theme="monitor" icon="&#127809;" :num="count(filter(-230, -1))|number" msg="🎣 Soft (24, 60)" :class="{'bg-dark': isTrackingTarget(-230, -1)}" style="cursor: pointer;"></card-counter>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(-240, -1)">
-					<card-counter theme="monitor" icon="&#129344;" :num="count(filter(-240, -1))|number" msg="Soft [60, inf)" :class="{'bg-danger': isTrackingTarget(-240, -1)}" style="cursor: pointer;"></card-counter>
+					<card-counter theme="monitor" icon="&#129344;" :num="count(filter(-240, -1))|number" msg="Soft [60, inf)" :class="{'bg-dark': isTrackingTarget(-240, -1)}" style="cursor: pointer;"></card-counter>
 				</div>
 			</div>
 
 			<div class="row mb-1 justify-content-center">
 				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(-210, 0)">
-					<card-counter theme="monitor" icon="&#127806;" :num="count(filter(-210, 0))|number" msg="🎣 Hard [0, 12]" :class="{'bg-danger': isTrackingTarget(-210, 0)}" style="cursor: pointer;"></card-counter>
+					<card-counter theme="monitor" icon="&#127806;" :num="count(filter(-210, 0))|number" msg="🎣 Hard [0, 12]" :class="{'bg-dark': isTrackingTarget(-210, 0)}" style="cursor: pointer;"></card-counter>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(-220, 0)">
-					<card-counter theme="monitor" icon="&#127810;" :num="count(filter(-220, 0))|number" msg="🎣 Hard (12, 24]" :class="{'bg-danger': isTrackingTarget(-220, 0)}" style="cursor: pointer;"></card-counter>
+					<card-counter theme="monitor" icon="&#127810;" :num="count(filter(-220, 0))|number" msg="🎣 Hard (12, 24]" :class="{'bg-dark': isTrackingTarget(-220, 0)}" style="cursor: pointer;"></card-counter>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(-230, 0)">
-					<card-counter theme="monitor" icon="&#127809;" :num="count(filter(-230, 0))|number" msg="🎣 Hard (24, 60)" :class="{'bg-danger': isTrackingTarget(-230, 0)}" style="cursor: pointer;"></card-counter>
+					<card-counter theme="monitor" icon="&#127809;" :num="count(filter(-230, 0))|number" msg="🎣 Hard (24, 60)" :class="{'bg-dark': isTrackingTarget(-230, 0)}" style="cursor: pointer;"></card-counter>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(-240, 0)">
-					<card-counter theme="monitor" icon="&#129344;" :num="count(filter(-240, 0))|number" msg="Hard [60, inf)" :class="{'bg-danger': isTrackingTarget(-240, 0)}" style="cursor: pointer;"></card-counter>
+					<card-counter theme="monitor" icon="&#129344;" :num="count(filter(-240, 0))|number" msg="Hard [60, inf)" :class="{'bg-dark': isTrackingTarget(-240, 0)}" style="cursor: pointer;"></card-counter>
 				</div>
 			</div>
 
@@ -355,46 +355,46 @@ Vue.component('anchor-summary', {
 			<h5 class="text-center text-primary">Never Given (months)</h5>
 			<div class="row mb-1 justify-content-center">
 				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(210)">
-					<card-counter theme="primary" icon="&#9732;" :num="count(filter(210))|number" msg="🎣 NG1 [0, 12)" :class="{'bg-danger': isTrackingTarget(210)}" style="cursor: pointer;"></card-counter>
+					<card-counter theme="primary" icon="&#9732;" :num="count(filter(210))|number" msg="🎣 NG1 [0, 12)" :class="{'bg-dark': isTrackingTarget(210)}" style="cursor: pointer;"></card-counter>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(220)">
-					<card-counter theme="primary" icon="&#128167;" :num="count(filter(220))|number" msg="🎣 NG2 [12, 24)" :class="{'bg-danger': isTrackingTarget(220)}" style="cursor: pointer;"></card-counter>
+					<card-counter theme="primary" icon="&#128167;" :num="count(filter(220))|number" msg="🎣 NG2 [12, 24)" :class="{'bg-dark': isTrackingTarget(220)}" style="cursor: pointer;"></card-counter>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(230)">
-					<card-counter theme="primary" icon="&#127754;" :num="count(filter(230))|number" msg="🎣 NG3 [24, 60)" :class="{'bg-danger': isTrackingTarget(230)}" style="cursor: pointer;"></card-counter>
+					<card-counter theme="primary" icon="&#127754;" :num="count(filter(230))|number" msg="🎣 NG3 [24, 60)" :class="{'bg-dark': isTrackingTarget(230)}" style="cursor: pointer;"></card-counter>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(240)">
-					<card-counter theme="primary" icon="&#10052;" :num="count(filter(240))|number" msg="NG4 [60, inf)" :class="{'bg-danger': isTrackingTarget(240)}" style="cursor: pointer;"></card-counter>
+					<card-counter theme="primary" icon="&#10052;" :num="count(filter(240))|number" msg="NG4 [60, inf)" :class="{'bg-dark': isTrackingTarget(240)}" style="cursor: pointer;"></card-counter>
 				</div>
 			</div>
 
 			<div class="row mb-1 justify-content-center">
 				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(210, -1)">
-					<card-counter theme="info" icon="&#9732;" :num="count(filter(210, -1))|number" msg="🎣 Soft [0, 12)" :class="{'bg-danger': isTrackingTarget(210, -1)}" style="cursor: pointer;"></card-counter>
+					<card-counter theme="info" icon="&#9732;" :num="count(filter(210, -1))|number" msg="🎣 Soft [0, 12)" :class="{'bg-dark': isTrackingTarget(210, -1)}" style="cursor: pointer;"></card-counter>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(220, -1)">
-					<card-counter theme="info" icon="&#128167;" :num="count(filter(220, -1))|number" msg="🎣 Soft [12, 24)" :class="{'bg-danger': isTrackingTarget(220, -1)}" style="cursor: pointer;"></card-counter>
+					<card-counter theme="info" icon="&#128167;" :num="count(filter(220, -1))|number" msg="🎣 Soft [12, 24)" :class="{'bg-dark': isTrackingTarget(220, -1)}" style="cursor: pointer;"></card-counter>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(230, -1)">
-					<card-counter theme="info" icon="&#127754;" :num="count(filter(230, -1))|number" msg="🎣 Soft [24, 60)" :class="{'bg-danger': isTrackingTarget(230, -1)}" style="cursor: pointer;"></card-counter>
+					<card-counter theme="info" icon="&#127754;" :num="count(filter(230, -1))|number" msg="🎣 Soft [24, 60)" :class="{'bg-dark': isTrackingTarget(230, -1)}" style="cursor: pointer;"></card-counter>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(240, -1)">
-					<card-counter theme="info" icon="&#10052;" :num="count(filter(240, -1))|number" msg="Soft [60, inf)" :class="{'bg-danger': isTrackingTarget(240, -1)}" style="cursor: pointer;"></card-counter>
+					<card-counter theme="info" icon="&#10052;" :num="count(filter(240, -1))|number" msg="Soft [60, inf)" :class="{'bg-dark': isTrackingTarget(240, -1)}" style="cursor: pointer;"></card-counter>
 				</div>
 			</div>
 
 			<div class="row mb-1 justify-content-center">
 				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(210, 0)">
-					<card-counter theme="info" icon="&#9732;" :num="count(filter(210, 0))|number" msg="🎣 Hard [0, 12)" :class="{'bg-danger': isTrackingTarget(210, 0)}" style="cursor: pointer;"></card-counter>
+					<card-counter theme="info" icon="&#9732;" :num="count(filter(210, 0))|number" msg="🎣 Hard [0, 12)" :class="{'bg-dark': isTrackingTarget(210, 0)}" style="cursor: pointer;"></card-counter>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(220, 0)">
-					<card-counter theme="info" icon="&#128167;" :num="count(filter(220, 0))|number" msg="🎣 Hard [12, 24)" :class="{'bg-danger': isTrackingTarget(220, 0)}" style="cursor: pointer;"></card-counter>
+					<card-counter theme="info" icon="&#128167;" :num="count(filter(220, 0))|number" msg="🎣 Hard [12, 24)" :class="{'bg-dark': isTrackingTarget(220, 0)}" style="cursor: pointer;"></card-counter>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(230, 0)">
-					<card-counter theme="info" icon="&#127754;" :num="count(filter(230, 0))|number" msg="🎣 Hard [24, 60)" :class="{'bg-danger': isTrackingTarget(230, 0)}" style="cursor: pointer;"></card-counter>
+					<card-counter theme="info" icon="&#127754;" :num="count(filter(230, 0))|number" msg="🎣 Hard [24, 60)" :class="{'bg-dark': isTrackingTarget(230, 0)}" style="cursor: pointer;"></card-counter>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(240, 0)">
-					<card-counter theme="info" icon="&#10052;" :num="count(filter(240, 0))|number" msg="Hard [60, inf)" :class="{'bg-danger': isTrackingTarget(240, 0)}" style="cursor: pointer;"></card-counter>
+					<card-counter theme="info" icon="&#10052;" :num="count(filter(240, 0))|number" msg="Hard [60, inf)" :class="{'bg-dark': isTrackingTarget(240, 0)}" style="cursor: pointer;"></card-counter>
 				</div>
 			</div>
 
@@ -402,7 +402,7 @@ Vue.component('anchor-summary', {
 			<h5 class="text-center text-dark">Not Exist (Prospect Created in Future)</h5>
 			<div class="row mb-1 justify-content-center">
 				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" v-on:click="setTracking(0)">
-					<card-counter theme="dark" icon="&#127787;" :num="count(filter(0))|number" msg="Not Exist" :class="{'bg-danger': isTrackingTarget(0)}" style="cursor: pointer;"></card-counter>
+					<card-counter theme="dark" icon="&#127787;" :num="count(filter(0))|number" msg="Not Exist" :class="{'bg-dark': isTrackingTarget(0)}" style="cursor: pointer;"></card-counter>
 				</div>
 			</div>
 

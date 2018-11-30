@@ -106,8 +106,7 @@ def pledge_headers():
 def fishing_pool():
 	fy = int(request_arg('fy', TLMA.cfy, tests.is_year))
 	d1, d2 = TLMA.fy_range(fy)
-	updates = (('BASE_QUERY', ''), ('PAYMENT_DATE1', Tq.format_date(d1), '\''), ('PAYMENT_DATE2', Tq.format_date(d2), '\''), ('FISHINGPOOL_DATE1', Tq.format_date(d1 - datetime.timedelta(days=1)), '\''), ('FISHINGPOOL_DATE2', Tq.format_date(datetime.date.today()), '\''))
-	print(updates)
+	updates = (('BASE_QUERY', ''), ('FISHINGPOOL_DATE1', Tq.format_date(d1 - datetime.timedelta(days=1)), '\''), ('FISHINGPOOL_DATE2', Tq.format_date(datetime.date.today()), '\''))
 	return Tq.query(('CTE', 'CTE_FISHING_POOL'), cached_timeout=60, updates=updates)
 
 
@@ -115,6 +114,5 @@ def fishing_pool():
 def fishing_pool_sankey():
 	fy = int(request_arg('fy', TLMA.cfy, tests.is_year))
 	d1, d2 = TLMA.fy_range(fy)
-	updates = (('BASE_QUERY', ''), ('PAYMENT_DATE1', Tq.format_date(d1), '\''), ('PAYMENT_DATE2', Tq.format_date(d2), '\''), ('FISHINGPOOL_DATE1', Tq.format_date(d1 - datetime.timedelta(days=1)), '\''), ('FISHINGPOOL_DATE2', Tq.format_date(datetime.date.today()), '\''))
-	print(updates)
+	updates = (('BASE_QUERY', ''), ('FISHINGPOOL_DATE1', Tq.format_date(d1 - datetime.timedelta(days=1)), '\''), ('FISHINGPOOL_DATE2', Tq.format_date(datetime.date.today()), '\''))
 	return Tq.query(('CTE', 'CTE_FISHING_POOL_SANKEY'), cached_timeout=30, updates=updates)
