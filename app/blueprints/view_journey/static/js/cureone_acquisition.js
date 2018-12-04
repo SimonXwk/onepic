@@ -172,6 +172,7 @@ let vueRow = Vue.component('vue-row', {
 				<mark>&#129488;
 				<span class="font-weight-bold"><< row.FOLLOWUP1_TYPE >></span> by <span class="font-weight-bold"><< row.FOLLOWUP1_BY >></span> <small class="text-success"> << row.FOLLOWUP1_DATE|dAU >></small>
 				</mark>
+				<small class="text-info d-block"><< row.FOLLOWUP1_SUBJECT >></small>
 				<small class="text-muted"><< row.FOLLOWUP1_NOTES >></small>
 			</span>
 		</td>
@@ -181,6 +182,7 @@ let vueRow = Vue.component('vue-row', {
 				<mark>&#129299;
 				<span class="font-weight-bold"><< row.FOLLOWUP2_TYPE >></span> by <span class="font-weight-bold"><< row.FOLLOWUP2_BY >></span> <small class="text-success"> << row.FOLLOWUP2_DATE|dAU >></small>
 				</mark>
+				<small class="text-info d-block"><< row.FOLLOWUP2_SUBJECT >></small>
 				<small class="text-muted"><< row.FOLLOWUP2_NOTES >></small>
 			</span>
 		</td>
