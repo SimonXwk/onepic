@@ -245,7 +245,7 @@ let rootVue = new Vue({
 		'vue-loader': vueLoader,
 		'vue-table': vueTable,
 	},
-	template: '<vue-loader msg="Finding Christmas Appeal Donor in ThankQ ..." v-if="rawData===null"></vue-loader>' + '<div class="container-fluid" v-else>' +
+	template: '<vue-loader msg="Finding Christmas Donors in ThankQ ..." v-if="rawData===null"></vue-loader>' + '<div class="container-fluid" v-else>' +
 	`
 	<div class="row mb-1 mt-0">
 
