@@ -13,10 +13,7 @@ def date_of_payments_fy():
 
 @templatified('overview', title='Private Revenue Overview')
 def overview():
-	today = datetime.date.today()
-	d1, d2 = TLMA.fy_range(TLMA.cfy)
-	progress = (today-d1).days/(d2-d1).days
-	return dict(date_progress=progress*100)
+	pass
 
 
 @templatified('comparative', title='Comparative View')

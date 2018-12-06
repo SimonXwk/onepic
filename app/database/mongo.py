@@ -3,10 +3,10 @@ from pymongo import MongoClient
 
 class Client(object):
 	def __init__(self, connection_string):
-		self.connection_string = connection_string
+		self._connection_string = connection_string
 
 	def __enter__(self):
-		self.client = MongoClient(self.connection_string)
+		self.client = MongoClient(self._connection_string)
 		return self
 
 	def __exit__(self, exc_type, exc_val, exc_tb):

@@ -225,11 +225,11 @@ let vueTable = Vue.component('vue-table', {
 		<table class="table table-sm table-hover table-bordered table-striped" v-bind:id="tableID" >
 			<thead>
 				<tr class=" text-left" v-bind:class="trClassObject">
-					<th scope="col" >DONOR</th>
-					<th scope="col" >MAIL PROFILE</th>
-					<th scope="col" >INFOMATION</th>
-					<th scope="col" >CONTACT METHOD</th>
-					<th scope="col" >CONVERSION PACK</th>
+					<th scope="col" style="width:15%">DONOR</th>
+					<th scope="col" style="width:20%">MAIL PROFILE</th>
+					<th scope="col" style="width:25%">INFOMATION</th>
+					<th scope="col" style="width:15%">CONTACT METHOD</th>
+					<th scope="col" style="width:15%">CONVERSION PACK</th>
 					<th scope="col" v-if="sublist === 'called'">FOLLOWUP1</th>
 					<th scope="col" v-if="sublist === 'called'">FOLLOWUP2</th>
 				</tr>
@@ -313,12 +313,12 @@ let rootVue = new Vue({
 
 		},
 		calcSubLists: function(row){
-			if (row.ANONYMOUS === -1 || row.DECD === -1 || row.PRIMARYCATEGORY === 'Estate' || row.PLEDGES > 0 || row.DONOTCALL === -1 || row.BOARDED === -2){
-				return 'excluded'
-			}else if (row['CONVERSIONCALL_BY'] === null || row['CONVERSIONCALL_BY'].trim() === '') {
-				return 'todo'
-			}else {
+			if (row['CONVERSIONCALL_BY'] !== null && row['CONVERSIONCALL_BY'].trim() !== ''){
 				return 'called'
+			}else if (row.ANONYMOUS === -1 || row.DECD === -1 || row.PRIMARYCATEGORY === 'Estate' || row.PLEDGES > 0 || row.DONOTCALL === -1 || row.BOARDED === -2) {
+				return 'excluded'
+			} else {
+				return 'todo'
 			}
 		},
 	},
