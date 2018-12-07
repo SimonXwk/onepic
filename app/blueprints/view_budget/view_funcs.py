@@ -1,5 +1,6 @@
 from app.helper import templatified
 from app.database.iif import get_class_list_of_dicts, get_account_list_of_dicts
+from app.database.mongo import Client
 
 
 @templatified('scoping_fy20', title='FY20 Budget Scoping')
@@ -19,5 +20,11 @@ def classes():
 
 @templatified('load_reckon_data', title='Load Reckon Data')
 def load_reckon_data():
-	pass
+	mongo = Client(is_developer=False)
+	with mongo:
+		db = mongo.tlma
+		mc = db['marketingcycle']
+		marketing_cycles = mc.find({}, {'name': 1, 'KPI': 1})
+		marketing_cycles = mongo.to_array(marketing_cycles)
+	return dict(marketing_cycles=marketing_cycles)
 
