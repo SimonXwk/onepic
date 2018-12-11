@@ -47,7 +47,7 @@ def create_app(test_config=None):
 		from .extension import init_app_extensions
 		init_app_extensions(app)
 		# step 5: Register Blueprints
-		register_blueprints(app, 'blueprints', 'bp', include_packages=True, recursive=False)
+		register_blueprints(app, 'bp', include_packages=True, recursive=False)
 
 		# step 6:
 		# Init the DataBase

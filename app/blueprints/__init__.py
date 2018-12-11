@@ -3,17 +3,25 @@ from flask.blueprints import Blueprint
 
 
 # Circular import in Blueprint is not allowed for this method
-def register_blueprints(app, blueprint_package='blueprints', blueprint_obj_name='bp', **kwargs):
-	blueprint_package = '.'.join((app.name, blueprint_package))
-	print(f' * Attempting to register Blueprint objects named "{blueprint_obj_name}" in package {blueprint_package} to Flask object {app}')
-	for dotted_module_name in find_modules(blueprint_package, **kwargs):
+def get_blueprint_objects(blueprint_obj_name='bp', **kwargs):
+	blueprint_package_path_string = __name__
+	print(f' * Searching in package "{blueprint_package_path_string}"')
+	for dotted_module_name in find_modules(blueprint_package_path_string, **kwargs):
 		module = import_string(dotted_module_name, silent=False)
-		print(f'   Searching {dotted_module_name}: ')
+		print(f'   Looking for attribute "{blueprint_obj_name}" in module /{dotted_module_name}/')
 		if hasattr(module, blueprint_obj_name):
-			blueprint = import_string(':'.join((dotted_module_name, blueprint_obj_name)))
-			if isinstance(blueprint, Blueprint):
-				print(f'   [{blueprint_obj_name}:{blueprint.name}] was found {blueprint}')
-				app.register_blueprint(blueprint)
-				print(f' * [{blueprint_obj_name}:{blueprint.name}] was registered !')
+			bp = import_string(':'.join((dotted_module_name, blueprint_obj_name)))
+			if isinstance(bp, Blueprint):
+				print(f'   Found Blueprint {bp} - [name: {bp.name}]')
+				yield bp
 		else:
-			print(f'\nX Can not found object named [{blueprint_obj_name}]')
+			print(f' - ["{blueprint_obj_name}" ???] can not be found !')
+
+
+def register_blueprints(app, blueprint_obj_name='bp', **kwargs):
+	print('-' * 100)
+	print(f' * Registering Blueprint Instances to {app}')
+	for blueprint in get_blueprint_objects(blueprint_obj_name=blueprint_obj_name, **kwargs):
+		app.register_blueprint(blueprint)
+		print(f' + Successfully registered <{blueprint.name}>')
+	print('-' * 100)

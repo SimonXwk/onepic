@@ -5,6 +5,11 @@ openpyxl
 pandas
 requests
 
+dash
+dash-html-components
+dash-core-components
+dash-table
+
 SQLAlchemy
 marshmallow
 
