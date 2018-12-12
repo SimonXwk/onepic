@@ -1,40 +1,42 @@
-<div class="container">
+{{ div('root') }}
 
-	<div class="row">
-
-		<div class="col-md-3">
-			<div class="list-group" id="list-tab" role="tablist">
-				{% for mc in data|sort(attribute='sequence') %}
-				<a class="list-group-item list-group-item-action " id="list-home-list" data-toggle="list" href="#{{ mc.code }}" role="tab" aria-controls="home">
-					<div class="d-flex w-100 justify-content-between">
-      			<h5 class="mb-1">[<abbr title="stands for {{ mc.name }}">{{ mc.code }}</abbr>] <strong>{{ mc.name }}</strong></h5>
-						<small><span class="badge badge-warning badge-pill">{{ mc.sequence }} </span></small>
-					</div>
-				</a>
-				{% endfor %}
-			</div>
-		</div>
-
-		<div class="col-md-9">
-			<br />
-			<div class="tab-content" id="nav-tabContent">
-				{% for mc in data|sort(attribute='sequence') %}
-					<div class="tab-pane fade {% if loop.index ==1 %}show active{% endif %}" id="{{ mc.code }}" role="tabpanel" aria-labelledby="list-profile-list">
-						<h1 class="mb-1">Marketing Cycle : <span class="text-primary"><strong>{{ mc.name }}</strong></span></h1>
-						<hr class="my-4">
-						<span class="badge badge-pill badge-primary">KPI</span> :
-						{% if mc.KPI %}{% for kpi in mc.KPI %}<span class="badge badge-pill badge-info">{{ kpi }}</span>{% endfor %}
-						{% else %}<span class="badge badge-pill badge-danger">Not Defined Yet</span>{% endif %}
-					 	<p class="mb-2">{{ lipsum(3, min=30, max=75) }}</p>
-						<small class="text-muted">Ranked  <span class="text-danger"><strong>{{ mc.sequence }}</strong></span> on communication calendar</small>
-					</div>
-				{% endfor %}
-
-			</div>
-		</div>
-
-
-
-	</div>
-</div>
+{#<div class="container">#}
+{##}
+{#	<div class="row">#}
+{##}
+{#		<div class="col-md-3">#}
+{#			<div class="list-group" id="list-tab" role="tablist">#}
+{#				{% for mc in data|sort(attribute='sequence') %}#}
+{#				<a class="list-group-item list-group-item-action " id="list-home-list" data-toggle="list" href="#{{ mc.code }}" role="tab" aria-controls="home">#}
+{#					<div class="d-flex w-100 justify-content-between">#}
+{#      			<h5 class="mb-1">[<abbr title="stands for {{ mc.name }}">{{ mc.code }}</abbr>] <strong>{{ mc.name }}</strong></h5>#}
+{#						<small><span class="badge badge-warning badge-pill">{{ mc.sequence }} </span></small>#}
+{#					</div>#}
+{#				</a>#}
+{#				{% endfor %}#}
+{#			</div>#}
+{#		</div>#}
+{##}
+{#		<div class="col-md-9">#}
+{#			<br />#}
+{#			<div class="tab-content" id="nav-tabContent">#}
+{#				{% for mc in data|sort(attribute='sequence') %}#}
+{#					<div class="tab-pane fade {% if loop.index ==1 %}show active{% endif %}" id="{{ mc.code }}" role="tabpanel" aria-labelledby="list-profile-list">#}
+{#						<h1 class="mb-1">Marketing Cycle : <span class="text-primary"><strong>{{ mc.name }}</strong></span></h1>#}
+{#						<hr class="my-4">#}
+{#						<span class="badge badge-pill badge-primary">KPI</span> :#}
+{#						{% if mc.KPI %}{% for kpi in mc.KPI %}<span class="badge badge-pill badge-info">{{ kpi }}</span>{% endfor %}#}
+{#						{% else %}<span class="badge badge-pill badge-danger">Not Defined Yet</span>{% endif %}#}
+{#					 	<p class="mb-2">{{ lipsum(3, min=30, max=75) }}</p>#}
+{#						<small class="text-muted">Ranked  <span class="text-danger"><strong>{{ mc.sequence }}</strong></span> on communication calendar</small>#}
+{#					</div>#}
+{#				{% endfor %}#}
+{##}
+{#			</div>#}
+{#		</div>#}
+{##}
+{##}
+{##}
+{#	</div>#}
+{#</div>#}
 

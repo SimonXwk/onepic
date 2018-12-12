@@ -23,5 +23,5 @@ def register_blueprints(app, blueprint_obj_name='bp', **kwargs):
 	print(f' * Registering Blueprint Instances to {app}')
 	for blueprint in get_blueprint_objects(blueprint_obj_name=blueprint_obj_name, **kwargs):
 		app.register_blueprint(blueprint)
-		print(f' + Successfully registered <{blueprint.name}>')
+		print(f' + <{blueprint.name}>')
 	print('-' * 100)

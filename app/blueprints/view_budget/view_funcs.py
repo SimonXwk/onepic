@@ -24,7 +24,7 @@ def load_reckon_data():
 	with mongo:
 		db = mongo.tlma
 		mc = db['marketingcycle']
-		marketing_cycles = mc.find({}, {'name': 1, 'KPI': 1})
+		marketing_cycles = mc.find({}, {'audit': 0})
 		marketing_cycles = mongo.to_array(marketing_cycles)
 	return dict(marketing_cycles=marketing_cycles)
 

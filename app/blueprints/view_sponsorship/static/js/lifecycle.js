@@ -1,4 +1,4 @@
-let renderFlow1Cht1 = () => { console.log('asd');new Highcharts.chart({
+let renderFlow1Cht1 = () => { new Highcharts.chart({
 	responsive: {
 		rules: [{
 			condition: {

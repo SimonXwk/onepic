@@ -31,6 +31,8 @@ ld.url('data_thankq.fishing_pool_sankey', ['/tq/fishing_pool_sankey'])
 ld.url('data_thankq.pledge_headers', ['/tq/pledges'])
 ld.url('data_thankq.marketing_cycle', ['/marketing_cycle'])
 
+# Mongo
+ld.url('data_mongo.get_marketing_cycles', ['/mongo/marketing_cycles'])
 
 # BUDGET
 ld.url('data_budget.budget', ['/budget'])

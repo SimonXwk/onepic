@@ -5,6 +5,9 @@
 {% endblock %}
 
 {% block js_optional %}
+{{ import('vue') }}
+{{ import('vuex') }}
+{{ Highchart([], []) }}
 {% endblock %}
 {# ------------------------------------------------------------------- #}
 
@@ -14,6 +17,8 @@
 {% endblock %}
 
 {% block js_custom %}
+	{{ bp_js('marketing_cycle') }}
+
 {% endblock %}
 {# ------------------------------------------------------------------- #}
 
