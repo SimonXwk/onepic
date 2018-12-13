@@ -94,8 +94,8 @@ def search_orders(phrase=None):
 		'endpoint': '/api/orders/search',
 		'params': {}
 	}
-	limit = int(request_arg('limit', 50, lambda x: tests.is_int(x, min_value=1)))
-	page = int(request_arg('page', 1, lambda x: tests.is_int(x, min_value=1, max_value=250)))
+	limit = request_arg('limit', 50, type_func=int, test_func=lambda x: tests.is_int(x, min_value=1))
+	page = request_arg('page', 1, type_func=int, test_func=lambda x: tests.is_int(x, min_value=1, max_value=250))
 	# Request parameters
 	if phrase:
 		api_call['params']['phrase'] = str(phrase)
@@ -133,8 +133,8 @@ def get_unshipped_orders(since_order_date=None):
 		'endpoint': '/api/orders/unshipped',
 		'params': {}
 	}
-	limit = int(request_arg('limit', 50, lambda x: tests.is_int(x, min_value=1)))
-	page = int(request_arg('page', 1, lambda x: tests.is_int(x, min_value=1, max_value=250)))
+	limit = request_arg('limit', 50, type_func=int, test_func=lambda x: tests.is_int(x, min_value=1))
+	page = request_arg('page', 1, type_func=int, test_func=lambda x: tests.is_int(x, min_value=1, max_value=250))
 	if since_order_date:
 		api_call['params']['since_order_date'] = str(since_order_date)   # date-time in RFC3339
 		api_call['params']['limit'] = limit

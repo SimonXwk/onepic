@@ -18,7 +18,7 @@ def overview():
 
 @templatified('comparative', title='Comparative View')
 def comparative():
-	fy = int(request_arg('fy', TLMA.cfy, tests.is_year))
+	fy = request_arg('fy', TLMA.cfy, type_func=int, test_func=tests.is_year)
 	# Prepare for SQL parameters
 	d1, d2 = TLMA.fy_range(fy)
 	progress = (datetime.date.today() - d1).days / (d2 - d1).days
@@ -64,7 +64,7 @@ def sourcecode1_active():
 
 @templatified('revenue_streams', title='Revenue Streams')
 def revenue_streams():
-	fy = int(request_arg('fy', TLMA.cfy, tests.is_year))
+	fy = request_arg('fy', TLMA.cfy, type_func=int, test_func=tests.is_year)
 	# Default to 3 minutes cache or else if the FY in URL is not CFY, then cache it for a longer period of time
 	timeout = 180 if fy == TLMA.cfy else 2000
 	# Prepare for SQL parameters
@@ -77,7 +77,7 @@ def revenue_streams():
 
 @templatified('single_campaign', title='Campaign Overview')
 def single_campaign():
-	fy = int(request_arg('fy', TLMA.cfy, tests.is_year))
+	fy = request_arg('fy', TLMA.cfy, type_func=int, test_func=tests.is_year)
 	# Default to 10 minutes cache or else if the FY in URL is not CFY, then cache it for a longer period of time
 	timeout = 600 if fy == TLMA.cfy else 2000
 
@@ -90,7 +90,7 @@ def single_campaign():
 	data = None
 
 	# Update campaign_code if found argument from URL query string called 'campaign_code'
-	campaign_code = request_arg('campaign_code', None, lambda x: tests.is_valid_string(x, nosql=True, max_length=50))
+	campaign_code = request_arg('campaign_code', None, test_func=lambda x: tests.is_valid_string(x, nosql=True, max_length=50))
 
 	if campaign_code is not None:
 		update = [('CAMPAIGN_CODE', str(campaign_code), '\'')]

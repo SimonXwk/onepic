@@ -22,7 +22,7 @@ def cure_one_acquisition():
 
 @templatified('merch_new_customer')
 def merchandise_new():
-	fy = int(request_arg('fy', TLMA.cfy, tests.is_year))
+	fy = request_arg('fy', TLMA.cfy, type_func=int, test_func=tests.is_year)
 	d1, d2 = TLMA.fy_range(fy)
 	# params = (Tq.format_date(d1), Tq.format_date(d2))
 	updates = [('DATE_START', Tq.format_date(d1), '\''), ('DATE_END',  Tq.format_date(d2), '\'')]

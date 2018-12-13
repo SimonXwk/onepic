@@ -16,7 +16,7 @@ def rex_fulfilment_excels():
 
 
 def rex_picking_slip():
-	filename = request_arg('filename', '*', tests.is_valid_string)
-	tab = request_arg('tab', None, tests.is_valid_string)
+	filename = request_arg('filename', '*', test_func=tests.is_valid_string)
+	tab = request_arg('tab', None, test_func=tests.is_valid_string)
 	data = read_one_slip(filename, tab)
 	return ApiResult(data)

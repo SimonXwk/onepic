@@ -22,7 +22,7 @@ def lifecycle():
 
 @templatified(title='Sponsorship Overview')
 def overview():
-	fy = int(request_arg('fy', TLMA.cfy, tests.is_year))
+	fy = int(request_arg('fy', TLMA.cfy, type_func=int, test_func=tests.is_year))
 	updates = [('PLEDGE_CREATED_FY', fy), ('BASE_QUERY', '')]
 	return dict(data=Tq.query(('CTE', 'CTE_PLEDGE'),  cached_timeout=30, updates=updates), thisfy=fy)
 

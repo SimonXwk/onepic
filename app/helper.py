@@ -203,10 +203,20 @@ def timeit(f):
 	return decorated_function
 
 
-def request_arg(arg_name, default_value, check_func, strip=True):
+def request_arg(arg_name, default_value, type_func=str, test_func=None):
 	arg = request.args.get(arg_name)
-	if not (arg is None) and check_func(arg):
-		return arg.strip() if strip else arg
+	if arg is None:
+		return default_value
+
+	if type_func != str:
+		try:
+			arg = type_func(arg)
+		except (TypeError, ValueError):
+			return default_value
+
+	#  short-circuit if test_func is None
+	if test_func is None or test_func(arg):
+		return type_func(arg)
 	return default_value
 
 
