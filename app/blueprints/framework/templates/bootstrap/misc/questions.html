@@ -35,9 +35,27 @@
 		</ul>
 		{% endmacro %}
 
+		{% macro Content3() %}
+		<ul>
+			<li>To fully prevent s1 from being used too early : 1 Not Creating until it's neeeded 2 Archive it before it's needed <span class="text-info">(Alan, resolved question)</span></li>
+
+		</ul>
+		{% endmacro %}
+
+		{% macro Content4() %}
+		<ul>
+			<li>KPI: Retention <span class="text-info">(Bel: Cost of Retention or something else ?)</span></li>
+			<li>Campaign Additional. <span class="text-info">(Paul, is campign list complete ? )</span></li>
+			<li>Budget Link to Stategic Plan. <span class="text-info">(From which level activity, type, campaign or marketing cycle. Or even individual calcs (Revenue, Expense, No.Pledges ... ) )</li>
+			<li>Data Dictionary <span class="text-info">(Simon, keep the dict up to date)</span></li>
+		</ul>
+		{% endmacro %}
+
 
 		{{ AccordionCard(1, "General", Content1()) }}
 		{{ AccordionCard(2, "Sponsorship", Content2()) }}
+		{{ AccordionCard(3, "Source Code", Content3()) }}
+		{{ AccordionCard(4, "Budget", Content4()) }}
 	</div>
 
 </div>

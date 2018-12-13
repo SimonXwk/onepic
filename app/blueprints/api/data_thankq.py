@@ -98,8 +98,16 @@ def christmas_appeal_donors():
 @odbc_json_api
 def pledge_headers():
 	fy = int(request_arg('fy', TLMA.cfy, tests.is_year))
-	updates = (('FY', fy), ('BASE_QUERY', ''))
-	return Tq.query(('CTE', 'PLEDGE_OVERVIEW'), cached_timeout=30, updates=updates)
+	updates = (('PLEDGE_CREATED_FY', fy), ('BASE_QUERY', ''))
+	return Tq.query(('CTE', 'CTE_PLEDGE'), cached_timeout=30, updates=updates)
+
+
+# Pledge Related
+@odbc_json_api
+def pledge_types():
+	fy = int(request_arg('fy', TLMA.cfy, tests.is_year))
+	updates = [('BASE_QUERY_TABLE', 'cte_pledge_types')]
+	return Tq.query('CTE', cached_timeout=30, updates=updates)
 
 
 @odbc_json_api

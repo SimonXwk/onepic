@@ -118,21 +118,31 @@ cte_decimal AS (SELECT * FROM (VALUES (0),(1),(2),(3),(4),(5),(6),(7),(8),(9)) A
 -- PLEDGES
 -- ====================================================================================================
 , cte_pledge_types AS (
-  SELECT [SOURCECODE]
-  ,[PLEDGE_CATEGORY] =
-    CASE WHEN SOURCECODE = 'TLCSPON'
-      THEN @TLC ELSE
-    CASE WHEN SOURCECODE IN ('SACTIONP','ACTCRA','ACTCRM','SCEDU')
-      THEN @AP ELSE
-    CASE WHEN SOURCECODE = 'SPERSON'
-      THEN @PS ELSE
-    CASE WHEN SOURCECODE IN ('SCOUNTRY','SPNEPAL','SPNG', 'SNIGER', 'SINDIA', 'STHAIL', 'SNIGERIA', 'SMYANM', 'AETIMO', 'SETIMOR', 'SNIGERIA', 'SCHINA', 'SCONGO')
-      THEN @CS ELSE
-    CASE WHEN SOURCECODE LIKE '%SCURE%' OR SOURCECODE IN ('CUREONE1', 'CUREONE2')
-      THEN @CUREONE ELSE @UNDEF
-    END END END END END
-  FROM TBL_SOURCECODE
-  WHERE SOURCETYPE LIKE '%SPONSORSHIP'
+  SELECT *
+    ,[SPONSORSHIP1_COLOR]=
+      CASE WHEN temp.PLEDGE_CATEGORY = @TLC     THEN '#007dc3' ELSE
+      CASE WHEN temp.PLEDGE_CATEGORY = @AP      THEN '#fdbb30' ELSE
+      CASE WHEN temp.PLEDGE_CATEGORY = @PS      THEN '#a560e8' ELSE
+      CASE WHEN temp.PLEDGE_CATEGORY = @CS      THEN '#4dc47d' ELSE
+      CASE WHEN temp.PLEDGE_CATEGORY = @CUREONE THEN '#e64b50' ELSE '#b0a696'
+      END END END END END
+  FROM(
+    SELECT [SOURCECODE]
+    ,[PLEDGE_CATEGORY] =
+      CASE WHEN SOURCECODE = 'TLCSPON'
+        THEN @TLC ELSE
+      CASE WHEN SOURCECODE IN ('SACTIONP','ACTCRA','ACTCRM','SCEDU')
+        THEN @AP ELSE
+      CASE WHEN SOURCECODE = 'SPERSON'
+        THEN @PS ELSE
+      CASE WHEN SOURCECODE IN ('SCOUNTRY','SPNEPAL','SPNG', 'SNIGER', 'SINDIA', 'STHAIL', 'SNIGERIA', 'SMYANM', 'AETIMO', 'SETIMOR', 'SNIGERIA', 'SCHINA', 'SCONGO')
+        THEN @CS ELSE
+      CASE WHEN SOURCECODE LIKE '%SCURE%' OR SOURCECODE IN ('CUREONE1', 'CUREONE2')
+        THEN @CUREONE ELSE @UNDEF
+      END END END END END
+    FROM TBL_SOURCECODE
+    WHERE SOURCETYPE LIKE '%SPONSORSHIP'
+  ) temp
 )
 -- ----------------------------------------------------------------------------------------------------
 , cte_pledge_frequency AS (
@@ -235,13 +245,8 @@ cte_decimal AS (SELECT * FROM (VALUES (0),(1),(2),(3),(4),(5),(6),(7),(8),(9)) A
         )
       )
     )
-    ,[SPONSORSHIP1_COLOR]=
-      CASE WHEN PT.PLEDGE_CATEGORY = @TLC     THEN '#007dc3' ELSE
-      CASE WHEN PT.PLEDGE_CATEGORY = @AP      THEN '#fdbb30' ELSE
-      CASE WHEN PT.PLEDGE_CATEGORY = @PS      THEN '#a560e8' ELSE
-      CASE WHEN PT.PLEDGE_CATEGORY = @CS      THEN '#4dc47d' ELSE
-      CASE WHEN PT.PLEDGE_CATEGORY = @CUREONE THEN '#e64b50' ELSE '#b0a696'
-      END END END END END
+    ,[SPONSORSHIP1_COLOR]=PT.SPONSORSHIP1_COLOR
+
   FROM
     TBL_PLEDGEHEADER P1
     LEFT JOIN cte_pledge_source P2 ON (P1.PLEDGEID=P2.PLEDGEID)
@@ -300,7 +305,7 @@ cte_decimal AS (SELECT * FROM (VALUES (0),(1),(2),(3),(4),(5),(6),(7),(8),(9)) A
     LEFT JOIN TBL_SOURCECODE ON (Tbl_BATCHITEMSPLIT.SOURCECODE = TBL_SOURCECODE.SOURCECODE)
   WHERE
     Tbl_BATCHHEADER.STAGE = 'Batch Approved'
-    AND TBL_SOURCECODE.SOURCETYPE LIKE '%Sponsorship'
+    AND TBL_SOURCECODE.SOURCETYPE LIKE '%Sponsorship%'
     AND (TBL_BATCHITEM.REVERSED IS NULL OR NOT (TBL_BATCHITEM.REVERSED=1 OR TBL_BATCHITEM.REVERSED=-1))
   GROUP BY
     TBL_BATCHITEMPLEDGE.PLEDGEID,TBL_BATCHITEMPLEDGE.ADMITNAME, TBL_BATCHITEMPLEDGE.SERIALNUMBER,TBL_BATCHITEMPLEDGE.PLEDGELINENO
@@ -657,7 +662,8 @@ WHERE
 )
 -- ----------------------------------------------------------------------------------------------------
 /*<BASE_QUERY>*/
-select * from cte_payments_with_donor_type_and_detail
+select *
+from /*<BASE_QUERY_TABLE>*/cte_payments_with_donor_type_and_detail/*</BASE_QUERY_TABLE>*/
 /*</BASE_QUERY>*/
 -- ----------------------------------------------------------------------------------------------------
 -- OPTION(RECOMPILE)

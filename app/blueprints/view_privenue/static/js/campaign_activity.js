@@ -434,7 +434,7 @@ Vue.component('summaries', {
 			<card-counter theme="success" icon="&#128140;" :num="calc('PLEDGEID', 'unique', {IS_FIRST_INSTALMENT: -1})|number" msg="1st Instalments Paid Pledge(s)"></card-counter>
 		</div>
 		<div class="col-xs-12 col-md-12 col-lg-4">
-			<card-counter theme="success" icon="&#128178;" :num="calc(calcDimensionSum, 'sum', {ISPLEDGE: -1})|currency" msg="Pledge 1st Instalments"></card-counter>
+			<card-counter theme="success" icon="&#128178;" :num="calc(calcDimensionSum, 'sum', {ISPLEDGE: -1})|currency" msg="Pledge Revenue"></card-counter>
 		</div>
 	</div>
 

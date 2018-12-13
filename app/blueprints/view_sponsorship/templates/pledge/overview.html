@@ -5,10 +5,10 @@
 {% endblock %}
 
 {% block js_optional %}
-{{ import('datatables', ['bs4']) }}
-{{ import('crossfilter') }}
 {{ import('vue') }}
+{{ import('vuex') }}
 {{ Highchart(['highcharts-more'], []) }}
+{{ import('datatables', ['bs4']) }}
 {% endblock %}
 
 

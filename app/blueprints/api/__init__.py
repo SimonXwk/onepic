@@ -29,6 +29,8 @@ ld.url('data_thankq.fishing_pool_sankey', ['/tq/fishing_pool_sankey'])
 
 
 ld.url('data_thankq.pledge_headers', ['/tq/pledges'])
+ld.url('data_thankq.pledge_types', ['/tq/pledge_types'])
+
 ld.url('data_thankq.marketing_cycle', ['/marketing_cycle'])
 
 # Mongo
