@@ -1,18 +1,18 @@
 from flask import flash, redirect, request
-from app.helper import templatified
+from app.helper import use_template
 from flask_login import login_user, logout_user, current_user
 from app.user import anonymous_user
 from app.database.odbc import ThankqODBC as Tq
 
 
-@templatified('index')
+@use_template('index')
 def index():
 	if current_user.is_authenticated:
 		redirect('/logged')
 	return dict(title='OnePic')
 
 
-@templatified('logged', require_login=True)
+@use_template('logged')
 def logged():
 	return dict(title='Logged')
 
@@ -37,7 +37,7 @@ def use_thankq_replicate_reporter():
 	return redirect('/logged')
 
 
-@templatified('test')
+@use_template('test')
 def test():
 	from datetime import datetime
 	from app.database.flasksqlalchemy_model import PledgeInstalmentsActive as Md

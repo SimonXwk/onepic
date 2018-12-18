@@ -1,26 +1,26 @@
 from flask import request
-from app.helper import templatified, request_arg
+from app.helper import use_template, request_arg
 from app.database.odbc import ThankqODBC as Tq
 from app.database.tlma import TLMA
 import app.tests as tests
 
 
-@templatified('pledgecureone')
+@use_template('pledgecureone')
 def cure_one():
 	return dict(title='Cure One Journey')
 
 
-@templatified('general_new_donor')
+@use_template('general_new_donor')
 def general_new():
 	return dict(title='New DonorJourney')
 
 
-@templatified('cureone_acquisition', title='Cure One Acquisition')
+@use_template('cureone_acquisition', title='Cure One Acquisition')
 def cure_one_acquisition():
 	pass
 
 
-@templatified('merch_new_customer')
+@use_template('merch_new_customer')
 def merchandise_new():
 	fy = request_arg('fy', TLMA.cfy, type_func=int, test_func=tests.is_year)
 	d1, d2 = TLMA.fy_range(fy)
@@ -30,6 +30,6 @@ def merchandise_new():
 	return dict(title='Merchandise New Customer Journey', data=data, dates=(d1, d2), thisfy=fy, cost=TLMA.acquisition_cost)
 
 
-@templatified('todo_christmas_appeal', title='Christmas Appeal')
+@use_template('todo_christmas_appeal', title='Christmas Appeal')
 def touch_point_christmas_appeal():
 	pass

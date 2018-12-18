@@ -1,6 +1,6 @@
 from flask import request
 import datetime
-from app.helper import templatified, request_arg
+from app.helper import use_template, request_arg
 from app.database.odbc import ThankqODBC as Tq
 from app.database.tlma import TLMA
 import app.tests as tests
@@ -11,12 +11,12 @@ def date_of_payments_fy():
 	return data.rows
 
 
-@templatified('overview', title='Private Revenue Overview')
+@use_template('overview', title='Private Revenue Overview')
 def overview():
 	pass
 
 
-@templatified('comparative', title='Comparative View')
+@use_template('comparative', title='Comparative View')
 def comparative():
 	fy = request_arg('fy', TLMA.cfy, type_func=int, test_func=tests.is_year)
 	# Prepare for SQL parameters
@@ -33,12 +33,12 @@ def comparative():
 	return dict(cfy=fy, data=data, progress=progress, budget=budget)
 
 
-@templatified('campaign_activity', title='Activities')
+@use_template('campaign_activity', title='Activities')
 def campaign_activity():
 	pass
 
 
-@templatified('pending', title='Pending Batches')
+@use_template('pending', title='Pending Batches')
 def pending():
 	from app.blueprints.api.data_privenue import pending_split, approved_split
 	result = pending_split()
@@ -48,7 +48,7 @@ def pending():
 	return dict(results=result, has_pending=has_pending)
 
 
-@templatified('sourcecode1_created', title='New Sourcecode 1')
+@use_template('sourcecode1_created', title='New Sourcecode 1')
 def sourcecode1_created():
 	# Prepare for SQL parameters
 	d1, d2 = TLMA.ccy_date(TLMA.fy12m, 1), TLMA.cfy_end_date
@@ -57,12 +57,12 @@ def sourcecode1_created():
 	return dict(data=data, d1=d1, d2=d2)
 
 
-@templatified('sourcecode1_active', title='Active Sourcecode 1')
+@use_template('sourcecode1_active', title='Active Sourcecode 1')
 def sourcecode1_active():
 	return {'data': Tq.query('SOURCECODE_ACTIVE', cached_timeout=10)}
 
 
-@templatified('revenue_streams', title='Revenue Streams')
+@use_template('revenue_streams', title='Revenue Streams')
 def revenue_streams():
 	fy = request_arg('fy', TLMA.cfy, type_func=int, test_func=tests.is_year)
 	# Default to 3 minutes cache or else if the FY in URL is not CFY, then cache it for a longer period of time
@@ -75,7 +75,7 @@ def revenue_streams():
 	return dict(data=data, thisfy=fy, fys=date_of_payments_fy())
 
 
-@templatified('single_campaign', title='Campaign Overview')
+@use_template('single_campaign', title='Campaign Overview')
 def single_campaign():
 	fy = request_arg('fy', TLMA.cfy, type_func=int, test_func=tests.is_year)
 	# Default to 10 minutes cache or else if the FY in URL is not CFY, then cache it for a longer period of time

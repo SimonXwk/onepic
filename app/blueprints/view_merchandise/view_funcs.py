@@ -3,7 +3,7 @@ from werkzeug.utils import secure_filename
 import os
 from .rfm_calc import list_all_files as rfm_files
 from app.database.tlma import TLMA
-from app.helper import templatified, request_arg
+from app.helper import use_template, request_arg
 import app.tests as tests
 
 
@@ -11,7 +11,7 @@ def rfm_upload_allowed_file(filename):
 	return '.' in filename and filename.rsplit('.', 1)[1].lower() in current_app.config.get('ALLOWED_EXTENSIONS')
 
 
-@templatified('rfm_upload', title='RFM DATA')
+@use_template('rfm_upload', title='RFM DATA')
 def upload():
 	if request.method == 'POST':
 		# check if the post request has the file part
@@ -45,12 +45,12 @@ def upload():
 	return None
 
 
-@templatified('rfm_result')
+@use_template('rfm_result')
 def rfm_result(filename):
 	return dict(filename=filename)
 
 
-@templatified('starshipit_shipped_orders')
+@use_template('starshipit_shipped_orders')
 def track_shipped_order(order_number=None):
 	order_number = order_number.strip() if order_number else None
 	if not order_number or len(order_number) != 11:
@@ -58,26 +58,26 @@ def track_shipped_order(order_number=None):
 	return dict(order_number=order_number)
 
 
-@templatified('starshipit_unshipped_orders')
+@use_template('starshipit_unshipped_orders')
 def list_unshipped_orders(order_number=None):
 	return dict(order_number=order_number)
 
 
-@templatified('merch_new_customer_courtesy_call', title='Merch Courtesy Call')
+@use_template('merch_new_customer_courtesy_call', title='Merch Courtesy Call')
 def merchandise_new_courtesy_call():
 	pass
 
 
-@templatified('merch_new_customer_welcome_pack', title='Merch Welcome Pack')
+@use_template('merch_new_customer_welcome_pack', title='Merch Welcome Pack')
 def merchandise_new_welcome_pack():
 	pass
 
 
-@templatified('merch_revenue_overview', title='Merch Revenue')
+@use_template('merch_revenue_overview', title='Merch Revenue')
 def merchandise_revenue_overview():
 	pass
 
 
-@templatified('merchandise_activity', title='Merch Activity')
+@use_template('merchandise_activity', title='Merch Activity')
 def merchandise_activity():
 	pass

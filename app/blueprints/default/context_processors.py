@@ -1,46 +1,23 @@
-from app.helper import create_blueprint, LazyLoader
-
-bp = create_blueprint('default', __name__, prefixed=False)
-ld = LazyLoader(bp)
-
-# LazyLoading View Functions
-ld.url('view_funcs.index', ['/'])
-ld.url('view_funcs.test', ['/test'])
-ld.url('view_funcs.logged', ['/logged'])
-ld.url('view_funcs.login', ['/login'], methods=['POST'])
-ld.url('view_funcs.login_as_guest', ['/login_as_guest'])
-ld.url('view_funcs.logout', ['/logout'])
-ld.url('view_funcs.use_thankq_live_reporter', ['/use_thankq_live_reporter'])
-ld.url('view_funcs.use_thankq_replicate_reporter', ['/use_thankq_replicate_reporter'])
-
-
-# App context
-@bp.app_context_processor
 def inject_now():
 	from datetime import datetime
 	return dict(now=datetime.now())
 
 
-# App context
-@bp.app_context_processor
 def inject_cfy():
 	from app.database.tlma import TLMA
 	return dict(cfy=TLMA.cfy)
 
 
-@bp.app_context_processor
 def inject_thankq_data_source():
 	from app.database.odbc import ThankqODBC
 	return dict(tq_use_live=ThankqODBC.use_live)
 
 
-@bp.app_context_processor
 def inject_fy_month_list():
 	from app.database.tlma import TLMA
 	return dict(fymths=TLMA.get_fy_month_list())
 
 
-@bp.app_context_processor
 def utility_processor():
 	def get_package_json_version(lib_name, dependency='dependencies'):
 		import json

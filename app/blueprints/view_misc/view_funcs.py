@@ -1,17 +1,17 @@
-from app.helper import templatified
+from app.helper import use_template
 from app.database.tlma import TLMA
 
 
-@templatified('basic', title='compendium')
+@use_template('basic', title='compendium')
 def basic():
 	return dict(tlma=TLMA)
 
 
-@templatified('marketing_cycle', title='marketing cycle')
+@use_template('marketing_cycle', title='marketing cycle')
 def marketing_cycle():
 	return dict(data=TLMA.marketing_cycle)
 
 
-@templatified('questions', title='Historical Questions')
+@use_template('questions', title='Historical Questions')
 def questions():
 	pass

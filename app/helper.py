@@ -1,7 +1,6 @@
 from werkzeug.utils import import_string, cached_property
 from flask import Blueprint, request, render_template
 from functools import wraps, singledispatch
-from flask_login import login_required
 from decimal import Decimal
 import datetime
 import time
@@ -12,14 +11,19 @@ class LazyView(object):
 	def __init__(self, import_name):
 		self.__module__, self.__name__ = import_name.rsplit('.', 1)
 		self.import_name = import_name
+		self.fall_back_func = lambda: f'"{self.import_name}" is not callable object hence can not be used as view_func'
 
 	@cached_property
-	def view(self):
-		print('--> {{Lazy Loading Function}} - <{}>'.format(self.import_name))
-		return import_string(self.import_name)
+	def imported_object(self):
+		obj = import_string(self.import_name)
+		print(f' . Lazy Loaded <{ self.import_name }> - {type(obj)}')
+		if hasattr(obj, '__call__'):
+			return obj
+		# TODO Add this to customized 500 error page
+		return self.fall_back_func
 
 	def __call__(self, *args, **kwargs):
-		return self.view(*args, **kwargs)
+		return self.imported_object(*args, **kwargs)
 
 
 class LazyLoader(object):
@@ -69,7 +73,7 @@ def create_blueprint(blueprint_name, import_name, prefixed=True, **options) -> B
 	return bp
 
 
-def templatified(template=None, title=None, template_path_absolute=False, template_format='html', require_login=False):
+def use_template(template=None, title=None, template_path_absolute=False, template_format='html', require_login=False):
 	""" Function that accepts arguments passed to decorator and creates the Actual Decorator
 	:param template: The Name of the template that will be used in flask.render_template(template)
 	:param title: The Name of page title, passed to flask.render_template() as a parameter
@@ -219,19 +223,3 @@ def request_arg(arg_name, default_value, type_func=str, test_func=None):
 		return type_func(arg)
 	return default_value
 
-
-def to_data_frame(header=None):
-	def decorator(f):
-		@wraps(f)
-		def decorated_function(*args, **kwargs):
-			# Run the wrapped function, which should return (())/[[]]/generator
-			data = f(*args, **kwargs)
-			from pandas import DataFrame
-			df = DataFrame(data)
-			if header:
-				df.columns = header
-			return df
-
-		return decorated_function
-
-	return decorator

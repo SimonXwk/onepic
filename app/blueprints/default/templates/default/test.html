@@ -34,11 +34,7 @@
 {% block js_embedded_after %}
 <script>
 
-fetchJSON(endpoint('/api/tq/payments'), function(json){
-	const obj = JSON.parse(json);
-	console.log(obj);
-
-});
+{#fetchJSON(endpoint('/api/tq/payments'), (json) =>  console.log(json));#}
 
 </script>
 {% endblock %}

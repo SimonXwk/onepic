@@ -1,6 +1,6 @@
 from flask import send_from_directory
 import os
-from app.helper import templatified
+from app.helper import use_template
 from app.cache import cached
 from app.blueprints.api.data_excel_mail import MailExcel
 
@@ -11,7 +11,7 @@ def excel_download(filename):
 	return send_from_directory(MailExcel.excel_folder, filename=filename)
 
 
-@templatified('excels')
+@use_template('excels')
 @cached(5)
 def excel_list():
 	# excels = MailExcel.locate_excel()
@@ -20,17 +20,17 @@ def excel_list():
 	return dict(title='Mail Excels', folders=folders)
 
 
-@templatified('today')
+@use_template('today')
 def today():
 	return dict(title='Mailbox-Daily')
 
 
-@templatified('daily')
+@use_template('daily')
 def daily():
 	return dict(title='Mailbox-Daily')
 
 
-@templatified('monthly')
+@use_template('monthly')
 def monthly():
 	return dict(title='Mailbox-Monthly')
 
