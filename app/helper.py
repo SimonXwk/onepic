@@ -73,13 +73,14 @@ def create_blueprint(blueprint_name, import_name, prefixed=True, **options) -> B
 	return bp
 
 
-def use_template(template=None, title=None, template_path_absolute=False, template_format='html', require_login=False):
+def use_template(template=None, title=None, template_path_absolute=False, template_format='html', require_login=False, status=200):
 	""" Function that accepts arguments passed to decorator and creates the Actual Decorator
 	:param template: The Name of the template that will be used in flask.render_template(template)
 	:param title: The Name of page title, passed to flask.render_template() as a parameter
 	:param template_path_absolute: set to True when the template provided in its full path, no further process needed in this function
 	:param template_format: default to .html if not provided, the template string will be checked if ends with template_format string
 	:param require_login: whether login is required to have access to this view
+	:param status: Status Code, default to 200, useful when handle errors
 	:return: Decorator function
 	"""
 	""" When using 'a decorator with arguments @something(your own args)', the process is as follows:
@@ -141,7 +142,7 @@ def use_template(template=None, title=None, template_path_absolute=False, templa
 			context = {**default_context, **context}
 
 			# Render the template
-			return render_template(template_name, **context)
+			return render_template(template_name, **context), status
 
 		if require_login:
 			pass

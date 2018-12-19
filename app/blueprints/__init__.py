@@ -11,6 +11,7 @@ class MyBlueprint(Blueprint):
 		print(f' $ Blueprint [{__blueprint_name}] Created')
 
 	def lazy_load_view_func(self, import_name):
+		# Prefix with the blueprint's import name
 		string_to_import = '.'.join((self.import_name, import_name))
 		return LazyView(string_to_import)
 

@@ -1,8 +1,8 @@
 from app.api import ApiResult, ApiException
 from app.helper import request_arg
 import app.tests as tests
-from app.blueprints.view_merchandise.rfm_calc import RFM
-from app.blueprints.view_merchandise.fulfilment import list_all_files, read_one_slip
+from app.blueprints.merch.rfm_calc import RFM
+from app.blueprints.merch.fulfilment import list_all_files, read_one_slip
 
 
 def rex_rfm(filename=None):

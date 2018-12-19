@@ -1,4 +1,4 @@
-from flask import flash, redirect, request
+from flask import flash, redirect, abort
 from app.helper import use_template
 from flask_login import login_user, logout_user, current_user
 from app.user import anonymous_user
@@ -59,3 +59,15 @@ def test():
 	# session.close()
 
 	return dict(title='test page', data=d)
+
+
+def error_page_403():
+	return abort(403)
+
+
+def error_page_404():
+	return abort(404)
+
+
+def error_page_500():
+	return abort(500)

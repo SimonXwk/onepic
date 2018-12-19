@@ -1,5 +1,7 @@
 @echo off
 
+title Flask Runner
+
 set env_folder=env
 echo -------------------------------------------------------------------------------
 echo Default Python Virtual Environment is ^/%env_folder%

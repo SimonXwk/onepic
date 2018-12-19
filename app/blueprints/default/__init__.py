@@ -1,4 +1,6 @@
 from app.blueprints import MyBlueprint
+from app.helper import use_template
+
 
 bp = MyBlueprint(__name__, has_url_prefix=False)
 
@@ -12,6 +14,9 @@ view_funcs_list = (
 	dict(import_name='view_funcs.logout', url_rules=['/logout']),
 	dict(import_name='view_funcs.use_thankq_live_reporter', url_rules=['/use_thankq_live_reporter']),
 	dict(import_name='view_funcs.use_thankq_replicate_reporter', url_rules=['/use_thankq_replicate_reporter']),
+	dict(import_name='view_funcs.error_page_403', url_rules=['/403']),
+	dict(import_name='view_funcs.error_page_404', url_rules=['/404']),
+	dict(import_name='view_funcs.error_page_500', url_rules=['/500']),
 )
 bp.register_lazy_urls(view_funcs_list)
 
@@ -43,3 +48,25 @@ bp.register_lazy_filters((
 	dict(import_name='jinja_filters.filter_filename', name='fname'),
 	dict(import_name='jinja_filters.filter_mail_excel_month', name='mailmonth'),
 ))
+
+
+""" Non-Lazy Registration :
+There's no Non-decorator version of app_errorhandler(). 
+the register_error_handler() is non-decorator version of errorhandler(), and
+this Blueprint function is for error handlers limited to the blueprint itself
+"""
+
+
+@bp.app_errorhandler(403)
+@use_template('/'.join((bp.name, '403')), title='403', status=403, template_path_absolute=True)
+def abort_403(e): pass
+
+
+@bp.app_errorhandler(404)
+@use_template('/'.join((bp.name, '404')), title='404', status=404, template_path_absolute=True)
+def abort_404(e): pass
+
+
+@bp.app_errorhandler(500)
+@use_template('/'.join((bp.name, '500')), title='500', status=500, template_path_absolute=True)
+def abort_500(e): pass
