@@ -269,16 +269,16 @@ Vue.component('anchor-summary', {
 					<card-counter theme="light" icon="&#128150;" :num="cntExist|number" msg="Exist (contact or payment)"></card-counter>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
-					<card-counter theme="info" icon="&#128033;" :num="cntNoGift|number" :msg="'🎣 No Gift ' + ((cntNoGift/cntExist)*100).toFixed(2) + '%'"></card-counter>
+					<card-counter theme="info" icon="&#128033;" :num="cntNoGift|number" :msg="'🎣 No Gift(Exc DECD) ' + ((cntNoGift/cntExist)*100).toFixed(2) + '%'"></card-counter>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
-					<card-counter theme="success" icon="&#128032;" :num="cntActive|number" :msg="'🎣 Active ' + ((cntActive/cntExist)*100).toFixed(2) + '%'""></card-counter>
+					<card-counter theme="success" icon="&#128032;" :num="cntActive|number" :msg="'🎣 Active(Exc DECD) ' + ((cntActive/cntExist)*100).toFixed(2) + '%'""></card-counter>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
-					<card-counter theme="monitor" icon="&#128031;" :num="cntLapsed|number" :msg="'🎣 Lapsed ' + ((cntLapsed/cntExist)*100).toFixed(2) + '%'""></card-counter>
+					<card-counter theme="monitor" icon="&#128031;" :num="cntLapsed|number" :msg="'🎣 Lapsed(Exc DECD)' + ((cntLapsed/cntExist)*100).toFixed(2) + '%'""></card-counter>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
-					<card-counter theme="warning" icon="&#129416;" :num="cntLost|number" :msg="'Lost ' + ((cntLost/cntExist)*100).toFixed(2) + '%'""></card-counter>
+					<card-counter theme="warning" icon="&#129416;" :num="cntLost|number" :msg="'Lost(Exc DECD) ' + ((cntLost/cntExist)*100).toFixed(2) + '%'""></card-counter>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<card-counter theme="danger" icon="&#9904;" :num="cntDECD|number" :msg="'Deceased ' + ((cntDECD/cntExist)*100).toFixed(2) + '%'""></card-counter>

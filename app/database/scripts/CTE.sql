@@ -18,28 +18,51 @@ WITH
 -- ----------------------------------------------------------------------------------------------------
 cte_decimal AS (SELECT * FROM (VALUES (0),(1),(2),(3),(4),(5),(6),(7),(8),(9)) AS numbers(X))
 -- ----------------------------------------------------------------------------------------------------
+
 -- ====================================================================================================
--- CONTACTS
+-- DEFINITIONS
 -- ====================================================================================================
 , cte_generation_definition AS (
   SELECT *
   FROM (
     VALUES
-      (DATEFROMPARTS(1000, 1, 1), DATEFROMPARTS(1825, 1, 1), 'ANCIENT', '01.AC')
-      ,(DATEFROMPARTS(1825, 1, 1), DATEFROMPARTS(1845, 1, 1), 'EARLY COLONIAL', '02.EC')
-      ,(DATEFROMPARTS(1845, 1, 1), DATEFROMPARTS(1865, 1, 1), 'MID COLONIAL', '03.MC')
-      ,(DATEFROMPARTS(1865, 1, 1), DATEFROMPARTS(1885, 1, 1), 'LATE COLONIAL', '04.LC')
-      ,(DATEFROMPARTS(1885, 1, 1), DATEFROMPARTS(1905, 1, 1), 'HARD TIMERS', '05.HT')
-      ,(DATEFROMPARTS(1905, 1, 1), DATEFROMPARTS(1925, 1, 1), 'FEDERATION', '06.F')
-      ,(DATEFROMPARTS(1925, 1, 1), DATEFROMPARTS(1945, 1, 1), 'SILENT', '07.S')
-      ,(DATEFROMPARTS(1945, 1, 1), DATEFROMPARTS(1965, 1, 1), 'BABY BOOMERS', '08.BB')
-      ,(DATEFROMPARTS(1965, 1, 1), DATEFROMPARTS(1980, 1, 1), 'GENERATION X', '09.X')
-      ,(DATEFROMPARTS(1980, 1, 1), DATEFROMPARTS(1995, 1, 1), 'GENERATION Y', '10.Y')
-      ,(DATEFROMPARTS(1995, 1, 1), DATEFROMPARTS(2010, 1, 1), 'GENERATION Z', '11.Z')
-      ,(DATEFROMPARTS(2010, 1, 1), CAST(DATEADD(d,1,CURRENT_TIMESTAMP) AS DATE), 'MILLENIALS', '12.M')
+      (DATEFROMPARTS(1000, 1, 1), DATEFROMPARTS(1826, 1, 1), 'ANCIENT', '01.AC')
+      ,(DATEFROMPARTS(1826, 1, 1), DATEFROMPARTS(1846, 1, 1), 'EARLY COLONIAL', '02.EC')
+      ,(DATEFROMPARTS(1846, 1, 1), DATEFROMPARTS(1866, 1, 1), 'MID COLONIAL', '03.MC')
+      ,(DATEFROMPARTS(1866, 1, 1), DATEFROMPARTS(1886, 1, 1), 'LATE COLONIAL', '04.LC')
+      ,(DATEFROMPARTS(1886, 1, 1), DATEFROMPARTS(1906, 1, 1), 'HARD TIMERS', '05.HT')
+      ,(DATEFROMPARTS(1906, 1, 1), DATEFROMPARTS(1926, 1, 1), 'FEDERATION', '06.F')
+      ,(DATEFROMPARTS(1926, 1, 1), DATEFROMPARTS(1946, 1, 1), 'SILENT', '07.S')
+      ,(DATEFROMPARTS(1946, 1, 1), DATEFROMPARTS(1966, 1, 1), 'BABY BOOMERS', '08.BB')
+      ,(DATEFROMPARTS(1966, 1, 1), DATEFROMPARTS(1986, 1, 1), 'GENERATION X & Y', '09.XY')
+      ,(DATEFROMPARTS(1986, 1, 1), DATEFROMPARTS(2006, 1, 1), 'iGENERATION', '10.I')
+      ,(DATEFROMPARTS(2006, 1, 1), CAST(DATEADD(d,1,CURRENT_TIMESTAMP) AS DATE), 'POST MILLENIALS', '11.PM')
   ) AS generation (DATE1, DATE2, GENERATION, GENERATION_ABBREVATION)
 )
 -- ----------------------------------------------------------------------------------------------------
+, cte_market_cycle AS(
+  SELECT *
+  FROM (VALUES
+    (1, 'PP', 'Prospecting'),
+    (2, 'AC', 'Acquisition'),
+    (3, 'DV', 'Development'),
+    (4, 'PM', 'Promotion'),
+    (5, 'DF', 'Differentiation'),
+    (6, 'RT', 'Retention'),
+    (7, 'EG', 'Engagement'),
+    (8, 'RN', 'Renewal'),
+    (9, 'RA', 'Reactivation'),
+    (0, '__', 'TBD'),
+    (-1, null, 'UNDEFINED')
+  ) AS mc (SEQ, CODE, NAME)
+)
+-- ----------------------------------------------------------------------------------------------------
+
+
+-- ====================================================================================================
+-- CONTACTS
+-- ====================================================================================================
+
 , cte_contacts AS (
   SELECT
 --     RTRIM(C1.SERIALNUMBER) AS [SN]
@@ -315,23 +338,6 @@ cte_decimal AS (SELECT * FROM (VALUES (0),(1),(2),(3),(4),(5),(6),(7),(8),(9)) A
 -- ====================================================================================================
 -- PAYMENTS
 -- ====================================================================================================
-, cte_market_cycle AS(
-  SELECT *
-  FROM (VALUES
-    (1, 'PP', 'Prospecting'),
-    (2, 'AC', 'Acquisition'),
-    (3, 'DV', 'Development'),
-    (4, 'PM', 'Promotion'),
-    (5, 'DF', 'Differentiation'),
-    (6, 'RT', 'Retention'),
-    (7, 'EG', 'Engagement'),
-    (8, 'RN', 'Renewal'),
-    (9, 'RA', 'Reactivation'),
-    (0, '__', 'TBD'),
-    (-1, null, 'UNDEFINED')
-  ) AS mc (SEQ, CODE, NAME)
-)
--- ----------------------------------------------------------------------------------------------------
 , cte_pledge_first_paid_instalment as (
   SELECT PLEDGEID
     ,[FIRST_INSTALMENTID] = MIN(Tbl_PLEDGEINSTALMENTS_CLOSED.INSTALMENTID)
