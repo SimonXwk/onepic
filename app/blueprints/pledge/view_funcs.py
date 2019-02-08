@@ -57,8 +57,9 @@ def pledges(fy=TLMA.cfy):
 
 @use_template(title='Pledge Income')
 def pledge_income_fy(fy=TLMA.cfy):
+	fy = request_arg('fy', TLMA.cfy, int, tests.is_year)
 	d1, d2 = Tq.format_date(TLMA.fy_range(fy))
-	update = [('PAYMENT_DATE1', d1, '\''), ('PAYMENT_DATE2', d2, '\''), ('BASE_QUERY', '')]
+	update = [('DOP_START', d1, '\''), ('DOP_END', d2, '\''), ('BASE_QUERY', '')]
 	data = Tq.query(('CTE', 'PLEDGE_INCOME'), updates=update, cached_timeout=25)
 	fys = pledge_dop_fys()
 	return dict(data=data, this_fy=fy, fys=fys)
